@@ -331,18 +331,18 @@ public class JavaCCGlobals {
       JavaCCErrors.warning("Output directory \"" + outputDir + "\" does not exist. Creating the directory.");
 
       if (!outputDir.mkdirs()) {
-        JavaCCErrors.semantic_error("Cannot create the output directory : " + outputDir);
+        JavaCCErrors.semanticError("Cannot create the output directory : " + outputDir);
         return;
       }
     }
 
     if (!outputDir.isDirectory()) {
-      JavaCCErrors.semantic_error("\"" + outputDir + " is not a valid output directory.");
+      JavaCCErrors.semanticError("\"" + outputDir + " is not a valid output directory.");
       return;
     }
 
     if (!outputDir.canWrite()) {
-      JavaCCErrors.semantic_error("Cannot write to the output output directory : \"" + outputDir + "\"");
+      JavaCCErrors.semanticError("Cannot write to the output output directory : \"" + outputDir + "\"");
       return;
     }
   }

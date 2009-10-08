@@ -31,11 +31,9 @@ import java.util.List;
 import java.util.Set;
 
 /** Describes expansions of the form "try {...} ...". */
-
 public class TryBlock extends Expansion {
-
   /** The expansion contained within the try block. */
-  public Expansion exp;
+  public Expansion expansion;
 
   /**
    * The types of each catch block.  Each list entry is itself a
@@ -53,13 +51,13 @@ public class TryBlock extends Expansion {
    * The block part of each catch block.  Each list entry is itself a
    * list which in turn contains tokens as entries.
    */
-  public List catchblks;
+  public List catchBlocks;
 
   /**
    * The block part of the finally block.  Each list entry is a token.
    * If there is no finally block, this is null.
    */
-  public List finallyblk;
+  public List finallyBlocks;
 
   public StringBuffer dump(int indent, Set alreadyDumped) {
     StringBuffer sb = super.dump(indent, alreadyDumped);
@@ -67,7 +65,7 @@ public class TryBlock extends Expansion {
       return sb;
     }
     alreadyDumped.add(this);
-    sb.append(eol).append(exp.dump(indent + 1, alreadyDumped));
+    sb.append(eol).append(expansion.dump(indent + 1, alreadyDumped));
     return sb;
   }
 }

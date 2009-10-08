@@ -185,7 +185,7 @@ public class OutputFile {
     }
     catch (FileNotFoundException e1) {
       // This should never happen
-      JavaCCErrors.semantic_error("Could not open file " + file.getName()
+      JavaCCErrors.semanticError("Could not open file " + file.getName()
           + " for writing.");
       throw new Error();
     }
@@ -217,7 +217,7 @@ public class OutputFile {
     }
     catch (FileNotFoundException e1) {
       // This should never happen
-      JavaCCErrors.semantic_error("Could not open file " + file.getName()
+      JavaCCErrors.semanticError("Could not open file " + file.getName()
           + " for writing.");
       throw new Error();
     }

@@ -45,10 +45,10 @@ public final class OptionsTest extends TestCase {
         assertEquals("", Options.getTokenFactory());
 		assertEquals(System.getProperties().get("file.encoding"), Options.getGrammarEncoding());
 
-        assertEquals(0, JavaCCErrors.get_warning_count());
-        assertEquals(0, JavaCCErrors.get_error_count());
-        assertEquals(0, JavaCCErrors.get_parse_error_count());
-        assertEquals(0, JavaCCErrors.get_semantic_error_count());
+        assertEquals(0, JavaCCErrors.getWarningCount());
+        assertEquals(0, JavaCCErrors.getErrorCount());
+        assertEquals(0, JavaCCErrors.getParseErrorCount());
+        assertEquals(0, JavaCCErrors.getSemanticErrorCount());
     }
 
     public void testSetBooleanOption() {
@@ -67,10 +67,10 @@ public final class OptionsTest extends TestCase {
         Options.setCmdLineOption("-SANITY_CHECK=false");
         assertEquals(false, Options.getSanityCheck());
 
-        assertEquals(0, JavaCCErrors.get_warning_count());
-        assertEquals(0, JavaCCErrors.get_error_count());
-        assertEquals(0, JavaCCErrors.get_parse_error_count());
-        assertEquals(0, JavaCCErrors.get_semantic_error_count());
+        assertEquals(0, JavaCCErrors.getWarningCount());
+        assertEquals(0, JavaCCErrors.getErrorCount());
+        assertEquals(0, JavaCCErrors.getParseErrorCount());
+        assertEquals(0, JavaCCErrors.getSemanticErrorCount());
     }
 
 
@@ -81,17 +81,17 @@ public final class OptionsTest extends TestCase {
         assertEquals(1, Options.getLookahead());
         Options.setCmdLineOption("LOOKAHEAD=2");
         assertEquals(2, Options.getLookahead());
-        assertEquals(0, JavaCCErrors.get_warning_count());
+        assertEquals(0, JavaCCErrors.getWarningCount());
         Options.setCmdLineOption("LOOKAHEAD=0");
         assertEquals(2, Options.getLookahead());
-        assertEquals(0, JavaCCErrors.get_warning_count());
+        assertEquals(0, JavaCCErrors.getWarningCount());
         Options.setInputFileOption(null, null, "LOOKAHEAD", new Integer(0));
         assertEquals(2, Options.getLookahead());
-        assertEquals(1, JavaCCErrors.get_warning_count());
+        assertEquals(1, JavaCCErrors.getWarningCount());
 
-        assertEquals(0, JavaCCErrors.get_error_count());
-        assertEquals(0, JavaCCErrors.get_parse_error_count());
-        assertEquals(0, JavaCCErrors.get_semantic_error_count());
+        assertEquals(0, JavaCCErrors.getErrorCount());
+        assertEquals(0, JavaCCErrors.getParseErrorCount());
+        assertEquals(0, JavaCCErrors.getSemanticErrorCount());
     }
 
     public void testSetStringOption() {
@@ -118,27 +118,27 @@ public final class OptionsTest extends TestCase {
         Options.init();
         JavaCCErrors.reInit();
 
-        assertEquals(0, JavaCCErrors.get_warning_count());
+        assertEquals(0, JavaCCErrors.getWarningCount());
         Options.setInputFileOption(null, null, "OPTION", Boolean.TRUE );
-        assertEquals(1, JavaCCErrors.get_warning_count());
+        assertEquals(1, JavaCCErrors.getWarningCount());
 
-        assertEquals(0, JavaCCErrors.get_error_count());
-        assertEquals(0, JavaCCErrors.get_parse_error_count());
-        assertEquals(0, JavaCCErrors.get_semantic_error_count());
+        assertEquals(0, JavaCCErrors.getErrorCount());
+        assertEquals(0, JavaCCErrors.getParseErrorCount());
+        assertEquals(0, JavaCCErrors.getSemanticErrorCount());
     }
 
     public void testSetWrongTypeForOption() {
         Options.init();
         JavaCCErrors.reInit();
 
-        assertEquals(0, JavaCCErrors.get_warning_count());
-        assertEquals(0, JavaCCErrors.get_error_count());
+        assertEquals(0, JavaCCErrors.getWarningCount());
+        assertEquals(0, JavaCCErrors.getErrorCount());
         Options.setInputFileOption(null, null, "STATIC", new Integer(8));
-        assertEquals(1, JavaCCErrors.get_warning_count());
+        assertEquals(1, JavaCCErrors.getWarningCount());
 
-        assertEquals(0, JavaCCErrors.get_error_count());
-        assertEquals(0, JavaCCErrors.get_parse_error_count());
-        assertEquals(0, JavaCCErrors.get_semantic_error_count());
+        assertEquals(0, JavaCCErrors.getErrorCount());
+        assertEquals(0, JavaCCErrors.getParseErrorCount());
+        assertEquals(0, JavaCCErrors.getSemanticErrorCount());
     }
 
     public void testNormalize() {
@@ -154,10 +154,10 @@ public final class OptionsTest extends TestCase {
         assertEquals(true, Options.getDebugLookahead());
         assertEquals(true, Options.getDebugParser());
 
-        assertEquals(0, JavaCCErrors.get_warning_count());
-        assertEquals(0, JavaCCErrors.get_error_count());
-        assertEquals(0, JavaCCErrors.get_parse_error_count());
-        assertEquals(0, JavaCCErrors.get_semantic_error_count());
+        assertEquals(0, JavaCCErrors.getWarningCount());
+        assertEquals(0, JavaCCErrors.getErrorCount());
+        assertEquals(0, JavaCCErrors.getParseErrorCount());
+        assertEquals(0, JavaCCErrors.getSemanticErrorCount());
     }
 
     public void testOptionsString() throws ParseException {

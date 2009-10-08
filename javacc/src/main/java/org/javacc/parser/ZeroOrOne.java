@@ -31,18 +31,16 @@ package org.javacc.parser;
 import java.util.Set;
 
 /** Describes zero-or-one expansions (e.g., [foo], foo?). */
-
 public class ZeroOrOne extends Expansion {
-
   /** The expansion which is repeated zero or one times. */
   public Expansion expansion;
 
   public ZeroOrOne() {}
 
   public ZeroOrOne(Token t, Expansion e) {
-    this.setLine(t.beginLine);
-    this.setColumn(t.beginColumn);
-    this.expansion = e;
+    setLine(t.beginLine);
+    setColumn(t.beginColumn);
+    expansion = e;
     e.parent = this;
   }
 

@@ -28,9 +28,7 @@
 package org.javacc.parser;
 
 /** Describes the EOF regular expression */
-
-public class REndOfFile extends RegularExpression {
-
+public class REndOfFile extends RegularExpression { 
   public Nfa GenerateNfa(boolean ignoreCase) {
     return null;
   }

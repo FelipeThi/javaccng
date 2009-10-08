@@ -28,19 +28,17 @@
 
 package org.javacc.parser;
 
-/** Describes zero-or-more regular expressions (<foo*>). */
-
+/** Describes zero-or-more regular expressions (&lt;foo*&gt;). */
 public class RZeroOrMore extends RegularExpression {
-
   /** The regular expression which is repeated zero or more times. */
-  public RegularExpression regexpr;
+  public RegularExpression regexp;
 
   public Nfa GenerateNfa(boolean ignoreCase) {
     Nfa retVal = new Nfa();
     NfaState startState = retVal.start;
     NfaState finalState = retVal.end;
 
-    Nfa temp = regexpr.GenerateNfa(ignoreCase);
+    Nfa temp = regexp.GenerateNfa(ignoreCase);
 
     startState.AddMove(temp.start);
     startState.AddMove(finalState);
@@ -53,8 +51,8 @@ public class RZeroOrMore extends RegularExpression {
   public RZeroOrMore() {}
 
   public RZeroOrMore(Token t, RegularExpression r) {
-    this.setLine(t.beginLine);
-    this.setColumn(t.beginColumn);
-    this.regexpr = r;
+    setLine(t.beginLine);
+    setColumn(t.beginColumn);
+    regexp = r;
   }
 }

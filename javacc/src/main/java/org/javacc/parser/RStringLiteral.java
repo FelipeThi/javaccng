@@ -28,6 +28,7 @@
 
 package org.javacc.parser;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -37,8 +38,8 @@ import java.util.Set;
 final class KindInfo {
   long[] validKinds;
   long[] finalKinds;
-  int validKindCnt = 0;
-  int finalKindCnt = 0;
+  int validKindCnt;
+  int finalKindCnt;
 
   KindInfo(int maxKind) {
     validKinds = new long[maxKind / 64 + 1];
@@ -57,24 +58,21 @@ final class KindInfo {
 };
 
 /** Describes string literals. */
-
 public class RStringLiteral extends RegularExpression {
-
   /** The string image of the literal. */
   public String image;
 
-  public RStringLiteral() {
-  }
+  public RStringLiteral() {}
 
   public RStringLiteral(Token t, String image) {
-    this.setLine(t.beginLine);
-    this.setColumn(t.beginColumn);
+    setLine(t.beginLine);
+    setColumn(t.beginColumn);
     this.image = image;
   }
 
-  private static int maxStrKind = 0;
-  private static int maxLen = 0;
-  private static int charCnt = 0;
+  private static int maxStrKind;
+  private static int maxLen;
+  private static int charCnt;
   private static List charPosKind = new ArrayList(); // Elements are hashtables
   // with single char keys;
   private static int[] maxLenForActive = new int[100]; // 6400 tokens
@@ -82,7 +80,7 @@ public class RStringLiteral extends RegularExpression {
   private static int[][] intermediateKinds;
   private static int[][] intermediateMatchedPos;
 
-  private static int startStateCnt = 0;
+  private static int startStateCnt;
   private static boolean subString[];
   private static boolean subStringAtPos[];
   private static Hashtable[] statesForPos;
@@ -106,7 +104,7 @@ public class RStringLiteral extends RegularExpression {
     statesForPos = null;
   }
 
-  public static void DumpStrLiteralImages(java.io.PrintWriter ostr) {
+  public static void DumpStrLiteralImages(PrintWriter ostr) {
     String image;
     int i;
     charCnt = 0; // Set to zero in reInit() but just to be sure
@@ -182,7 +180,7 @@ public class RStringLiteral extends RegularExpression {
   }
 
   /** Used for top level string literals. */
-  public void GenerateDfa(java.io.PrintWriter ostr, int kind) {
+  public void GenerateDfa(PrintWriter ostr, int kind) {
     String s;
     Hashtable temp;
     KindInfo info;
@@ -320,7 +318,7 @@ public class RStringLiteral extends RegularExpression {
     return new Nfa(theStartState, finalState);
   }
 
-  static void DumpNullStrLiterals(java.io.PrintWriter ostr) {
+  static void DumpNullStrLiterals(PrintWriter ostr) {
     ostr.println("{");
 
     if (NfaState.generatedStates != 0) {
@@ -445,7 +443,7 @@ public class RStringLiteral extends RegularExpression {
     }
   }
 
-  static void DumpStartWithStates(java.io.PrintWriter ostr) {
+  static void DumpStartWithStates(PrintWriter ostr) {
     ostr.println((Options.getStatic() ? "static " : "") + "private int " +
         "jjStartNfaWithStates" + LexGen.lexStateSuffix + "(int pos, int kind, int state)");
     ostr.println("{");
@@ -473,9 +471,9 @@ public class RStringLiteral extends RegularExpression {
     ostr.println("}");
   }
 
-  private static boolean boilerPlateDumped = false;
+  private static boolean boilerPlateDumped;
 
-  static void DumpBoilerPlate(java.io.PrintWriter ostr) {
+  static void DumpBoilerPlate(PrintWriter ostr) {
     ostr.println((Options.getStatic() ? "static " : "") + "private int " +
         "jjStopAtPos(int pos, int kind)");
     ostr.println("{");
@@ -519,7 +517,7 @@ public class RStringLiteral extends RegularExpression {
     return ret;
   }
 
-  static void DumpDfaCode(java.io.PrintWriter ostr) {
+  static void DumpDfaCode(PrintWriter ostr) {
     Hashtable tab;
     String key;
     KindInfo info;
@@ -1043,7 +1041,7 @@ public class RStringLiteral extends RegularExpression {
     return Integer.MAX_VALUE;
   }
 
-  static void GenerateNfaStartStates(java.io.PrintWriter ostr,
+  static void GenerateNfaStartStates(PrintWriter ostr,
                                      NfaState initialState) {
     boolean[] seen = new boolean[NfaState.generatedStates];
     Hashtable stateSets = new Hashtable();
@@ -1077,7 +1075,7 @@ public class RStringLiteral extends RegularExpression {
         }
       }
       catch (Exception e) {
-        JavaCCErrors.semantic_error("Error cloning state vector");
+        JavaCCErrors.semanticError("Error cloning state vector");
       }
 
       intermediateKinds[i] = new int[image.length()];
@@ -1167,7 +1165,7 @@ public class RStringLiteral extends RegularExpression {
   }
 
   static void DumpNfaStartStatesCode(Hashtable[] statesForPos,
-                                     java.io.PrintWriter ostr) {
+                                     PrintWriter ostr) {
     if (maxStrKind == 0) { // No need to generate this function
       return;
     }

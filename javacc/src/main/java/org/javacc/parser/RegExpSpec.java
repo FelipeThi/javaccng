@@ -31,14 +31,12 @@ package org.javacc.parser;
  * The object type of entries in the vector "respecs" of class
  * "TokenProduction".
  */
-
-public class RegExprSpec {
-
+public class RegExpSpec {
   /** The regular expression of this specification. */
-  public RegularExpression rexp;
+  public RegularExpression regexp;
 
   /** The action corresponding to this specification. */
-  public Action act;
+  public Action action;
 
   /**
    * The next state corresponding to this specification.  If no
@@ -52,5 +50,5 @@ public class RegExprSpec {
    * the next state.  This is used for location information, etc.
    * in error reporting.
    */
-  public Token nsTok;
+  public Token nextStateToken;
 }

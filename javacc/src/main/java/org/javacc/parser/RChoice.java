@@ -34,9 +34,7 @@ import java.util.List;
  * Describes regular expressions which are choices from
  * from among included regular expressions.
  */
-
 public class RChoice extends RegularExpression {
-
   /**
    * The list of choices of this regular expression.  Each
    * list component will narrow to RegularExpression.
@@ -54,7 +52,7 @@ public class RChoice extends RegularExpression {
   }
 
   public Nfa GenerateNfa(boolean ignoreCase) {
-    CompressCharLists();
+    compressCharLists();
 
     if (getChoices().size() == 1) {
       return ((RegularExpression) getChoices().get(0)).GenerateNfa(ignoreCase);
@@ -77,8 +75,8 @@ public class RChoice extends RegularExpression {
     return retVal;
   }
 
-  void CompressCharLists() {
-    CompressChoices(); // Unroll nested choices
+  void compressCharLists() {
+    compressChoices(); // Unroll nested choices
     RegularExpression curRE;
     RCharacterList curCharList = null;
 
@@ -86,7 +84,7 @@ public class RChoice extends RegularExpression {
       curRE = (RegularExpression) getChoices().get(i);
 
       while (curRE instanceof RJustName) {
-        curRE = ((RJustName) curRE).regexpr;
+        curRE = ((RJustName) curRE).regexp;
       }
 
       if (curRE instanceof RStringLiteral &&
@@ -96,8 +94,8 @@ public class RChoice extends RegularExpression {
       }
 
       if (curRE instanceof RCharacterList) {
-        if (((RCharacterList) curRE).negated_list) {
-          ((RCharacterList) curRE).RemoveNegation();
+        if (((RCharacterList) curRE).negatedList) {
+          ((RCharacterList) curRE).removeNegation();
         }
 
         List tmp = ((RCharacterList) curRE).descriptors;
@@ -116,14 +114,14 @@ public class RChoice extends RegularExpression {
     }
   }
 
-  void CompressChoices() {
+  void compressChoices() {
     RegularExpression curRE;
 
     for (int i = 0; i < getChoices().size(); i++) {
       curRE = (RegularExpression) getChoices().get(i);
 
       while (curRE instanceof RJustName) {
-        curRE = ((RJustName) curRE).regexpr;
+        curRE = ((RJustName) curRE).regexp;
       }
 
       if (curRE instanceof RChoice) {
@@ -135,7 +133,7 @@ public class RChoice extends RegularExpression {
     }
   }
 
-  public void CheckUnmatchability() {
+  public void checkUnmatchability() {
     RegularExpression curRE;
     int numStrings = 0;
 

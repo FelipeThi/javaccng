@@ -28,22 +28,23 @@
 package org.javacc.parser;
 
 /** Describes single character descriptors in a character list. */
-
 public class SingleCharacter {
-
   /**
-   * The line and column number of the construct that corresponds
+   * The line number of the construct that corresponds
    * most closely to this node.
    */
   private int column;
 
+  /**
+   * The column number of the construct that corresponds
+   * most closely to this node.
+   */
   private int line;
 
   /** The character of this descriptor. */
   public char ch;
 
-  SingleCharacter() {
-  }
+  SingleCharacter() {}
 
   SingleCharacter(char c) {
     ch = c;

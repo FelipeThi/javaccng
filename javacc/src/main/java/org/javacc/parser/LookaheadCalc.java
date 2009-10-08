@@ -31,13 +31,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LookaheadCalc extends JavaCCGlobals {
-
   static MatchInfo overlap(List v1, List v2) {
     MatchInfo m1, m2, m3;
     int size;
     boolean diff;
-    for (int i = 0; i < v1.size(); i++) {
-      m1 = (MatchInfo) v1.get(i);
+    for (Object aV1 : v1) {
+      m1 = (MatchInfo) aV1;
       for (int j = 0; j < v2.size(); j++) {
         m2 = (MatchInfo) v2.get(j);
         size = m1.firstFreeLoc;
@@ -66,8 +65,8 @@ public class LookaheadCalc extends JavaCCGlobals {
   }
 
   static boolean javaCodeCheck(List v) {
-    for (int i = 0; i < v.size(); i++) {
-      if (((MatchInfo) v.get(i)).firstFreeLoc == 0) {
+    for (Object aV : v) {
+      if (((MatchInfo) aV).firstFreeLoc == 0) {
         return true;
       }
     }
@@ -226,13 +225,13 @@ public class LookaheadCalc extends JavaCCGlobals {
     else if (exp instanceof ZeroOrMore) {
       return "(...)*";
     }
-    else /* if (exp instanceof ZeroOrOne) */ {
+    else /* if (expansion instanceof ZeroOrOne) */ {
       return "[...]";
     }
   }
 
   public static void ebnfCalc(Expansion exp, Expansion nested) {
-    // exp is one of OneOrMore, ZeroOrMore, ZeroOrOne
+    // expansion is one of OneOrMore, ZeroOrMore, ZeroOrOne
     MatchInfo m, m1 = null;
     List v, first, follow;
     int la;

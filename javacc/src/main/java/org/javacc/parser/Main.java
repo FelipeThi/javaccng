@@ -27,11 +27,17 @@
  */
 package org.javacc.parser;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStreamReader;
+
 /** Entry point. */
 public final class Main {
   private Main() {}
 
-  static void help_message() {
+  static void helpMessage() {
     System.out.println("Usage:");
     System.out.println("    javacc option-settings inputfile");
     System.out.println("");
@@ -90,8 +96,7 @@ public final class Main {
 
   /** A main program that exercises the parser. */
   public static void main(String args[]) throws Exception {
-    int errorcode = mainProgram(args);
-    System.exit(errorcode);
+    System.exit(mainProgram(args));
   }
 
   /**
@@ -100,7 +105,6 @@ public final class Main {
    * this method.
    */
   public static int mainProgram(String args[]) throws Exception {
-
     // Initialize all static state
     reInitAll();
 
@@ -109,7 +113,7 @@ public final class Main {
     JavaCCParser parser = null;
     if (args.length == 0) {
       System.out.println("");
-      help_message();
+      helpMessage();
       return 1;
     }
     else {
@@ -129,7 +133,7 @@ public final class Main {
     }
 
     try {
-      java.io.File fp = new java.io.File(args[args.length - 1]);
+      File fp = new File(args[args.length - 1]);
       if (!fp.exists()) {
         System.out.println("File " + args[args.length - 1] + " not found.");
         return 1;
@@ -138,13 +142,13 @@ public final class Main {
         System.out.println(args[args.length - 1] + " is a directory. Please use a valid file name.");
         return 1;
       }
-      parser = new JavaCCParser(new java.io.BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream(args[args.length - 1]), Options.getGrammarEncoding())));
+      parser = new JavaCCParser(new BufferedReader(new InputStreamReader(new FileInputStream(args[args.length - 1]), Options.getGrammarEncoding())));
     }
     catch (SecurityException se) {
       System.out.println("Security violation while trying to open " + args[args.length - 1]);
       return 1;
     }
-    catch (java.io.FileNotFoundException e) {
+    catch (FileNotFoundException e) {
       System.out.println("File " + args[args.length - 1] + " not found.");
       return 1;
     }
@@ -168,50 +172,50 @@ public final class Main {
       LexGen.start();
       OtherFilesGen.start();
 
-      if ((JavaCCErrors.get_error_count() == 0) && (Options.getBuildParser() || Options.getBuildTokenManager())) {
-        if (JavaCCErrors.get_warning_count() == 0) {
+      if ((JavaCCErrors.getErrorCount() == 0) && (Options.getBuildParser() || Options.getBuildTokenManager())) {
+        if (JavaCCErrors.getWarningCount() == 0) {
           System.out.println("Parser generated successfully.");
         }
         else {
           System.out.println("Parser generated with 0 errors and "
-              + JavaCCErrors.get_warning_count() + " warnings.");
+              + JavaCCErrors.getWarningCount() + " warnings.");
         }
         return 0;
       }
       else {
-        System.out.println("Detected " + JavaCCErrors.get_error_count() + " errors and "
-            + JavaCCErrors.get_warning_count() + " warnings.");
-        return (JavaCCErrors.get_error_count() == 0) ? 0 : 1;
+        System.out.println("Detected " + JavaCCErrors.getErrorCount() + " errors and "
+            + JavaCCErrors.getWarningCount() + " warnings.");
+        return (JavaCCErrors.getErrorCount() == 0) ? 0 : 1;
       }
     }
     catch (MetaParseException e) {
-      System.out.println("Detected " + JavaCCErrors.get_error_count() + " errors and "
-          + JavaCCErrors.get_warning_count() + " warnings.");
+      System.out.println("Detected " + JavaCCErrors.getErrorCount() + " errors and "
+          + JavaCCErrors.getWarningCount() + " warnings.");
       return 1;
     }
     catch (ParseException e) {
       System.out.println(e.toString());
-      System.out.println("Detected " + (JavaCCErrors.get_error_count() + 1) + " errors and "
-          + JavaCCErrors.get_warning_count() + " warnings.");
+      System.out.println("Detected " + (JavaCCErrors.getErrorCount() + 1) + " errors and "
+          + JavaCCErrors.getWarningCount() + " warnings.");
       return 1;
     }
   }
 
   public static void reInitAll() {
-    org.javacc.parser.Expansion.reInit();
-    org.javacc.parser.JavaCCErrors.reInit();
-    org.javacc.parser.JavaCCGlobals.reInit();
+    Expansion.reInit();
+    JavaCCErrors.reInit();
+    JavaCCGlobals.reInit();
     Options.init();
-    org.javacc.parser.JavaCCParserInternals.reInit();
-    org.javacc.parser.RStringLiteral.reInit();
-    org.javacc.parser.JavaFiles.reInit();
-    org.javacc.parser.LexGen.reInit();
-    org.javacc.parser.NfaState.reInit();
-    org.javacc.parser.MatchInfo.reInit();
-    org.javacc.parser.LookaheadWalk.reInit();
-    org.javacc.parser.Semanticize.reInit();
-    org.javacc.parser.ParseGen.reInit();
-    org.javacc.parser.OtherFilesGen.reInit();
-    org.javacc.parser.ParseEngine.reInit();
+    JavaCCParserInternals.reInit();
+    RStringLiteral.reInit();
+    JavaFiles.reInit();
+    LexGen.reInit();
+    NfaState.reInit();
+    MatchInfo.reInit();
+    LookaheadWalk.reInit();
+    Semanticize.reInit();
+    ParseGen.reInit();
+    OtherFilesGen.reInit();
+    ParseEngine.reInit();
   }
 }

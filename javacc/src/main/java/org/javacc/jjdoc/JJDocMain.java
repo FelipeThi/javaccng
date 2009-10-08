@@ -156,32 +156,32 @@ public final class JJDocMain extends JJDocGlobals {
       parser.javacc_input();
       JJDoc.start();
 
-      if (JavaCCErrors.get_error_count() == 0) {
-        if (JavaCCErrors.get_warning_count() == 0) {
+      if (JavaCCErrors.getErrorCount() == 0) {
+        if (JavaCCErrors.getWarningCount() == 0) {
           info("Grammar documentation generated successfully in " + JJDocGlobals.output_file);
         }
         else {
           info("Grammar documentation generated with 0 errors and "
-              + JavaCCErrors.get_warning_count() + " warnings.");
+              + JavaCCErrors.getWarningCount() + " warnings.");
         }
         return 0;
       }
       else {
-        error("Detected " + JavaCCErrors.get_error_count() + " errors and "
-            + JavaCCErrors.get_warning_count() + " warnings.");
-        return (JavaCCErrors.get_error_count() == 0) ? 0 : 1;
+        error("Detected " + JavaCCErrors.getErrorCount() + " errors and "
+            + JavaCCErrors.getWarningCount() + " warnings.");
+        return (JavaCCErrors.getErrorCount() == 0) ? 0 : 1;
       }
     }
     catch (org.javacc.parser.MetaParseException e) {
       error(e.toString());
-      error("Detected " + JavaCCErrors.get_error_count() + " errors and "
-          + JavaCCErrors.get_warning_count() + " warnings.");
+      error("Detected " + JavaCCErrors.getErrorCount() + " errors and "
+          + JavaCCErrors.getWarningCount() + " warnings.");
       return 1;
     }
     catch (org.javacc.parser.ParseException e) {
       error(e.toString());
-      error("Detected " + (JavaCCErrors.get_error_count() + 1) + " errors and "
-          + JavaCCErrors.get_warning_count() + " warnings.");
+      error("Detected " + (JavaCCErrors.getErrorCount() + 1) + " errors and "
+          + JavaCCErrors.getWarningCount() + " warnings.");
       return 1;
     }
   }

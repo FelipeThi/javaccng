@@ -42,7 +42,6 @@ import java.util.Map;
  * @since 4.2
  */
 public class JavaFileGenerator {
-
   /**
    * @param templateName the name of the template. E.g.
    *                     "/templates/Token.template".
@@ -56,7 +55,6 @@ public class JavaFileGenerator {
 
   private final String templateName;
   private final Map options;
-
   private String currentLine;
 
   /** Generate the output file. */
@@ -162,12 +160,6 @@ public class JavaFileGenerator {
     return text.substring(0, startPos) + value + text.substring(endPos);
   }
 
-  /**
-   * @param substring
-   * @param defaultValue
-   * @return
-   * @throws IOException
-   */
   private String substituteWithConditional(String variableName, String values) throws IOException {
     // Split values into true and false values.
 
@@ -184,11 +176,6 @@ public class JavaFileGenerator {
     }
   }
 
-  /**
-   * @param variableName
-   * @param defaultValue
-   * @return
-   */
   private String substituteWithDefault(String variableName, String defaultValue) throws IOException {
     Object obj = options.get(variableName.trim());
     if (obj == null || obj.toString().length() == 0) {

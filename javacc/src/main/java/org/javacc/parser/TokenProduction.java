@@ -31,9 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Describes the various regular expression productions. */
-
 public class TokenProduction {
-
   /**
    * Definitions of constants that identify the kind of regular
    * expression production this is.
@@ -48,9 +46,10 @@ public class TokenProduction {
       "TOKEN", "SKIP", "MORE", "SPECIAL"
   };
 
-  /** The starting line and column of this token production. */
+  /** The starting line of this token production. */
   private int column;
 
+  /** The starting column of this token production. */
   private int line;
 
   /**
@@ -67,7 +66,7 @@ public class TokenProduction {
 
   /**
    * The list of regular expression specifications that comprise this
-   * production.  Each entry is a "RegExprSpec".
+   * production.  Each entry is a "RegExpSpec".
    */
   public List respecs = new ArrayList();
 
@@ -83,7 +82,7 @@ public class TokenProduction {
    * This is true if case is to be ignored within the regular expressions
    * of this token production.
    */
-  public boolean ignoreCase = false;
+  public boolean ignoreCase;
 
   /**
    * The first and last tokens from the input stream that represent this

@@ -31,21 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Describes character lists. */
-
 public class RCharacterList extends RegularExpression {
-
-  /**
-   * This is true if a tilde (~) appears before the character list.
-   * Otherwise, this is false.
-   */
-  public boolean negated_list = false;
-
-  /**
-   * This is the list of descriptors of the character list.  Each list
-   * entry will narrow to either SingleCharacter or to CharacterRange.
-   */
-  public List descriptors = new ArrayList();
-
   static final char[] diffLowerCaseRanges = {
       65, 90, 192, 214, 216, 222, 256, 256, 258, 258, 260, 260, 262, 262, 264, 264,
       266, 266, 268, 268, 270, 270, 272, 272, 274, 274, 276, 276, 278, 278, 280, 280,
@@ -170,7 +156,31 @@ public class RCharacterList extends RegularExpression {
       65345, 65370, 65371, 0xfffe, 0xffff, 0xffff
   };
 
-  void ToCaseNeutral() {
+  /**
+   * This is true if a tilde (~) appears before the character list.
+   * Otherwise, this is false.
+   */
+  public boolean negatedList;
+
+  /**
+   * This is the list of descriptors of the character list.  Each list
+   * entry will narrow to either SingleCharacter or to CharacterRange.
+   */
+  public List descriptors = new ArrayList();
+
+  boolean transformed = false;
+
+  RCharacterList() {
+  }
+
+  RCharacterList(char c) {
+    descriptors = new ArrayList();
+    descriptors.add(new SingleCharacter(c));
+    negatedList = false;
+    ordinal = Integer.MAX_VALUE;
+  }
+
+  void toCaseNeutral() {
     int cnt = descriptors.size();
 
     for (int i = 0; i < cnt; i++) {
@@ -288,8 +298,6 @@ public class RCharacterList extends RegularExpression {
     }
   }
 
-  boolean transformed = false;
-
   public Nfa GenerateNfa(boolean ignoreCase) {
     if (!transformed) {
       if (Options.getIgnoreCase() || ignoreCase) {
@@ -316,8 +324,8 @@ public class RCharacterList extends RegularExpression {
            System.out.println("");
 */
 
-        ToCaseNeutral();
-        SortDescriptors();
+        toCaseNeutral();
+        sortDescriptors();
 
 /*
            System.out.println("After:");
@@ -342,16 +350,16 @@ public class RCharacterList extends RegularExpression {
 */
       }
 
-      if (negated_list) {
-        RemoveNegation();  // This also sorts the list
+      if (negatedList) {
+        removeNegation();  // This also sorts the list
       }
       else {
-        SortDescriptors();
+        sortDescriptors();
       }
     }
 
-    if (descriptors.size() == 0 && !negated_list) {
-      JavaCCErrors.semantic_error(this, "Empty character set is not allowed as it will not match any character.");
+    if (descriptors.size() == 0 && !negatedList) {
+      JavaCCErrors.semanticError(this, "Empty character set is not allowed as it will not match any character.");
       return new Nfa();
     }
 
@@ -383,31 +391,31 @@ public class RCharacterList extends RegularExpression {
     return retVal;
   }
 
-  static boolean Overlaps(CharacterRange r1, CharacterRange r2) {
-    return (r1.getLeft() <= r2.getRight() && r1.getRight() > r2.getRight());
+  static boolean overlaps(CharacterRange r1, CharacterRange r2) {
+    return r1.getLeft() <= r2.getRight() && r1.getRight() > r2.getRight();
   }
 
-  static boolean SubRange(CharacterRange r1, CharacterRange r2) {
-    return (r1.getLeft() >= r2.getLeft() && r1.getRight() <= r2.getRight());
+  static boolean subRange(CharacterRange r1, CharacterRange r2) {
+    return r1.getLeft() >= r2.getLeft() && r1.getRight() <= r2.getRight();
   }
 
-  static boolean InRange(char c, CharacterRange range) {
-    return (c >= range.getLeft() && c <= range.getRight());
+  static boolean inRange(char c, CharacterRange range) {
+    return c >= range.getLeft() && c <= range.getRight();
   }
 
-  void SortDescriptors() {
+  void sortDescriptors() {
     int j;
 
     List newDesc = new ArrayList(descriptors.size());
     int cnt = 0;
 
     Outer:
-    for (int i = 0; i < descriptors.size(); i++) {
+    for (Object descriptor : descriptors) {
       SingleCharacter s;
       CharacterRange range;
 
-      if (descriptors.get(i) instanceof SingleCharacter) {
-        s = (SingleCharacter) descriptors.get(i);
+      if (descriptor instanceof SingleCharacter) {
+        s = (SingleCharacter) descriptor;
 
         for (j = 0; j < cnt; j++) {
           if (newDesc.get(j) instanceof SingleCharacter) {
@@ -421,7 +429,7 @@ public class RCharacterList extends RegularExpression {
           else {
             char l = ((CharacterRange) newDesc.get(j)).getLeft();
 
-            if (InRange(s.ch, (CharacterRange) newDesc.get(j))) {
+            if (inRange(s.ch, (CharacterRange) newDesc.get(j))) {
               continue Outer;
             }
             else if (l > s.ch) {
@@ -434,11 +442,11 @@ public class RCharacterList extends RegularExpression {
         cnt++;
       }
       else {
-        range = (CharacterRange) descriptors.get(i);
+        range = (CharacterRange) descriptor;
 
         for (j = 0; j < cnt; j++) {
           if (newDesc.get(j) instanceof SingleCharacter) {
-            if (InRange(((SingleCharacter) newDesc.get(j)).ch, range)) {
+            if (inRange(((SingleCharacter) newDesc.get(j)).ch, range)) {
               newDesc.remove(j--);
               cnt--;
             }
@@ -447,17 +455,17 @@ public class RCharacterList extends RegularExpression {
             }
           }
           else {
-            if (SubRange(range, (CharacterRange) newDesc.get(j))) {
+            if (subRange(range, (CharacterRange) newDesc.get(j))) {
               continue Outer;
             }
-            else if (SubRange((CharacterRange) newDesc.get(j), range)) {
+            else if (subRange((CharacterRange) newDesc.get(j), range)) {
               newDesc.set(j, range);
               continue Outer;
             }
-            else if (Overlaps(range, (CharacterRange) newDesc.get(j))) {
+            else if (overlaps(range, (CharacterRange) newDesc.get(j))) {
               range.setLeft((char) (((CharacterRange) newDesc.get(j)).getRight() + 1));
             }
-            else if (Overlaps((CharacterRange) newDesc.get(j), range)) {
+            else if (overlaps((CharacterRange) newDesc.get(j), range)) {
               CharacterRange tmp = range;
               ((CharacterRange) newDesc.get(j)).setRight((char) (range.getLeft() + 1));
               range = (CharacterRange) newDesc.get(j);
@@ -477,10 +485,10 @@ public class RCharacterList extends RegularExpression {
     descriptors = newDesc;
   }
 
-  void RemoveNegation() {
+  void removeNegation() {
     int i;
 
-    SortDescriptors();
+    sortDescriptors();
 
 /*
      System.out.println("REM. NEG Before:");
@@ -549,7 +557,7 @@ public class RCharacterList extends RegularExpression {
     }
 
     descriptors = newDescriptors;
-    negated_list = false;
+    negatedList = false;
 
 /*
      System.out.println("REM NEG After:");
@@ -572,18 +580,8 @@ public class RCharacterList extends RegularExpression {
 */
   }
 
-  RCharacterList() {
-  }
-
-  RCharacterList(char c) {
-    descriptors = new ArrayList();
-    descriptors.add(new SingleCharacter(c));
-    negated_list = false;
-    ordinal = Integer.MAX_VALUE;
-  }
-
-  public boolean CanMatchAnyChar() {
+  public boolean canMatchAnyChar() {
     // Return true only if it is ~[]
-    return negated_list && (descriptors == null || descriptors.size() == 0);
+    return negatedList && (descriptors == null || descriptors.size() == 0);
   }
 }

@@ -40,7 +40,7 @@ public class OtherFilesGen extends JavaCCGlobals implements JavaCCParserConstant
     Token t = null;
     keepLineCol = Options.getKeepLineColumn();
 
-    if (JavaCCErrors.get_error_count() != 0) {
+    if (JavaCCErrors.getErrorCount() != 0) {
       throw new MetaParseException();
     }
 
@@ -73,7 +73,7 @@ public class OtherFilesGen extends JavaCCGlobals implements JavaCCParserConstant
       );
     }
     catch (java.io.IOException e) {
-      JavaCCErrors.semantic_error("Could not open file " + cu_name + "Constants.java for writing.");
+      JavaCCErrors.semanticError("Could not open file " + cu_name + "Constants.java for writing.");
       throw new Error();
     }
 
@@ -132,8 +132,8 @@ public class OtherFilesGen extends JavaCCGlobals implements JavaCCParserConstant
       TokenProduction tp = (TokenProduction) (it.next());
       List respecs = tp.respecs;
       for (java.util.Iterator it2 = respecs.iterator(); it2.hasNext();) {
-        RegExprSpec res = (RegExprSpec) (it2.next());
-        re = res.rexp;
+        RegExpSpec res = (RegExpSpec) (it2.next());
+        re = res.regexp;
         if (re instanceof RStringLiteral) {
           ostr.println("    \"\\\"" + add_escapes(add_escapes(((RStringLiteral) re).image)) + "\\\"\",");
         }

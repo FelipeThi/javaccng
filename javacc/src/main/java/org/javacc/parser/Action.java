@@ -35,14 +35,17 @@ import java.util.Set;
  * Describes actions that may occur on the right hand side
  * of productions.
  */
-
 public class Action extends Expansion {
-
   /**
    * Contains the list of tokens that make up the action.  This
    * list does not include the surrounding braces.
    */
-  private List action_tokens = new ArrayList();
+  private final List actionTokens = new ArrayList();
+
+  /** @return the action_tokens */
+  public List getActionTokens() {
+    return actionTokens;
+  }
 
   public StringBuffer dump(int indent, Set alreadyDumped) {
     StringBuffer sb = super.dump(indent, alreadyDumped);
@@ -51,10 +54,5 @@ public class Action extends Expansion {
       sb.append(' ').append(getActionTokens().get(0));
     }
     return sb;
-  }
-
-  /** @return the action_tokens */
-  public List getActionTokens() {
-    return action_tokens;
   }
 }

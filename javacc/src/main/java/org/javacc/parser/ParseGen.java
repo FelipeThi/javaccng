@@ -43,7 +43,7 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
 
     Token t = null;
 
-    if (JavaCCErrors.get_error_count() != 0) {
+    if (JavaCCErrors.getErrorCount() != 0) {
       throw new MetaParseException();
     }
 
@@ -60,7 +60,7 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
         );
       }
       catch (IOException e) {
-        JavaCCErrors.semantic_error("Could not open file " + cu_name + ".java for writing.");
+        JavaCCErrors.semanticError("Could not open file " + cu_name + ".java for writing.");
         throw new Error();
       }
 

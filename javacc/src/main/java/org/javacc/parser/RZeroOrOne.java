@@ -28,18 +28,16 @@
 package org.javacc.parser;
 
 /** Describes zero-or-one regular expressions (<foo?>). */
-
 public class RZeroOrOne extends RegularExpression {
-
   /** The regular expression which is repeated zero or one times. */
-  public RegularExpression regexpr;
+  public RegularExpression regexp;
 
   public Nfa GenerateNfa(boolean ignoreCase) {
     Nfa retVal = new Nfa();
     NfaState startState = retVal.start;
     NfaState finalState = retVal.end;
 
-    Nfa temp = regexpr.GenerateNfa(ignoreCase);
+    Nfa temp = regexp.GenerateNfa(ignoreCase);
 
     startState.AddMove(temp.start);
     startState.AddMove(finalState);

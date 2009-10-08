@@ -32,16 +32,19 @@ package org.javacc.parser;
  * routines in ExpansionTreeWalker.
  */
 public interface TreeWalkerOp {
-
   /**
    * When called at a particular node, this specifies to the
    * tree walker if it should visit more nodes under this node.
+   *
+   * @param expansion An expansion.
    */
-  boolean goDeeper(Expansion e);
+  boolean goDeeper(Expansion expansion);
 
   /**
    * When a node is visited, this method is invoked with the
    * node as parameter.
+   *
+   * @param expansion An expansion.
    */
-  void action(Expansion e);
+  void action(Expansion expansion);
 }

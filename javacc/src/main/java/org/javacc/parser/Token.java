@@ -7,9 +7,7 @@
 package org.javacc.parser;
 
 /** Describes the input token stream. */
-
 public class Token {
-
   /**
    * An integer that describes the kind of this token.  This numbering
    * system is determined by JavaCCParser, and a table of these numbers is
@@ -96,7 +94,7 @@ public class Token {
    * to the following switch statement. Then you can cast matchedToken
    * variable to the appropriate type and use it in your lexical actions.
    */
-  public static final Token newToken(int ofKind, String image) {
+  public static Token newToken(int ofKind, String image) {
     switch (ofKind) {
       default:
         return new Token(ofKind, image);
@@ -107,7 +105,7 @@ public class Token {
     }
   }
 
-  public static final Token newToken(int ofKind) {
+  public static Token newToken(int ofKind) {
     return newToken(ofKind, null);
   }
 

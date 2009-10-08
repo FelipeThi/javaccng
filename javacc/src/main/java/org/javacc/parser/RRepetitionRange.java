@@ -31,11 +31,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Describes one-or-more regular expressions (<foo+>). */
-
 public class RRepetitionRange extends RegularExpression {
-
   /** The regular expression which is repeated one or more times. */
-  public RegularExpression regexpr;
+  public RegularExpression regexp;
   public int min = 0;
   public int max = -1;
   public boolean hasMax;
@@ -46,19 +44,19 @@ public class RRepetitionRange extends RegularExpression {
     int i;
 
     for (i = 0; i < min; i++) {
-      units.add(regexpr);
+      units.add(regexp);
     }
 
     if (hasMax && max == -1) // Unlimited
     {
       RZeroOrMore zoo = new RZeroOrMore();
-      zoo.regexpr = regexpr;
+      zoo.regexp = regexp;
       units.add(zoo);
     }
 
     while (i++ < max) {
       RZeroOrOne zoo = new RZeroOrOne();
-      zoo.regexpr = regexpr;
+      zoo.regexp = regexp;
       units.add(zoo);
     }
     seq = new RSequence(units);

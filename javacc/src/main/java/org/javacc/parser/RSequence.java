@@ -34,14 +34,19 @@ import java.util.List;
  * Describes regular expressions which are sequences of
  * other regular expressions.
  */
-
 public class RSequence extends RegularExpression {
-
   /**
    * The list of units in this regular expression sequence.  Each
    * list component will narrow to RegularExpression.
    */
   public List units = new ArrayList();
+
+  RSequence() {}
+
+  RSequence(List seq) {
+    ordinal = Integer.MAX_VALUE;
+    units = seq;
+  }
 
   public Nfa GenerateNfa(boolean ignoreCase) {
     if (units.size() == 1) {
@@ -71,13 +76,5 @@ public class RSequence extends RegularExpression {
     temp2.end.AddMove(finalState);
 
     return retVal;
-  }
-
-  RSequence() {
-  }
-
-  RSequence(List seq) {
-    ordinal = Integer.MAX_VALUE;
-    units = seq;
   }
 }

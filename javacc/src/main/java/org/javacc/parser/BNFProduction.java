@@ -31,11 +31,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Describes BNF productions. */
-
 public class BNFProduction extends NormalProduction {
-
   /** The declarations of this production. */
-  private List declaration_tokens = new ArrayList();
+  private final List declarationTokens = new ArrayList();
 
   /**
    * This flag keeps track of whether or not return and throw
@@ -46,7 +44,7 @@ public class BNFProduction extends NormalProduction {
 
   /** @return the declaration_tokens */
   public List getDeclarationTokens() {
-    return declaration_tokens;
+    return declarationTokens;
   }
 
   /** @param jumpPatched the jumpPatched to set */

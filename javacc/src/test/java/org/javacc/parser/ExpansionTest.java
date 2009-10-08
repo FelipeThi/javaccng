@@ -64,7 +64,7 @@ public final class ExpansionTest extends TestCase {
         RZeroOrMore rzom = new RZeroOrMore(t, r);
         assertEquals(t.beginColumn, rzom.getColumn());
         assertEquals(t.beginLine, rzom.getLine());
-        assertEquals(r, rzom.regexpr);
+        assertEquals(r, rzom.regexp);
     }
 
     public void testROneOrMoreConstructor() {
@@ -72,7 +72,7 @@ public final class ExpansionTest extends TestCase {
         ROneOrMore room = new ROneOrMore(t, r);
         assertEquals(t.beginColumn, room.getColumn());
         assertEquals(t.beginLine, room.getLine());
-        assertEquals(r, room.regexpr);
+        assertEquals(r, room.regexp);
     }
 
     public void testOneOrMoreConstructor() {

@@ -33,21 +33,19 @@ package org.javacc.parser;
  * their name.  This means that a regular expression with this
  * name has been declared earlier.
  */
-
 public class RJustName extends RegularExpression {
-
-  /** "regexpr" points to the regular expression denoted by the name. */
-  public RegularExpression regexpr;
-
-  public Nfa GenerateNfa(boolean ignoreCase) {
-    return regexpr.GenerateNfa(ignoreCase);
-  }
+  /** Points to the regular expression denoted by the name. */
+  public RegularExpression regexp;
 
   public RJustName() {}
 
   public RJustName(Token token, String image) {
-    this.setLine(token.beginLine);
-    this.setColumn(token.beginColumn);
-    this.label = image;
+    setLine(token.beginLine);
+    setColumn(token.beginColumn);
+    label = image;
+  }
+
+  public Nfa GenerateNfa(boolean ignoreCase) {
+    return regexp.GenerateNfa(ignoreCase);
   }
 }

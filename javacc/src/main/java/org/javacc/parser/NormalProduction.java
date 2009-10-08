@@ -32,16 +32,18 @@ import java.util.List;
 import java.util.Set;
 
 /** Describes JavaCC productions. */
-
 public class NormalProduction {
+  /**
+   * The line number of the construct that corresponds
+   * most closely to this node.
+   */
+  private int line;
 
   /**
-   * The line and column number of the construct that corresponds
+   * The column number of the construct that corresponds
    * most closely to this node.
    */
   private int column;
-
-  private int line;
 
   /** The NonTerminal nodes which refer to this production. */
   private List parents = new ArrayList();
@@ -53,23 +55,23 @@ public class NormalProduction {
   private String lhs;
 
   /** The tokens that make up the return type of this production. */
-  private List return_type_tokens = new ArrayList();
+  private final List returnTypeTokens = new ArrayList();
 
   /** The tokens that make up the parameters of this production. */
-  private List parameter_list_tokens = new ArrayList();
+  private final List parameterListTokens = new ArrayList();
 
   /**
    * Each entry in this list is a list of tokens that represents an
    * exception in the throws list of this production.  This list does not
    * include ParseException which is always thrown.
    */
-  private List throws_list = new ArrayList();
+  private List throwsList = new ArrayList();
 
   /** The RHS of this production.  Not used for JavaCodeProduction. */
   private Expansion expansion;
 
   /** This boolean flag is true if this production can expand to empty. */
-  private boolean emptyPossible = false;
+  private boolean emptyPossible;
 
   /**
    * A list of all non-terminals that this one can expand to without
@@ -77,7 +79,7 @@ public class NormalProduction {
    * pointers exist.
    */
   private NormalProduction[] leftExpansions = new NormalProduction[10];
-  int leIndex = 0;
+  int leIndex;
 
   /**
    * The following variable is used to maintain state information for the
@@ -87,7 +89,7 @@ public class NormalProduction {
    * node has been traversed.  i.e., -1 indicates partially processed,
    * and 1 indicates fully processed.
    */
-  private int walkStatus = 0;
+  private int walkStatus;
 
   /**
    * The first and last tokens from the input stream that represent this
@@ -96,33 +98,6 @@ public class NormalProduction {
   private Token lastToken;
 
   private Token firstToken;
-
-  protected String eol = System.getProperty("line.separator", "\n");
-
-  protected StringBuffer dumpPrefix(int indent) {
-    StringBuffer sb = new StringBuffer(128);
-    for (int i = 0; i < indent; i++) {
-      sb.append("  ");
-    }
-    return sb;
-  }
-
-  protected String getSimpleName() {
-    String name = getClass().getName();
-    return name.substring(name.lastIndexOf(".") + 1); // strip the package name
-  }
-
-  public StringBuffer dump(int indent, Set alreadyDumped) {
-    StringBuffer sb = dumpPrefix(indent).append(System.identityHashCode(this)).append(' ').append(getSimpleName()).append(' ').append(getLhs());
-    if (!alreadyDumped.contains(this)) {
-      alreadyDumped.add(this);
-      if (getExpansion() != null) {
-        sb.append(eol).append(getExpansion().dump(indent + 1, alreadyDumped));
-      }
-    }
-
-    return sb;
-  }
 
   /** @param line the line to set */
   public void setLine(int line) {
@@ -176,22 +151,22 @@ public class NormalProduction {
 
   /** @return the return_type_tokens */
   public List getReturnTypeTokens() {
-    return return_type_tokens;
+    return returnTypeTokens;
   }
 
   /** @return the parameter_list_tokens */
   public List getParameterListTokens() {
-    return parameter_list_tokens;
+    return parameterListTokens;
   }
 
   /** @param throws_list the throws_list to set */
   public void setThrowsList(List throws_list) {
-    this.throws_list = throws_list;
+    this.throwsList = throws_list;
   }
 
   /** @return the throws_list */
   public List getThrowsList() {
-    return throws_list;
+    return throwsList;
   }
 
   /** @param expansion the expansion to set */
@@ -254,5 +229,32 @@ public class NormalProduction {
   /** @return the lastToken */
   public Token getLastToken() {
     return lastToken;
+  }
+
+  protected String getSimpleName() {
+    String name = getClass().getName();
+    return name.substring(name.lastIndexOf(".") + 1); // strip the package name
+  }
+
+  protected String eol = System.getProperty("line.separator", "\n");
+
+  protected StringBuffer dumpPrefix(int indent) {
+    StringBuffer sb = new StringBuffer(128);
+    for (int i = 0; i < indent; i++) {
+      sb.append("  ");
+    }
+    return sb;
+  }
+
+  public StringBuffer dump(int indent, Set alreadyDumped) {
+    StringBuffer sb = dumpPrefix(indent).append(System.identityHashCode(this)).append(' ').append(getSimpleName()).append(' ').append(getLhs());
+    if (!alreadyDumped.contains(this)) {
+      alreadyDumped.add(this);
+      if (getExpansion() != null) {
+        sb.append(eol).append(getExpansion().dump(indent + 1, alreadyDumped));
+      }
+    }
+
+    return sb;
   }
 }

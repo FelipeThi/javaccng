@@ -40,7 +40,6 @@ import java.util.Set;
  */
 
 public class Lookahead extends Expansion {
-
   /**
    * Contains the list of tokens that make up the semantic lookahead
    * if any.  If this node represents a different kind of lookahead (other
@@ -49,7 +48,7 @@ public class Lookahead extends Expansion {
    * that forms the semantic lookahead.  In this case, the following
    * fields "amount" and "la_expansion" are ignored.
    */
-  private List action_tokens = new ArrayList();
+  private final List actionTokens = new ArrayList();
 
   /**
    * The lookahead amount.  Its default value essentially gives us
@@ -64,24 +63,14 @@ public class Lookahead extends Expansion {
    * is found.  Usually, this is the same as the expansion to be
    * parsed.
    */
-  private Expansion la_expansion;
+  private Expansion laExpansion;
 
   /** Is set to true if this is an explicit lookahead specification. */
   private boolean isExplicit;
 
-  public StringBuffer dump(int indent, Set alreadyDumped) {
-    StringBuffer sb = super.dump(indent, alreadyDumped).append(isExplicit ? " explicit" : " implicit");
-    if (alreadyDumped.contains(this)) {
-      return sb;
-    }
-    alreadyDumped.add(this);
-    sb.append(eol).append(la_expansion.dump(indent + 1, alreadyDumped));
-    return sb;
-  }
-
   /** @return the action_tokens */
   public List getActionTokens() {
-    return action_tokens;
+    return actionTokens;
   }
 
   /** @param amount the amount to set */
@@ -96,12 +85,12 @@ public class Lookahead extends Expansion {
 
   /** @param la_expansion the la_expansion to set */
   public void setLaExpansion(Expansion la_expansion) {
-    this.la_expansion = la_expansion;
+    this.laExpansion = la_expansion;
   }
 
   /** @return the la_expansion */
   public Expansion getLaExpansion() {
-    return la_expansion;
+    return laExpansion;
   }
 
   /** @param isExplicit the isExplicit to set */
@@ -112,5 +101,15 @@ public class Lookahead extends Expansion {
   /** @return the isExplicit */
   public boolean isExplicit() {
     return isExplicit;
+  }
+
+  public StringBuffer dump(int indent, Set alreadyDumped) {
+    StringBuffer sb = super.dump(indent, alreadyDumped).append(isExplicit ? " explicit" : " implicit");
+    if (alreadyDumped.contains(this)) {
+      return sb;
+    }
+    alreadyDumped.add(this);
+    sb.append(eol).append(laExpansion.dump(indent + 1, alreadyDumped));
+    return sb;
   }
 }

@@ -36,39 +36,23 @@ import java.util.Set;
  */
 
 public class Expansion {
-
   /**
-   * The line and column number of the construct that corresponds
+   * The line number of the construct that corresponds
    * most closely to this node.
    */
   private int line;
 
-  private int column;
-
   /**
-   * A reimplementing of Object.hashCode() to be deterministic.  This uses
-   * the line and column fields to generate an arbitrary number - we assume
-   * that this method is called only after line and column are set to
-   * their actual values.
+   * The column number of the construct that corresponds
+   * most closely to this node.
    */
-  public int hashCode() {
-    return getLine() + getColumn();
-  }
+  private int column;
 
   /**
    * An internal name for this expansion.  This is used to generate parser
    * routines.
    */
-  String internal_name = "";
-
-  /**
-   * The parser routines are generated in three phases.  The generation
-   * of the second and third phase are on demand only, and the third phase
-   * can be recursive.  This variable is used to keep track of the
-   * expansions for which phase 3 generations have been already added to
-   * a list so that the recursion can be terminated.
-   */
-  boolean phase3done = false;
+  String internalName = "";
 
   /**
    * The parent of this expansion node.  In case this is the top level
@@ -89,41 +73,13 @@ public class Expansion {
    * generation is stored in the non-static variable below.
    */
   public static long nextGenerationIndex = 1;
-  public long myGeneration = 0;
+  public long myGeneration;
 
   /**
    * This flag is used for bookkeeping by the minimumSize method in class
    * ParseEngine.
    */
-  public boolean inMinimumSize = false;
-
-  public static void reInit() {
-    nextGenerationIndex = 1;
-  }
-
-  private String getSimpleName() {
-    String name = getClass().getName();
-    return name.substring(name.lastIndexOf(".") + 1); // strip the package name
-  }
-
-  public String toString() {
-    return "[" + getLine() + "," + getColumn() + " " + System.identityHashCode(this) + " " + getSimpleName() + "]";
-  }
-
-  protected static final String eol = System.getProperty("line.separator", "\n");
-
-  protected StringBuffer dumpPrefix(int indent) {
-    StringBuffer sb = new StringBuffer(128);
-    for (int i = 0; i < indent; i++) {
-      sb.append("  ");
-    }
-    return sb;
-  }
-
-  public StringBuffer dump(int indent, Set alreadyDumped) {
-    StringBuffer value = dumpPrefix(indent).append(System.identityHashCode(this)).append(" ").append(getSimpleName());
-    return value;
-  }
+  public boolean inMinimumSize;
 
   /** @param column the column to set */
   void setColumn(int column) {
@@ -143,5 +99,42 @@ public class Expansion {
   /** @return the line */
   int getLine() {
     return line;
+  }
+
+  public static void reInit() {
+    nextGenerationIndex = 1;
+  }
+
+  private String getSimpleName() {
+    String name = getClass().getName();
+    return name.substring(name.lastIndexOf(".") + 1); // strip the package name
+  }
+
+  /**
+   * A reimplementing of Object.hashCode() to be deterministic.  This uses
+   * the line and column fields to generate an arbitrary number - we assume
+   * that this method is called only after line and column are set to
+   * their actual values.
+   */
+  public int hashCode() {
+    return getLine() + getColumn();
+  }
+
+  public String toString() {
+    return "[" + getLine() + "," + getColumn() + " " + System.identityHashCode(this) + " " + getSimpleName() + "]";
+  }
+
+  protected static final String eol = System.getProperty("line.separator", "\n");
+
+  protected StringBuffer dumpPrefix(int indent) {
+    StringBuffer sb = new StringBuffer(128);
+    for (int i = 0; i < indent; i++) {
+      sb.append("  ");
+    }
+    return sb;
+  }
+
+  public StringBuffer dump(int indent, Set alreadyDumped) {
+    return dumpPrefix(indent).append(System.identityHashCode(this)).append(" ").append(getSimpleName());
   }
 }

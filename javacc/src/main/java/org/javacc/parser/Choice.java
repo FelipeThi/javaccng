@@ -29,7 +29,6 @@
 package org.javacc.parser;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -37,31 +36,24 @@ import java.util.Set;
  * Describes expansions where one of many choices
  * is taken (c1|c2|...).
  */
-
 public class Choice extends Expansion {
-
   /**
    * The list of choices of this expansion unit.  Each
    * List component will narrow to ExpansionUnit.
    */
-  private List choices = new ArrayList();
+  private final List choices = new ArrayList();
 
   public Choice() {}
 
   public Choice(Token token) {
-    this.setLine(token.beginLine);
-    this.setColumn(token.beginColumn);
+    setLine(token.beginLine);
+    setColumn(token.beginColumn);
   }
 
   public Choice(Expansion expansion) {
-    this.setLine(expansion.getLine());
-    this.setColumn(expansion.getColumn());
-    this.getChoices().add(expansion);
-  }
-
-  /** @param choices the choices to set */
-  public void setChoices(List choices) {
-    this.choices = choices;
+    setLine(expansion.getLine());
+    setColumn(expansion.getColumn());
+    getChoices().add(expansion);
   }
 
   /** @return the choices */
@@ -75,8 +67,8 @@ public class Choice extends Expansion {
       return sb;
     }
     alreadyDumped.add(this);
-    for (Iterator it = getChoices().iterator(); it.hasNext();) {
-      Expansion next = (Expansion) it.next();
+    for (final Object o : getChoices()) {
+      Expansion next = (Expansion) o;
       sb.append(eol).append(next.dump(indent + 1, alreadyDumped));
     }
     return sb;

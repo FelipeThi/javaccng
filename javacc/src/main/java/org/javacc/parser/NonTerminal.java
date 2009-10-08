@@ -32,9 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 /** Describes non terminals. */
-
 public class NonTerminal extends Expansion {
-
   /**
    * The LHS to which the return value of the non-terminal
    * is assigned.  In case there is no LHS, then the vector
@@ -46,15 +44,10 @@ public class NonTerminal extends Expansion {
   private String name;
 
   /** The list of all tokens in the argument list. */
-  private List argument_tokens = new ArrayList();
+  private final List argumentTokens = new ArrayList();
 
   /** The production this non-terminal corresponds to. */
-  private NormalProduction prod;
-
-  public StringBuffer dump(int indent, Set alreadyDumped) {
-    StringBuffer value = super.dump(indent, alreadyDumped).append(' ').append(name);
-    return value;
-  }
+  private NormalProduction production;
 
   /** @param lhsTokens the lhsTokens to set */
   public void setLhsTokens(List lhsTokens) {
@@ -76,23 +69,22 @@ public class NonTerminal extends Expansion {
     return name;
   }
 
-  /** @param argument_tokens the argument_tokens to set */
-  public void setArgumentTokens(List argument_tokens) {
-    this.argument_tokens = argument_tokens;
-  }
-
   /** @return the argument_tokens */
   public List getArgumentTokens() {
-    return argument_tokens;
+    return argumentTokens;
   }
 
-  /** @param prod the prod to set */
-  public NormalProduction setProd(NormalProduction prod) {
-    return this.prod = prod;
+  /** @param production the prod to set */
+  public NormalProduction setProduction(NormalProduction production) {
+    return this.production = production;
   }
 
   /** @return the prod */
-  public NormalProduction getProd() {
-    return prod;
+  public NormalProduction getProduction() {
+    return production;
+  }
+
+  public StringBuffer dump(int indent, Set alreadyDumped) {
+    return super.dump(indent, alreadyDumped).append(' ').append(name);
   }
 }

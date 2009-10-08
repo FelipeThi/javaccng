@@ -31,18 +31,16 @@ package org.javacc.parser;
 import java.util.Set;
 
 /** Describes one-or-more expansions (e.g., foo+). */
-
 public class OneOrMore extends Expansion {
-
   /** The expansion which is repeated one or more times. */
   public Expansion expansion;
 
   public OneOrMore() {}
 
   public OneOrMore(Token t, Expansion e) {
-    this.setLine(t.beginLine);
-    this.setColumn(t.beginColumn);
-    this.expansion = e;
+    setLine(t.beginLine);
+    setColumn(t.beginColumn);
+    expansion = e;
     expansion.parent = this;
   }
 

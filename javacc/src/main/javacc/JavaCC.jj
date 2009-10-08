@@ -527,7 +527,7 @@ void javacc_input() :
   javacc_options()
   "PARSER_BEGIN" "(" id1=identifier()
 	{
-	  addcuname(id1);
+	  addCuName(id1);
 	}
                  ")"
 	{
@@ -657,7 +657,7 @@ void javacode_production() :
   Block(p.getCodeTokens())
 	{
 	  p.setLastToken(getToken(0));
-	  addproduction(p);
+	  addProduction(p);
 	}
 }
 
@@ -703,8 +703,8 @@ void bnf_production() :
 	{
 	  p.setLastToken(t);
 	  p.setJumpPatched(jumpPatched);
-	  production_addexpansion(p, (Expansion)(c.member));
-	  addproduction(p);
+	  productionAddExpansion(p, (Expansion)(c.member));
+	  addProduction(p);
 	}
 }
 
@@ -781,7 +781,7 @@ void regular_expr_production() :
   "{" regexpr_spec(p) ( "|" regexpr_spec(p) )* t="}"
 	{
 	  p.lastToken = t;
-	  addregexpr(p);
+	  addRegExp(p);
 	}
 }
 
@@ -794,7 +794,7 @@ void token_manager_decls() :
   t="TOKEN_MGR_DECLS" ":"
   ClassOrInterfaceBody(false, decls)
 	{
-	  add_token_manager_decls(t, decls);
+	  addTokenManagerDecls(t, decls);
 	}
 }
 
@@ -827,13 +827,13 @@ void regexpr_spec(TokenProduction p) :
 	  Container c = new Container();
 	  Action act = new Action();
 	  Token t = null;
-	  RegExprSpec res = new RegExprSpec();
+	  RegExpSpec res = new RegExpSpec();
 	}
 {
   regular_expression(c)
 	{
-	  res.rexp = (RegularExpression)c.member;
-	  res.rexp.tpContext = p;
+	  res.regexp = (RegularExpression)c.member;
+	  res.regexp.tpContext = p;
 	}
   [
 	{
@@ -844,22 +844,22 @@ void regexpr_spec(TokenProduction p) :
 	  if (Options.getUserTokenManager()) {
 	    JavaCCErrors.warning(t, "Ignoring action in regular expression specification since option USER_TOKEN_MANAGER has been set to true.");
 	  }
-	  if (res.rexp.private_rexp) {
-	    JavaCCErrors.parse_error(t, "Actions are not permitted on private (#) regular expressions.");
+	  if (res.regexp.private_rexp) {
+	    JavaCCErrors.parseError(t, "Actions are not permitted on private (#) regular expressions.");
 	  }
 	}
   ]
   [ ":" t=<IDENTIFIER>
 	{
 	  res.nextState = t.image;
-	  if (res.rexp.private_rexp) {
-	    JavaCCErrors.parse_error(t, "Lexical state changes are not permitted after private (#) regular expressions.");
+	  if (res.regexp.private_rexp) {
+	    JavaCCErrors.parseError(t, "Lexical state changes are not permitted after private (#) regular expressions.");
 	  }
 	}
   ]
 	{
-	  res.act = act;
-	  res.nsTok = t;
+	  res.action = act;
+	  res.nextStateToken = t;
 	  p.respecs.add(res);
 	}
 }
@@ -1144,7 +1144,7 @@ void expansion_unit(Container c) :
     regular_expression(c)
 	{
 	  ((RegularExpression)(c.member)).lhsTokens = lhsTokens;
-	  add_inline_regexpr((RegularExpression)(c.member));
+	  addInlineRegExp((RegularExpression)(c.member));
 	}
 	[ "." t=<IDENTIFIER> { ((RegularExpression)(c.member)).rhsToken = t; } ]
   )
@@ -1308,7 +1308,7 @@ void complex_regular_expression_unit(Container c) :
 	  RZeroOrOne zorexp = new RZeroOrOne();
 	  zorexp.setLine(t.beginLine);
 	  zorexp.setColumn(t.beginColumn);
-	  zorexp.regexpr = (RegularExpression)c.member;
+	  zorexp.regexp = (RegularExpression)c.member;
 	  c.member = zorexp;
 	}
    | "{" r1 = IntegerLiteral()
@@ -1320,8 +1320,8 @@ void complex_regular_expression_unit(Container c) :
 	  rrrexp.setColumn(t.beginColumn);
 	  rrrexp.min = r1;
 	  rrrexp.max = r2;
-        rrrexp.hasMax = hasMax;
-	  rrrexp.regexpr = (RegularExpression)c.member;
+      rrrexp.hasMax = hasMax;
+	  rrrexp.regexp = (RegularExpression)c.member;
 	  c.member = rrrexp;
 	}
   )?
@@ -1338,7 +1338,7 @@ void character_list(Container c1) :
 {
   ["~"
 	{
-	  chlist.negated_list = true;
+	  chlist.negatedList = true;
 	}
   ]
   "[" [ character_descriptor(c2)
@@ -1367,12 +1367,12 @@ void character_descriptor(Container c) :
 {
   imageL=StringLiteral()
 	{
-	  c1 = character_descriptor_assign(getToken(0), imageL);
+	  c1 = characterDescriptorAssign(getToken(0), imageL);
 	}
   [ "-" imageR=StringLiteral()
 	{
 	  isrange = true;
-	  c2 = character_descriptor_assign(getToken(0), imageR, imageL);
+	  c2 = characterDescriptorAssign(getToken(0), imageR, imageL);
 	}
   ]
 	{
@@ -1459,7 +1459,7 @@ void CompilationUnit() :
   ( ImportDeclaration() )*
   ( TypeDeclaration() )*
 	{
-	  insertionpointerrors(getToken(1));
+	  insertionPointErrors(getToken(1));
 	}
 }
 
@@ -1559,13 +1559,13 @@ void ClassOrInterfaceDeclaration(int modifiers, List tokens):
 	{
 	  if (t.image.equals(parser_class_name) && class_nesting == 1 && processing_cu) {
 	    is_parser_class = true;
-	    setinsertionpoint(getToken(1), 1);
+	    setInsertionPoint(getToken(1), 1);
 	  }
 	}
   ClassOrInterfaceBody(isInterface, null)
 	{
 	  if (is_parser_class) {
-	    setinsertionpoint(getToken(0), 2);
+	    setInsertionPoint(getToken(0), 2);
 	  }
 	  class_nesting--;
 	}
@@ -2222,7 +2222,7 @@ String StringLiteral() :
 {
   t=<STRING_LITERAL>
 	{
-	  return remove_escapes_and_quotes(t, t.image);
+	  return removeEscapesAndQuotes(t, t.image);
 	}
 }
 

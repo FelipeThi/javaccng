@@ -28,32 +28,35 @@
 package org.javacc.parser;
 
 /** Describes character range descriptors in a character list. */
-
 public class CharacterRange {
+  /**
+   * The line number of the construct that corresponds
+   * most closely to this node.
+   */
+  private int line;
 
   /**
-   * The line and column number of the construct that corresponds
+   * The column number of the construct that corresponds
    * most closely to this node.
    */
   private int column;
 
-  private int line;
-
-  /** The leftmost and the rightmost characters in this character range. */
+  /** The leftmost characters in this character range. */
   private char right;
 
+  /** The rightmost characters in this character range. */
   private char left;
 
-  CharacterRange() { }
+  CharacterRange() {}
 
-  CharacterRange(char l, char r) {
-    if (l > r) {
-      JavaCCErrors.semantic_error(this, "Invalid range : \"" + (int) l + "\" - \""
-          + (int) r + "\". First character shoud be less than or equal to the second one in a range.");
+  CharacterRange(char left, char right) {
+    if (left > right) {
+      JavaCCErrors.semanticError(this, "Invalid range : \"" + (int) left + "\" - \""
+          + (int) right + "\". First character should be less than or equal to the second one in a range.");
     }
 
-    setLeft(l);
-    setRight(r);
+    setLeft(left);
+    setRight(right);
   }
 
   /** @param line the line to set */

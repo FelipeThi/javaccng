@@ -73,11 +73,11 @@ public class JJDoc extends JJDocGlobals {
   }
 
   /*
-  private static boolean toplevelExpansion(Expansion exp) {
-    return exp.parent != null
-      && ( (exp.parent instanceof NormalProduction)
+  private static boolean toplevelExpansion(Expansion expansion) {
+    return expansion.parent != null
+      && ( (expansion.parent instanceof NormalProduction)
          ||
-         (exp.parent instanceof TokenProduction)
+         (expansion.parent instanceof TokenProduction)
          );
   }
   */
@@ -110,12 +110,12 @@ public class JJDoc extends JJDocGlobals {
         }
         token += " : {\n";
         for (Iterator it2 = tp.respecs.iterator(); it2.hasNext();) {
-          RegExprSpec res = (RegExprSpec) it2.next();
+          RegExpSpec res = (RegExpSpec) it2.next();
 
-          token += emitRE(res.rexp);
+          token += emitRE(res.regexp);
 
-          if (res.nsTok != null) {
-            token += " : " + res.nsTok.image;
+          if (res.nextStateToken != null) {
+            token += " : " + res.nextStateToken.image;
           }
 
           token += "\n";
@@ -167,7 +167,7 @@ public class JJDoc extends JJDocGlobals {
   }
 
   private static void emitExpansionTree(Expansion exp, Generator gen) {
-//     gen.text("[->" + exp.getClass().getName() + "]");
+//     gen.text("[->" + expansion.getClass().getName() + "]");
     if (exp instanceof Action) {
       emitExpansionAction((Action) exp, gen);
     }
@@ -201,7 +201,7 @@ public class JJDoc extends JJDocGlobals {
     else {
       error("Oops: Unknown expansion type.");
     }
-//     gen.text("[<-" + exp.getClass().getName() + "]");
+//     gen.text("[<-" + expansion.getClass().getName() + "]");
   }
 
   private static void emitExpansionAction(Action a, Generator gen) {
@@ -265,11 +265,11 @@ public class JJDoc extends JJDocGlobals {
   }
 
   private static void emitExpansionTryBlock(TryBlock t, Generator gen) {
-    boolean needParens = t.exp instanceof Choice;
+    boolean needParens = t.expansion instanceof Choice;
     if (needParens) {
       gen.text("( ");
     }
-    emitExpansionTree(t.exp, gen);
+    emitExpansionTree(t.expansion, gen);
     if (needParens) {
       gen.text(" )");
     }
@@ -310,7 +310,7 @@ public class JJDoc extends JJDocGlobals {
     }
     if (re instanceof RCharacterList) {
       RCharacterList cl = (RCharacterList) re;
-      if (cl.negated_list) {
+      if (cl.negatedList) {
         returnString += "~";
       }
       returnString += "[";
@@ -360,7 +360,7 @@ public class JJDoc extends JJDocGlobals {
     else if (re instanceof ROneOrMore) {
       ROneOrMore om = (ROneOrMore) re;
       returnString += "(";
-      returnString += emitRE(om.regexpr);
+      returnString += emitRE(om.regexp);
       returnString += ")+";
     }
     else if (re instanceof RSequence) {
@@ -390,19 +390,19 @@ public class JJDoc extends JJDocGlobals {
     else if (re instanceof RZeroOrMore) {
       RZeroOrMore zm = (RZeroOrMore) re;
       returnString += "(";
-      returnString += emitRE(zm.regexpr);
+      returnString += emitRE(zm.regexp);
       returnString += ")*";
     }
     else if (re instanceof RZeroOrOne) {
       RZeroOrOne zo = (RZeroOrOne) re;
       returnString += "(";
-      returnString += emitRE(zo.regexpr);
+      returnString += emitRE(zo.regexp);
       returnString += ")?";
     }
     else if (re instanceof RRepetitionRange) {
       RRepetitionRange zo = (RRepetitionRange) re;
       returnString += "(";
-      returnString += emitRE(zo.regexpr);
+      returnString += emitRE(zo.regexp);
       returnString += ")";
       returnString += "{";
       if (zo.hasMax) {

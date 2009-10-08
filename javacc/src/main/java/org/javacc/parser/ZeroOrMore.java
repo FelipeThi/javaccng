@@ -31,17 +31,15 @@ package org.javacc.parser;
 import java.util.Set;
 
 /** Describes zero-or-more expansions (e.g., foo*). */
-
 public class ZeroOrMore extends Expansion {
-
   /** The expansion which is repeated zero or more times. */
   public Expansion expansion;
 
   public ZeroOrMore() {}
 
   public ZeroOrMore(Token token, Expansion expansion) {
-    this.setLine(token.beginLine);
-    this.setColumn(token.beginColumn);
+    setLine(token.beginLine);
+    setColumn(token.beginColumn);
     this.expansion = expansion;
     this.expansion.parent = this;
   }

@@ -30,18 +30,18 @@ public final class JJTreeOptionsTest extends TestCase {
         assertEquals(new File("test/output"), JJTreeOptions.getOutputDirectory());
         assertEquals(new File("test/jjtreeoutput"), JJTreeOptions.getJJTreeOutputDirectory());
 
-        assertEquals(0, JavaCCErrors.get_warning_count());
-        assertEquals(0, JavaCCErrors.get_error_count());
-        assertEquals(0, JavaCCErrors.get_parse_error_count());
-        assertEquals(0, JavaCCErrors.get_semantic_error_count());
+        assertEquals(0, JavaCCErrors.getWarningCount());
+        assertEquals(0, JavaCCErrors.getErrorCount());
+        assertEquals(0, JavaCCErrors.getParseErrorCount());
+        assertEquals(0, JavaCCErrors.getSemanticErrorCount());
     }
 
     public void testNodeFactory() {
       JJTreeOptions.init();
       JavaCCErrors.reInit();
 
-      assertEquals(0, JavaCCErrors.get_warning_count());
-      assertEquals(0, JavaCCErrors.get_error_count());
+      assertEquals(0, JavaCCErrors.getWarningCount());
+      assertEquals(0, JavaCCErrors.getErrorCount());
       JJTreeOptions.setInputFileOption(null, null, "NODE_FACTORY", Boolean.FALSE);
       assertEquals(JJTreeOptions.getNodeFactory(), "");
 
@@ -53,19 +53,19 @@ public final class JJTreeOptionsTest extends TestCase {
       JJTreeOptions.setInputFileOption(null, null, "NODE_FACTORY", "mypackage.MyNode");
       assertEquals(JJTreeOptions.getNodeFactory(), "mypackage.MyNode");
 
-      assertEquals(0, JavaCCErrors.get_warning_count());
+      assertEquals(0, JavaCCErrors.getWarningCount());
 
-      assertEquals(0, JavaCCErrors.get_error_count());
-      assertEquals(0, JavaCCErrors.get_parse_error_count());
-      assertEquals(0, JavaCCErrors.get_semantic_error_count());
+      assertEquals(0, JavaCCErrors.getErrorCount());
+      assertEquals(0, JavaCCErrors.getParseErrorCount());
+      assertEquals(0, JavaCCErrors.getSemanticErrorCount());
     }
 
     public void testNodeClass() {
       JJTreeOptions.init();
       JavaCCErrors.reInit();
 
-      assertEquals(0, JavaCCErrors.get_warning_count());
-      assertEquals(0, JavaCCErrors.get_error_count());
+      assertEquals(0, JavaCCErrors.getWarningCount());
+      assertEquals(0, JavaCCErrors.getErrorCount());
 
       assertEquals("", JJTreeOptions.getNodeClass());
       // Need some functional tests, as well.
@@ -77,7 +77,7 @@ public final class JJTreeOptionsTest extends TestCase {
 
       JJTreeOptions.setCmdLineOption("VISITOR_DATA_TYPE=Object");
       JJTreeOptions.validate();
-      assertEquals(1, JavaCCErrors.get_warning_count());
+      assertEquals(1, JavaCCErrors.getWarningCount());
 
       JJTreeOptions.init();
       JavaCCErrors.reInit();
@@ -85,14 +85,14 @@ public final class JJTreeOptionsTest extends TestCase {
       JJTreeOptions.setCmdLineOption("VISITOR_DATA_TYPE=Object");
       JJTreeOptions.setCmdLineOption("VISITOR=true");
       JJTreeOptions.validate();
-      assertEquals(0, JavaCCErrors.get_warning_count());
+      assertEquals(0, JavaCCErrors.getWarningCount());
 
       JJTreeOptions.init();
       JavaCCErrors.reInit();
 
       JJTreeOptions.setCmdLineOption("VISITOR_DATA_TYPE=Object");
       JJTreeOptions.validate();
-      assertEquals(1, JavaCCErrors.get_warning_count());
+      assertEquals(1, JavaCCErrors.getWarningCount());
     }
 
     public void testValidateReturnType() {
@@ -101,7 +101,7 @@ public final class JJTreeOptionsTest extends TestCase {
 
       JJTreeOptions.setCmdLineOption("VISITOR_DATA_TYPE=String");
       JJTreeOptions.validate();
-      assertEquals(1, JavaCCErrors.get_warning_count());
+      assertEquals(1, JavaCCErrors.getWarningCount());
 
       JJTreeOptions.init();
       JavaCCErrors.reInit();
@@ -109,13 +109,13 @@ public final class JJTreeOptionsTest extends TestCase {
       JJTreeOptions.setCmdLineOption("VISITOR_DATA_TYPE=String");
       JJTreeOptions.setCmdLineOption("VISITOR=true");
       JJTreeOptions.validate();
-      assertEquals(0, JavaCCErrors.get_warning_count());
+      assertEquals(0, JavaCCErrors.getWarningCount());
 
       JJTreeOptions.init();
       JavaCCErrors.reInit();
 
       JJTreeOptions.setCmdLineOption("VISITOR_DATA_TYPE=String");
       JJTreeOptions.validate();
-      assertEquals(1, JavaCCErrors.get_warning_count());
+      assertEquals(1, JavaCCErrors.getWarningCount());
     }
   }

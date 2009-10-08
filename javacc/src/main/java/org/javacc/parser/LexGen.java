@@ -145,7 +145,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
       ostr.println("{"); // }
     }
     catch (java.io.IOException err) {
-      JavaCCErrors.semantic_error("Could not create file : " + tokMgrClassName + ".java\n");
+      JavaCCErrors.semanticError("Could not create file : " + tokMgrClassName + ".java\n");
       throw new Error();
     }
 
@@ -278,7 +278,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
 
       RegularExpression re;
       for (i = 0; i < respecs.size(); i++) {
-        if (maxOrdinal <= (re = ((RegExprSpec) respecs.get(i)).rexp).ordinal) {
+        if (maxOrdinal <= (re = ((RegExpSpec) respecs.get(i)).regexp).ordinal) {
           maxOrdinal = re.ordinal + 1;
         }
       }
@@ -337,7 +337,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
   public static void start() {
     if (!Options.getBuildTokenManager() ||
         Options.getUserTokenManager() ||
-        JavaCCErrors.get_error_count() > 0) {
+        JavaCCErrors.getErrorCount() > 0) {
       return;
     }
 
@@ -387,8 +387,8 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
         }
 
         for (j = 0; j < rexps.size(); j++) {
-          RegExprSpec respec = (RegExprSpec) rexps.get(j);
-          curRE = respec.rexp;
+          RegExpSpec respec = (RegExpSpec) rexps.get(j);
+          curRE = respec.regexp;
 
           rexprs[curKind = curRE.ordinal] = curRE;
           lexStates[curRE.ordinal] = lexStateIndex;
@@ -406,7 +406,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
               mixed[lexStateIndex] = true;
             }
           }
-          else if (curRE.CanMatchAnyChar()) {
+          else if (curRE.canMatchAnyChar()) {
             if (canMatchAnyChar[lexStateIndex] == -1 ||
                 canMatchAnyChar[lexStateIndex] > curRE.ordinal) {
               canMatchAnyChar[lexStateIndex] = curRE.ordinal;
@@ -440,9 +440,9 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
             newLexState[curRE.ordinal] = respec.nextState;
           }
 
-          if (respec.act != null && respec.act.getActionTokens() != null &&
-              respec.act.getActionTokens().size() > 0) {
-            actions[curRE.ordinal] = respec.act;
+          if (respec.action != null && respec.action.getActionTokens() != null &&
+              respec.action.getActionTokens().size() > 0) {
+            actions[curRE.ordinal] = respec.action;
           }
 
           switch (kind) {
@@ -531,7 +531,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
     }
 
     for (i = 0; i < choices.size(); i++) {
-      ((RChoice) choices.get(i)).CheckUnmatchability();
+      ((RChoice) choices.get(i)).checkUnmatchability();
     }
 
     NfaState.DumpStateSets(ostr);

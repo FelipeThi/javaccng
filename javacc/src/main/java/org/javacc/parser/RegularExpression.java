@@ -32,9 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 /** Describes regular expressions. */
-
 public abstract class RegularExpression extends Expansion {
-
   /**
    * The label of the regular expression (if any).  If no label is
    * present, this is set to "".
@@ -63,18 +61,18 @@ public abstract class RegularExpression extends Expansion {
    * with the # symbol - this indicates that the purpose of the regular
    * expression is solely for defining other regular expressions.
    */
-  public boolean private_rexp = false;
+  public boolean private_rexp;
 
   /**
    * If this is a top-level regular expression (nested directly
    * within a TokenProduction), then this field point to that
    * TokenProduction object.
    */
-  public TokenProduction tpContext = null;
+  public TokenProduction tpContext;
 
   public abstract Nfa GenerateNfa(boolean ignoreCase);
 
-  public boolean CanMatchAnyChar() {
+  public boolean canMatchAnyChar() {
     return false;
   }
 
@@ -86,7 +84,7 @@ public abstract class RegularExpression extends Expansion {
    * node has been traversed.  i.e., -1 indicates partially processed,
    * and 1 indicates fully processed.
    */
-  int walkStatus = 0;
+  int walkStatus;
 
   public StringBuffer dump(int indent, Set alreadyDumped) {
     StringBuffer sb = super.dump(indent, alreadyDumped);

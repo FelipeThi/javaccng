@@ -27,6 +27,7 @@
  */
 package org.javacc.parser;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -154,8 +155,8 @@ public class NfaState {
     }
   }
 
-  private final void AddASCIIMove(char c) {
-    asciiMoves[c / 64] |= (1L << (c % 64));
+  private void AddASCIIMove(char c) {
+    asciiMoves[c / 64] |= 1L << c % 64;
   }
 
   void AddChar(char c) {
@@ -252,8 +253,8 @@ public class NfaState {
 
     for (i = 0; i < len; i += 2) {
       if (rangeMoves[i] == 0 ||
-          (rangeMoves[i] > left) ||
-          ((rangeMoves[i] == left) && (rangeMoves[i + 1] > right))) {
+          rangeMoves[i] > left ||
+          rangeMoves[i] == left && rangeMoves[i + 1] > right) {
         break;
       }
     }
@@ -350,15 +351,15 @@ public class NfaState {
   }
 
   public boolean HasTransitions() {
-    return (asciiMoves[0] != 0L || asciiMoves[1] != 0L ||
-        (charMoves != null && charMoves[0] != 0) ||
-        (rangeMoves != null && rangeMoves[0] != 0));
+    return asciiMoves[0] != 0L || asciiMoves[1] != 0L ||
+        charMoves != null && charMoves[0] != 0 ||
+        rangeMoves != null && rangeMoves[0] != 0;
   }
 
   void MergeMoves(NfaState other) {
     // Warning : This function does not merge epsilon moves
     if (asciiMoves == other.asciiMoves) {
-      JavaCCErrors.semantic_error("Bug in JavaCC : Please send " +
+      JavaCCErrors.semanticError("Bug in JavaCC : Please send " +
           "a report along with the input that caused this. Thank you.");
       throw new Error();
     }
@@ -418,7 +419,7 @@ public class NfaState {
                   ((NfaState) states.get(0)).next);
 
     for (int i = 1; i < states.size(); i++) {
-      NfaState tmp2 = ((NfaState) states.get(i));
+      NfaState tmp2 = (NfaState) states.get(i);
 
       if (tmp2.kind < newState.kind) {
         newState.kind = tmp2.kind;
@@ -559,10 +560,10 @@ public class NfaState {
           for (j = i + 1; j < epsilonMoves.size(); j++) {
             if ((tmp2 = (NfaState) epsilonMoves.get(j)).
                 HasTransitions() &&
-                (tmp1.asciiMoves[0] == tmp2.asciiMoves[0] &&
+                tmp1.asciiMoves[0] == tmp2.asciiMoves[0] &&
                     tmp1.asciiMoves[1] == tmp2.asciiMoves[1] &&
                     EqualCharArr(tmp1.charMoves, tmp2.charMoves) &&
-                    EqualCharArr(tmp1.rangeMoves, tmp2.rangeMoves))) {
+                    EqualCharArr(tmp1.rangeMoves, tmp2.rangeMoves)) {
               if (equivStates == null) {
                 equivStates = new ArrayList();
                 equivStates.add(tmp1);
@@ -703,7 +704,7 @@ public class NfaState {
     for (int i = 0; i < states.length; i++) {
       NfaState tmp = (NfaState) indexedAllStates.get(states[i]);
 
-      if ((tmp.asciiMoves[c / 64] & (1L << c % 64)) != 0L) {
+      if ((tmp.asciiMoves[c / 64] & 1L << c % 64) != 0L) {
         return true;
       }
     }
@@ -719,7 +720,7 @@ public class NfaState {
     }
 
     if (c < 128) {
-      return ((asciiMoves[c / 64] & (1L << c % 64)) != 0L);
+      return (asciiMoves[c / 64] & 1L << c % 64) != 0L;
     }
 
     // Just check directly if there is a move for this char
@@ -838,7 +839,7 @@ It also generates code to match a char with the common bit vectors.
 
   static int[] tmpIndices = new int[512]; // 2 * 256
 
-  void GenerateNonAsciiMoves(java.io.PrintWriter ostr) {
+  void GenerateNonAsciiMoves(PrintWriter ostr) {
     int i = 0, j = 0;
     char hiByte;
     int cnt = 0;
@@ -857,7 +858,7 @@ It also generates code to match a char with the common bit vectors.
 
         hiByte = (char) (charMoves[i] >> 8);
         loBytes[hiByte][(charMoves[i] & 0xff) / 64] |=
-            (1L << ((charMoves[i] & 0xff) % 64));
+            1L << (charMoves[i] & 0xff) % 64;
       }
     }
 
@@ -874,14 +875,14 @@ It also generates code to match a char with the common bit vectors.
 
         if (hiByte == (char) (rangeMoves[i + 1] >> 8)) {
           for (c = (char) (rangeMoves[i] & 0xff); c <= r; c++) {
-            loBytes[hiByte][c / 64] |= (1L << (c % 64));
+            loBytes[hiByte][c / 64] |= 1L << c % 64;
           }
 
           continue;
         }
 
         for (c = (char) (rangeMoves[i] & 0xff); c <= 0xff; c++) {
-          loBytes[hiByte][c / 64] |= (1L << (c % 64));
+          loBytes[hiByte][c / 64] |= 1L << c % 64;
         }
 
         while (++hiByte < (char) (rangeMoves[i + 1] >> 8)) {
@@ -892,7 +893,7 @@ It also generates code to match a char with the common bit vectors.
         }
 
         for (c = 0; c <= r; c++) {
-          loBytes[hiByte][c / 64] |= (1L << (c % 64));
+          loBytes[hiByte][c / 64] |= 1L << c % 64;
         }
       }
     }
@@ -923,10 +924,10 @@ It also generates code to match a char with the common bit vectors.
           if (common == null) {
             done[i] = true;
             common = new long[4];
-            common[i / 64] |= (1L << (i % 64));
+            common[i / 64] |= 1L << i % 64;
           }
 
-          common[j / 64] |= (1L << (j % 64));
+          common[j / 64] |= 1L << j % 64;
         }
       }
 
@@ -1124,7 +1125,7 @@ It also generates code to match a char with the common bit vectors.
     }
 
     while (toRet < nameSet.length &&
-        (starts && ((NfaState) indexedAllStates.get(nameSet[toRet])).inNextOf > 1)) {
+        starts && ((NfaState) indexedAllStates.get(nameSet[toRet])).inNextOf > 1) {
       toRet++;
     }
 
@@ -1136,7 +1137,7 @@ It also generates code to match a char with the common bit vectors.
         int[] other = (int[]) compositeStateTable.get(s);
 
         while (toRet < nameSet.length &&
-            ((starts && ((NfaState) indexedAllStates.get(nameSet[toRet])).inNextOf > 1) ||
+            (starts && ((NfaState) indexedAllStates.get(nameSet[toRet])).inNextOf > 1 ||
                 ElemOccurs(nameSet[toRet], other) >= 0)) {
           toRet++;
         }
@@ -1177,7 +1178,7 @@ It also generates code to match a char with the common bit vectors.
     return -1;
   }
 
-  public void GenerateInitMoves(java.io.PrintWriter ostr) {
+  public void GenerateInitMoves(PrintWriter ostr) {
     GetEpsilonMovesString();
 
     if (epsilonMovesString == null) {
@@ -1208,7 +1209,7 @@ It also generates code to match a char with the common bit vectors.
     return ret;
   }
 
-  public static void DumpStateSets(java.io.PrintWriter ostr) {
+  public static void DumpStateSets(PrintWriter ostr) {
     int cnt = 0;
 
     ostr.print("static final int[] jjnextStates = {");
@@ -1267,7 +1268,7 @@ It also generates code to match a char with the common bit vectors.
   static int NumberOfBitsSet(long l) {
     int ret = 0;
     for (int i = 0; i < 63; i++) {
-      if (((l >> i) & 1L) != 0L) {
+      if ((l >> i & 1L) != 0L) {
         ret++;
       }
     }
@@ -1278,7 +1279,7 @@ It also generates code to match a char with the common bit vectors.
   static int OnlyOneBitSet(long l) {
     int oneSeen = -1;
     for (int i = 0; i < 64; i++) {
-      if (((l >> i) & 1L) != 0L) {
+      if ((l >> i & 1L) != 0L) {
         if (oneSeen >= 0) {
           return -1;
         }
@@ -1565,7 +1566,7 @@ It also generates code to match a char with the common bit vectors.
     }
   }
 
-  private final void FixNextStates(int[] newSet) {
+  private void FixNextStates(int[] newSet) {
     next.usefulEpsilonMoves = newSet.length;
     //next.epsilonMovesString = GetStateSetString(newSet);
   }
@@ -1597,7 +1598,7 @@ It also generates code to match a char with the common bit vectors.
     return false;
   }
 
-  private static void DumpHeadForCase(java.io.PrintWriter ostr, int byteNum) {
+  private static void DumpHeadForCase(PrintWriter ostr, int byteNum) {
     if (byteNum == 0) {
       ostr.println("         long l = 1L << curChar;");
     }
@@ -1682,7 +1683,7 @@ It also generates code to match a char with the common bit vectors.
     return partition;
   }
 
-  private String PrintNoBreak(java.io.PrintWriter ostr, int byteNum, boolean[] dumped) {
+  private String PrintNoBreak(PrintWriter ostr, int byteNum, boolean[] dumped) {
     if (inNextOf != 1) {
       throw new Error("JavaCC Bug: Please send mail to sankar@cs.stanford.edu");
     }
@@ -1702,10 +1703,10 @@ It also generates code to match a char with the common bit vectors.
       return "";
     }
 
-    return ("               case " + stateName + ":\n");
+    return "               case " + stateName + ":\n";
   }
 
-  private static void DumpCompositeStatesAsciiMoves(java.io.PrintWriter ostr,
+  private static void DumpCompositeStatesAsciiMoves(PrintWriter ostr,
                                                     String key, int byteNum, boolean[] dumped) {
     int i;
 
@@ -1720,7 +1721,7 @@ It also generates code to match a char with the common bit vectors.
     NfaState tmp;
     NfaState stateForCase = null;
     String toPrint = "";
-    boolean stateBlock = (stateBlockTable.get(key) != null);
+    boolean stateBlock = stateBlockTable.get(key) != null;
 
     for (i = 0; i < nameSet.length; i++) {
       tmp = (NfaState) allStates.get(nameSet[i]);
@@ -1819,7 +1820,7 @@ It also generates code to match a char with the common bit vectors.
     return ElemOccurs(stateName, set) >= 0;
   }
 
-  private void DumpAsciiMoveForCompositeState(java.io.PrintWriter ostr, int byteNum, boolean elseNeeded) {
+  private void DumpAsciiMoveForCompositeState(PrintWriter ostr, int byteNum, boolean elseNeeded) {
     boolean nextIntersects = selfLoop();
 
     for (int j = 0; j < allStates.size(); j++) {
@@ -1881,7 +1882,7 @@ It also generates code to match a char with the common bit vectors.
       }
       else {
         int[] indices = GetStateSetIndicesForUse(next.epsilonMovesString);
-        boolean notTwo = (indices[0] + 1 != indices[1]);
+        boolean notTwo = indices[0] + 1 != indices[1];
 
         if (nextIntersects) {
           ostr.print(prefix + "                  jjCheckNAddStates(" + indices[0]);
@@ -1906,7 +1907,7 @@ It also generates code to match a char with the common bit vectors.
     }
   }
 
-  private void DumpAsciiMove(java.io.PrintWriter ostr, int byteNum, boolean dumped[]) {
+  private void DumpAsciiMove(PrintWriter ostr, int byteNum, boolean dumped[]) {
     boolean nextIntersects = selfLoop() && isComposite;
     boolean onlyState = true;
 
@@ -1931,10 +1932,10 @@ It also generates code to match a char with the common bit vectors.
           asciiMoves[byteNum] == temp1.asciiMoves[byteNum] &&
           kindToPrint == temp1.kindToPrint &&
           (next.epsilonMovesString == temp1.next.epsilonMovesString ||
-              (next.epsilonMovesString != null &&
+              next.epsilonMovesString != null &&
                   temp1.next.epsilonMovesString != null &&
                   next.epsilonMovesString.equals(
-                      temp1.next.epsilonMovesString)))) {
+                      temp1.next.epsilonMovesString))) {
         dumped[temp1.stateName] = true;
         ostr.println("               case " + temp1.stateName + ":");
       }
@@ -2027,7 +2028,7 @@ It also generates code to match a char with the common bit vectors.
       }
       else {
         int[] indices = GetStateSetIndicesForUse(next.epsilonMovesString);
-        boolean notTwo = (indices[0] + 1 != indices[1]);
+        boolean notTwo = indices[0] + 1 != indices[1];
 
         if (nextIntersects) {
           ostr.print(prefix + "                  jjCheckNAddStates(" + indices[0]);
@@ -2055,7 +2056,7 @@ It also generates code to match a char with the common bit vectors.
     }
   }
 
-  private static void DumpAsciiMoves(java.io.PrintWriter ostr, int byteNum) {
+  private static void DumpAsciiMoves(PrintWriter ostr, int byteNum) {
     boolean[] dumped = new boolean[Math.max(generatedStates, dummyStateIndex + 1)];
     Enumeration e = compositeStateTable.keys();
 
@@ -2085,7 +2086,7 @@ It also generates code to match a char with the common bit vectors.
           continue;
         }
 
-        toPrint = (temp.stateForCase.PrintNoBreak(ostr, byteNum, dumped));
+        toPrint = temp.stateForCase.PrintNoBreak(ostr, byteNum, dumped);
 
         if (temp.asciiMoves[byteNum] == 0L) {
           if (toPrint.equals("")) {
@@ -2114,7 +2115,7 @@ It also generates code to match a char with the common bit vectors.
     ostr.println("         } while(i != startsAt);");
   }
 
-  private static void DumpCompositeStatesNonAsciiMoves(java.io.PrintWriter ostr,
+  private static void DumpCompositeStatesNonAsciiMoves(PrintWriter ostr,
                                                        String key, boolean[] dumped) {
     int i;
     int[] nameSet = (int[]) allNextStates.get(key);
@@ -2128,7 +2129,7 @@ It also generates code to match a char with the common bit vectors.
     NfaState tmp;
     NfaState stateForCase = null;
     String toPrint = "";
-    boolean stateBlock = (stateBlockTable.get(key) != null);
+    boolean stateBlock = stateBlockTable.get(key) != null;
 
     for (i = 0; i < nameSet.length; i++) {
       tmp = (NfaState) allStates.get(nameSet[i]);
@@ -2211,13 +2212,13 @@ It also generates code to match a char with the common bit vectors.
     }
   }
 
-  private final void DumpNonAsciiMoveForCompositeState(java.io.PrintWriter ostr) {
+  private void DumpNonAsciiMoveForCompositeState(PrintWriter ostr) {
     boolean nextIntersects = selfLoop();
     for (int j = 0; j < allStates.size(); j++) {
       NfaState temp1 = (NfaState) allStates.get(j);
 
       if (this == temp1 || temp1.stateName == -1 || temp1.dummy ||
-          stateName == temp1.stateName || (temp1.nonAsciiMethod == -1)) {
+          stateName == temp1.stateName || temp1.nonAsciiMethod == -1) {
         continue;
       }
 
@@ -2264,7 +2265,7 @@ It also generates code to match a char with the common bit vectors.
       }
       else {
         int[] indices = GetStateSetIndicesForUse(next.epsilonMovesString);
-        boolean notTwo = (indices[0] + 1 != indices[1]);
+        boolean notTwo = indices[0] + 1 != indices[1];
 
         if (nextIntersects) {
           ostr.print("                     jjCheckNAddStates(" + indices[0]);
@@ -2288,14 +2289,14 @@ It also generates code to match a char with the common bit vectors.
     }
   }
 
-  private final void DumpNonAsciiMove(java.io.PrintWriter ostr, boolean dumped[]) {
+  private void DumpNonAsciiMove(PrintWriter ostr, boolean dumped[]) {
     boolean nextIntersects = selfLoop() && isComposite;
 
     for (int j = 0; j < allStates.size(); j++) {
       NfaState temp1 = (NfaState) allStates.get(j);
 
       if (this == temp1 || temp1.stateName == -1 || temp1.dummy ||
-          stateName == temp1.stateName || (temp1.nonAsciiMethod == -1)) {
+          stateName == temp1.stateName || temp1.nonAsciiMethod == -1) {
         continue;
       }
 
@@ -2308,9 +2309,9 @@ It also generates code to match a char with the common bit vectors.
           nonAsciiMethod == temp1.nonAsciiMethod &&
           kindToPrint == temp1.kindToPrint &&
           (next.epsilonMovesString == temp1.next.epsilonMovesString ||
-              (next.epsilonMovesString != null &&
+              next.epsilonMovesString != null &&
                   temp1.next.epsilonMovesString != null &&
-                  next.epsilonMovesString.equals(temp1.next.epsilonMovesString)))) {
+                  next.epsilonMovesString.equals(temp1.next.epsilonMovesString))) {
         dumped[temp1.stateName] = true;
         ostr.println("               case " + temp1.stateName + ":");
       }
@@ -2385,7 +2386,7 @@ It also generates code to match a char with the common bit vectors.
       }
       else {
         int[] indices = GetStateSetIndicesForUse(next.epsilonMovesString);
-        boolean notTwo = (indices[0] + 1 != indices[1]);
+        boolean notTwo = indices[0] + 1 != indices[1];
 
         if (nextIntersects) {
           ostr.print(prefix + "                  jjCheckNAddStates(" + indices[0]);
@@ -2407,7 +2408,7 @@ It also generates code to match a char with the common bit vectors.
     ostr.println("                  break;");
   }
 
-  public static void DumpCharAndRangeMoves(java.io.PrintWriter ostr) {
+  public static void DumpCharAndRangeMoves(PrintWriter ostr) {
     boolean[] dumped = new boolean[Math.max(generatedStates, dummyStateIndex + 1)];
     Enumeration e = compositeStateTable.keys();
     int i;
@@ -2437,7 +2438,7 @@ It also generates code to match a char with the common bit vectors.
           continue;
         }
 
-        toPrint = (temp.stateForCase.PrintNoBreak(ostr, -1, dumped));
+        toPrint = temp.stateForCase.PrintNoBreak(ostr, -1, dumped);
 
         if (temp.nonAsciiMethod == -1) {
           if (toPrint.equals("")) {
@@ -2467,7 +2468,7 @@ It also generates code to match a char with the common bit vectors.
     ostr.println("         } while(i != startsAt);");
   }
 
-  public static void DumpNonAsciiMoveMethods(java.io.PrintWriter ostr) {
+  public static void DumpNonAsciiMoveMethods(PrintWriter ostr) {
     if (!Options.getJavaUnicodeEscape() && !unicodeWarningGiven) {
       return;
     }
@@ -2482,7 +2483,7 @@ It also generates code to match a char with the common bit vectors.
     }
   }
 
-  void DumpNonAsciiMoveMethod(java.io.PrintWriter ostr) {
+  void DumpNonAsciiMoveMethod(PrintWriter ostr) {
     int j;
     ostr.println("private static final boolean jjCanMove_" + nonAsciiMethod +
         "(int hiByte, int i1, int i2, long l1, long l2)");
@@ -2550,7 +2551,7 @@ It also generates code to match a char with the common bit vectors.
   }
 
   //private static boolean boilerPlateDumped = false;
-  static void PrintBoilerPlate(java.io.PrintWriter ostr) {
+  static void PrintBoilerPlate(PrintWriter ostr) {
     ostr.println((Options.getStatic() ? "static " : "") + "private void " +
         "jjCheckNAdd(int state)");
     ostr.println("{");
@@ -2699,7 +2700,7 @@ It also generates code to match a char with the common bit vectors.
   static int[][] kinds;
   static int[][][] statesForState;
 
-  public static void DumpMoveNfa(java.io.PrintWriter ostr) {
+  public static void DumpMoveNfa(PrintWriter ostr) {
     //if (!boilerPlateDumped)
     //   PrintBoilerPlate(ostr);
 
@@ -2892,7 +2893,7 @@ It also generates code to match a char with the common bit vectors.
     allStates.clear();
   }
 
-  public static void DumpStatesForState(java.io.PrintWriter ostr) {
+  public static void DumpStatesForState(PrintWriter ostr) {
     ostr.print("protected static final int[][][] statesForState = ");
 
     if (statesForState == null) {
@@ -2933,7 +2934,7 @@ It also generates code to match a char with the common bit vectors.
     ostr.println("\n};");
   }
 
-  public static void DumpStatesForKind(java.io.PrintWriter ostr) {
+  public static void DumpStatesForKind(PrintWriter ostr) {
     DumpStatesForState(ostr);
     boolean moreThanOne = false;
     int cnt = 0;
