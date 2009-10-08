@@ -41,7 +41,7 @@ public class Choice extends Expansion {
    * The list of choices of this expansion unit.  Each
    * List component will narrow to ExpansionUnit.
    */
-  private final List choices = new ArrayList();
+  private final List<Expansion> choices = new ArrayList<Expansion>();
 
   public Choice() {}
 
@@ -57,7 +57,7 @@ public class Choice extends Expansion {
   }
 
   /** @return the choices */
-  public List getChoices() {
+  public List<Expansion> getChoices() {
     return choices;
   }
 
@@ -67,8 +67,7 @@ public class Choice extends Expansion {
       return sb;
     }
     alreadyDumped.add(this);
-    for (final Object o : getChoices()) {
-      Expansion next = (Expansion) o;
+    for (final Expansion next : getChoices()) {
       sb.append(eol).append(next.dump(indent + 1, alreadyDumped));
     }
     return sb;

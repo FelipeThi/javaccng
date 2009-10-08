@@ -530,8 +530,8 @@ public class Semanticize extends JavaCCGlobals {
       return true;
     }
     else if (exp instanceof Choice) {
-      for (final Object o : ((Choice) exp).getChoices()) {
-        if (emptyExpansionExists((Expansion) o)) {
+      for (final Expansion expansion : ((Choice) exp).getChoices()) {
+        if (emptyExpansionExists(expansion)) {
           return true;
         }
       }
@@ -578,8 +578,8 @@ public class Semanticize extends JavaCCGlobals {
       addLeftMost(prod, ((ZeroOrOne) exp).expansion);
     }
     else if (exp instanceof Choice) {
-      for (final Object o : ((Choice) exp).getChoices()) {
-        addLeftMost(prod, (Expansion) o);
+      for (final Expansion expansion : ((Choice) exp).getChoices()) {
+        addLeftMost(prod, expansion);
       }
     }
     else if (exp instanceof Sequence) {

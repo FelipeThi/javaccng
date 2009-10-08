@@ -43,8 +43,8 @@ public final class ExpansionTreeWalker {
     opObj.action(node);
     if (opObj.goDeeper(node)) {
       if (node instanceof Choice) {
-        for (final Object o : ((Choice) node).getChoices()) {
-          preOrderWalk((Expansion) o, opObj);
+        for (final Expansion expansion : ((Choice) node).getChoices()) {
+          preOrderWalk(expansion, opObj);
         }
       }
       else if (node instanceof Sequence) {
@@ -103,8 +103,8 @@ public final class ExpansionTreeWalker {
   static void postOrderWalk(Expansion node, TreeWalkerOp opObj) {
     if (opObj.goDeeper(node)) {
       if (node instanceof Choice) {
-        for (final Object o : ((Choice) node).getChoices()) {
-          postOrderWalk((Expansion) o, opObj);
+        for (final Expansion expansion : ((Choice) node).getChoices()) {
+          postOrderWalk(expansion, opObj);
         }
       }
       else if (node instanceof Sequence) {
@@ -123,7 +123,7 @@ public final class ExpansionTreeWalker {
       }
       else if (node instanceof Lookahead) {
         Expansion nested = ((Lookahead) node).getLaExpansion();
-        if (!(nested instanceof Sequence && (Expansion) ((Sequence) nested).units.get(0) == node)) {
+        if (!(nested instanceof Sequence && ((Sequence) nested).units.get(0) == node)) {
           postOrderWalk(nested, opObj);
         }
       }

@@ -37,6 +37,132 @@ import java.io.InputStreamReader;
 public final class Main {
   private Main() {}
 
+  /** A main program that exercises the parser. */
+  public static void main(String args[]) throws Exception {
+    System.exit(mainProgram(args));
+  }
+
+  /**
+   * The method to call to exercise the parser from other Java programs.
+   * It returns an error code.  See how the main program above uses
+   * this method.
+   */
+  public static int mainProgram(String args[]) throws Exception {
+    // Initialize all static state
+    reInitAll();
+
+    JavaCCGlobals.bannerLine("Parser Generator", "");
+
+    if (args.length == 0) {
+      System.out.println("");
+      helpMessage();
+      return 1;
+    }
+    else {
+      System.out.println("(type \"javacc\" with no arguments for help)");
+    }
+
+    final String fileName = args[args.length - 1];
+    if (Options.isOption(fileName)) {
+      System.out.println("Last argument \"" + fileName + "\" is not a filename.");
+      return 1;
+    }
+    for (int arg = 0; arg < args.length - 1; arg++) {
+      if (!Options.isOption(args[arg])) {
+        System.out.println("Argument \"" + args[arg] + "\" must be an option setting.");
+        return 1;
+      }
+      Options.setCmdLineOption(args[arg]);
+    }
+
+    JavaCCParser parser;
+    try {
+      final File file = new File(fileName);
+      if (!file.exists()) {
+        System.out.println("File " + fileName + " not found.");
+        return 1;
+      }
+      if (file.isDirectory()) {
+        System.out.println(fileName + " is a directory. Please use a valid file name.");
+        return 1;
+      }
+      parser = new JavaCCParser(new BufferedReader(new InputStreamReader(new FileInputStream(fileName), Options.getGrammarEncoding())));
+    }
+    catch (SecurityException ex) {
+      System.out.println("Security violation while trying to open " + fileName);
+      return 1;
+    }
+    catch (FileNotFoundException ex) {
+      System.out.println("File " + fileName + " not found.");
+      return 1;
+    }
+
+    try {
+      System.out.println("Reading from file " + fileName + " . . .");
+      JavaCCGlobals.fileName = JavaCCGlobals.origFileName = fileName;
+      JavaCCGlobals.jjtreeGenerated = JavaCCGlobals.isGeneratedBy("JJTree", fileName);
+      JavaCCGlobals.toolNames = JavaCCGlobals.getToolNames(fileName);
+      parser.javacc_input();
+      JavaCCGlobals.createOutputDir(Options.getOutputDirectory());
+
+      if (Options.getUnicodeInput()) {
+        NfaState.unicodeWarningGiven = true;
+        System.out.println("Note: UNICODE_INPUT option is specified. " +
+            "Please make sure you create the parser/lexer using a Reader with the correct character encoding.");
+      }
+
+      Semanticize.start();
+      ParseGen.start();
+      LexGen.start();
+      OtherFilesGen.start();
+
+      if (JavaCCErrors.getErrorCount() == 0 && (Options.getBuildParser() || Options.getBuildTokenManager())) {
+        if (JavaCCErrors.getWarningCount() == 0) {
+          System.out.println("Parser generated successfully.");
+        }
+        else {
+          System.out.println("Parser generated with 0 errors and "
+              + JavaCCErrors.getWarningCount() + " warnings.");
+        }
+        return 0;
+      }
+      else {
+        System.out.println("Detected " + JavaCCErrors.getErrorCount() + " errors and "
+            + JavaCCErrors.getWarningCount() + " warnings.");
+        return JavaCCErrors.getErrorCount() == 0 ? 0 : 1;
+      }
+    }
+    catch (MetaParseException e) {
+      System.out.println("Detected " + JavaCCErrors.getErrorCount() + " errors and "
+          + JavaCCErrors.getWarningCount() + " warnings.");
+      return 1;
+    }
+    catch (ParseException e) {
+      System.out.println(e.toString());
+      System.out.println("Detected " + (JavaCCErrors.getErrorCount() + 1) + " errors and "
+          + JavaCCErrors.getWarningCount() + " warnings.");
+      return 1;
+    }
+  }
+
+  public static void reInitAll() {
+    Expansion.reInit();
+    JavaCCErrors.reInit();
+    JavaCCGlobals.reInit();
+    Options.init();
+    JavaCCParserInternals.reInit();
+    RStringLiteral.reInit();
+    JavaFiles.reInit();
+    LexGen.reInit();
+    NfaState.reInit();
+    MatchInfo.reInit();
+    LookaheadWalk.reInit();
+    Semanticize.reInit();
+    ParseGen.reInit();
+    OtherFilesGen.reInit();
+    ParseEngine.reInit();
+  }
+
   static void helpMessage() {
     System.out.println("Usage:");
     System.out.println("    javacc option-settings inputfile");
@@ -92,130 +218,5 @@ public final class Main {
     System.out.println("EXAMPLE:");
     System.out.println("    javacc -STATIC=false -LOOKAHEAD:2 -debug_parser mygrammar.jj");
     System.out.println("");
-  }
-
-  /** A main program that exercises the parser. */
-  public static void main(String args[]) throws Exception {
-    System.exit(mainProgram(args));
-  }
-
-  /**
-   * The method to call to exercise the parser from other Java programs.
-   * It returns an error code.  See how the main program above uses
-   * this method.
-   */
-  public static int mainProgram(String args[]) throws Exception {
-    // Initialize all static state
-    reInitAll();
-
-    JavaCCGlobals.bannerLine("Parser Generator", "");
-
-    JavaCCParser parser = null;
-    if (args.length == 0) {
-      System.out.println("");
-      helpMessage();
-      return 1;
-    }
-    else {
-      System.out.println("(type \"javacc\" with no arguments for help)");
-    }
-
-    if (Options.isOption(args[args.length - 1])) {
-      System.out.println("Last argument \"" + args[args.length - 1] + "\" is not a filename.");
-      return 1;
-    }
-    for (int arg = 0; arg < args.length - 1; arg++) {
-      if (!Options.isOption(args[arg])) {
-        System.out.println("Argument \"" + args[arg] + "\" must be an option setting.");
-        return 1;
-      }
-      Options.setCmdLineOption(args[arg]);
-    }
-
-    try {
-      File fp = new File(args[args.length - 1]);
-      if (!fp.exists()) {
-        System.out.println("File " + args[args.length - 1] + " not found.");
-        return 1;
-      }
-      if (fp.isDirectory()) {
-        System.out.println(args[args.length - 1] + " is a directory. Please use a valid file name.");
-        return 1;
-      }
-      parser = new JavaCCParser(new BufferedReader(new InputStreamReader(new FileInputStream(args[args.length - 1]), Options.getGrammarEncoding())));
-    }
-    catch (SecurityException se) {
-      System.out.println("Security violation while trying to open " + args[args.length - 1]);
-      return 1;
-    }
-    catch (FileNotFoundException e) {
-      System.out.println("File " + args[args.length - 1] + " not found.");
-      return 1;
-    }
-
-    try {
-      System.out.println("Reading from file " + args[args.length - 1] + " . . .");
-      JavaCCGlobals.fileName = JavaCCGlobals.origFileName = args[args.length - 1];
-      JavaCCGlobals.jjtreeGenerated = JavaCCGlobals.isGeneratedBy("JJTree", args[args.length - 1]);
-      JavaCCGlobals.toolNames = JavaCCGlobals.getToolNames(args[args.length - 1]);
-      parser.javacc_input();
-      JavaCCGlobals.createOutputDir(Options.getOutputDirectory());
-
-      if (Options.getUnicodeInput()) {
-        NfaState.unicodeWarningGiven = true;
-        System.out.println("Note: UNICODE_INPUT option is specified. " +
-            "Please make sure you create the parser/lexer using a Reader with the correct character encoding.");
-      }
-
-      Semanticize.start();
-      ParseGen.start();
-      LexGen.start();
-      OtherFilesGen.start();
-
-      if ((JavaCCErrors.getErrorCount() == 0) && (Options.getBuildParser() || Options.getBuildTokenManager())) {
-        if (JavaCCErrors.getWarningCount() == 0) {
-          System.out.println("Parser generated successfully.");
-        }
-        else {
-          System.out.println("Parser generated with 0 errors and "
-              + JavaCCErrors.getWarningCount() + " warnings.");
-        }
-        return 0;
-      }
-      else {
-        System.out.println("Detected " + JavaCCErrors.getErrorCount() + " errors and "
-            + JavaCCErrors.getWarningCount() + " warnings.");
-        return (JavaCCErrors.getErrorCount() == 0) ? 0 : 1;
-      }
-    }
-    catch (MetaParseException e) {
-      System.out.println("Detected " + JavaCCErrors.getErrorCount() + " errors and "
-          + JavaCCErrors.getWarningCount() + " warnings.");
-      return 1;
-    }
-    catch (ParseException e) {
-      System.out.println(e.toString());
-      System.out.println("Detected " + (JavaCCErrors.getErrorCount() + 1) + " errors and "
-          + JavaCCErrors.getWarningCount() + " warnings.");
-      return 1;
-    }
-  }
-
-  public static void reInitAll() {
-    Expansion.reInit();
-    JavaCCErrors.reInit();
-    JavaCCGlobals.reInit();
-    Options.init();
-    JavaCCParserInternals.reInit();
-    RStringLiteral.reInit();
-    JavaFiles.reInit();
-    LexGen.reInit();
-    NfaState.reInit();
-    MatchInfo.reInit();
-    LookaheadWalk.reInit();
-    Semanticize.reInit();
-    ParseGen.reInit();
-    OtherFilesGen.reInit();
-    ParseEngine.reInit();
   }
 }

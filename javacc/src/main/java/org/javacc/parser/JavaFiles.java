@@ -167,7 +167,7 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants {
         return;
       }
 
-      final PrintWriter ostr = outputFile.getPrintWriter();
+      final PrintWriter out = outputFile.getPrintWriter();
 
       if (cu_to_insertion_point_1.size() != 0 &&
           ((Token) cu_to_insertion_point_1.get(0)).kind == PACKAGE
@@ -177,10 +177,10 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants {
             cline = ((Token) (cu_to_insertion_point_1.get(0))).beginLine;
             ccol = ((Token) (cu_to_insertion_point_1.get(0))).beginColumn;
             for (int j = 0; j <= i; j++) {
-              printToken((Token) (cu_to_insertion_point_1.get(j)), ostr);
+              printToken((Token) (cu_to_insertion_point_1.get(j)), out);
             }
-            ostr.println("");
-            ostr.println("");
+            out.println("");
+            out.println("");
             break;
           }
         }
@@ -192,9 +192,9 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants {
       JavaFileGenerator generator = new JavaFileGenerator(
           "/templates/JavaCharStream.template", options);
 
-      generator.generate(ostr);
+      generator.generate(out);
 
-      ostr.close();
+      out.close();
     }
     catch (IOException e) {
       System.err.println("Failed to create JavaCharStream " + e);
@@ -212,7 +212,7 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants {
         return;
       }
 
-      final PrintWriter ostr = outputFile.getPrintWriter();
+      final PrintWriter out = outputFile.getPrintWriter();
 
       if (cu_to_insertion_point_1.size() != 0 &&
           ((Token) cu_to_insertion_point_1.get(0)).kind == PACKAGE
@@ -222,10 +222,10 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants {
             cline = ((Token) (cu_to_insertion_point_1.get(0))).beginLine;
             ccol = ((Token) (cu_to_insertion_point_1.get(0))).beginColumn;
             for (int j = 0; j <= i; j++) {
-              printToken((Token) (cu_to_insertion_point_1.get(j)), ostr);
+              printToken((Token) (cu_to_insertion_point_1.get(j)), out);
             }
-            ostr.println("");
-            ostr.println("");
+            out.println("");
+            out.println("");
             break;
           }
         }
@@ -237,9 +237,9 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants {
       JavaFileGenerator generator = new JavaFileGenerator(
           "/templates/SimpleCharStream.template", options);
 
-      generator.generate(ostr);
+      generator.generate(out);
 
-      ostr.close();
+      out.close();
     }
     catch (IOException e) {
       System.err.println("Failed to create SimpleCharStream " + e);
@@ -257,7 +257,7 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants {
         return;
       }
 
-      final PrintWriter ostr = outputFile.getPrintWriter();
+      final PrintWriter out = outputFile.getPrintWriter();
 
       if (cu_to_insertion_point_1.size() != 0 &&
           ((Token) cu_to_insertion_point_1.get(0)).kind == PACKAGE
@@ -267,10 +267,10 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants {
             cline = ((Token) (cu_to_insertion_point_1.get(0))).beginLine;
             ccol = ((Token) (cu_to_insertion_point_1.get(0))).beginColumn;
             for (int j = 0; j <= i; j++) {
-              printToken((Token) (cu_to_insertion_point_1.get(j)), ostr);
+              printToken((Token) (cu_to_insertion_point_1.get(j)), out);
             }
-            ostr.println("");
-            ostr.println("");
+            out.println("");
+            out.println("");
             break;
           }
         }
@@ -279,9 +279,9 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants {
       JavaFileGenerator generator = new JavaFileGenerator(
           "/templates/CharStream.template", Options.getOptions());
 
-      generator.generate(ostr);
+      generator.generate(out);
 
-      ostr.close();
+      out.close();
     }
     catch (IOException e) {
       System.err.println("Failed to create CharStream " + e);
@@ -299,7 +299,7 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants {
         return;
       }
 
-      final PrintWriter ostr = outputFile.getPrintWriter();
+      final PrintWriter out = outputFile.getPrintWriter();
 
       if (cu_to_insertion_point_1.size() != 0 &&
           ((Token) cu_to_insertion_point_1.get(0)).kind == PACKAGE
@@ -309,10 +309,10 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants {
             cline = ((Token) (cu_to_insertion_point_1.get(0))).beginLine;
             ccol = ((Token) (cu_to_insertion_point_1.get(0))).beginColumn;
             for (int j = 0; j <= i; j++) {
-              printToken((Token) (cu_to_insertion_point_1.get(j)), ostr);
+              printToken((Token) (cu_to_insertion_point_1.get(j)), out);
             }
-            ostr.println("");
-            ostr.println("");
+            out.println("");
+            out.println("");
             break;
           }
         }
@@ -321,9 +321,9 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants {
       JavaFileGenerator generator = new JavaFileGenerator(
           "/templates/ParseException.template", Options.getOptions());
 
-      generator.generate(ostr);
+      generator.generate(out);
 
-      ostr.close();
+      out.close();
     }
     catch (IOException e) {
       System.err.println("Failed to create ParseException " + e);
@@ -341,7 +341,7 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants {
         return;
       }
 
-      final PrintWriter ostr = outputFile.getPrintWriter();
+      final PrintWriter out = outputFile.getPrintWriter();
 
       if (cu_to_insertion_point_1.size() != 0 &&
           ((Token) cu_to_insertion_point_1.get(0)).kind == PACKAGE
@@ -351,10 +351,10 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants {
             cline = ((Token) (cu_to_insertion_point_1.get(0))).beginLine;
             ccol = ((Token) (cu_to_insertion_point_1.get(0))).beginColumn;
             for (int j = 0; j <= i; j++) {
-              printToken((Token) (cu_to_insertion_point_1.get(j)), ostr);
+              printToken((Token) (cu_to_insertion_point_1.get(j)), out);
             }
-            ostr.println("");
-            ostr.println("");
+            out.println("");
+            out.println("");
             break;
           }
         }
@@ -363,9 +363,9 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants {
       JavaFileGenerator generator = new JavaFileGenerator(
           "/templates/TokenMgrError.template", Options.getOptions());
 
-      generator.generate(ostr);
+      generator.generate(out);
 
-      ostr.close();
+      out.close();
     }
     catch (IOException e) {
       System.err.println("Failed to create TokenMgrError " + e);
@@ -383,7 +383,7 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants {
         return;
       }
 
-      final PrintWriter ostr = outputFile.getPrintWriter();
+      final PrintWriter out = outputFile.getPrintWriter();
 
       if (cu_to_insertion_point_1.size() != 0 &&
           ((Token) cu_to_insertion_point_1.get(0)).kind == PACKAGE
@@ -393,10 +393,10 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants {
             cline = ((Token) (cu_to_insertion_point_1.get(0))).beginLine;
             ccol = ((Token) (cu_to_insertion_point_1.get(0))).beginColumn;
             for (int j = 0; j <= i; j++) {
-              printToken((Token) (cu_to_insertion_point_1.get(j)), ostr);
+              printToken((Token) (cu_to_insertion_point_1.get(j)), out);
             }
-            ostr.println("");
-            ostr.println("");
+            out.println("");
+            out.println("");
             break;
           }
         }
@@ -405,9 +405,9 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants {
       JavaFileGenerator generator = new JavaFileGenerator(
           "/templates/Token.template", Options.getOptions());
 
-      generator.generate(ostr);
+      generator.generate(out);
 
-      ostr.close();
+      out.close();
     }
     catch (IOException e) {
       System.err.println("Failed to create Token " + e);
@@ -425,7 +425,7 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants {
         return;
       }
 
-      final PrintWriter ostr = outputFile.getPrintWriter();
+      final PrintWriter out = outputFile.getPrintWriter();
 
       if (cu_to_insertion_point_1.size() != 0 &&
           ((Token) cu_to_insertion_point_1.get(0)).kind == PACKAGE
@@ -435,10 +435,10 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants {
             cline = ((Token) (cu_to_insertion_point_1.get(0))).beginLine;
             ccol = ((Token) (cu_to_insertion_point_1.get(0))).beginColumn;
             for (int j = 0; j <= i; j++) {
-              printToken((Token) (cu_to_insertion_point_1.get(j)), ostr);
+              printToken((Token) (cu_to_insertion_point_1.get(j)), out);
             }
-            ostr.println("");
-            ostr.println("");
+            out.println("");
+            out.println("");
             break;
           }
         }
@@ -447,9 +447,9 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants {
       JavaFileGenerator generator = new JavaFileGenerator(
           "/templates/TokenManager.template", Options.getOptions());
 
-      generator.generate(ostr);
+      generator.generate(out);
 
-      ostr.close();
+      out.close();
     }
     catch (IOException e) {
       System.err.println("Failed to create TokenManager " + e);

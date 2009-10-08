@@ -34,7 +34,6 @@ import java.util.Set;
  * right hand sides of productions.  This is the base class of
  * a bunch of other more specific classes.
  */
-
 public class Expansion {
   /**
    * The line number of the construct that corresponds

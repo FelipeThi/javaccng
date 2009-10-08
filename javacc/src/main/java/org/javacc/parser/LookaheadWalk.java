@@ -85,7 +85,7 @@ public final class LookaheadWalk {
       List v = partialMatches;
       Sequence seq = (Sequence) exp;
       for (int i = 0; i < seq.units.size(); i++) {
-        v = genFirstSet(v, (Expansion) seq.units.get(i));
+        v = genFirstSet(v, seq.units.get(i));
         if (v.size() == 0) {
           break;
         }
@@ -128,10 +128,9 @@ public final class LookaheadWalk {
     else if (exp instanceof TryBlock) {
       return genFirstSet(partialMatches, ((TryBlock) exp).expansion);
     }
-    else if (considerSemanticLA &&
-        exp instanceof Lookahead &&
-        ((Lookahead) exp).getActionTokens().size() != 0
-        ) {
+    else if (considerSemanticLA
+        && exp instanceof Lookahead
+        && ((Lookahead) exp).getActionTokens().size() != 0) {
       return new ArrayList();
     }
     else {
@@ -179,7 +178,7 @@ public final class LookaheadWalk {
       Sequence seq = (Sequence) exp.parent;
       List v = partialMatches;
       for (int i = exp.ordinal + 1; i < seq.units.size(); i++) {
-        v = genFirstSet(v, (Expansion) seq.units.get(i));
+        v = genFirstSet(v, seq.units.get(i));
         if (v.size() == 0) {
           return v;
         }

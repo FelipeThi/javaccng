@@ -39,7 +39,7 @@ import java.io.PrintWriter;
 
 /** Output BNF in text format. */
 public class TextGenerator implements Generator {
-  protected PrintWriter ostr;
+  protected PrintWriter out;
 
   public TextGenerator() {
   }
@@ -59,7 +59,7 @@ public class TextGenerator implements Generator {
    * @see org.javacc.jjdoc.Generator#print(java.lang.String)
    */
   public void print(String s) {
-    ostr.print(s);
+    out.print(s);
   }
 
   /**
@@ -68,8 +68,8 @@ public class TextGenerator implements Generator {
    * @see org.javacc.jjdoc.Generator#documentStart()
    */
   public void documentStart() {
-    ostr = create_output_stream();
-    ostr.print("\nDOCUMENT START\n");
+    out = create_output_stream();
+    out.print("\nDOCUMENT START\n");
   }
 
   /**
@@ -78,8 +78,8 @@ public class TextGenerator implements Generator {
    * @see org.javacc.jjdoc.Generator#documentEnd()
    */
   public void documentEnd() {
-    ostr.print("\nDOCUMENT END\n");
-    ostr.close();
+    out.print("\nDOCUMENT END\n");
+    out.close();
   }
 
   /**
@@ -88,7 +88,7 @@ public class TextGenerator implements Generator {
    * @see org.javacc.jjdoc.Generator#specialTokens(java.lang.String)
    */
   public void specialTokens(String s) {
-    ostr.print(s);
+    out.print(s);
   }
 
   /**
@@ -158,7 +158,7 @@ public class TextGenerator implements Generator {
    * @see org.javacc.jjdoc.Generator#productionStart(org.javacc.parser.NormalProduction)
    */
   public void productionStart(NormalProduction np) {
-    ostr.print("\t" + np.getLhs() + "\t:=\t");
+    out.print("\t" + np.getLhs() + "\t:=\t");
   }
 
   /**
@@ -167,7 +167,7 @@ public class TextGenerator implements Generator {
    * @see org.javacc.jjdoc.Generator#productionEnd(org.javacc.parser.NormalProduction)
    */
   public void productionEnd(NormalProduction np) {
-    ostr.print("\n");
+    out.print("\n");
   }
 
   /**
@@ -177,7 +177,7 @@ public class TextGenerator implements Generator {
    */
   public void expansionStart(Expansion e, boolean first) {
     if (!first) {
-      ostr.print("\n\t\t|\t");
+      out.print("\n\t\t|\t");
     }
   }
 
@@ -260,17 +260,17 @@ public class TextGenerator implements Generator {
     }
 
     try {
-      ostr = new java.io.PrintWriter(
+      out = new java.io.PrintWriter(
           new java.io.FileWriter(
               JJDocGlobals.output_file));
     }
     catch (java.io.IOException e) {
       error("JJDoc: can't open output stream on file "
           + JJDocGlobals.output_file + ".  Using standard output.");
-      ostr = new java.io.PrintWriter(new java.io.OutputStreamWriter(System.out));
+      out = new java.io.PrintWriter(new java.io.OutputStreamWriter(System.out));
     }
 
-    return ostr;
+    return out;
   }
 
   /**

@@ -33,7 +33,7 @@ import java.util.List;
 /** Describes BNF productions. */
 public class BNFProduction extends NormalProduction {
   /** The declarations of this production. */
-  private final List declarationTokens = new ArrayList();
+  private final List<Token> declarationTokens = new ArrayList<Token>();
 
   /**
    * This flag keeps track of whether or not return and throw
@@ -43,7 +43,7 @@ public class BNFProduction extends NormalProduction {
   private boolean jumpPatched;
 
   /** @return the declaration_tokens */
-  public List getDeclarationTokens() {
+  public List<Token> getDeclarationTokens() {
     return declarationTokens;
   }
 

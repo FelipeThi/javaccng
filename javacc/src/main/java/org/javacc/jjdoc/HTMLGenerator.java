@@ -79,11 +79,11 @@ public class HTMLGenerator extends TextGenerator implements Generator {
   }
 
   public void print(String s) {
-    ostr.print(s);
+    out.print(s);
   }
 
   public void documentStart() {
-    ostr = create_output_stream();
+    out = create_output_stream();
     println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2//EN\">");
     println("<HTML>");
     println("<HEAD>");
@@ -104,7 +104,7 @@ public class HTMLGenerator extends TextGenerator implements Generator {
   public void documentEnd() {
     println("</BODY>");
     println("</HTML>");
-    ostr.close();
+    out.close();
   }
 
   /**

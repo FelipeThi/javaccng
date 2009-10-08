@@ -52,22 +52,21 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class JavaCCParser extends JavaCCParserInternals {
-
   /**
    * The name of the parser class.
    */
-  String parser_class_name;
+  String parserClassName;
 
   /**
    * This flag is set to true when the part between PARSER_BEGIN and
    * PARSER_END is being parsed.
    */
-  boolean processing_cu = false;
+  boolean processingCu = false;
 
   /**
    * The level of class nesting.
    */
-  int class_nesting = 0;
+  int classNesting = 0;
 
   /**
    * This int variable is incremented while parsing local lookaheads.
@@ -102,11 +101,8 @@ public class JavaCCParser extends JavaCCParserInternals {
     return true;
   }
 
-   /**
-    * Class to hold modifiers.
-    */
-   static public final class ModifierSet
-   {
+   /** Class to hold modifiers. */
+   static public final class ModifierSet {
      /* Definitions of the bits in the modifiers field.  */
      public static final int PUBLIC = 0x0001;
      public static final int PROTECTED = 0x0002;
@@ -123,71 +119,57 @@ public class JavaCCParser extends JavaCCParserInternals {
      /** A set of accessors that indicate whether the specified modifier
          is in the set. */
 
-     public boolean isPublic(int modifiers)
-     {
+     public boolean isPublic(int modifiers) {
        return (modifiers & PUBLIC) != 0;
      }
 
-     public boolean isProtected(int modifiers)
-     {
+     public boolean isProtected(int modifiers) {
        return (modifiers & PROTECTED) != 0;
      }
 
-     public boolean isPrivate(int modifiers)
-     {
+     public boolean isPrivate(int modifiers) {
        return (modifiers & PRIVATE) != 0;
      }
 
-     public boolean isStatic(int modifiers)
-     {
+     public boolean isStatic(int modifiers) {
        return (modifiers & STATIC) != 0;
      }
 
-     public boolean isAbstract(int modifiers)
-     {
+     public boolean isAbstract(int modifiers) {
        return (modifiers & ABSTRACT) != 0;
      }
 
-     public boolean isFinal(int modifiers)
-     {
+     public boolean isFinal(int modifiers) {
        return (modifiers & FINAL) != 0;
      }
 
-     public boolean isNative(int modifiers)
-     {
+     public boolean isNative(int modifiers) {
        return (modifiers & NATIVE) != 0;
      }
 
-     public boolean isStrictfp(int modifiers)
-     {
+     public boolean isStrictfp(int modifiers) {
        return (modifiers & STRICTFP) != 0;
      }
 
-     public boolean isSynchronized(int modifiers)
-     {
+     public boolean isSynchronized(int modifiers) {
        return (modifiers & SYNCHRONIZED) != 0;
      }
 
-     public boolean isTransient(int modifiers)
-      {
+     public boolean isTransient(int modifiers) {
        return (modifiers & TRANSIENT) != 0;
      }
 
-     public boolean isVolatile(int modifiers)
-     {
+     public boolean isVolatile(int modifiers) {
        return (modifiers & VOLATILE) != 0;
      }
 
      /**
       * Removes the given modifier.
       */
-     static int removeModifier(int modifiers, int mod)
-     {
+     static int removeModifier(int modifiers, int mod) {
         return modifiers & ~mod;
      }
    }
-
-
 }
 
 PARSER_END(JavaCCParser)
@@ -531,12 +513,12 @@ void javacc_input() :
 	}
                  ")"
 	{
-	  processing_cu = true;
-	  parser_class_name = id1;
+	  processingCu = true;
+	  parserClassName = id1;
 	}
   CompilationUnit()
 	{
-	  processing_cu = false;
+	  processingCu = false;
 	}
   "PARSER_END" "(" id2=identifier()
 	{
@@ -875,13 +857,13 @@ void expansion_choices(Container c1) :
   ( "|" expansion(c2)
 	{
 	  if (morethanone) {
-	    ch.getChoices().add(c2.member);
+	    ch.getChoices().add((Expansion)c2.member);
 	    ((Expansion)c2.member).parent = ch;
 	  } else {
 	    morethanone = true;
 	    ch = new Choice((Expansion)c1.member);
 	    ((Expansion)c1.member).parent = ch;
-	    ch.getChoices().add(c2.member);
+	    ch.getChoices().add((Expansion)c2.member);
 	    ((Expansion)c2.member).parent = ch;
 	  }
 	}
@@ -924,7 +906,7 @@ void expansion(Container c1) :
   ( LOOKAHEAD(0, { notTailOfExpansionUnit() } )
     expansion_unit(c2)
 	{
-	  seq.units.add(c2.member);
+	  seq.units.add((Expansion)c2.member);
 	  ((Expansion)c2.member).parent = seq;
 	  ((Expansion)c2.member).ordinal = seq.units.size()-1;
 	}
@@ -1226,14 +1208,14 @@ void complex_regular_expression_choices(Container c1) :
   ( "|" complex_regular_expression(c2)
 	{
 	  if (morethanone) {
-	    ch.getChoices().add(c2.member);
+	    ch.getChoices().add((Expansion)c2.member);
 	  } else {
 	    morethanone = true;
 	    ch = new RChoice();
 	    ch.setLine(((RegularExpression)c1.member).getLine());
 	    ch.setColumn(((RegularExpression)c1.member).getColumn());
-	    ch.getChoices().add(c1.member);
-	    ch.getChoices().add(c2.member);
+	    ch.getChoices().add((Expansion)c1.member);
+	    ch.getChoices().add((Expansion)c2.member);
 	  }
 	}
   )*
@@ -1260,10 +1242,10 @@ void complex_regular_expression(Container c1) :
 	    seq = new RSequence();
 	    seq.setLine(((RegularExpression)c1.member).getLine());
 	    seq.setColumn(((RegularExpression)c1.member).getColumn());
-	    seq.units.add(c1.member);
-	    seq.units.add(c2.member);
+	    seq.units.add((Expansion)c1.member);
+	    seq.units.add((Expansion)c2.member);
 	  } else {
-	    seq.units.add(c2.member);
+	    seq.units.add((Expansion)c2.member);
 	  }
 	}
   )+
@@ -1544,7 +1526,7 @@ void TypeDeclaration():
 void ClassOrInterfaceDeclaration(int modifiers, List tokens):
 {
    boolean isInterface = false;
-	  class_nesting++;
+	  classNesting++;
 	  Token t;
 	  boolean is_parser_class = false;
   if (tokens == null)
@@ -1557,7 +1539,7 @@ void ClassOrInterfaceDeclaration(int modifiers, List tokens):
   [ ExtendsList(isInterface) ]
   [ ImplementsList(isInterface) ]
 	{
-	  if (t.image.equals(parser_class_name) && class_nesting == 1 && processing_cu) {
+	  if (t.image.equals(parserClassName) && classNesting == 1 && processingCu) {
 	    is_parser_class = true;
 	    setInsertionPoint(getToken(1), 1);
 	  }
@@ -1567,7 +1549,7 @@ void ClassOrInterfaceDeclaration(int modifiers, List tokens):
 	  if (is_parser_class) {
 	    setInsertionPoint(getToken(0), 2);
 	  }
-	  class_nesting--;
+	  classNesting--;
 	}
 }
 

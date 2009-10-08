@@ -33,10 +33,10 @@ import java.util.List;
 /** Describes JAVACODE productions. */
 public class JavaCodeProduction extends NormalProduction {
   /** The tokens that implement this JAVACODE production. */
-  private final List codeTokens = new ArrayList();
+  private final List<Token> codeTokens = new ArrayList<Token>();
 
   /** @return the code_tokens */
-  public List getCodeTokens() {
+  public List<Token> getCodeTokens() {
     return codeTokens;
   }
 }

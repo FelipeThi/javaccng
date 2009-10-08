@@ -40,10 +40,10 @@ public class Action extends Expansion {
    * Contains the list of tokens that make up the action.  This
    * list does not include the surrounding braces.
    */
-  private final List actionTokens = new ArrayList();
+  private final List<Token> actionTokens = new ArrayList<Token>();
 
   /** @return the action_tokens */
-  public List getActionTokens() {
+  public List<Token> getActionTokens() {
     return actionTokens;
   }
 

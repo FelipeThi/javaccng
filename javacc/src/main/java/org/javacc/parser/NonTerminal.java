@@ -44,7 +44,7 @@ public class NonTerminal extends Expansion {
   private String name;
 
   /** The list of all tokens in the argument list. */
-  private final List argumentTokens = new ArrayList();
+  private final List<Token> argumentTokens = new ArrayList<Token>();
 
   /** The production this non-terminal corresponds to. */
   private NormalProduction production;
@@ -70,7 +70,7 @@ public class NonTerminal extends Expansion {
   }
 
   /** @return the argument_tokens */
-  public List getArgumentTokens() {
+  public List<Token> getArgumentTokens() {
     return argumentTokens;
   }
 

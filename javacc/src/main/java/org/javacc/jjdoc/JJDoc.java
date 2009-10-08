@@ -144,8 +144,7 @@ public class JJDoc extends JJDocGlobals {
         if (np.getExpansion() instanceof Choice) {
           boolean first = true;
           Choice c = (Choice) np.getExpansion();
-          for (Iterator expansionsIterator = c.getChoices().iterator(); expansionsIterator.hasNext();) {
-            Expansion e = (Expansion) (expansionsIterator.next());
+          for (final Expansion e : c.getChoices()) {
             gen.expansionStart(e, first);
             emitExpansionTree(e, gen);
             gen.expansionEnd(e, first);
@@ -209,7 +208,7 @@ public class JJDoc extends JJDocGlobals {
 
   private static void emitExpansionChoice(Choice c, Generator gen) {
     for (Iterator it = c.getChoices().iterator(); it.hasNext();) {
-      Expansion e = (Expansion) (it.next());
+      Expansion e = (Expansion) it.next();
       emitExpansionTree(e, gen);
       if (it.hasNext()) {
         gen.text(" | ");

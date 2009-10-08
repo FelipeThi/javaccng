@@ -41,7 +41,7 @@ public class Sequence extends Expansion {
    * The list of units in this expansion sequence.  Each
    * List component will narrow to Expansion.
    */
-  public List units = new ArrayList();
+  public List<Expansion> units = new ArrayList<Expansion>();
 
   public Sequence() {}
 

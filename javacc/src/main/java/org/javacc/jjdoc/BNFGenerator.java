@@ -42,7 +42,7 @@ import java.util.Hashtable;
 public class BNFGenerator implements Generator {
   private Hashtable id_map = new Hashtable();
   private int id = 1;
-  protected PrintWriter ostr;
+  protected PrintWriter out;
   private boolean printing = true;
 
   protected String get_id(String nt) {
@@ -84,17 +84,17 @@ public class BNFGenerator implements Generator {
       JJDocGlobals.output_file = JJDocOptions.getOutputFile();
     }
     try {
-      ostr = new java.io.PrintWriter(
+      out = new java.io.PrintWriter(
           new java.io.FileWriter(
               JJDocGlobals.output_file));
     }
     catch (java.io.IOException e) {
       error("JJDoc: can't open output stream on file "
           + JJDocGlobals.output_file + ".  Using standard output.");
-      ostr = new java.io.PrintWriter(new java.io.OutputStreamWriter(System.out));
+      out = new java.io.PrintWriter(new java.io.OutputStreamWriter(System.out));
     }
 
-    return ostr;
+    return out;
   }
 
   private void println(String s) {
@@ -108,15 +108,15 @@ public class BNFGenerator implements Generator {
   }
 
   public void print(String s) {
-    ostr.print(s);
+    out.print(s);
   }
 
   public void documentStart() {
-    ostr = create_output_stream();
+    out = create_output_stream();
   }
 
   public void documentEnd() {
-    ostr.close();
+    out.close();
   }
 
   public void specialTokens(String s) {

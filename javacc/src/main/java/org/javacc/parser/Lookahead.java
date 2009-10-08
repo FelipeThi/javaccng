@@ -48,7 +48,7 @@ public class Lookahead extends Expansion {
    * that forms the semantic lookahead.  In this case, the following
    * fields "amount" and "la_expansion" are ignored.
    */
-  private final List actionTokens = new ArrayList();
+  private final List<Token> actionTokens = new ArrayList<Token>();
 
   /**
    * The lookahead amount.  Its default value essentially gives us
@@ -69,7 +69,7 @@ public class Lookahead extends Expansion {
   private boolean isExplicit;
 
   /** @return the action_tokens */
-  public List getActionTokens() {
+  public List<Token> getActionTokens() {
     return actionTokens;
   }
 
