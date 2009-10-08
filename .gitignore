@@ -1,0 +1,6 @@
+javacc-maven-plugin
+target
+*~
+*.iml
+*.ipr
+*.iws
