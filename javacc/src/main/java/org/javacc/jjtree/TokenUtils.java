@@ -29,17 +29,16 @@ package org.javacc.jjtree;
 
 import org.javacc.parser.JavaCCErrors;
 
-/**
- * Utilities for manipulating Tokens.
- */
-public final class TokenUtils
-{
+/** Utilities for manipulating Tokens. */
+public final class TokenUtils {
   private TokenUtils() {}
 
   static void print(Token t, IO io, String in, String out) {
     Token tt = t.specialToken;
     if (tt != null) {
-      while (tt.specialToken != null) tt = tt.specialToken;
+      while (tt.specialToken != null) {
+        tt = tt.specialToken;
+      }
       while (tt != null) {
         io.print(addUnicodeEscapes(tt.image));
         tt = tt.next;
@@ -64,19 +63,19 @@ public final class TokenUtils
       if ((ch < 0x20 || ch > 0x7e) && ch != '\t' && ch != '\n' && ch != '\r' && ch != '\f') {
         String s = "0000" + Integer.toString(ch, 16);
         buff.append("\\u" + s.substring(s.length() - 4, s.length()));
-      } else {
+      }
+      else {
         buff.append(ch);
       }
     }
     return buff.toString();
   }
 
-
-  static boolean hasTokens(JJTreeNode n)
-  {
+  static boolean hasTokens(JJTreeNode n) {
     if (n.getLastToken().next == n.getFirstToken()) {
       return false;
-    } else {
+    }
+    else {
       return true;
     }
   }
@@ -86,71 +85,87 @@ public final class TokenUtils
     int index = 1;
     char ch, ch1;
     int ordinal;
-    while (index < str.length()-1) {
+    while (index < str.length() - 1) {
       if (str.charAt(index) != '\\') {
-        retval += str.charAt(index); index++;
+        retval += str.charAt(index);
+        index++;
         continue;
       }
       index++;
       ch = str.charAt(index);
       if (ch == 'b') {
-        retval += '\b'; index++;
+        retval += '\b';
+        index++;
         continue;
       }
       if (ch == 't') {
-        retval += '\t'; index++;
+        retval += '\t';
+        index++;
         continue;
       }
       if (ch == 'n') {
-        retval += '\n'; index++;
+        retval += '\n';
+        index++;
         continue;
       }
       if (ch == 'f') {
-        retval += '\f'; index++;
+        retval += '\f';
+        index++;
         continue;
       }
       if (ch == 'r') {
-        retval += '\r'; index++;
+        retval += '\r';
+        index++;
         continue;
       }
       if (ch == '"') {
-        retval += '\"'; index++;
+        retval += '\"';
+        index++;
         continue;
       }
       if (ch == '\'') {
-        retval += '\''; index++;
+        retval += '\'';
+        index++;
         continue;
       }
       if (ch == '\\') {
-        retval += '\\'; index++;
+        retval += '\\';
+        index++;
         continue;
       }
       if (ch >= '0' && ch <= '7') {
-        ordinal = ((int)ch) - ((int)'0'); index++;
+        ordinal = ((int) ch) - ((int) '0');
+        index++;
         ch1 = str.charAt(index);
         if (ch1 >= '0' && ch1 <= '7') {
-          ordinal = ordinal*8 + ((int)ch1) - ((int)'0'); index++;
+          ordinal = ordinal * 8 + ((int) ch1) - ((int) '0');
+          index++;
           ch1 = str.charAt(index);
           if (ch <= '3' && ch1 >= '0' && ch1 <= '7') {
-            ordinal = ordinal*8 + ((int)ch1) - ((int)'0'); index++;
+            ordinal = ordinal * 8 + ((int) ch1) - ((int) '0');
+            index++;
           }
         }
-        retval += (char)ordinal;
+        retval += (char) ordinal;
         continue;
       }
       if (ch == 'u') {
-        index++; ch = str.charAt(index);
+        index++;
+        ch = str.charAt(index);
         if (hexchar(ch)) {
           ordinal = hexval(ch);
-          index++; ch = str.charAt(index);
+          index++;
+          ch = str.charAt(index);
           if (hexchar(ch)) {
-            ordinal = ordinal*16 + hexval(ch);
-            index++; ch = str.charAt(index);
+            ordinal = ordinal * 16 + hexval(ch);
+            index++;
+            ch = str.charAt(index);
             if (hexchar(ch)) {
-              ordinal = ordinal*16 + hexval(ch);
-              index++; ch = str.charAt(index);
+              ordinal = ordinal * 16 + hexval(ch);
+              index++;
+              ch = str.charAt(index);
               if (hexchar(ch)) {
-                ordinal = ordinal*16 + hexval(ch);
+                ordinal = ordinal * 16 + hexval(ch);
                 index++;
                 continue;
               }
@@ -168,18 +183,27 @@ public final class TokenUtils
   }
 
   private static boolean hexchar(char ch) {
-    if (ch >= '0' && ch <= '9') return true;
-    if (ch >= 'A' && ch <= 'F') return true;
-    if (ch >= 'a' && ch <= 'f') return true;
+    if (ch >= '0' && ch <= '9') {
+      return true;
+    }
+    if (ch >= 'A' && ch <= 'F') {
+      return true;
+    }
+    if (ch >= 'a' && ch <= 'f') {
+      return true;
+    }
     return false;
   }
 
   private static int hexval(char ch) {
-    if (ch >= '0' && ch <= '9') return ((int)ch) - ((int)'0');
-    if (ch >= 'A' && ch <= 'F') return ((int)ch) - ((int)'A') + 10;
-    return ((int)ch) - ((int)'a') + 10;
+    if (ch >= '0' && ch <= '9') {
+      return ((int) ch) - ((int) '0');
+    }
+    if (ch >= 'A' && ch <= 'F') {
+      return ((int) ch) - ((int) 'A') + 10;
+    }
+    return ((int) ch) - ((int) 'a') + 10;
   }
-
 }
 
 /*end*/

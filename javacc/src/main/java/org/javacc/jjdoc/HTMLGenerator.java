@@ -28,8 +28,6 @@
 
 package org.javacc.jjdoc;
 
-import java.util.Hashtable;
-
 import org.javacc.parser.Expansion;
 import org.javacc.parser.JavaCodeProduction;
 import org.javacc.parser.NonTerminal;
@@ -37,9 +35,9 @@ import org.javacc.parser.NormalProduction;
 import org.javacc.parser.RegularExpression;
 import org.javacc.parser.TokenProduction;
 
-/**
- * Output BNF in HTML 3.2 format.
- */
+import java.util.Hashtable;
+
+/** Output BNF in HTML 3.2 format. */
 public class HTMLGenerator extends TextGenerator implements Generator {
   private Hashtable id_map = new Hashtable();
   private int id = 1;
@@ -49,7 +47,7 @@ public class HTMLGenerator extends TextGenerator implements Generator {
   }
 
   protected String get_id(String nt) {
-    String i = (String)id_map.get(nt);
+    String i = (String) id_map.get(nt);
     if (i == null) {
       i = "prod" + id++;
       id_map.put(nt, i);
@@ -65,13 +63,16 @@ public class HTMLGenerator extends TextGenerator implements Generator {
     String ss = "";
     for (int i = 0; i < s.length(); ++i) {
       if (s.charAt(i) == '<') {
-  ss += "&lt;";
-      } else if (s.charAt(i) == '>') {
-  ss += "&gt;";
-      } else if (s.charAt(i) == '&') {
-  ss += "&amp;";
-      } else {
-  ss += s.charAt(i);
+        ss += "&lt;";
+      }
+      else if (s.charAt(i) == '>') {
+        ss += "&gt;";
+      }
+      else if (s.charAt(i) == '&') {
+        ss += "&amp;";
+      }
+      else {
+        ss += s.charAt(i);
       }
     }
     print(ss);
@@ -91,7 +92,8 @@ public class HTMLGenerator extends TextGenerator implements Generator {
     }
     if (JJDocGlobals.input_file != null) {
       println("<TITLE>BNF for " + JJDocGlobals.input_file + "</TITLE>");
-    } else {
+    }
+    else {
       println("<TITLE>A BNF grammar by JJDoc</TITLE>");
     }
     println("</HEAD>");
@@ -108,6 +110,7 @@ public class HTMLGenerator extends TextGenerator implements Generator {
   /**
    * Prints out comments, used for tokens and non-terminals.
    * {@inheritDoc}
+   *
    * @see org.javacc.jjdoc.TextGenerator#specialTokens(java.lang.String)
    */
   public void specialTokens(String s) {
@@ -140,6 +143,7 @@ public class HTMLGenerator extends TextGenerator implements Generator {
       println("<TABLE>");
     }
   }
+
   public void nonterminalsEnd() {
     if (JJDocOptions.getOneTable()) {
       println("</TABLE>");
@@ -150,6 +154,7 @@ public class HTMLGenerator extends TextGenerator implements Generator {
     println("<H2 ALIGN=CENTER>TOKENS</H2>");
     println("<TABLE>");
   }
+
   public void tokensEnd() {
     println("</TABLE>");
   }
@@ -171,6 +176,7 @@ public class HTMLGenerator extends TextGenerator implements Generator {
     println("<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>");
     print("<TD ALIGN=LEFT VALIGN=BASELINE>");
   }
+
   public void productionEnd(NormalProduction np) {
     if (!JJDocOptions.getOneTable()) {
       println("</TABLE>");
@@ -186,6 +192,7 @@ public class HTMLGenerator extends TextGenerator implements Generator {
       print("<TD ALIGN=LEFT VALIGN=BASELINE>");
     }
   }
+
   public void expansionEnd(Expansion e, boolean first) {
     println("</TD>");
     println("</TR>");
@@ -194,12 +201,14 @@ public class HTMLGenerator extends TextGenerator implements Generator {
   public void nonTerminalStart(NonTerminal nt) {
     print("<A HREF=\"#" + get_id(nt.getName()) + "\">");
   }
+
   public void nonTerminalEnd(NonTerminal nt) {
     print("</A>");
   }
 
   public void reStart(RegularExpression r) {
   }
+
   public void reEnd(RegularExpression r) {
   }
 }

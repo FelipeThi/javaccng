@@ -25,6 +25,8 @@
 
 package org.javacc.parser;
 
+import org.javacc.Version;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -37,8 +39,6 @@ import java.io.PrintWriter;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
-import org.javacc.Version;
 
 /**
  * This class handles the creation and maintenance of the boiler-plate classes,
@@ -59,7 +59,6 @@ import org.javacc.Version;
  * </ul>
  *
  * @author Paul Cager
- *
  */
 public class OutputFile {
   private static final String MD5_LINE_PART_1 = "/* JavaCC - OriginalChecksum=";
@@ -82,17 +81,13 @@ public class OutputFile {
   /**
    * Create a new OutputFile.
    *
-   * @param file
-   *            the file to write to.
-   * @param compatibleVersion
-   *      the minimum compatible JavaCC version.
-   * @param options
-   *      if the file already exists, and cannot be overwritten, this is
-   *      a list of options (such s STATIC=false) to check for changes.
-   * @throws IOException
+   * @param file              the file to write to.
+   * @param compatibleVersion the minimum compatible JavaCC version.
+   * @param options           if the file already exists, and cannot be overwritten, this is
+   *                          a list of options (such s STATIC=false) to check for changes.
    */
   public OutputFile(File file, String compatibleVersion, String[] options)
-  throws IOException {
+      throws IOException {
     this.file = file;
     this.compatibleVersion = compatibleVersion;
     this.options = options;
@@ -106,9 +101,10 @@ public class OutputFile {
       MessageDigest digest;
       try {
         digest = MessageDigest.getInstance("MD5");
-      } catch (NoSuchAlgorithmException e) {
+      }
+      catch (NoSuchAlgorithmException e) {
         throw (IOException) (new IOException("No MD5 implementation")
-        .initCause(e));
+            .initCause(e));
       }
       DigestOutputStream digestStream = new DigestOutputStream(
           new NullOutputStream(), digest);
@@ -119,7 +115,8 @@ public class OutputFile {
         if (line.startsWith(MD5_LINE_PART_1)) {
           existingMD5 = line.replaceAll(MD5_LINE_PART_1q, "").replaceAll(
               MD5_LINE_PART_2q, "");
-        } else {
+        }
+        else {
           pw.println(line);
         }
       }
@@ -139,15 +136,16 @@ public class OutputFile {
         if (options != null) {
           checkOptions(file, options);
         }
-
-      } else {
+      }
+      else {
         // The file has not been altered since JavaCC created it.
         // Rebuild it.
         System.out.println("File \"" + file.getName()
             + "\" is being rebuilt.");
         needToWrite = true;
       }
-    } else {
+    }
+    else {
       // File does not exist
       System.out.println("File \"" + file.getName()
           + "\" does not exist.  Will create one.");
@@ -164,8 +162,6 @@ public class OutputFile {
   /**
    * Output a warning if the file was created with an incompatible version
    * of JavaCC.
-   * @param fileName
-   * @param versionId
    */
   private void checkVersion(File file, String versionId) {
     String firstLine = "/* " + JavaCCGlobals.getIdString(toolName, file.getName()) + " Version ";
@@ -186,21 +182,20 @@ public class OutputFile {
         }
       }
       // If no version line is found, do not output the warning.
-    } catch (FileNotFoundException e1) {
+    }
+    catch (FileNotFoundException e1) {
       // This should never happen
       JavaCCErrors.semantic_error("Could not open file " + file.getName()
           + " for writing.");
       throw new Error();
-    } catch (IOException e2) {
+    }
+    catch (IOException e2) {
     }
   }
 
   /**
    * Read the options line from the file and compare to the options currently in
    * use. Output a warning if they are different.
-   *
-   * @param fileName
-   * @param options
    */
   private void checkOptions(File file, String[] options) {
     try {
@@ -212,19 +207,21 @@ public class OutputFile {
           String currentOptions = Options.getOptionsString(options);
           if (line.indexOf(currentOptions) == -1) {
             JavaCCErrors
-            .warning(file.getName()
-                + ": Generated using incompatible options. Please rename or delete this file so"
-                + " that a new one can be generated for you.");
+                .warning(file.getName()
+                    + ": Generated using incompatible options. Please rename or delete this file so"
+                    + " that a new one can be generated for you.");
           }
           return;
         }
       }
-    } catch (FileNotFoundException e1) {
+    }
+    catch (FileNotFoundException e1) {
       // This should never happen
       JavaCCErrors.semantic_error("Could not open file " + file.getName()
           + " for writing.");
       throw new Error();
-    } catch (IOException e2) {
+    }
+    catch (IOException e2) {
     }
 
     // Not found so cannot check
@@ -233,18 +230,16 @@ public class OutputFile {
   /**
    * Return a PrintWriter object that may be used to write to this file. Any
    * necessary header information is written by this method.
-   *
-   * @return
-   * @throws IOException
    */
   public PrintWriter getPrintWriter() throws IOException {
     if (pw == null) {
       MessageDigest digest;
       try {
         digest = MessageDigest.getInstance("MD5");
-      } catch (NoSuchAlgorithmException e) {
+      }
+      catch (NoSuchAlgorithmException e) {
         throw (IOException) (new IOException("No MD5 implementation")
-        .initCause(e));
+            .initCause(e));
       }
       dos = new DigestOutputStream(new BufferedOutputStream(
           new FileOutputStream(file)), digest);
@@ -266,7 +261,6 @@ public class OutputFile {
   /**
    * Close the OutputFile, writing any necessary trailer information
    * (such as a checksum).
-   * @throws IOException
    */
   public void close() throws IOException {
 
@@ -285,8 +279,8 @@ public class OutputFile {
     return toHexString(digest);
   }
 
-  private final static char[] HEX_DIGITS = new char[] { '0', '1', '2', '3',
-    '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+  private final static char[] HEX_DIGITS = new char[]{'0', '1', '2', '3',
+      '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
   private static final String toHexString(byte[] bytes) {
     StringBuffer sb = new StringBuffer(32);
@@ -322,23 +316,19 @@ public class OutputFile {
     public void close() {
       try {
         OutputFile.this.close();
-      } catch (IOException e) {
+      }
+      catch (IOException e) {
         System.err.println("Could not close " + file.getAbsolutePath());
       }
     }
   }
 
-  /**
-   * @return the toolName
-   */
+  /** @return the toolName */
   public String getToolName() {
     return toolName;
   }
 
-  /**
-   * @param toolName
-   *            the toolName to set
-   */
+  /** @param toolName the toolName to set */
   public void setToolName(String toolName) {
     this.toolName = toolName;
   }

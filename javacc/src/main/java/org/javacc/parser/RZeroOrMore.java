@@ -28,39 +28,33 @@
 
 package org.javacc.parser;
 
-/**
- * Describes zero-or-more regular expressions (<foo*>).
- */
+/** Describes zero-or-more regular expressions (<foo*>). */
 
 public class RZeroOrMore extends RegularExpression {
 
-  /**
-   * The regular expression which is repeated zero or more times.
-   */
+  /** The regular expression which is repeated zero or more times. */
   public RegularExpression regexpr;
 
-  public Nfa GenerateNfa(boolean ignoreCase)
-  {
-     Nfa retVal = new Nfa();
-     NfaState startState = retVal.start;
-     NfaState finalState = retVal.end;
+  public Nfa GenerateNfa(boolean ignoreCase) {
+    Nfa retVal = new Nfa();
+    NfaState startState = retVal.start;
+    NfaState finalState = retVal.end;
 
-     Nfa temp = regexpr.GenerateNfa(ignoreCase);
+    Nfa temp = regexpr.GenerateNfa(ignoreCase);
 
-     startState.AddMove(temp.start);
-     startState.AddMove(finalState);
-     temp.end.AddMove(finalState);
-     temp.end.AddMove(temp.start);
+    startState.AddMove(temp.start);
+    startState.AddMove(finalState);
+    temp.end.AddMove(finalState);
+    temp.end.AddMove(temp.start);
 
-     return retVal;
+    return retVal;
   }
 
-    public RZeroOrMore() {}
+  public RZeroOrMore() {}
 
-    public RZeroOrMore(Token t, RegularExpression r) {
-        this.setLine(t.beginLine);
-        this.setColumn(t.beginColumn);
-        this.regexpr = r;
-    }
-
+  public RZeroOrMore(Token t, RegularExpression r) {
+    this.setLine(t.beginLine);
+    this.setColumn(t.beginColumn);
+    this.regexpr = r;
+  }
 }

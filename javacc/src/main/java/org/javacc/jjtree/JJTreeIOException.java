@@ -27,13 +27,10 @@
  */
 package org.javacc.jjtree;
 
-/**
- * Thrown when ther is a problem reading or writing to the file system.
- */
+/** Thrown when ther is a problem reading or writing to the file system. */
 class JJTreeIOException extends java.io.IOException {
 
-  JJTreeIOException(String detail)
-  {
+  JJTreeIOException(String detail) {
     super(detail);
   }
 }

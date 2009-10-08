@@ -6,9 +6,7 @@
 
 package org.javacc.parser;
 
-/**
- * Describes the input token stream.
- */
+/** Describes the input token stream. */
 
 public class Token {
 
@@ -28,9 +26,7 @@ public class Token {
   /** The column number of the last character of this Token. */
   public int endColumn;
 
-  /**
-   * The string image of the token.
-   */
+  /** The string image of the token. */
   public String image;
 
   /**
@@ -69,33 +65,22 @@ public class Token {
     return null;
   }
 
-  /**
-   * No-argument contructor
-   */
+  /** No-argument contructor */
   public Token() {}
 
-  /**
-   * Constructs a new token for the specified Image.
-   */
-  public Token(int kind)
-  {
+  /** Constructs a new token for the specified Image. */
+  public Token(int kind) {
     this(kind, null);
   }
 
-  /**
-   * Constructs a new token for the specified Image and Kind.
-   */
-  public Token(int kind, String image)
-  {
+  /** Constructs a new token for the specified Image and Kind. */
+  public Token(int kind, String image) {
     this.kind = kind;
     this.image = image;
   }
 
-  /**
-   * Returns the image.
-   */
-  public String toString()
-  {
+  /** Returns the image. */
+  public String toString() {
     return image;
   }
 
@@ -106,35 +91,29 @@ public class Token {
    * For example, if you have a subclass of Token called IDToken that
    * you want to create if ofKind is ID, simply add something like :
    *
-   *    case MyParserConstants.ID : return new IDToken(ofKind, image);
+   * case MyParserConstants.ID : return new IDToken(ofKind, image);
    *
    * to the following switch statement. Then you can cast matchedToken
    * variable to the appropriate type and use it in your lexical actions.
    */
-  public static final Token newToken(int ofKind, String image)
-  {
-    switch(ofKind)
-    {
-    default : return new Token(ofKind, image);
-    case JavaCCParserConstants.RUNSIGNEDSHIFT:
-    case JavaCCParserConstants.RSIGNEDSHIFT:
-    case JavaCCParserConstants.GT:
-      return new GTToken(ofKind, image);
+  public static final Token newToken(int ofKind, String image) {
+    switch (ofKind) {
+      default:
+        return new Token(ofKind, image);
+      case JavaCCParserConstants.RUNSIGNEDSHIFT:
+      case JavaCCParserConstants.RSIGNEDSHIFT:
+      case JavaCCParserConstants.GT:
+        return new GTToken(ofKind, image);
     }
   }
 
-  public static final Token newToken(int ofKind)
-  {
+  public static final Token newToken(int ofKind) {
     return newToken(ofKind, null);
   }
 
-  /**
-   * Greater than Token.
-   */
-  public static class GTToken extends Token
-  {
-    public GTToken(int kind, String image)
-    {
+  /** Greater than Token. */
+  public static class GTToken extends Token {
+    public GTToken(int kind, String image) {
       super(kind, image);
     }
 

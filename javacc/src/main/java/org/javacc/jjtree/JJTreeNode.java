@@ -45,34 +45,36 @@ public class JJTreeNode extends SimpleNode {
 
   public void jjtAddChild(Node n, int i) {
     super.jjtAddChild(n, i);
-    ((JJTreeNode)n).setOrdinal(i);
+    ((JJTreeNode) n).setOrdinal(i);
   }
 
-  public int getOrdinal()
-  {
+  public int getOrdinal() {
     return myOrdinal;
   }
 
-  public void setOrdinal(int o)
-  {
+  public void setOrdinal(int o) {
     myOrdinal = o;
   }
 
-
-  /*****************************************************************
+  /**
+   * **************************************************************
    *
    * The following is added manually to enhance all tree nodes with
    * attributes that store the first and last tokens corresponding to
    * each node, as well as to print the tokens back to the specified
    * output stream.
    *
-   *****************************************************************/
+   * ***************************************************************
+   */
 
   private Token first, last;
 
   public Token getFirstToken() { return first; }
+
   public void setFirstToken(Token t) { first = t; }
-  public Token getLastToken() { return last;  }
+
+  public Token getLastToken() { return last; }
+
   public void setLastToken(Token t) { last = t; }
 
   /* This method prints the tokens corresponding to this node
@@ -92,10 +94,12 @@ public class JJTreeNode extends SimpleNode {
     t.next = t1;
     JJTreeNode n;
     for (int ord = 0; ord < jjtGetNumChildren(); ord++) {
-      n = (JJTreeNode)jjtGetChild(ord);
+      n = (JJTreeNode) jjtGetChild(ord);
       while (true) {
         t = t.next;
-        if (t == n.getFirstToken()) break;
+        if (t == n.getFirstToken()) {
+          break;
+        }
         print(t, io);
       }
       n.print(io);
@@ -107,21 +111,19 @@ public class JJTreeNode extends SimpleNode {
     }
   }
 
-
-  String translateImage(Token t)
-  {
+  String translateImage(Token t) {
     return t.image;
   }
 
-  String whiteOut(Token t)
-  {
+  String whiteOut(Token t) {
     StringBuffer sb = new StringBuffer(t.image.length());
 
     for (int i = 0; i < t.image.length(); ++i) {
       char ch = t.image.charAt(i);
       if (ch != '\t' && ch != '\n' && ch != '\r' && ch != '\f') {
         sb.append(' ');
-      } else {
+      }
+      else {
         sb.append(ch);
       }
     }
@@ -129,16 +131,16 @@ public class JJTreeNode extends SimpleNode {
     return sb.toString();
   }
 
-
-
   /* Indicates whether the token should be replaced by white space or
-     replaced with the actual node variable. */
+replaced with the actual node variable. */
   private boolean whitingOut = false;
 
   protected void print(Token t, IO io) {
     Token tt = t.specialToken;
     if (tt != null) {
-      while (tt.specialToken != null) tt = tt.specialToken;
+      while (tt.specialToken != null) {
+        tt = tt.specialToken;
+      }
       while (tt != null) {
         io.print(TokenUtils.addUnicodeEscapes(translateImage(tt)));
         tt = tt.next;
@@ -165,7 +167,8 @@ public class JJTreeNode extends SimpleNode {
     if (t.image.equals("jjtThis")) {
       io.print(s.getNodeVariable());
       return;
-    } else if (t.image.equals("jjtree")) {
+    }
+    else if (t.image.equals("jjtree")) {
       if (t.next.image.equals(".")) {
         if (t.next.next.image.equals("currentNode")) {
           if (t.next.next.next.image.equals("(")) {
@@ -183,10 +186,12 @@ public class JJTreeNode extends SimpleNode {
       if (t.image.equals("jjtree")) {
         io.print(s.getNodeVariable());
         io.print(" ");
-      } else if (t.image.equals(")")) {
+      }
+      else if (t.image.equals(")")) {
         io.print(" ");
         whitingOut = false;
-      } else {
+      }
+      else {
         for (int i = 0; i < t.image.length(); ++i) {
           io.print(" ");
         }
@@ -197,36 +202,28 @@ public class JJTreeNode extends SimpleNode {
     io.print(TokenUtils.addUnicodeEscapes(translateImage(t)));
   }
 
-
-  static void openJJTreeComment(IO io, String arg)
-  {
+  static void openJJTreeComment(IO io, String arg) {
     if (arg != null) {
       io.print("/*@bgen(jjtree) " + arg + " */");
-    } else {
+    }
+    else {
       io.print("/*@bgen(jjtree)*/");
     }
   }
 
-
-  static void closeJJTreeComment(IO io)
-  {
+  static void closeJJTreeComment(IO io) {
     io.print("/*@egen*/");
   }
 
-
-  String getIndentation(JJTreeNode n)
-  {
+  String getIndentation(JJTreeNode n) {
     return getIndentation(n, 0);
   }
 
-
-  String getIndentation(JJTreeNode n, int offset)
-  {
+  String getIndentation(JJTreeNode n, int offset) {
     String s = "";
     for (int i = offset + 1; i < n.getFirstToken().beginColumn; ++i) {
       s += " ";
     }
     return s;
   }
-
 }

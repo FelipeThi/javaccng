@@ -30,9 +30,7 @@ package org.javacc.parser;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Describes the various regular expression productions.
- */
+/** Describes the various regular expression productions. */
 
 public class TokenProduction {
 
@@ -40,21 +38,17 @@ public class TokenProduction {
    * Definitions of constants that identify the kind of regular
    * expression production this is.
    */
-  public static final int TOKEN  = 0,
-                          SKIP   = 1,
-                          MORE   = 2,
-                          SPECIAL = 3;
+  public static final int TOKEN = 0,
+      SKIP = 1,
+      MORE = 2,
+      SPECIAL = 3;
 
-  /**
-   * The image of the above constants.
-   */
+  /** The image of the above constants. */
   public static final String[] kindImage = {
-    "TOKEN", "SKIP", "MORE", "SPECIAL"
+      "TOKEN", "SKIP", "MORE", "SPECIAL"
   };
 
-  /**
-   * The starting line and column of this token production.
-   */
+  /** The starting line and column of this token production. */
   private int column;
 
   private int line;
@@ -68,9 +62,7 @@ public class TokenProduction {
    */
   public String[] lexStates;
 
-  /**
-   * The kind of this token production - TOKEN, SKIP, MORE, or SPECIAL.
-   */
+  /** The kind of this token production - TOKEN, SKIP, MORE, or SPECIAL. */
   public int kind;
 
   /**
@@ -99,32 +91,23 @@ public class TokenProduction {
    */
   public Token firstToken, lastToken;
 
-  /**
-   * @param line the line to set
-   */
+  /** @param line the line to set */
   public void setLine(int line) {
     this.line = line;
   }
 
-  /**
-   * @return the line
-   */
+  /** @return the line */
   public int getLine() {
     return line;
   }
 
-  /**
-   * @param column the column to set
-   */
+  /** @param column the column to set */
   public void setColumn(int column) {
     this.column = column;
   }
 
-  /**
-   * @return the column
-   */
+  /** @return the column */
   public int getColumn() {
     return column;
   }
-
 }

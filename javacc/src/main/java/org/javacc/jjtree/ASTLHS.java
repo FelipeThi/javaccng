@@ -27,14 +27,12 @@
  */
 package org.javacc.jjtree;
 
-
 public class ASTLHS extends JJTreeNode {
   ASTLHS(int id) {
     super(id);
   }
 
-  public void print(IO io)
-  {
+  public void print(IO io) {
     NodeScope ns = NodeScope.getEnclosingNodeScope(this);
 
     /* Print out all the tokens, converting all references to
@@ -44,7 +42,6 @@ public class ASTLHS extends JJTreeNode {
     for (Token t = first; t != last.next; t = t.next) {
       TokenUtils.print(t, io, "jjtThis", ns.getNodeVariable());
     }
-
   }
 }
 

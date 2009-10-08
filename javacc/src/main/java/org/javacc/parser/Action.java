@@ -47,16 +47,13 @@ public class Action extends Expansion {
   public StringBuffer dump(int indent, Set alreadyDumped) {
     StringBuffer sb = super.dump(indent, alreadyDumped);
     alreadyDumped.add(this);
-    if (getActionTokens().size() > 0)
-    {
+    if (getActionTokens().size() > 0) {
       sb.append(' ').append(getActionTokens().get(0));
     }
     return sb;
   }
 
-  /**
-   * @return the action_tokens
-   */
+  /** @return the action_tokens */
   public List getActionTokens() {
     return action_tokens;
   }

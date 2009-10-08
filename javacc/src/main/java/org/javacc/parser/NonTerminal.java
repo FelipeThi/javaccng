@@ -31,9 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Describes non terminals.
- */
+/** Describes non terminals. */
 
 public class NonTerminal extends Expansion {
 
@@ -44,19 +42,13 @@ public class NonTerminal extends Expansion {
    */
   private List lhsTokens = new ArrayList();
 
-  /**
-   * The name of the non-terminal.
-   */
+  /** The name of the non-terminal. */
   private String name;
 
-  /**
-   * The list of all tokens in the argument list.
-   */
+  /** The list of all tokens in the argument list. */
   private List argument_tokens = new ArrayList();
 
-  /**
-   * The production this non-terminal corresponds to.
-   */
+  /** The production this non-terminal corresponds to. */
   private NormalProduction prod;
 
   public StringBuffer dump(int indent, Set alreadyDumped) {
@@ -64,59 +56,43 @@ public class NonTerminal extends Expansion {
     return value;
   }
 
-/**
- * @param lhsTokens the lhsTokens to set
- */
-public void setLhsTokens(List lhsTokens) {
-	this.lhsTokens = lhsTokens;
-}
+  /** @param lhsTokens the lhsTokens to set */
+  public void setLhsTokens(List lhsTokens) {
+    this.lhsTokens = lhsTokens;
+  }
 
-/**
- * @return the lhsTokens
- */
-public List getLhsTokens() {
-	return lhsTokens;
-}
+  /** @return the lhsTokens */
+  public List getLhsTokens() {
+    return lhsTokens;
+  }
 
-/**
- * @param name the name to set
- */
-public void setName(String name) {
-	this.name = name;
-}
+  /** @param name the name to set */
+  public void setName(String name) {
+    this.name = name;
+  }
 
-/**
- * @return the name
- */
-public String getName() {
-	return name;
-}
+  /** @return the name */
+  public String getName() {
+    return name;
+  }
 
-/**
- * @param argument_tokens the argument_tokens to set
- */
-public void setArgumentTokens(List argument_tokens) {
-	this.argument_tokens = argument_tokens;
-}
+  /** @param argument_tokens the argument_tokens to set */
+  public void setArgumentTokens(List argument_tokens) {
+    this.argument_tokens = argument_tokens;
+  }
 
-/**
- * @return the argument_tokens
- */
-public List getArgumentTokens() {
-	return argument_tokens;
-}
+  /** @return the argument_tokens */
+  public List getArgumentTokens() {
+    return argument_tokens;
+  }
 
-/**
- * @param prod the prod to set
- */
-public NormalProduction setProd(NormalProduction prod) {
-	return this.prod = prod;
-}
+  /** @param prod the prod to set */
+  public NormalProduction setProd(NormalProduction prod) {
+    return this.prod = prod;
+  }
 
-/**
- * @return the prod
- */
-public NormalProduction getProd() {
-	return prod;
-}
+  /** @return the prod */
+  public NormalProduction getProd() {
+    return prod;
+  }
 }

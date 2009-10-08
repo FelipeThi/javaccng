@@ -27,7 +27,6 @@
  */
 package org.javacc.jjtree;
 
-
 public class ASTOptionBinding extends JJTreeNode {
   ASTOptionBinding(int id) {
     super(id);
@@ -36,8 +35,7 @@ public class ASTOptionBinding extends JJTreeNode {
   private boolean suppressed = false;
   private String name;
 
-  void initialize(String n, String v)
-  {
+  void initialize(String n, String v) {
     name = n;
 
     // If an option is specific to JJTree it should not be written out
@@ -48,27 +46,22 @@ public class ASTOptionBinding extends JJTreeNode {
     }
   }
 
-
-  boolean isSuppressed()
-  {
+  boolean isSuppressed() {
     return suppressed;
   }
 
-  void suppressOption(boolean s)
-  {
+  void suppressOption(boolean s) {
     suppressed = s;
   }
 
-
-  String translateImage(Token t)
-  {
+  String translateImage(Token t) {
     if (suppressed) {
       return whiteOut(t);
-    } else {
+    }
+    else {
       return t.image;
     }
   }
 }
-
 
 /*end*/

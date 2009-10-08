@@ -27,7 +27,6 @@
  */
 package org.javacc.jjtree;
 
-
 public class ASTJavacode extends ASTProduction {
   ASTJavacode(int id) {
     super(id);

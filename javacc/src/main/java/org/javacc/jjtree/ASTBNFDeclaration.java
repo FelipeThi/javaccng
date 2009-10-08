@@ -27,7 +27,6 @@
  */
 package org.javacc.jjtree;
 
-
 public class ASTBNFDeclaration extends JJTreeNode {
   ASTBNFDeclaration(int id) {
     super(id);
@@ -35,19 +34,19 @@ public class ASTBNFDeclaration extends JJTreeNode {
 
   NodeScope node_scope;
 
-  public void print(IO io)
-  {
+  public void print(IO io) {
     if (!node_scope.isVoid()) {
       String indent = "";
       if (TokenUtils.hasTokens(this)) {
         for (int i = 1; i < getFirstToken().beginColumn; ++i) {
           indent += " ";
         }
-      } else {
+      }
+      else {
         indent = "  ";
       }
 
-      openJJTreeComment(io,  node_scope.getNodeDescriptorText());
+      openJJTreeComment(io, node_scope.getNodeDescriptorText());
       io.println();
       node_scope.insertOpenNodeCode(io, indent);
       closeJJTreeComment(io);

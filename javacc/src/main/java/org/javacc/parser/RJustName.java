@@ -36,22 +36,18 @@ package org.javacc.parser;
 
 public class RJustName extends RegularExpression {
 
-  /**
-   * "regexpr" points to the regular expression denoted by the name.
-   */
+  /** "regexpr" points to the regular expression denoted by the name. */
   public RegularExpression regexpr;
 
-  public Nfa GenerateNfa(boolean ignoreCase)
-  {
-     return regexpr.GenerateNfa(ignoreCase);
+  public Nfa GenerateNfa(boolean ignoreCase) {
+    return regexpr.GenerateNfa(ignoreCase);
   }
 
-    public RJustName() {}
+  public RJustName() {}
 
-    public RJustName(Token token, String image) {
-        this.setLine(token.beginLine);
-        this.setColumn(token.beginColumn);
-        this.label = image;
-    }
-
+  public RJustName(Token token, String image) {
+    this.setLine(token.beginLine);
+    this.setColumn(token.beginColumn);
+    this.label = image;
+  }
 }

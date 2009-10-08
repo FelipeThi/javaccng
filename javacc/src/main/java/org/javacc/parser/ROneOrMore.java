@@ -28,37 +28,32 @@
 
 package org.javacc.parser;
 
-/**
- * Describes one-or-more regular expressions (<foo+>).
- */
+/** Describes one-or-more regular expressions (<foo+>). */
 
 public class ROneOrMore extends RegularExpression {
 
-  /**
-   * The regular expression which is repeated one or more times.
-   */
+  /** The regular expression which is repeated one or more times. */
   public RegularExpression regexpr;
 
-  public Nfa GenerateNfa(boolean ignoreCase)
-  {
-     Nfa retVal = new Nfa();
-     NfaState startState = retVal.start;
-     NfaState finalState = retVal.end;
+  public Nfa GenerateNfa(boolean ignoreCase) {
+    Nfa retVal = new Nfa();
+    NfaState startState = retVal.start;
+    NfaState finalState = retVal.end;
 
-     Nfa temp = regexpr.GenerateNfa(ignoreCase);
+    Nfa temp = regexpr.GenerateNfa(ignoreCase);
 
-     startState.AddMove(temp.start);
-     temp.end.AddMove(temp.start);
-     temp.end.AddMove(finalState);
+    startState.AddMove(temp.start);
+    temp.end.AddMove(temp.start);
+    temp.end.AddMove(finalState);
 
-     return retVal;
+    return retVal;
   }
 
-    public ROneOrMore() {}
+  public ROneOrMore() {}
 
-    public ROneOrMore(Token t, RegularExpression re) {
-        this.setLine(t.beginLine);
-        this.setColumn(t.beginColumn);
-        this.regexpr = re;
-    }
+  public ROneOrMore(Token t, RegularExpression re) {
+    this.setLine(t.beginLine);
+    this.setColumn(t.beginColumn);
+    this.regexpr = re;
+  }
 }

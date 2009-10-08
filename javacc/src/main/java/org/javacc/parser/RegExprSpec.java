@@ -34,14 +34,10 @@ package org.javacc.parser;
 
 public class RegExprSpec {
 
-  /**
-   * The regular expression of this specification.
-   */
+  /** The regular expression of this specification. */
   public RegularExpression rexp;
 
-  /**
-   * The action corresponding to this specification.
-   */
+  /** The action corresponding to this specification. */
   public Action act;
 
   /**
@@ -57,5 +53,4 @@ public class RegExprSpec {
    * in error reporting.
    */
   public Token nsTok;
-
 }

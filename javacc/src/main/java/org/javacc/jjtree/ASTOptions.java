@@ -27,12 +27,10 @@
  */
 package org.javacc.jjtree;
 
-
 public class ASTOptions extends JJTreeNode {
   ASTOptions(int id) {
     super(id);
   }
-
 }
 
 /*end*/

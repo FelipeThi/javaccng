@@ -27,9 +27,7 @@
  */
 package org.javacc.parser;
 
-/**
- * Describes single character descriptors in a character list.
- */
+/** Describes single character descriptors in a character list. */
 
 public class SingleCharacter {
 
@@ -41,46 +39,33 @@ public class SingleCharacter {
 
   private int line;
 
-  /**
-   * The character of this descriptor.
-   */
+  /** The character of this descriptor. */
   public char ch;
 
-  SingleCharacter()
-  {
+  SingleCharacter() {
   }
 
-  SingleCharacter(char c)
-  {
-     ch = c;
+  SingleCharacter(char c) {
+    ch = c;
   }
 
-  /**
-   * @param line the line to set
-   */
+  /** @param line the line to set */
   void setLine(int line) {
     this.line = line;
   }
 
-  /**
-   * @return the line
-   */
+  /** @return the line */
   int getLine() {
     return line;
   }
 
-  /**
-   * @param column the column to set
-   */
+  /** @param column the column to set */
   void setColumn(int column) {
     this.column = column;
   }
 
-  /**
-   * @return the column
-   */
+  /** @return the column */
   int getColumn() {
     return column;
   }
-
 }

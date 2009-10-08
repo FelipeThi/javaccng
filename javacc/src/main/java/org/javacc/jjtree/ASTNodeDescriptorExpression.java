@@ -27,14 +27,12 @@
  */
 package org.javacc.jjtree;
 
-
 public class ASTNodeDescriptorExpression extends JJTreeNode {
   ASTNodeDescriptorExpression(int id) {
     super(id);
   }
 
-  String translateImage(Token t)
-  {
+  String translateImage(Token t) {
     return whiteOut(t);
   }
 }

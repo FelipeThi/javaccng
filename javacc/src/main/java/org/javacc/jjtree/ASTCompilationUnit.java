@@ -27,15 +27,12 @@
  */
 package org.javacc.jjtree;
 
-
 public class ASTCompilationUnit extends JJTreeNode {
   ASTCompilationUnit(int id) {
     super(id);
   }
 
-
-  public void print(IO io)
-  {
+  public void print(IO io) {
     Token t = getFirstToken();
 
     while (true) {
@@ -43,8 +40,7 @@ public class ASTCompilationUnit extends JJTreeNode {
 
         // If the parser and nodes are in separate packages (NODE_PACKAGE specified in
         // OPTIONS), then generate an import for the node package.
-        if (!JJTreeGlobals.nodePackageName.equals("") && !JJTreeGlobals.nodePackageName.equals(JJTreeGlobals.packageName))
-        {
+        if (!JJTreeGlobals.nodePackageName.equals("") && !JJTreeGlobals.nodePackageName.equals(JJTreeGlobals.packageName)) {
           io.getOut().println("");
           io.getOut().println("import " + JJTreeGlobals.nodePackageName + ".*;");
         }
@@ -56,14 +52,16 @@ public class ASTCompilationUnit extends JJTreeNode {
           openJJTreeComment(io, null);
           io.getOut().print(" " + NodeFiles.nodeConstants() + ", ");
           closeJJTreeComment(io);
-        } else {
+        }
+        else {
           // t is pointing at the opening brace of the class body.
           openJJTreeComment(io, null);
           io.getOut().print("implements " + NodeFiles.nodeConstants());
           closeJJTreeComment(io);
           print(t, io);
         }
-      } else {
+      }
+      else {
         print(t, io);
       }
 
@@ -79,7 +77,6 @@ public class ASTCompilationUnit extends JJTreeNode {
       t = t.next;
     }
   }
-
 }
 
 /*end*/

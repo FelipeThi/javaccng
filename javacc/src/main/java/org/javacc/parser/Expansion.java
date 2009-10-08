@@ -78,9 +78,7 @@ public class Expansion {
    */
   public Object parent;
 
-  /**
-   * The ordinal of this node with respect to its parent.
-   */
+  /** The ordinal of this node with respect to its parent. */
   int ordinal;
 
   /**
@@ -99,14 +97,13 @@ public class Expansion {
    */
   public boolean inMinimumSize = false;
 
-   public static void reInit()
-   {
-      nextGenerationIndex = 1;
-   }
+  public static void reInit() {
+    nextGenerationIndex = 1;
+  }
 
   private String getSimpleName() {
     String name = getClass().getName();
-    return name.substring(name.lastIndexOf(".")+1); // strip the package name
+    return name.substring(name.lastIndexOf(".") + 1); // strip the package name
   }
 
   public String toString() {
@@ -114,10 +111,12 @@ public class Expansion {
   }
 
   protected static final String eol = System.getProperty("line.separator", "\n");
+
   protected StringBuffer dumpPrefix(int indent) {
     StringBuffer sb = new StringBuffer(128);
-    for (int i = 0; i < indent; i++)
+    for (int i = 0; i < indent; i++) {
       sb.append("  ");
+    }
     return sb;
   }
 
@@ -126,30 +125,22 @@ public class Expansion {
     return value;
   }
 
-  /**
-   * @param column the column to set
-   */
+  /** @param column the column to set */
   void setColumn(int column) {
     this.column = column;
   }
 
-  /**
-   * @return the column
-   */
+  /** @return the column */
   int getColumn() {
     return column;
   }
 
-  /**
-   * @param line the line to set
-   */
+  /** @param line the line to set */
   void setLine(int line) {
     this.line = line;
   }
 
-  /**
-   * @return the line
-   */
+  /** @return the line */
   int getLine() {
     return line;
   }

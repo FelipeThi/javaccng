@@ -27,22 +27,21 @@
  */
 package org.javacc.jjtree;
 
-
 public class ASTBNFAction extends JJTreeNode {
 
   ASTBNFAction(int id) {
     super(id);
   }
 
-  private Node getScopingParent(NodeScope ns)
-  {
+  private Node getScopingParent(NodeScope ns) {
     for (Node n = this.jjtGetParent(); n != null; n = n.jjtGetParent()) {
       if (n instanceof ASTBNFNodeScope) {
-        if (((ASTBNFNodeScope)n).node_scope == ns) {
+        if (((ASTBNFNodeScope) n).node_scope == ns) {
           return n;
         }
-      } else if (n instanceof ASTExpansionNodeScope) {
-        if (((ASTExpansionNodeScope)n).node_scope == ns) {
+      }
+      else if (n instanceof ASTExpansionNodeScope) {
+        if (((ASTExpansionNodeScope) n).node_scope == ns) {
           return n;
         }
       }
@@ -50,9 +49,7 @@ public class ASTBNFAction extends JJTreeNode {
     return null;
   }
 
-
-  public void print(IO io)
-  {
+  public void print(IO io) {
     /* Assume that this action requires an early node close, and then
        try to decide whether this assumption is false.  Do this by
        looking outwards through the enclosing expansion units.  If we
@@ -74,9 +71,10 @@ public class ASTBNFAction extends JJTreeNode {
             needClose = false;
             break;
           }
-        } else if (p instanceof ASTBNFZeroOrOne ||
-                 p instanceof ASTBNFZeroOrMore ||
-                 p instanceof ASTBNFOneOrMore) {
+        }
+        else if (p instanceof ASTBNFZeroOrOne ||
+            p instanceof ASTBNFZeroOrMore ||
+            p instanceof ASTBNFOneOrMore) {
           needClose = false;
           break;
         }
@@ -84,7 +82,7 @@ public class ASTBNFAction extends JJTreeNode {
           /* No more parents to look at. */
           break;
         }
-        n = (JJTreeNode)p;
+        n = (JJTreeNode) p;
       }
       if (needClose) {
         openJJTreeComment(io, null);
@@ -95,8 +93,6 @@ public class ASTBNFAction extends JJTreeNode {
     }
     super.print(io);
   }
-
-
 }
 
 /*end*/

@@ -27,32 +27,36 @@
  */
 package org.javacc.parser;
 
-/**
- * Output error messages and keep track of totals.
- */
+/** Output error messages and keep track of totals. */
 public final class JavaCCErrors {
 
   private static int parse_error_count = 0, semantic_error_count = 0, warning_count = 0;
+
   private JavaCCErrors() {}
 
   private static void printLocationInfo(Object node) {
     if (node instanceof NormalProduction) {
-      NormalProduction n = (NormalProduction)node;
+      NormalProduction n = (NormalProduction) node;
       System.err.print("Line " + n.getLine() + ", Column " + n.getColumn() + ": ");
-    } else if (node instanceof TokenProduction) {
-      TokenProduction n = (TokenProduction)node;
+    }
+    else if (node instanceof TokenProduction) {
+      TokenProduction n = (TokenProduction) node;
       System.err.print("Line " + n.getLine() + ", Column " + n.getColumn() + ": ");
-    } else if (node instanceof Expansion) {
-      Expansion n = (Expansion)node;
+    }
+    else if (node instanceof Expansion) {
+      Expansion n = (Expansion) node;
       System.err.print("Line " + n.getLine() + ", Column " + n.getColumn() + ": ");
-    } else if (node instanceof CharacterRange) {
-      CharacterRange n = (CharacterRange)node;
+    }
+    else if (node instanceof CharacterRange) {
+      CharacterRange n = (CharacterRange) node;
       System.err.print("Line " + n.getLine() + ", Column " + n.getColumn() + ": ");
-    } else if (node instanceof SingleCharacter) {
-      SingleCharacter n = (SingleCharacter)node;
+    }
+    else if (node instanceof SingleCharacter) {
+      SingleCharacter n = (SingleCharacter) node;
       System.err.print("Line " + n.getLine() + ", Column " + n.getColumn() + ": ");
-    } else if (node instanceof Token) {
-      Token t = (Token)node;
+    }
+    else if (node instanceof Token) {
+      Token t = (Token) node;
       System.err.print("Line " + t.beginLine + ", Column " + t.beginColumn + ": ");
     }
   }
@@ -112,11 +116,9 @@ public final class JavaCCErrors {
     return parse_error_count + semantic_error_count;
   }
 
-   public static void reInit()
-   {
-      parse_error_count = 0;
-      semantic_error_count = 0;
-      warning_count = 0;
-   }
-
+  public static void reInit() {
+    parse_error_count = 0;
+    semantic_error_count = 0;
+    warning_count = 0;
+  }
 }

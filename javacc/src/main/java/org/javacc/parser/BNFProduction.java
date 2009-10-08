@@ -30,15 +30,11 @@ package org.javacc.parser;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Describes BNF productions.
- */
+/** Describes BNF productions. */
 
 public class BNFProduction extends NormalProduction {
 
-  /**
-   * The declarations of this production.
-   */
+  /** The declarations of this production. */
   private List declaration_tokens = new ArrayList();
 
   /**
@@ -48,25 +44,18 @@ public class BNFProduction extends NormalProduction {
    */
   private boolean jumpPatched;
 
-  /**
-   * @return the declaration_tokens
-   */
+  /** @return the declaration_tokens */
   public List getDeclarationTokens() {
     return declaration_tokens;
   }
 
-  /**
-   * @param jumpPatched the jumpPatched to set
-   */
+  /** @param jumpPatched the jumpPatched to set */
   public void setJumpPatched(boolean jumpPatched) {
     this.jumpPatched = jumpPatched;
   }
 
-  /**
-   * @return the jumpPatched
-   */
+  /** @return the jumpPatched */
   public boolean isJumpPatched() {
     return jumpPatched;
   }
-
 }

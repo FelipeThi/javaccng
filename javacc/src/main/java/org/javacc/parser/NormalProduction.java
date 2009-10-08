@@ -31,9 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Describes JavaCC productions.
- */
+/** Describes JavaCC productions. */
 
 public class NormalProduction {
 
@@ -45,29 +43,19 @@ public class NormalProduction {
 
   private int line;
 
-  /**
-   * The NonTerminal nodes which refer to this production.
-   */
+  /** The NonTerminal nodes which refer to this production. */
   private List parents = new ArrayList();
 
-  /**
-   * The access modifier of this production.
-   */
+  /** The access modifier of this production. */
   private String accessMod;
 
-  /**
-   * The name of the non-terminal of this production.
-   */
+  /** The name of the non-terminal of this production. */
   private String lhs;
 
-  /**
-   * The tokens that make up the return type of this production.
-   */
+  /** The tokens that make up the return type of this production. */
   private List return_type_tokens = new ArrayList();
 
-  /**
-   * The tokens that make up the parameters of this production.
-   */
+  /** The tokens that make up the parameters of this production. */
   private List parameter_list_tokens = new ArrayList();
 
   /**
@@ -77,14 +65,10 @@ public class NormalProduction {
    */
   private List throws_list = new ArrayList();
 
-  /**
-   * The RHS of this production.  Not used for JavaCodeProduction.
-   */
+  /** The RHS of this production.  Not used for JavaCodeProduction. */
   private Expansion expansion;
 
-  /**
-   * This boolean flag is true if this production can expand to empty.
-   */
+  /** This boolean flag is true if this production can expand to empty. */
   private boolean emptyPossible = false;
 
   /**
@@ -114,25 +98,25 @@ public class NormalProduction {
   private Token firstToken;
 
   protected String eol = System.getProperty("line.separator", "\n");
+
   protected StringBuffer dumpPrefix(int indent) {
     StringBuffer sb = new StringBuffer(128);
-    for (int i = 0; i < indent; i++)
+    for (int i = 0; i < indent; i++) {
       sb.append("  ");
+    }
     return sb;
   }
 
   protected String getSimpleName() {
     String name = getClass().getName();
-    return name.substring(name.lastIndexOf(".")+1); // strip the package name
+    return name.substring(name.lastIndexOf(".") + 1); // strip the package name
   }
 
   public StringBuffer dump(int indent, Set alreadyDumped) {
     StringBuffer sb = dumpPrefix(indent).append(System.identityHashCode(this)).append(' ').append(getSimpleName()).append(' ').append(getLhs());
-    if (!alreadyDumped.contains(this))
-    {
+    if (!alreadyDumped.contains(this)) {
       alreadyDumped.add(this);
-      if (getExpansion() != null)
-      {
+      if (getExpansion() != null) {
         sb.append(eol).append(getExpansion().dump(indent + 1, alreadyDumped));
       }
     }
@@ -140,188 +124,135 @@ public class NormalProduction {
     return sb;
   }
 
-  /**
-   * @param line the line to set
-   */
+  /** @param line the line to set */
   public void setLine(int line) {
     this.line = line;
   }
 
-  /**
-   * @return the line
-   */
+  /** @return the line */
   public int getLine() {
     return line;
   }
 
-  /**
-   * @param column the column to set
-   */
+  /** @param column the column to set */
   public void setColumn(int column) {
     this.column = column;
   }
 
-  /**
-   * @return the column
-   */
+  /** @return the column */
   public int getColumn() {
     return column;
   }
 
-  /**
-   * @param parents the parents to set
-   */
+  /** @param parents the parents to set */
   void setParents(List parents) {
     this.parents = parents;
   }
 
-  /**
-   * @return the parents
-   */
+  /** @return the parents */
   List getParents() {
     return parents;
   }
 
-  /**
-   * @param accessMod the accessMod to set
-   */
+  /** @param accessMod the accessMod to set */
   public void setAccessMod(String accessMod) {
     this.accessMod = accessMod;
   }
 
-  /**
-   * @return the accessMod
-   */
+  /** @return the accessMod */
   public String getAccessMod() {
     return accessMod;
   }
 
-  /**
-   * @param lhs the lhs to set
-   */
+  /** @param lhs the lhs to set */
   public void setLhs(String lhs) {
     this.lhs = lhs;
   }
 
-  /**
-   * @return the lhs
-   */
+  /** @return the lhs */
   public String getLhs() {
     return lhs;
   }
 
-  /**
-   * @return the return_type_tokens
-   */
+  /** @return the return_type_tokens */
   public List getReturnTypeTokens() {
     return return_type_tokens;
   }
 
-  /**
-   * @return the parameter_list_tokens
-   */
+  /** @return the parameter_list_tokens */
   public List getParameterListTokens() {
     return parameter_list_tokens;
   }
 
-  /**
-   * @param throws_list the throws_list to set
-   */
+  /** @param throws_list the throws_list to set */
   public void setThrowsList(List throws_list) {
     this.throws_list = throws_list;
   }
 
-  /**
-   * @return the throws_list
-   */
+  /** @return the throws_list */
   public List getThrowsList() {
     return throws_list;
   }
 
-  /**
-   * @param expansion the expansion to set
-   */
+  /** @param expansion the expansion to set */
   public void setExpansion(Expansion expansion) {
     this.expansion = expansion;
   }
 
-  /**
-   * @return the expansion
-   */
+  /** @return the expansion */
   public Expansion getExpansion() {
     return expansion;
   }
 
-  /**
-   * @param emptyPossible the emptyPossible to set
-   */
+  /** @param emptyPossible the emptyPossible to set */
   boolean setEmptyPossible(boolean emptyPossible) {
     this.emptyPossible = emptyPossible;
     return emptyPossible;
   }
 
-  /**
-   * @return the emptyPossible
-   */
+  /** @return the emptyPossible */
   boolean isEmptyPossible() {
     return emptyPossible;
   }
 
-  /**
-   * @param leftExpansions the leftExpansions to set
-   */
+  /** @param leftExpansions the leftExpansions to set */
   void setLeftExpansions(NormalProduction[] leftExpansions) {
     this.leftExpansions = leftExpansions;
   }
 
-  /**
-   * @return the leftExpansions
-   */
+  /** @return the leftExpansions */
   NormalProduction[] getLeftExpansions() {
     return leftExpansions;
   }
 
-  /**
-   * @param walkStatus the walkStatus to set
-   */
+  /** @param walkStatus the walkStatus to set */
   void setWalkStatus(int walkStatus) {
     this.walkStatus = walkStatus;
   }
 
-  /**
-   * @return the walkStatus
-   */
+  /** @return the walkStatus */
   int getWalkStatus() {
     return walkStatus;
   }
 
-  /**
-   * @param firstToken the firstToken to set
-   */
+  /** @param firstToken the firstToken to set */
   public Token setFirstToken(Token firstToken) {
     this.firstToken = firstToken;
     return firstToken;
   }
 
-  /**
-   * @return the firstToken
-   */
+  /** @return the firstToken */
   public Token getFirstToken() {
     return firstToken;
   }
 
-  /**
-   * @param lastToken the lastToken to set
-   */
+  /** @param lastToken the lastToken to set */
   public void setLastToken(Token lastToken) {
     this.lastToken = lastToken;
   }
 
-  /**
-   * @return the lastToken
-   */
+  /** @return the lastToken */
   public Token getLastToken() {
     return lastToken;
   }
-
 }

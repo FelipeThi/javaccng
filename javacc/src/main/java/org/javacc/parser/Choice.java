@@ -59,27 +59,24 @@ public class Choice extends Expansion {
     this.getChoices().add(expansion);
   }
 
-  /**
-   * @param choices the choices to set
-   */
+  /** @param choices the choices to set */
   public void setChoices(List choices) {
     this.choices = choices;
   }
 
-  /**
-   * @return the choices
-   */
+  /** @return the choices */
   public List getChoices() {
     return choices;
   }
 
   public StringBuffer dump(int indent, Set alreadyDumped) {
     StringBuffer sb = super.dump(indent, alreadyDumped);
-    if (alreadyDumped.contains(this))
+    if (alreadyDumped.contains(this)) {
       return sb;
+    }
     alreadyDumped.add(this);
-    for (Iterator it = getChoices().iterator(); it.hasNext(); ) {
-      Expansion next = (Expansion)it.next();
+    for (Iterator it = getChoices().iterator(); it.hasNext();) {
+      Expansion next = (Expansion) it.next();
       sb.append(eol).append(next.dump(indent + 1, alreadyDumped));
     }
     return sb;

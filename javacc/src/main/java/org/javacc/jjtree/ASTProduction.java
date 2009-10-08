@@ -30,9 +30,7 @@ package org.javacc.jjtree;
 import java.util.Hashtable;
 import java.util.Vector;
 
-
-public class ASTProduction extends JJTreeNode
-{
+public class ASTProduction extends JJTreeNode {
   ASTProduction(int id) {
     super(id);
   }
@@ -43,10 +41,8 @@ public class ASTProduction extends JJTreeNode
   private Hashtable scopes = new Hashtable();
   private int nextNodeScopeNumber = 0;
 
-
-  int getNodeScopeNumber(NodeScope s)
-  {
-    Integer i = (Integer)scopes.get(s);
+  int getNodeScopeNumber(NodeScope s) {
+    Integer i = (Integer) scopes.get(s);
     if (i == null) {
       i = new Integer(nextNodeScopeNumber++);
       scopes.put(s, i);

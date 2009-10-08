@@ -27,9 +27,7 @@
  */
 package org.javacc.parser;
 
-/**
- * Describes character range descriptors in a character list.
- */
+/** Describes character range descriptors in a character list. */
 
 public class CharacterRange {
 
@@ -41,77 +39,59 @@ public class CharacterRange {
 
   private int line;
 
-  /**
-   * The leftmost and the rightmost characters in this character range.
-   */
+  /** The leftmost and the rightmost characters in this character range. */
   private char right;
 
   private char left;
 
   CharacterRange() { }
 
-  CharacterRange(char l, char r)
-  {
-     if (l > r)
-        JavaCCErrors.semantic_error(this, "Invalid range : \"" + (int)l + "\" - \""
-              + (int)r + "\". First character shoud be less than or equal to the second one in a range.");
+  CharacterRange(char l, char r) {
+    if (l > r) {
+      JavaCCErrors.semantic_error(this, "Invalid range : \"" + (int) l + "\" - \""
+          + (int) r + "\". First character shoud be less than or equal to the second one in a range.");
+    }
 
-     setLeft(l);
-     setRight(r);
+    setLeft(l);
+    setRight(r);
   }
 
-  /**
-   * @param line the line to set
-   */
+  /** @param line the line to set */
   void setLine(int line) {
     this.line = line;
   }
 
-  /**
-   * @return the line
-   */
+  /** @return the line */
   int getLine() {
     return line;
   }
 
-  /**
-   * @param column the column to set
-   */
+  /** @param column the column to set */
   void setColumn(int column) {
     this.column = column;
   }
 
-  /**
-   * @return the column
-   */
+  /** @return the column */
   int getColumn() {
     return column;
   }
 
-  /**
-   * @param left the left to set
-   */
+  /** @param left the left to set */
   public void setLeft(char left) {
     this.left = left;
   }
 
-  /**
-   * @return the left
-   */
+  /** @return the left */
   public char getLeft() {
     return left;
   }
 
-  /**
-   * @param right the right to set
-   */
+  /** @param right the right to set */
   public void setRight(char right) {
     this.right = right;
   }
 
-  /**
-   * @return the right
-   */
+  /** @return the right */
   public char getRight() {
     return right;
   }

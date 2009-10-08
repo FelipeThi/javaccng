@@ -66,66 +66,51 @@ public class Lookahead extends Expansion {
    */
   private Expansion la_expansion;
 
-  /**
-   * Is set to true if this is an explicit lookahead specification.
-   */
+  /** Is set to true if this is an explicit lookahead specification. */
   private boolean isExplicit;
 
   public StringBuffer dump(int indent, Set alreadyDumped) {
     StringBuffer sb = super.dump(indent, alreadyDumped).append(isExplicit ? " explicit" : " implicit");
-    if (alreadyDumped.contains(this))
+    if (alreadyDumped.contains(this)) {
       return sb;
+    }
     alreadyDumped.add(this);
     sb.append(eol).append(la_expansion.dump(indent + 1, alreadyDumped));
     return sb;
   }
 
-/**
- * @return the action_tokens
- */
-public List getActionTokens() {
-	return action_tokens;
-}
+  /** @return the action_tokens */
+  public List getActionTokens() {
+    return action_tokens;
+  }
 
-/**
- * @param amount the amount to set
- */
-public void setAmount(int amount) {
-	this.amount = amount;
-}
+  /** @param amount the amount to set */
+  public void setAmount(int amount) {
+    this.amount = amount;
+  }
 
-/**
- * @return the amount
- */
-public int getAmount() {
-	return amount;
-}
+  /** @return the amount */
+  public int getAmount() {
+    return amount;
+  }
 
-/**
- * @param la_expansion the la_expansion to set
- */
-public void setLaExpansion(Expansion la_expansion) {
-	this.la_expansion = la_expansion;
-}
+  /** @param la_expansion the la_expansion to set */
+  public void setLaExpansion(Expansion la_expansion) {
+    this.la_expansion = la_expansion;
+  }
 
-/**
- * @return the la_expansion
- */
-public Expansion getLaExpansion() {
-	return la_expansion;
-}
+  /** @return the la_expansion */
+  public Expansion getLaExpansion() {
+    return la_expansion;
+  }
 
-/**
- * @param isExplicit the isExplicit to set
- */
-public void setExplicit(boolean isExplicit) {
-	this.isExplicit = isExplicit;
-}
+  /** @param isExplicit the isExplicit to set */
+  public void setExplicit(boolean isExplicit) {
+    this.isExplicit = isExplicit;
+  }
 
-/**
- * @return the isExplicit
- */
-public boolean isExplicit() {
-	return isExplicit;
-}
+  /** @return the isExplicit */
+  public boolean isExplicit() {
+    return isExplicit;
+  }
 }

@@ -27,9 +27,7 @@
  */
 package org.javacc.jjtree;
 
-
-public class ASTBNFNodeScope extends JJTreeNode
-{
+public class ASTBNFNodeScope extends JJTreeNode {
   ASTBNFNodeScope(int id) {
     super(id);
   }
@@ -37,8 +35,7 @@ public class ASTBNFNodeScope extends JJTreeNode
   NodeScope node_scope;
   JJTreeNode expansion_unit;
 
-  public void print(IO io)
-  {
+  public void print(IO io) {
     if (node_scope.isVoid()) {
       super.print(io);
       return;
@@ -50,7 +47,6 @@ public class ASTBNFNodeScope extends JJTreeNode
     io.println();
     node_scope.tryExpansionUnit(io, indent, expansion_unit);
   }
-
 }
 
 /*end*/

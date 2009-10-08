@@ -31,9 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Describes regular expressions.
- */
+/** Describes regular expressions. */
 
 public abstract class RegularExpression extends Expansion {
 
@@ -57,9 +55,7 @@ public abstract class RegularExpression extends Expansion {
    */
   public List lhsTokens = new ArrayList();
 
-  /**
-   * We now allow qualified access to token members. Store it here.
-   */
+  /** We now allow qualified access to token members. Store it here. */
   public Token rhsToken;
 
   /**
@@ -78,9 +74,8 @@ public abstract class RegularExpression extends Expansion {
 
   public abstract Nfa GenerateNfa(boolean ignoreCase);
 
-  public boolean CanMatchAnyChar()
-  {
-     return false;
+  public boolean CanMatchAnyChar() {
+    return false;
   }
 
   /**

@@ -27,7 +27,6 @@
  */
 package org.javacc.jjtree;
 
-
 public class ASTJavacodeBody extends JJTreeNode {
   ASTJavacodeBody(int id) {
     super(id);
@@ -35,8 +34,7 @@ public class ASTJavacodeBody extends JJTreeNode {
 
   NodeScope node_scope;
 
-  public void print(IO io)
-  {
+  public void print(IO io) {
     if (node_scope.isVoid()) {
       super.print(io);
       return;

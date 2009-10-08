@@ -30,9 +30,7 @@ package org.javacc.parser;
 
 import java.util.List;
 
-/**
- * Utilities.
- */
+/** Utilities. */
 public abstract class JavaCCParserInternals extends JavaCCGlobals {
 
   static protected void initialize() {
@@ -61,15 +59,18 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
     do {
       add_cu_token_here.add(first_cu_token);
       first_cu_token = first_cu_token.next;
-    } while (first_cu_token != t);
+    }
+    while (first_cu_token != t);
     if (no == 1) {
       if (insertionpoint1set) {
         JavaCCErrors.parse_error(t, "Multiple declaration of parser class.");
-      } else {
+      }
+      else {
         insertionpoint1set = true;
         add_cu_token_here = cu_to_insertion_point_2;
       }
-    } else {
+    }
+    else {
       add_cu_token_here = cu_from_insertion_point_2;
       insertionpoint2set = true;
     }
@@ -107,7 +108,7 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
     if (Options.getUserTokenManager()) {
       if (p.lexStates == null || p.lexStates.length != 1 || !p.lexStates[0].equals("DEFAULT")) {
         JavaCCErrors.warning(p, "Ignoring lexical state specifications since option " +
-                                "USER_TOKEN_MANAGER has been set to true.");
+            "USER_TOKEN_MANAGER has been set to true.");
       }
     }
     if (p.lexStates == null) {
@@ -131,11 +132,12 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
   static protected void add_token_manager_decls(Token t, java.util.List decls) {
     if (token_mgr_decls != null) {
       JavaCCErrors.parse_error(t, "Multiple occurrence of \"TOKEN_MGR_DECLS\".");
-    } else {
+    }
+    else {
       token_mgr_decls = decls;
       if (Options.getUserTokenManager()) {
         JavaCCErrors.warning(t, "Ignoring declarations in \"TOKEN_MGR_DECLS\" since option " +
-                                "USER_TOKEN_MANAGER has been set to true.");
+            "USER_TOKEN_MANAGER has been set to true.");
       }
     }
   }
@@ -144,7 +146,7 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
     if (!(r instanceof REndOfFile)) {
       TokenProduction p = new TokenProduction();
       p.isExplicit = false;
-      p.lexStates = new String[] {"DEFAULT"};
+      p.lexStates = new String[]{"DEFAULT"};
       p.kind = TokenProduction.TOKEN;
       RegExprSpec res = new RegExprSpec();
       res.rexp = r;
@@ -158,16 +160,26 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
   }
 
   static protected boolean hexchar(char ch) {
-    if (ch >= '0' && ch <= '9') return true;
-    if (ch >= 'A' && ch <= 'F') return true;
-    if (ch >= 'a' && ch <= 'f') return true;
+    if (ch >= '0' && ch <= '9') {
+      return true;
+    }
+    if (ch >= 'A' && ch <= 'F') {
+      return true;
+    }
+    if (ch >= 'a' && ch <= 'f') {
+      return true;
+    }
     return false;
   }
 
   static protected int hexval(char ch) {
-    if (ch >= '0' && ch <= '9') return ((int)ch) - ((int)'0');
-    if (ch >= 'A' && ch <= 'F') return ((int)ch) - ((int)'A') + 10;
-    return ((int)ch) - ((int)'a') + 10;
+    if (ch >= '0' && ch <= '9') {
+      return ((int) ch) - ((int) '0');
+    }
+    if (ch >= 'A' && ch <= 'F') {
+      return ((int) ch) - ((int) 'A') + 10;
+    }
+    return ((int) ch) - ((int) 'a') + 10;
   }
 
   static protected String remove_escapes_and_quotes(Token t, String str) {
@@ -175,71 +187,87 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
     int index = 1;
     char ch, ch1;
     int ordinal;
-    while (index < str.length()-1) {
+    while (index < str.length() - 1) {
       if (str.charAt(index) != '\\') {
-        retval += str.charAt(index); index++;
+        retval += str.charAt(index);
+        index++;
         continue;
       }
       index++;
       ch = str.charAt(index);
       if (ch == 'b') {
-        retval += '\b'; index++;
+        retval += '\b';
+        index++;
         continue;
       }
       if (ch == 't') {
-        retval += '\t'; index++;
+        retval += '\t';
+        index++;
         continue;
       }
       if (ch == 'n') {
-        retval += '\n'; index++;
+        retval += '\n';
+        index++;
         continue;
       }
       if (ch == 'f') {
-        retval += '\f'; index++;
+        retval += '\f';
+        index++;
         continue;
       }
       if (ch == 'r') {
-        retval += '\r'; index++;
+        retval += '\r';
+        index++;
         continue;
       }
       if (ch == '"') {
-        retval += '\"'; index++;
+        retval += '\"';
+        index++;
         continue;
       }
       if (ch == '\'') {
-        retval += '\''; index++;
+        retval += '\'';
+        index++;
         continue;
       }
       if (ch == '\\') {
-        retval += '\\'; index++;
+        retval += '\\';
+        index++;
         continue;
       }
       if (ch >= '0' && ch <= '7') {
-        ordinal = ((int)ch) - ((int)'0'); index++;
+        ordinal = ((int) ch) - ((int) '0');
+        index++;
         ch1 = str.charAt(index);
         if (ch1 >= '0' && ch1 <= '7') {
-          ordinal = ordinal*8 + ((int)ch1) - ((int)'0'); index++;
+          ordinal = ordinal * 8 + ((int) ch1) - ((int) '0');
+          index++;
           ch1 = str.charAt(index);
           if (ch <= '3' && ch1 >= '0' && ch1 <= '7') {
-            ordinal = ordinal*8 + ((int)ch1) - ((int)'0'); index++;
+            ordinal = ordinal * 8 + ((int) ch1) - ((int) '0');
+            index++;
           }
         }
-        retval += (char)ordinal;
+        retval += (char) ordinal;
         continue;
       }
       if (ch == 'u') {
-        index++; ch = str.charAt(index);
+        index++;
+        ch = str.charAt(index);
         if (hexchar(ch)) {
           ordinal = hexval(ch);
-          index++; ch = str.charAt(index);
+          index++;
+          ch = str.charAt(index);
           if (hexchar(ch)) {
-            ordinal = ordinal*16 + hexval(ch);
-            index++; ch = str.charAt(index);
+            ordinal = ordinal * 16 + hexval(ch);
+            index++;
+            ch = str.charAt(index);
             if (hexchar(ch)) {
-              ordinal = ordinal*16 + hexval(ch);
-              index++; ch = str.charAt(index);
+              ordinal = ordinal * 16 + hexval(ch);
+              index++;
+              ch = str.charAt(index);
               if (hexchar(ch)) {
-                ordinal = ordinal*16 + hexval(ch);
+                ordinal = ordinal * 16 + hexval(ch);
                 index++;
                 continue;
               }
@@ -247,12 +275,12 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
           }
         }
         JavaCCErrors.parse_error(t, "Encountered non-hex character '" + ch +
-                "' at position " + index + " of string " +
-                "- Unicode escape must have 4 hex digits after it.");
+            "' at position " + index + " of string " +
+            "- Unicode escape must have 4 hex digits after it.");
         return retval;
       }
       JavaCCErrors.parse_error(t, "Illegal escape sequence '\\" + ch +
-              "' at position " + index + " of string.");
+          "' at position " + index + " of string.");
       return retval;
     }
     return retval;
@@ -262,7 +290,8 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
     if (s.length() != 1) {
       JavaCCErrors.parse_error(t, "String in character list may contain only one character.");
       return ' ';
-    } else {
+    }
+    else {
       return s.charAt(0);
     }
   }
@@ -271,25 +300,26 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
     if (s.length() != 1) {
       JavaCCErrors.parse_error(t, "String in character list may contain only one character.");
       return ' ';
-    } else if ((int)(left.charAt(0)) > (int)(s.charAt(0))) {
+    }
+    else if ((int) (left.charAt(0)) > (int) (s.charAt(0))) {
       JavaCCErrors.parse_error(t, "Right end of character range \'" + s +
-              "\' has a lower ordinal value than the left end of character range \'" + left + "\'.");
+          "\' has a lower ordinal value than the left end of character range \'" + left + "\'.");
       return left.charAt(0);
-    } else {
+    }
+    else {
       return s.charAt(0);
     }
   }
 
   static protected void makeTryBlock(
-    Token tryLoc,
-    Container result,
-    Container nestedExp,
-    List types,
-    List ids,
-    List catchblks,
-    List finallyblk
-  )
-  {
+      Token tryLoc,
+      Container result,
+      Container nestedExp,
+      List types,
+      List ids,
+      List catchblks,
+      List finallyblk
+  ) {
     if (catchblks.size() == 0 && finallyblk == null) {
       JavaCCErrors.parse_error(tryLoc, "Try block must contain at least one catch or finally block.");
       return;
@@ -297,7 +327,7 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
     TryBlock tblk = new TryBlock();
     tblk.setLine(tryLoc.beginLine);
     tblk.setColumn(tryLoc.beginColumn);
-    tblk.exp = (Expansion)(nestedExp.member);
+    tblk.exp = (Expansion) (nestedExp.member);
     tblk.exp.parent = tblk;
     tblk.exp.ordinal = 0;
     tblk.types = types;
@@ -307,13 +337,11 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
     result.member = tblk;
   }
 
-   public static void reInit()
-   {
-      add_cu_token_here = cu_to_insertion_point_1;
-      first_cu_token = null;
-      insertionpoint1set = false;
-      insertionpoint2set = false;
-      nextFreeLexState = 1;
-   }
-
+  public static void reInit() {
+    add_cu_token_here = cu_to_insertion_point_1;
+    first_cu_token = null;
+    insertionpoint1set = false;
+    insertionpoint2set = false;
+    nextFreeLexState = 1;
+  }
 }

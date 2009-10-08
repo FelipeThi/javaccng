@@ -36,29 +36,30 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * Generate the parser.
- */
+/** Generate the parser. */
 public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
 
   static public void start() throws MetaParseException {
 
     Token t = null;
 
-    if (JavaCCErrors.get_error_count() != 0) throw new MetaParseException();
+    if (JavaCCErrors.get_error_count() != 0) {
+      throw new MetaParseException();
+    }
 
     if (Options.getBuildParser()) {
 
       try {
         ostr = new PrintWriter(
-                  new BufferedWriter(
-                     new FileWriter(
-                       new File(Options.getOutputDirectory(), cu_name + ".java")
-                     ),
-                     8192
-                  )
-               );
-      } catch (IOException e) {
+            new BufferedWriter(
+                new FileWriter(
+                    new File(Options.getOutputDirectory(), cu_name + ".java")
+                ),
+                8192
+            )
+        );
+      }
+      catch (IOException e) {
         JavaCCErrors.semantic_error("Could not open file " + cu_name + ".java for writing.");
         throw new Error();
       }
@@ -70,12 +71,14 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
       boolean implementsExists = false;
 
       if (cu_to_insertion_point_1.size() != 0) {
-        printTokenSetup((Token)(cu_to_insertion_point_1.get(0))); ccol = 1;
+        printTokenSetup((Token) (cu_to_insertion_point_1.get(0)));
+        ccol = 1;
         for (Iterator it = cu_to_insertion_point_1.iterator(); it.hasNext();) {
-          t = (Token)it.next();
+          t = (Token) it.next();
           if (t.kind == IMPLEMENTS) {
             implementsExists = true;
-          } else if (t.kind == CLASS) {
+          }
+          else if (t.kind == CLASS) {
             implementsExists = false;
           }
           printToken(t, ostr);
@@ -83,14 +86,15 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
       }
       if (implementsExists) {
         ostr.print(", ");
-      } else {
+      }
+      else {
         ostr.print(" implements ");
       }
       ostr.print(cu_name + "Constants ");
       if (cu_to_insertion_point_2.size() != 0) {
-        printTokenSetup((Token)(cu_to_insertion_point_2.get(0)));
+        printTokenSetup((Token) (cu_to_insertion_point_2.get(0)));
         for (Iterator it = cu_to_insertion_point_2.iterator(); it.hasNext();) {
-          t = (Token)it.next();
+          t = (Token) it.next();
           printToken(t, ostr);
         }
       }
@@ -106,13 +110,15 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
       if (Options.getUserTokenManager()) {
         ostr.println("  /** User defined Token Manager. */");
         ostr.println("  " + staticOpt() + "public TokenManager token_source;");
-      } else {
+      }
+      else {
         ostr.println("  /** Generated Token Manager. */");
         ostr.println("  " + staticOpt() + "public " + cu_name + "TokenManager token_source;");
         if (!Options.getUserCharStream()) {
           if (Options.getJavaUnicodeEscape()) {
             ostr.println("  " + staticOpt() + "JavaCharStream jj_input_stream;");
-          } else {
+          }
+          else {
             ostr.println("  " + staticOpt() + "SimpleCharStream jj_input_stream;");
           }
         }
@@ -136,18 +142,20 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
       if (Options.getErrorReporting()) {
         ostr.println("  " + staticOpt() + "private int jj_gen;");
         ostr.println("  " + staticOpt() + "final private int[] jj_la1 = new int[" + maskindex + "];");
-        int tokenMaskSize = (tokenCount-1)/32 + 1;
-        for (int i = 0; i < tokenMaskSize; i++)
+        int tokenMaskSize = (tokenCount - 1) / 32 + 1;
+        for (int i = 0; i < tokenMaskSize; i++) {
           ostr.println("  static private int[] jj_la1_" + i + ";");
+        }
         ostr.println("  static {");
-        for (int i = 0; i < tokenMaskSize; i++)
+        for (int i = 0; i < tokenMaskSize; i++) {
           ostr.println("      jj_la1_init_" + i + "();");
+        }
         ostr.println("   }");
         for (int i = 0; i < tokenMaskSize; i++) {
           ostr.println("   private static void jj_la1_init_" + i + "() {");
           ostr.print("      jj_la1_" + i + " = new int[] {");
           for (Iterator it = maskVals.iterator(); it.hasNext();) {
-            int[] tokenMask = (int[])(it.next());
+            int[] tokenMask = (int[]) (it.next());
             ostr.print("0x" + Integer.toHexString(tokenMask[i]) + ",");
           }
           ostr.println("};");
@@ -169,21 +177,23 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
             ostr.println("    if (jj_initialized_once) {");
             ostr.println("      System.out.println(\"ERROR: Second call to constructor of static parser.  \");");
             ostr.println("      System.out.println(\"       You must either use ReInit() " +
-                    "or set the JavaCC option STATIC to false\");");
+                "or set the JavaCC option STATIC to false\");");
             ostr.println("      System.out.println(\"       during parser generation.\");");
             ostr.println("      throw new Error();");
             ostr.println("    }");
             ostr.println("    jj_initialized_once = true;");
           }
-          if(Options.getTokenManagerUsesParser() && !Options.getStatic()){
+          if (Options.getTokenManagerUsesParser() && !Options.getStatic()) {
             ostr.println("    token_source = new " + cu_name + "TokenManager(this, stream);");
-          } else {
+          }
+          else {
             ostr.println("    token_source = new " + cu_name + "TokenManager(stream);");
           }
           ostr.println("    token = new Token();");
           if (Options.getCacheTokens()) {
             ostr.println("    token.next = jj_nt = token_source.getNextToken();");
-          } else {
+          }
+          else {
             ostr.println("    jj_ntk = -1;");
           }
           if (Options.getErrorReporting()) {
@@ -201,7 +211,8 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
           ostr.println("    token = new Token();");
           if (Options.getCacheTokens()) {
             ostr.println("    token.next = jj_nt = token_source.getNextToken();");
-          } else {
+          }
+          else {
             ostr.println("    jj_ntk = -1;");
           }
           if (lookaheadNeeded) {
@@ -218,7 +229,8 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
             }
           }
           ostr.println("  }");
-        } else {
+        }
+        else {
           ostr.println("  /** Constructor with InputStream. */");
           ostr.println("  public " + cu_name + "(java.io.InputStream stream) {");
           ostr.println("     this(stream, null);");
@@ -229,40 +241,45 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
             ostr.println("    if (jj_initialized_once) {");
             ostr.println("      System.out.println(\"ERROR: Second call to constructor of static parser.  \");");
             ostr.println("      System.out.println(\"       You must either use ReInit() or " +
-                    "set the JavaCC option STATIC to false\");");
+                "set the JavaCC option STATIC to false\");");
             ostr.println("      System.out.println(\"       during parser generation.\");");
             ostr.println("      throw new Error();");
             ostr.println("    }");
             ostr.println("    jj_initialized_once = true;");
           }
           if (Options.getJavaUnicodeEscape()) {
-              if (!Options.getGenerateChainedException()) {
-                  ostr.println("    try { jj_input_stream = new JavaCharStream(stream, encoding, 1, 1); } " +
-                          "catch(java.io.UnsupportedEncodingException e) {" +
-                          " throw new RuntimeException(e.getMessage()); }");
-              } else {
-                ostr.println("    try { jj_input_stream = new JavaCharStream(stream, encoding, 1, 1); } " +
-                        "catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }");
-              }
-          } else {
-              if (!Options.getGenerateChainedException()) {
-                  ostr.println("    try { jj_input_stream = new SimpleCharStream(stream, encoding, 1, 1); } " +
-                          "catch(java.io.UnsupportedEncodingException e) { " +
-                          "throw new RuntimeException(e.getMessage()); }");
-          } else {
-            ostr.println("    try { jj_input_stream = new SimpleCharStream(stream, encoding, 1, 1); } " +
-                    "catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }");
+            if (!Options.getGenerateChainedException()) {
+              ostr.println("    try { jj_input_stream = new JavaCharStream(stream, encoding, 1, 1); } " +
+                  "catch(java.io.UnsupportedEncodingException e) {" +
+                  " throw new RuntimeException(e.getMessage()); }");
+            }
+            else {
+              ostr.println("    try { jj_input_stream = new JavaCharStream(stream, encoding, 1, 1); } " +
+                  "catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }");
+            }
           }
+          else {
+            if (!Options.getGenerateChainedException()) {
+              ostr.println("    try { jj_input_stream = new SimpleCharStream(stream, encoding, 1, 1); } " +
+                  "catch(java.io.UnsupportedEncodingException e) { " +
+                  "throw new RuntimeException(e.getMessage()); }");
+            }
+            else {
+              ostr.println("    try { jj_input_stream = new SimpleCharStream(stream, encoding, 1, 1); } " +
+                  "catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }");
+            }
           }
-          if(Options.getTokenManagerUsesParser() && !Options.getStatic()){
+          if (Options.getTokenManagerUsesParser() && !Options.getStatic()) {
             ostr.println("    token_source = new " + cu_name + "TokenManager(this, jj_input_stream);");
-          } else {
+          }
+          else {
             ostr.println("    token_source = new " + cu_name + "TokenManager(jj_input_stream);");
           }
           ostr.println("    token = new Token();");
           if (Options.getCacheTokens()) {
             ostr.println("    token.next = jj_nt = token_source.getNextToken();");
-          } else {
+          }
+          else {
             ostr.println("    jj_ntk = -1;");
           }
           if (Options.getErrorReporting()) {
@@ -282,17 +299,19 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
           ostr.println("  " + staticOpt() + "public void ReInit(java.io.InputStream stream, String encoding) {");
           if (!Options.getGenerateChainedException()) {
             ostr.println("    try { jj_input_stream.ReInit(stream, encoding, 1, 1); } " +
-                    "catch(java.io.UnsupportedEncodingException e) { " +
-                    "throw new RuntimeException(e.getMessage()); }");
-          } else {
+                "catch(java.io.UnsupportedEncodingException e) { " +
+                "throw new RuntimeException(e.getMessage()); }");
+          }
+          else {
             ostr.println("    try { jj_input_stream.ReInit(stream, encoding, 1, 1); } " +
-                    "catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }");
+                "catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }");
           }
           ostr.println("    token_source.ReInit(jj_input_stream);");
           ostr.println("    token = new Token();");
           if (Options.getCacheTokens()) {
             ostr.println("    token.next = jj_nt = token_source.getNextToken();");
-          } else {
+          }
+          else {
             ostr.println("    jj_ntk = -1;");
           }
           if (jjtreeGenerated) {
@@ -313,7 +332,7 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
             ostr.println("    if (jj_initialized_once) {");
             ostr.println("      System.out.println(\"ERROR: Second call to constructor of static parser. \");");
             ostr.println("      System.out.println(\"       You must either use ReInit() or " +
-                    "set the JavaCC option STATIC to false\");");
+                "set the JavaCC option STATIC to false\");");
             ostr.println("      System.out.println(\"       during parser generation.\");");
             ostr.println("      throw new Error();");
             ostr.println("    }");
@@ -321,18 +340,21 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
           }
           if (Options.getJavaUnicodeEscape()) {
             ostr.println("    jj_input_stream = new JavaCharStream(stream, 1, 1);");
-          } else {
+          }
+          else {
             ostr.println("    jj_input_stream = new SimpleCharStream(stream, 1, 1);");
           }
-          if(Options.getTokenManagerUsesParser() && !Options.getStatic()){
+          if (Options.getTokenManagerUsesParser() && !Options.getStatic()) {
             ostr.println("    token_source = new " + cu_name + "TokenManager(this, jj_input_stream);");
-          } else {
+          }
+          else {
             ostr.println("    token_source = new " + cu_name + "TokenManager(jj_input_stream);");
           }
           ostr.println("    token = new Token();");
           if (Options.getCacheTokens()) {
             ostr.println("    token.next = jj_nt = token_source.getNextToken();");
-          } else {
+          }
+          else {
             ostr.println("    jj_ntk = -1;");
           }
           if (Options.getErrorReporting()) {
@@ -348,14 +370,16 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
           ostr.println("  " + staticOpt() + "public void ReInit(java.io.Reader stream) {");
           if (Options.getJavaUnicodeEscape()) {
             ostr.println("    jj_input_stream.ReInit(stream, 1, 1);");
-          } else {
+          }
+          else {
             ostr.println("    jj_input_stream.ReInit(stream, 1, 1);");
           }
           ostr.println("    token_source.ReInit(jj_input_stream);");
           ostr.println("    token = new Token();");
           if (Options.getCacheTokens()) {
             ostr.println("    token.next = jj_nt = token_source.getNextToken();");
-          } else {
+          }
+          else {
             ostr.println("    jj_ntk = -1;");
           }
           if (jjtreeGenerated) {
@@ -375,7 +399,8 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
       if (Options.getUserTokenManager()) {
         ostr.println("  /** Constructor with user supplied Token Manager. */");
         ostr.println("  public " + cu_name + "(TokenManager tm) {");
-      } else {
+      }
+      else {
         ostr.println("  /** Constructor with generated Token Manager. */");
         ostr.println("  public " + cu_name + "(" + cu_name + "TokenManager tm) {");
       }
@@ -383,7 +408,7 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
         ostr.println("    if (jj_initialized_once) {");
         ostr.println("      System.out.println(\"ERROR: Second call to constructor of static parser. \");");
         ostr.println("      System.out.println(\"       You must either use ReInit() or " +
-                "set the JavaCC option STATIC to false\");");
+            "set the JavaCC option STATIC to false\");");
         ostr.println("      System.out.println(\"       during parser generation.\");");
         ostr.println("      throw new Error();");
         ostr.println("    }");
@@ -393,7 +418,8 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
       ostr.println("    token = new Token();");
       if (Options.getCacheTokens()) {
         ostr.println("    token.next = jj_nt = token_source.getNextToken();");
-      } else {
+      }
+      else {
         ostr.println("    jj_ntk = -1;");
       }
       if (Options.getErrorReporting()) {
@@ -408,7 +434,8 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
       if (Options.getUserTokenManager()) {
         ostr.println("  /** Reinitialise. */");
         ostr.println("  public void ReInit(TokenManager tm) {");
-      } else {
+      }
+      else {
         ostr.println("  /** Reinitialise. */");
         ostr.println("  public void ReInit(" + cu_name + "TokenManager tm) {");
       }
@@ -416,7 +443,8 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
       ostr.println("    token = new Token();");
       if (Options.getCacheTokens()) {
         ostr.println("    token.next = jj_nt = token_source.getNextToken();");
-      } else {
+      }
+      else {
         ostr.println("    jj_ntk = -1;");
       }
       if (jjtreeGenerated) {
@@ -436,7 +464,8 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
         ostr.println("    Token oldToken = token;");
         ostr.println("    if ((token = jj_nt).next != null) jj_nt = jj_nt.next;");
         ostr.println("    else jj_nt = jj_nt.next = token_source.getNextToken();");
-      } else {
+      }
+      else {
         ostr.println("    Token oldToken;");
         ostr.println("    if ((oldToken = token).next != null) token = token.next;");
         ostr.println("    else token = token.next = token_source.getNextToken();");
@@ -497,7 +526,8 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
             ostr.println("      trace_scan(jj_scanpos, kind);");
           }
           ostr.println("    }");
-        } else if (Options.getDebugLookahead()) {
+        }
+        else if (Options.getDebugLookahead()) {
           ostr.println("    trace_scan(jj_scanpos, kind);");
         }
         ostr.println("    if (jj_scanpos.kind != kind) return true;");
@@ -512,7 +542,8 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
       if (Options.getCacheTokens()) {
         ostr.println("    if ((token = jj_nt).next != null) jj_nt = jj_nt.next;");
         ostr.println("    else jj_nt = jj_nt.next = token_source.getNextToken();");
-      } else {
+      }
+      else {
         ostr.println("    if (token.next != null) token = token.next;");
         ostr.println("    else token = token.next = token_source.getNextToken();");
         ostr.println("    jj_ntk = -1;");
@@ -530,7 +561,8 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
       ostr.println("  " + staticOpt() + "final public Token getToken(int index) {");
       if (lookaheadNeeded) {
         ostr.println("    Token t = jj_lookingAhead ? jj_scanpos : token;");
-      } else {
+      }
+      else {
         ostr.println("    Token t = token;");
       }
       ostr.println("    for (int i = 0; i < index; i++) {");
@@ -550,11 +582,13 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
         ostr.println("");
       }
       if (Options.getErrorReporting()) {
-        if (!Options.getGenerateGenerics())
+        if (!Options.getGenerateGenerics()) {
           ostr.println("  " + staticOpt() + "private java.util.List jj_expentries = new java.util.ArrayList();");
-        else
+        }
+        else {
           ostr.println("  " + staticOpt() +
-                  "private java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();");
+              "private java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();");
+        }
         ostr.println("  " + staticOpt() + "private int[] jj_expentry;");
         ostr.println("  " + staticOpt() + "private int jj_kind = -1;");
         if (jj2index != 0) {
@@ -570,10 +604,12 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
           ostr.println("      for (int i = 0; i < jj_endpos; i++) {");
           ostr.println("        jj_expentry[i] = jj_lasttokens[i];");
           ostr.println("      }");
-        if (!Options.getGenerateGenerics())
-          ostr.println("      jj_entries_loop: for (java.util.Iterator it = jj_expentries.iterator(); it.hasNext();) {");
-        else
-          ostr.println("      jj_entries_loop: for (java.util.Iterator<?> it = jj_expentries.iterator(); it.hasNext();) {");
+          if (!Options.getGenerateGenerics()) {
+            ostr.println("      jj_entries_loop: for (java.util.Iterator it = jj_expentries.iterator(); it.hasNext();) {");
+          }
+          else {
+            ostr.println("      jj_entries_loop: for (java.util.Iterator<?> it = jj_expentries.iterator(); it.hasNext();) {");
+          }
           ostr.println("        int[] oldentry = (int[])(it.next());");
           ostr.println("        if (oldentry.length == jj_expentry.length) {");
           ostr.println("          for (int i = 0; i < jj_expentry.length; i++) {");
@@ -601,11 +637,11 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
         ostr.println("    for (int i = 0; i < " + maskindex + "; i++) {");
         ostr.println("      if (jj_la1[i] == jj_gen) {");
         ostr.println("        for (int j = 0; j < 32; j++) {");
-        for (int i = 0; i < (tokenCount-1)/32 + 1; i++) {
+        for (int i = 0; i < (tokenCount - 1) / 32 + 1; i++) {
           ostr.println("          if ((jj_la1_" + i + "[i] & (1<<j)) != 0) {");
           ostr.print("            la1tokens[");
           if (i != 0) {
-            ostr.print((32*i) + "+");
+            ostr.print((32 * i) + "+");
           }
           ostr.println("j] = true;");
           ostr.println("          }");
@@ -627,27 +663,33 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
         }
         ostr.println("    int[][] exptokseq = new int[jj_expentries.size()][];");
         ostr.println("    for (int i = 0; i < jj_expentries.size(); i++) {");
-        if (!Options.getGenerateGenerics())
-           ostr.println("      exptokseq[i] = (int[])jj_expentries.get(i);");
-        else
-           ostr.println("      exptokseq[i] = jj_expentries.get(i);");
+        if (!Options.getGenerateGenerics()) {
+          ostr.println("      exptokseq[i] = (int[])jj_expentries.get(i);");
+        }
+        else {
+          ostr.println("      exptokseq[i] = jj_expentries.get(i);");
+        }
         ostr.println("    }");
         ostr.println("    return new ParseException(token, exptokseq, tokenImage);");
         ostr.println("  }");
-      } else {
+      }
+      else {
         ostr.println("  /** Generate ParseException. */");
         ostr.println("  " + staticOpt() + "public ParseException generateParseException() {");
         ostr.println("    Token errortok = token.next;");
-        if (Options.getKeepLineColumn())
-           ostr.println("    int line = errortok.beginLine, column = errortok.beginColumn;");
+        if (Options.getKeepLineColumn()) {
+          ostr.println("    int line = errortok.beginLine, column = errortok.beginColumn;");
+        }
         ostr.println("    String mess = (errortok.kind == 0) ? tokenImage[0] : errortok.image;");
-        if (Options.getKeepLineColumn())
-           ostr.println("    return new ParseException(" +
-               "\"Parse error at line \" + line + \", column \" + column + \".  " +
-               "Encountered: \" + mess);");
-        else
-           ostr.println("    return new ParseException(\"Parse error at <unknown location>.  " +
-                   "Encountered: \" + mess);");
+        if (Options.getKeepLineColumn()) {
+          ostr.println("    return new ParseException(" +
+              "\"Parse error at line \" + line + \", column \" + column + \".  " +
+              "Encountered: \" + mess);");
+        }
+        else {
+          ostr.println("    return new ParseException(\"Parse error at <unknown location>.  " +
+              "Encountered: \" + mess);");
+        }
         ostr.println("  }");
       }
       ostr.println("");
@@ -690,7 +732,7 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
         ostr.println("        System.out.print(\": \\\"\" + t.image + \"\\\"\");");
         ostr.println("      }");
         ostr.println("      System.out.println(\" at line \" + t.beginLine + " +
-                "\" column \" + t.beginColumn + \">\" + where);");
+            "\" column \" + t.beginColumn + \">\" + where);");
         ostr.println("    }");
         ostr.println("  }");
         ostr.println("");
@@ -702,11 +744,12 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
         ostr.println("        System.out.print(\": \\\"\" + t1.image + \"\\\"\");");
         ostr.println("      }");
         ostr.println("      System.out.println(\" at line \" + t1.beginLine + \"" +
-                " column \" + t1.beginColumn + \">; Expected token: <\" + tokenImage[t2] + \">\");");
+            " column \" + t1.beginColumn + \">; Expected token: <\" + tokenImage[t2] + \">\");");
         ostr.println("    }");
         ostr.println("  }");
         ostr.println("");
-      } else {
+      }
+      else {
         ostr.println("  /** Enable tracing. */");
         ostr.println("  " + staticOpt() + "final public void enable_tracing() {");
         ostr.println("  }");
@@ -728,7 +771,7 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
         ostr.println("          jj_la = p.arg; jj_lastpos = jj_scanpos = p.first;");
         ostr.println("          switch (i) {");
         for (int i = 0; i < jj2index; i++) {
-          ostr.println("            case " + i + ": jj_3_" + (i+1) + "(); break;");
+          ostr.println("            case " + i + ": jj_3_" + (i + 1) + "(); break;");
         }
         ostr.println("          }");
         ostr.println("        }");
@@ -761,9 +804,10 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
       }
 
       if (cu_from_insertion_point_2.size() != 0) {
-        printTokenSetup((Token)(cu_from_insertion_point_2.get(0))); ccol = 1;
+        printTokenSetup((Token) (cu_from_insertion_point_2.get(0)));
+        ccol = 1;
         for (Iterator it = cu_from_insertion_point_2.iterator(); it.hasNext();) {
-          t = (Token)it.next();
+          t = (Token) it.next();
           printToken(t, ostr);
         }
         printTrailingComments(t, ostr);
@@ -771,17 +815,13 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
       ostr.println("");
 
       ostr.close();
-
     } // matches "if (Options.getBuildParser())"
-
   }
 
   static private PrintWriter ostr;
 
-   public static void reInit()
-   {
-      ostr = null;
-      lookaheadNeeded = false;
-   }
-
+  public static void reInit() {
+    ostr = null;
+    lookaheadNeeded = false;
+  }
 }

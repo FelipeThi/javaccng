@@ -26,17 +26,13 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-
 package org.javacc.jjdoc;
 
 import org.javacc.parser.JavaCCErrors;
 import org.javacc.parser.JavaCCParser;
 import org.javacc.parser.Main;
 
-/**
- * Main class.
- */
+/** Main class. */
 public final class JJDocMain extends JJDocGlobals {
 
   private JJDocMain() {}
@@ -86,9 +82,7 @@ public final class JJDocMain extends JJDocGlobals {
     info("    https://javacc.dev.java.net/doc/JJDoc.html");
   }
 
-  /**
-   * A main program that exercises the parser.
-   */
+  /** A main program that exercises the parser. */
   public static void main(String args[]) throws Exception {
     int errorcode = mainProgram(args);
     System.exit(errorcode);
@@ -110,16 +104,16 @@ public final class JJDocMain extends JJDocGlobals {
     if (args.length == 0) {
       help_message();
       return 1;
-    } else {
+    }
+    else {
       info("(type \"jjdoc\" with no arguments for help)");
     }
 
-
-    if (JJDocOptions.isOption(args[args.length-1])) {
-      error("Last argument \"" + args[args.length-1] + "\" is not a filename or \"-\".  ");
+    if (JJDocOptions.isOption(args[args.length - 1])) {
+      error("Last argument \"" + args[args.length - 1] + "\" is not a filename or \"-\".  ");
       return 1;
     }
-    for (int arg = 0; arg < args.length-1; arg++) {
+    for (int arg = 0; arg < args.length - 1; arg++) {
       if (!JJDocOptions.isOption(args[arg])) {
         error("Argument \"" + args[arg] + "\" must be an option setting.  ");
         return 1;
@@ -127,30 +121,33 @@ public final class JJDocMain extends JJDocGlobals {
       JJDocOptions.setCmdLineOption(args[arg]);
     }
 
-    if (args[args.length-1].equals("-")) {
+    if (args[args.length - 1].equals("-")) {
       info("Reading from standard input . . .");
       parser = new JavaCCParser(new java.io.DataInputStream(System.in));
       JJDocGlobals.input_file = "standard input";
       JJDocGlobals.output_file = "standard output";
-    } else {
-      info("Reading from file " + args[args.length-1] + " . . .");
+    }
+    else {
+      info("Reading from file " + args[args.length - 1] + " . . .");
       try {
-        java.io.File fp = new java.io.File(args[args.length-1]);
+        java.io.File fp = new java.io.File(args[args.length - 1]);
         if (!fp.exists()) {
-           error("File " + args[args.length-1] + " not found.");
-           return 1;
+          error("File " + args[args.length - 1] + " not found.");
+          return 1;
         }
         if (fp.isDirectory()) {
-           error(args[args.length-1] + " is a directory. Please use a valid file name.");
-           return 1;
+          error(args[args.length - 1] + " is a directory. Please use a valid file name.");
+          return 1;
         }
         JJDocGlobals.input_file = fp.getName();
-        parser = new JavaCCParser(new java.io.BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream(args[args.length-1]), JJDocOptions.getGrammarEncoding())));
-      } catch (SecurityException se) {
-        error("Security violation while trying to open " + args[args.length-1]);
+        parser = new JavaCCParser(new java.io.BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream(args[args.length - 1]), JJDocOptions.getGrammarEncoding())));
+      }
+      catch (SecurityException se) {
+        error("Security violation while trying to open " + args[args.length - 1]);
         return 1;
-      } catch (java.io.FileNotFoundException e) {
-        error("File " + args[args.length-1] + " not found.");
+      }
+      catch (java.io.FileNotFoundException e) {
+        error("File " + args[args.length - 1] + " not found.");
         return 1;
       }
     }
@@ -162,27 +159,30 @@ public final class JJDocMain extends JJDocGlobals {
       if (JavaCCErrors.get_error_count() == 0) {
         if (JavaCCErrors.get_warning_count() == 0) {
           info("Grammar documentation generated successfully in " + JJDocGlobals.output_file);
-        } else {
+        }
+        else {
           info("Grammar documentation generated with 0 errors and "
-                             + JavaCCErrors.get_warning_count() + " warnings.");
+              + JavaCCErrors.get_warning_count() + " warnings.");
         }
         return 0;
-      } else {
-        error("Detected " + JavaCCErrors.get_error_count() + " errors and "
-                           + JavaCCErrors.get_warning_count() + " warnings.");
-        return (JavaCCErrors.get_error_count()==0)?0:1;
       }
-    } catch (org.javacc.parser.MetaParseException e) {
+      else {
+        error("Detected " + JavaCCErrors.get_error_count() + " errors and "
+            + JavaCCErrors.get_warning_count() + " warnings.");
+        return (JavaCCErrors.get_error_count() == 0) ? 0 : 1;
+      }
+    }
+    catch (org.javacc.parser.MetaParseException e) {
       error(e.toString());
       error("Detected " + JavaCCErrors.get_error_count() + " errors and "
-                         + JavaCCErrors.get_warning_count() + " warnings.");
+          + JavaCCErrors.get_warning_count() + " warnings.");
       return 1;
-    } catch (org.javacc.parser.ParseException e) {
+    }
+    catch (org.javacc.parser.ParseException e) {
       error(e.toString());
-      error("Detected " + (JavaCCErrors.get_error_count()+1) + " errors and "
-                         + JavaCCErrors.get_warning_count() + " warnings.");
+      error("Detected " + (JavaCCErrors.get_error_count() + 1) + " errors and "
+          + JavaCCErrors.get_warning_count() + " warnings.");
       return 1;
     }
   }
-
 }

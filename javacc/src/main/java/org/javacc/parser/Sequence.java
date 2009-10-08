@@ -46,27 +46,25 @@ public class Sequence extends Expansion {
    */
   public List units = new ArrayList();
 
-    public Sequence() {}
+  public Sequence() {}
 
-    public Sequence(Token token, Lookahead lookahead) {
-        this.setLine(token.beginLine);
-        this.setColumn(token.beginColumn);
-        this.units.add(lookahead);
+  public Sequence(Token token, Lookahead lookahead) {
+    this.setLine(token.beginLine);
+    this.setColumn(token.beginColumn);
+    this.units.add(lookahead);
+  }
+
+  public StringBuffer dump(int indent, Set alreadyDumped) {
+    if (alreadyDumped.contains(this)) {
+      return super.dump(0, alreadyDumped).insert(0, '[').append(']').insert(0, dumpPrefix(indent));
     }
 
-
-    public StringBuffer dump(int indent, Set alreadyDumped) {
-      if (alreadyDumped.contains(this))
-      {
-        return super.dump(0, alreadyDumped).insert(0, '[').append(']').insert(0, dumpPrefix(indent));
-      }
-
-      alreadyDumped.add(this);
-      final StringBuffer sb = super.dump(indent, alreadyDumped);
-      for (Iterator it = units.iterator(); it.hasNext(); ) {
-        Expansion next = (Expansion)it.next();
-        sb.append(eol).append(next.dump(indent + 1, alreadyDumped));
-      }
-      return sb;
+    alreadyDumped.add(this);
+    final StringBuffer sb = super.dump(indent, alreadyDumped);
+    for (Iterator it = units.iterator(); it.hasNext();) {
+      Expansion next = (Expansion) it.next();
+      sb.append(eol).append(next.dump(indent + 1, alreadyDumped));
     }
+    return sb;
+  }
 }

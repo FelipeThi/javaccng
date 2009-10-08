@@ -32,9 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-/**
- * Supply the version number.
- */
+/** Supply the version number. */
 public class Version {
   private Version() {}
 
@@ -50,15 +48,12 @@ public class Version {
     String patch = "??";
 
     Properties props = new Properties();
-    InputStream is = Version.class.getResourceAsStream("/version.properties");
-    if (is != null)
-    {
-      try
-      {
-        props.load(is);
+    InputStream inputStream = Version.class.getResourceAsStream("/version.properties");
+    if (inputStream != null) {
+      try {
+        props.load(inputStream);
       }
-      catch (IOException e)
-      {
+      catch (IOException e) {
         System.err.println("Could not read version.properties: " + e);
       }
       major = props.getProperty("version.major", major);
