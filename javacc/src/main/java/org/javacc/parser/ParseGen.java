@@ -103,12 +103,9 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
       if (Options.getStatic()) {
         ostr.println("  static private boolean jj_initialized_once = false;");
       }
-      if (Options.getUserTokenManager()) {
-        ostr.println("  /** User defined Token Manager. */");
-        ostr.println("  " + staticOpt() + "public TokenManager token_source;");
-      } else {
-        ostr.println("  /** Generated Token Manager. */");
-        ostr.println("  " + staticOpt() + "public " + cu_name + "TokenManager token_source;");
+      ostr.println("  /** Either generated or user defined Token Manager. */");
+      ostr.println("  " + staticOpt() + "public TokenManager token_source;");
+      if (!Options.getUserTokenManager()) {
         if (!Options.getUserCharStream()) {
           if (Options.getJavaUnicodeEscape()) {
             ostr.println("  " + staticOpt() + "JavaCharStream jj_input_stream;");
@@ -161,224 +158,8 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
       }
       ostr.println("");
 
-      if (!Options.getUserTokenManager()) {
-        if (Options.getUserCharStream()) {
-          ostr.println("  /** Constructor with user supplied CharStream. */");
-          ostr.println("  public " + cu_name + "(CharStream stream) {");
-          if (Options.getStatic()) {
-            ostr.println("    if (jj_initialized_once) {");
-            ostr.println("      System.out.println(\"ERROR: Second call to constructor of static parser.  \");");
-            ostr.println("      System.out.println(\"       You must either use ReInit() " +
-                    "or set the JavaCC option STATIC to false\");");
-            ostr.println("      System.out.println(\"       during parser generation.\");");
-            ostr.println("      throw new Error();");
-            ostr.println("    }");
-            ostr.println("    jj_initialized_once = true;");
-          }
-          if(Options.getTokenManagerUsesParser() && !Options.getStatic()){
-            ostr.println("    token_source = new " + cu_name + "TokenManager(this, stream);");
-          } else {
-            ostr.println("    token_source = new " + cu_name + "TokenManager(stream);");
-          }
-          ostr.println("    token = new Token();");
-          if (Options.getCacheTokens()) {
-            ostr.println("    token.next = jj_nt = token_source.getNextToken();");
-          } else {
-            ostr.println("    jj_ntk = -1;");
-          }
-          if (Options.getErrorReporting()) {
-            ostr.println("    jj_gen = 0;");
-            ostr.println("    for (int i = 0; i < " + maskindex + "; i++) jj_la1[i] = -1;");
-            if (jj2index != 0) {
-              ostr.println("    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();");
-            }
-          }
-          ostr.println("  }");
-          ostr.println("");
-          ostr.println("  /** Reinitialise. */");
-          ostr.println("  " + staticOpt() + "public void ReInit(CharStream stream) {");
-          ostr.println("    token_source.ReInit(stream);");
-          ostr.println("    token = new Token();");
-          if (Options.getCacheTokens()) {
-            ostr.println("    token.next = jj_nt = token_source.getNextToken();");
-          } else {
-            ostr.println("    jj_ntk = -1;");
-          }
-          if (lookaheadNeeded) {
-            ostr.println("    jj_lookingAhead = false;");
-          }
-          if (jjtreeGenerated) {
-            ostr.println("    jjtree.reset();");
-          }
-          if (Options.getErrorReporting()) {
-            ostr.println("    jj_gen = 0;");
-            ostr.println("    for (int i = 0; i < " + maskindex + "; i++) jj_la1[i] = -1;");
-            if (jj2index != 0) {
-              ostr.println("    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();");
-            }
-          }
-          ostr.println("  }");
-        } else {
-          ostr.println("  /** Constructor with InputStream. */");
-          ostr.println("  public " + cu_name + "(java.io.InputStream stream) {");
-          ostr.println("     this(stream, null);");
-          ostr.println("  }");
-          ostr.println("  /** Constructor with InputStream and supplied encoding */");
-          ostr.println("  public " + cu_name + "(java.io.InputStream stream, String encoding) {");
-          if (Options.getStatic()) {
-            ostr.println("    if (jj_initialized_once) {");
-            ostr.println("      System.out.println(\"ERROR: Second call to constructor of static parser.  \");");
-            ostr.println("      System.out.println(\"       You must either use ReInit() or " +
-                    "set the JavaCC option STATIC to false\");");
-            ostr.println("      System.out.println(\"       during parser generation.\");");
-            ostr.println("      throw new Error();");
-            ostr.println("    }");
-            ostr.println("    jj_initialized_once = true;");
-          }
-          if (Options.getJavaUnicodeEscape()) {
-              if (!Options.getGenerateChainedException()) {
-                  ostr.println("    try { jj_input_stream = new JavaCharStream(stream, encoding, 1, 1); } " +
-                          "catch(java.io.UnsupportedEncodingException e) {" +
-                          " throw new RuntimeException(e.getMessage()); }");
-              } else {
-                ostr.println("    try { jj_input_stream = new JavaCharStream(stream, encoding, 1, 1); } " +
-                        "catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }");
-              }
-          } else {
-              if (!Options.getGenerateChainedException()) {
-                  ostr.println("    try { jj_input_stream = new SimpleCharStream(stream, encoding, 1, 1); } " +
-                          "catch(java.io.UnsupportedEncodingException e) { " +
-                          "throw new RuntimeException(e.getMessage()); }");
-          } else {
-            ostr.println("    try { jj_input_stream = new SimpleCharStream(stream, encoding, 1, 1); } " +
-                    "catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }");
-          }
-          }
-          if(Options.getTokenManagerUsesParser() && !Options.getStatic()){
-            ostr.println("    token_source = new " + cu_name + "TokenManager(this, jj_input_stream);");
-          } else {
-            ostr.println("    token_source = new " + cu_name + "TokenManager(jj_input_stream);");
-          }
-          ostr.println("    token = new Token();");
-          if (Options.getCacheTokens()) {
-            ostr.println("    token.next = jj_nt = token_source.getNextToken();");
-          } else {
-            ostr.println("    jj_ntk = -1;");
-          }
-          if (Options.getErrorReporting()) {
-            ostr.println("    jj_gen = 0;");
-            ostr.println("    for (int i = 0; i < " + maskindex + "; i++) jj_la1[i] = -1;");
-            if (jj2index != 0) {
-              ostr.println("    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();");
-            }
-          }
-          ostr.println("  }");
-          ostr.println("");
-          ostr.println("  /** Reinitialise. */");
-          ostr.println("  " + staticOpt() + "public void ReInit(java.io.InputStream stream) {");
-          ostr.println("     ReInit(stream, null);");
-          ostr.println("  }");
-          ostr.println("  /** Reinitialise. */");
-          ostr.println("  " + staticOpt() + "public void ReInit(java.io.InputStream stream, String encoding) {");
-          if (!Options.getGenerateChainedException()) {
-            ostr.println("    try { jj_input_stream.ReInit(stream, encoding, 1, 1); } " +
-                    "catch(java.io.UnsupportedEncodingException e) { " +
-                    "throw new RuntimeException(e.getMessage()); }");
-          } else {
-            ostr.println("    try { jj_input_stream.ReInit(stream, encoding, 1, 1); } " +
-                    "catch(java.io.UnsupportedEncodingException e) { throw new RuntimeException(e); }");
-          }
-          ostr.println("    token_source.ReInit(jj_input_stream);");
-          ostr.println("    token = new Token();");
-          if (Options.getCacheTokens()) {
-            ostr.println("    token.next = jj_nt = token_source.getNextToken();");
-          } else {
-            ostr.println("    jj_ntk = -1;");
-          }
-          if (jjtreeGenerated) {
-            ostr.println("    jjtree.reset();");
-          }
-          if (Options.getErrorReporting()) {
-            ostr.println("    jj_gen = 0;");
-            ostr.println("    for (int i = 0; i < " + maskindex + "; i++) jj_la1[i] = -1;");
-            if (jj2index != 0) {
-              ostr.println("    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();");
-            }
-          }
-          ostr.println("  }");
-          ostr.println("");
-          ostr.println("  /** Constructor. */");
-          ostr.println("  public " + cu_name + "(java.io.Reader stream) {");
-          if (Options.getStatic()) {
-            ostr.println("    if (jj_initialized_once) {");
-            ostr.println("      System.out.println(\"ERROR: Second call to constructor of static parser. \");");
-            ostr.println("      System.out.println(\"       You must either use ReInit() or " +
-                    "set the JavaCC option STATIC to false\");");
-            ostr.println("      System.out.println(\"       during parser generation.\");");
-            ostr.println("      throw new Error();");
-            ostr.println("    }");
-            ostr.println("    jj_initialized_once = true;");
-          }
-          if (Options.getJavaUnicodeEscape()) {
-            ostr.println("    jj_input_stream = new JavaCharStream(stream, 1, 1);");
-          } else {
-            ostr.println("    jj_input_stream = new SimpleCharStream(stream, 1, 1);");
-          }
-          if(Options.getTokenManagerUsesParser() && !Options.getStatic()){
-            ostr.println("    token_source = new " + cu_name + "TokenManager(this, jj_input_stream);");
-          } else {
-            ostr.println("    token_source = new " + cu_name + "TokenManager(jj_input_stream);");
-          }
-          ostr.println("    token = new Token();");
-          if (Options.getCacheTokens()) {
-            ostr.println("    token.next = jj_nt = token_source.getNextToken();");
-          } else {
-            ostr.println("    jj_ntk = -1;");
-          }
-          if (Options.getErrorReporting()) {
-            ostr.println("    jj_gen = 0;");
-            ostr.println("    for (int i = 0; i < " + maskindex + "; i++) jj_la1[i] = -1;");
-            if (jj2index != 0) {
-              ostr.println("    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();");
-            }
-          }
-          ostr.println("  }");
-          ostr.println("");
-          ostr.println("  /** Reinitialise. */");
-          ostr.println("  " + staticOpt() + "public void ReInit(java.io.Reader stream) {");
-          if (Options.getJavaUnicodeEscape()) {
-            ostr.println("    jj_input_stream.ReInit(stream, 1, 1);");
-          } else {
-            ostr.println("    jj_input_stream.ReInit(stream, 1, 1);");
-          }
-          ostr.println("    token_source.ReInit(jj_input_stream);");
-          ostr.println("    token = new Token();");
-          if (Options.getCacheTokens()) {
-            ostr.println("    token.next = jj_nt = token_source.getNextToken();");
-          } else {
-            ostr.println("    jj_ntk = -1;");
-          }
-          if (jjtreeGenerated) {
-            ostr.println("    jjtree.reset();");
-          }
-          if (Options.getErrorReporting()) {
-            ostr.println("    jj_gen = 0;");
-            ostr.println("    for (int i = 0; i < " + maskindex + "; i++) jj_la1[i] = -1;");
-            if (jj2index != 0) {
-              ostr.println("    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();");
-            }
-          }
-          ostr.println("  }");
-        }
-      }
-      ostr.println("");
-      if (Options.getUserTokenManager()) {
-        ostr.println("  /** Constructor with user supplied Token Manager. */");
-        ostr.println("  public " + cu_name + "(TokenManager tm) {");
-      } else {
-        ostr.println("  /** Constructor with generated Token Manager. */");
-        ostr.println("  public " + cu_name + "(" + cu_name + "TokenManager tm) {");
-      }
+      ostr.println("  /** Constructor with either generated or user provided Token Manager. */");
+      ostr.println("  public " + cu_name + "(TokenManager tm) {");
       if (Options.getStatic()) {
         ostr.println("    if (jj_initialized_once) {");
         ostr.println("      System.out.println(\"ERROR: Second call to constructor of static parser. \");");
@@ -405,13 +186,8 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
       }
       ostr.println("  }");
       ostr.println("");
-      if (Options.getUserTokenManager()) {
-        ostr.println("  /** Reinitialise. */");
-        ostr.println("  public void ReInit(TokenManager tm) {");
-      } else {
-        ostr.println("  /** Reinitialise. */");
-        ostr.println("  public void ReInit(" + cu_name + "TokenManager tm) {");
-      }
+      ostr.println("  /** Reinitialise. */");
+      ostr.println("  public void ReInit(TokenManager tm) {");
       ostr.println("    token_source = tm;");
       ostr.println("    token = new Token();");
       if (Options.getCacheTokens()) {

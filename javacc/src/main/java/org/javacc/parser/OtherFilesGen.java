@@ -46,9 +46,8 @@ public class OtherFilesGen extends JavaCCGlobals implements JavaCCParserConstant
     JavaFiles.gen_TokenMgrError();
     JavaFiles.gen_ParseException();
     JavaFiles.gen_Token();
-    if (Options.getUserTokenManager()) {
-      JavaFiles.gen_TokenManager();
-    } else if (Options.getUserCharStream()) {
+    JavaFiles.gen_TokenManager();
+    if (Options.getUserCharStream()) {
       JavaFiles.gen_CharStream();
     } else {
       if (Options.getJavaUnicodeEscape()) {

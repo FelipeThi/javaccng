@@ -143,7 +143,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
       if(Options.getSupportClassVisibilityPublic()) {
     	  ostr.print("public ");
       }
-      ostr.println("class " + tokMgrClassName + " implements " +
+      ostr.println("class " + tokMgrClassName + " implements TokenManager, " +
     		  cu_name + "Constants");
       ostr.println("{"); // }
     }
