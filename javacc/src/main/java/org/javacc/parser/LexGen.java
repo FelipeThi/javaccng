@@ -655,7 +655,6 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
   static void DumpStaticVarDeclarations()
   {
     int i;
-    String charStreamName;
 
     ostr.println("");
     ostr.println("/** Lexer state names. */");
@@ -735,17 +734,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
       ostr.println("\n};");
     }
 
-    if (Options.getUserCharStream())
-      charStreamName = "CharStream";
-    else
-    {
-      if (Options.getJavaUnicodeEscape())
-        charStreamName = "JavaCharStream";
-      else
-        charStreamName = "SimpleCharStream";
-    }
-
-    ostr.println(staticString + "protected " + charStreamName + " input_stream;");
+    ostr.println(staticString + "protected CharStream input_stream;");
 
     ostr.println(staticString + "private final int[] jjrounds = " +
         "new int[" + stateSetSize + "];");
@@ -765,11 +754,11 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
     if(Options.getTokenManagerUsesParser() && !Options.getStatic()){
       ostr.println("");
       ostr.println("/** Constructor with parser. */");
-      ostr.println("public " + tokMgrClassName + "(" + cu_name + " parserArg, " + charStreamName + " stream){");
+      ostr.println("public " + tokMgrClassName + "(" + cu_name + " parserArg, CharStream stream){");
       ostr.println("   parser = parserArg;");
     } else {
       ostr.println("/** Constructor. */");
-      ostr.println("public " + tokMgrClassName + "(" + charStreamName + " stream){");
+      ostr.println("public " + tokMgrClassName + "(CharStream stream){");
     }
 
     if (Options.getStatic() && !Options.getUserCharStream())
@@ -796,13 +785,12 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
     if(Options.getTokenManagerUsesParser() && !Options.getStatic()){
       ostr.println("");
       ostr.println("/** Constructor with parser. */");
-      ostr.println("public " + tokMgrClassName + "(" + cu_name + " parserArg, " +
-          charStreamName + " stream, int lexState){");
+      ostr.println("public " + tokMgrClassName + "(" + cu_name + " parserArg, CharStream stream, int lexState){");
       ostr.println("   this(parserArg, stream);");
     } else {
       ostr.println("");
       ostr.println("/** Constructor. */");
-      ostr.println("public " + tokMgrClassName + "(" + charStreamName + " stream, int lexState){");
+      ostr.println("public " + tokMgrClassName + "(CharStream stream, int lexState){");
       ostr.println("   this(stream);");
     }
     ostr.println("   SwitchTo(lexState);");
@@ -811,7 +799,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
     // Reinit method for reinitializing the parser (for static parsers).
     ostr.println("");
     ostr.println("/** Reinitialise parser. */");
-    ostr.println(staticString + "public void ReInit(" + charStreamName + " stream)");
+    ostr.println(staticString + "public void ReInit(CharStream stream)");
     ostr.println("{");
     ostr.println("   jjmatchedPos = jjnewStateCnt = 0;");
     ostr.println("   curLexState = defaultLexState;");
@@ -831,7 +819,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
     // Reinit method for reinitializing the parser (for static parsers).
     ostr.println("");
     ostr.println("/** Reinitialise parser. */");
-    ostr.println(staticString + "public void ReInit(" + charStreamName + " stream, int lexState)");
+    ostr.println(staticString + "public void ReInit(CharStream stream, int lexState)");
     ostr.println("{");
     ostr.println("   ReInit(stream);");
     ostr.println("   SwitchTo(lexState);");
@@ -1161,17 +1149,10 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
 
       if (Options.getDebugTokenManager())
       {
-        if (Options.getJavaUnicodeEscape() ||
-            Options.getUserCharStream())
-          ostr.println("    debugStream.println(" +
-              "\"****** FOUND A \" + tokenImage[jjmatchedKind] + \" MATCH " +
-              "(\" + TokenMgrError.addEscapes(new String(input_stream.GetSuffix(jjmatchedPos + 1))) + " +
-          "\") ******\\n\");");
-        else
-          ostr.println("    debugStream.println(" +
-              "\"****** FOUND A \" + tokenImage[jjmatchedKind] + \" MATCH " +
-              "(\" + TokenMgrError.addEscapes(new String(input_stream.GetSuffix(jjmatchedPos + 1))) + " +
-          "\") ******\\n\");");
+        ostr.println("    debugStream.println(" +
+            "\"****** FOUND A \" + tokenImage[jjmatchedKind] + \" MATCH " +
+            "(\" + TokenMgrError.addEscapes(new String(input_stream.GetSuffix(jjmatchedPos + 1))) + " +
+        "\") ******\\n\");");
       }
 
       if (hasSkip || hasMore || hasSpecial)

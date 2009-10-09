@@ -2,11 +2,7 @@
  * An implementation of interface CharStream, where the stream is assumed to
  * contain only ASCII characters (with java-like unicode escape processing).
  */
-
-#if SUPPORT_CLASS_VISIBILITY_PUBLIC
-public
-#fi
-class JavaCharStream
+${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharStream
 {
   /** Whether parser is static. */
   public static final boolean staticFlag = ${STATIC};
