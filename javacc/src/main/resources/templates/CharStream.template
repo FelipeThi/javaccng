@@ -13,37 +13,13 @@
  * operation.
  */
 
-#if SUPPORT_CLASS_VISIBILITY_PUBLIC
-public
-#fi
-interface CharStream {
-
+${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}interface CharStream { 
   /**
    * Returns the next character from the selected input.  The method
    * of selecting the input is the responsibility of the class
    * implementing this interface.  Can throw any java.io.IOException.
    */
   char readChar() throws java.io.IOException;
-
-#if GENERATE_ANNOTATIONS
-  @Deprecated
-#fi
-  /**
-   * Returns the column position of the character last read.
-   * @deprecated
-   * @see #getEndColumn
-   */
-  int getColumn();
-
-#if GENERATE_ANNOTATIONS
-  @Deprecated
-#fi
-  /**
-   * Returns the line number of the character last read.
-   * @deprecated
-   * @see #getEndLine
-   */
-  int getLine();
 
   /**
    * Returns the column number of the last character for current token (being
@@ -112,5 +88,4 @@ interface CharStream {
    * affect the lexer's operation.
    */
   void Done();
-
 }

@@ -206,38 +206,6 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class SimpleCharStream implements Cha
     return c;
   }
 
-#if GENERATE_ANNOTATIONS
-  @Deprecated
-#fi
-  /**
-   * @deprecated
-   * @see #getEndColumn
-   */
-
-  public int getColumn() {
-#if KEEP_LINE_COLUMN
-    return bufcolumn[bufpos];
-#else
-    return -1;
-#fi
-  }
-
-#if GENERATE_ANNOTATIONS
-  @Deprecated
-#fi
-  /**
-   * @deprecated
-   * @see #getEndLine
-   */
-
-  public int getLine() {
-#if KEEP_LINE_COLUMN
-    return bufline[bufpos];
-#else
-    return -1;
-#fi
-  }
-
   /** Get token end column number. */
   public int getEndColumn() {
 #if KEEP_LINE_COLUMN
