@@ -42,6 +42,9 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <grammarEncoding>UTF-8</grammarEncoding>
+        </configuration>
       </plugin>
     </plugins>
   </build>
