@@ -459,7 +459,7 @@ public class RStringLiteral extends RegularExpression {
 
   static void DumpStartWithStates(java.io.PrintWriter ostr)
   {
-     ostr.println((Options.getStatic() ? "static " : "") + "private int " +
+     ostr.println("private int " +
                   "jjStartNfaWithStates" + LexGen.lexStateSuffix + "(int pos, int kind, int state)");
      ostr.println("{");
      ostr.println("   jjmatchedKind = kind;");
@@ -489,7 +489,7 @@ public class RStringLiteral extends RegularExpression {
   private static boolean boilerPlateDumped = false;
   static void DumpBoilerPlate(java.io.PrintWriter ostr)
   {
-     ostr.println((Options.getStatic() ? "static " : "") + "private int " +
+     ostr.println("private int " +
                   "jjStopAtPos(int pos, int kind)");
      ostr.println("{");
      ostr.println("   jjmatchedKind = kind;");
@@ -543,7 +543,7 @@ public class RStringLiteral extends RegularExpression {
 
      if (maxLen == 0)
      {
-        ostr.println((Options.getStatic() ? "static " : "") + "private int " +
+        ostr.println("private int " +
                        "jjMoveStringLiteralDfa0" + LexGen.lexStateSuffix + "()");
 
         DumpNullStrLiterals(ostr);
@@ -564,7 +564,7 @@ public class RStringLiteral extends RegularExpression {
         tab = (Hashtable)charPosKind.get(i);
         String[] keys = ReArrange(tab);
 
-        ostr.print((Options.getStatic() ? "static " : "") + "private int " +
+        ostr.print("private int " +
                        "jjMoveStringLiteralDfa" + i + LexGen.lexStateSuffix + "(");
 
         if (i != 0)
@@ -1186,7 +1186,7 @@ public class RStringLiteral extends RegularExpression {
      boolean condGenerated = false;
      int ind = 0;
 
-     ostr.print("private" + (Options.getStatic() ? " static" : "") + " final int jjStopStringLiteralDfa" +
+     ostr.print("private final int jjStopStringLiteralDfa" +
                   LexGen.lexStateSuffix + "(int pos, ");
      for (i = 0; i < maxKindsReqd - 1; i++)
         ostr.print("long active" + i + ", ");
@@ -1304,7 +1304,7 @@ public class RStringLiteral extends RegularExpression {
      ostr.println("   }");
      ostr.println("}");
 
-     ostr.print("private" + (Options.getStatic() ? " static" : "") + " final int jjStartNfa" +
+     ostr.print("private final int jjStartNfa" +
                   LexGen.lexStateSuffix + "(int pos, ");
      for (i = 0; i < maxKindsReqd - 1; i++)
         ostr.print("long active" + i + ", ");

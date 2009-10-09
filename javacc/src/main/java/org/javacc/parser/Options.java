@@ -39,7 +39,7 @@ import java.util.Set;
  */
 public class Options {
 
-  
+
   /**
    * Limit subclassing to derived classes.
    */
@@ -74,7 +74,7 @@ public class Options {
   protected static String stringValue(final String option) {
     return (String) optionValues.get(option);
   }
-  
+
   public static Map getOptions()
   {
     return new HashMap(optionValues);
@@ -106,7 +106,6 @@ public class Options {
     optionValues.put("CHOICE_AMBIGUITY_CHECK", new Integer(2));
     optionValues.put("OTHER_AMBIGUITY_CHECK", new Integer(1));
 
-    optionValues.put("STATIC", Boolean.TRUE);
     optionValues.put("DEBUG_PARSER", Boolean.FALSE);
     optionValues.put("DEBUG_LOOKAHEAD", Boolean.FALSE);
     optionValues.put("DEBUG_TOKEN_MANAGER", Boolean.FALSE);
@@ -124,7 +123,7 @@ public class Options {
     optionValues.put("COMMON_TOKEN_ACTION", Boolean.FALSE);
     optionValues.put("CACHE_TOKENS", Boolean.FALSE);
     optionValues.put("KEEP_LINE_COLUMN", Boolean.TRUE);
-    
+
     optionValues.put("GENERATE_CHAINED_EXCEPTION", Boolean.FALSE);
     optionValues.put("GENERATE_GENERICS", Boolean.FALSE);
     optionValues.put("GENERATE_STRING_BUILDER", Boolean.FALSE);
@@ -345,9 +344,9 @@ public class Options {
       }
       optionValues.put("DEBUG_PARSER", Boolean.TRUE);
     }
-    
+
     // Now set the "GENERATE" options from the supplied (or default) JDK version.
-    
+
     optionValues.put("GENERATE_CHAINED_EXCEPTION", Boolean.valueOf(jdkVersionAtLeast(1.4)));
     optionValues.put("GENERATE_GENERICS", Boolean.valueOf(jdkVersionAtLeast(1.5)));
     optionValues.put("GENERATE_STRING_BUILDER", Boolean.valueOf(jdkVersionAtLeast(1.5)));
@@ -379,15 +378,6 @@ public class Options {
    */
   public static int getOtherAmbiguityCheck() {
     return intValue("OTHER_AMBIGUITY_CHECK");
-  }
-
-  /**
-   * Find the static value.
-   *
-   * @return The requested static value.
-   */
-  public static boolean getStatic() {
-    return booleanValue("STATIC");
   }
 
   /**
@@ -584,7 +574,7 @@ public class Options {
   public static boolean getGenerateAnnotations() {
     return booleanValue("GENERATE_ANNOTATIONS");
   }
-  
+
   /**
    * Should the generated code class visibility public?
    * @return

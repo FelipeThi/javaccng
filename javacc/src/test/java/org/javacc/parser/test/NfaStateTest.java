@@ -1,16 +1,19 @@
 package org.javacc.parser.test;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 import org.javacc.JavaCCTestCase;
 import org.javacc.parser.JavaCCGlobals;
 import org.javacc.parser.JavaCCParser;
+import org.javacc.parser.JavaCCParserTokenManager;
+import org.javacc.parser.JavaCharStream;
 import org.javacc.parser.LexGen;
 import org.javacc.parser.Main;
 import org.javacc.parser.NfaState;
 import org.javacc.parser.Options;
 import org.javacc.parser.Semanticize;
+
+import java.io.BufferedReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 
 /**
@@ -49,7 +52,8 @@ public class NfaStateTest extends JavaCCTestCase {
   }
 
   protected void setupState() throws Exception {
-	JavaCCParser parser = new JavaCCParser(new java.io.BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream(parserInput), Options.getGrammarEncoding())));
+    final BufferedReader bufferedReader = new BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream(parserInput), Options.getGrammarEncoding()));
+    JavaCCParser parser = new JavaCCParser(new JavaCCParserTokenManager(new JavaCharStream(bufferedReader)));
     parser.javacc_input();
     JavaCCGlobals.fileName = JavaCCGlobals.origFileName = parserInput;
     JavaCCGlobals.jjtreeGenerated = JavaCCGlobals.isGeneratedBy("JJTree", parserInput);

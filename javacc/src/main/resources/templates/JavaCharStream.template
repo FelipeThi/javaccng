@@ -4,9 +4,6 @@
  */
 ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharStream
 {
-  /** Whether parser is static. */
-  public static final boolean staticFlag = ${STATIC};
-
   static final int hexval(char c) throws java.io.IOException {
     switch(c)
     {
@@ -55,34 +52,34 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharS
   }
 
 /** Position in buffer. */
-  ${PREFIX}public int bufpos = -1;
-  ${PREFIX}int bufsize;
-  ${PREFIX}int available;
-  ${PREFIX}int tokenBegin;
+  public int bufpos = -1;
+  int bufsize;
+  int available;
+  int tokenBegin;
 #if KEEP_LINE_COLUMN
-  ${PREFIX}protected int bufline[];
-  ${PREFIX}protected int bufcolumn[];
+  protected int bufline[];
+  protected int bufcolumn[];
 
-  ${PREFIX}protected int column = 0;
-  ${PREFIX}protected int line = 1;
+  protected int column = 0;
+  protected int line = 1;
 
-  ${PREFIX}protected boolean prevCharIsCR = false;
-  ${PREFIX}protected boolean prevCharIsLF = false;
+  protected boolean prevCharIsCR = false;
+  protected boolean prevCharIsLF = false;
 #fi
 
-  ${PREFIX}protected java.io.Reader inputStream;
+  protected java.io.Reader inputStream;
 
-  ${PREFIX}protected char[] nextCharBuf;
-  ${PREFIX}protected char[] buffer;
-  ${PREFIX}protected int maxNextCharInd = 0;
-  ${PREFIX}protected int nextCharInd = -1;
-  ${PREFIX}protected int inBuf = 0;
-  ${PREFIX}protected int tabSize = 8;
+  protected char[] nextCharBuf;
+  protected char[] buffer;
+  protected int maxNextCharInd = 0;
+  protected int nextCharInd = -1;
+  protected int inBuf = 0;
+  protected int tabSize = 8;
 
-  ${PREFIX}protected void setTabSize(int i) { tabSize = i; }
-  ${PREFIX}protected int getTabSize(int i) { return tabSize; }
+  protected void setTabSize(int i) { tabSize = i; }
+  protected int getTabSize(int i) { return tabSize; }
 
-  ${PREFIX}protected void ExpandBuff(boolean wrapAround)
+  protected void ExpandBuff(boolean wrapAround)
   {
     char[] newbuffer = new char[bufsize + 2048];
 #if KEEP_LINE_COLUMN
@@ -135,7 +132,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharS
     tokenBegin = 0;
   }
 
-  ${PREFIX}protected void FillBuff() throws java.io.IOException
+  protected void FillBuff() throws java.io.IOException
   {
     int i;
     if (maxNextCharInd == 4096)
@@ -169,7 +166,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharS
     }
   }
 
-  ${PREFIX}protected char ReadByte() throws java.io.IOException
+  protected char ReadByte() throws java.io.IOException
   {
     if (++nextCharInd >= maxNextCharInd)
       FillBuff();
@@ -178,7 +175,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharS
   }
 
 /** @return starting character for token. */
-  ${PREFIX}public char BeginToken() throws java.io.IOException
+  public char BeginToken() throws java.io.IOException
   {
     if (inBuf > 0)
     {
@@ -197,7 +194,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharS
     return readChar();
   }
 
-  ${PREFIX}protected void AdjustBuffSize()
+  protected void AdjustBuffSize()
   {
     if (available == bufsize)
     {
@@ -218,7 +215,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharS
   }
 #if KEEP_LINE_COLUMN
 
-  ${PREFIX}protected void UpdateLineColumn(char c)
+  protected void UpdateLineColumn(char c)
   {
     column++;
 
@@ -260,7 +257,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharS
 #fi
 
 /** Read a character. */
-  ${PREFIX}public char readChar() throws java.io.IOException
+  public char readChar() throws java.io.IOException
   {
     if (inBuf > 0)
     {
@@ -376,7 +373,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharS
    * @deprecated
    * @see #getEndColumn
    */
-  ${PREFIX}public int getColumn() {
+  public int getColumn() {
 #if KEEP_LINE_COLUMN
     return bufcolumn[bufpos];
 #else
@@ -391,7 +388,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharS
    * @deprecated
    * @see #getEndLine
    */
-  ${PREFIX}public int getLine() {
+  public int getLine() {
 #if KEEP_LINE_COLUMN
     return bufline[bufpos];
 #else
@@ -400,7 +397,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharS
   }
 
 /** Get end column. */
-  ${PREFIX}public int getEndColumn() {
+  public int getEndColumn() {
 #if KEEP_LINE_COLUMN
     return bufcolumn[bufpos];
 #else
@@ -409,7 +406,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharS
   }
 
 /** Get end line. */
-  ${PREFIX}public int getEndLine() {
+  public int getEndLine() {
 #if KEEP_LINE_COLUMN
     return bufline[bufpos];
 #else
@@ -418,7 +415,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharS
   }
 
 /** @return column of token start */
-  ${PREFIX}public int getBeginColumn() {
+  public int getBeginColumn() {
 #if KEEP_LINE_COLUMN
     return bufcolumn[tokenBegin];
 #else
@@ -427,7 +424,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharS
   }
 
 /** @return line number of token start */
-  ${PREFIX}public int getBeginLine() {
+  public int getBeginLine() {
 #if KEEP_LINE_COLUMN
     return bufline[tokenBegin];
 #else
@@ -436,7 +433,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharS
   }
 
 /** Retreat. */
-  ${PREFIX}public void backup(int amount) {
+  public void backup(int amount) {
 
     inBuf += amount;
     if ((bufpos -= amount) < 0)
@@ -447,12 +444,6 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharS
   public JavaCharStream(java.io.Reader dstream,
                  int startline, int startcolumn, int buffersize)
   {
-#if STATIC
-    if (inputStream != null)
-      throw new Error("\n   ERROR: Second call to the constructor of a static JavaCharStream.\n" +
-      "       You must either use ReInit() or set the JavaCC option STATIC to false\n" +
-      "       during the generation of this class.");
-#fi
     inputStream = dstream;
 #if KEEP_LINE_COLUMN
     line = startline;
@@ -480,45 +471,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharS
   {
     this(dstream, 1, 1, 4096);
   }
-/** Reinitialise. */
-  public void ReInit(java.io.Reader dstream,
-                 int startline, int startcolumn, int buffersize)
-  {
-    inputStream = dstream;
-#if KEEP_LINE_COLUMN
-    line = startline;
-    column = startcolumn - 1;
-#fi
 
-    if (buffer == null || buffersize != buffer.length)
-    {
-      available = bufsize = buffersize;
-      buffer = new char[buffersize];
-#if KEEP_LINE_COLUMN
-      bufline = new int[buffersize];
-      bufcolumn = new int[buffersize];
-#fi
-      nextCharBuf = new char[4096];
-    }
-#if KEEP_LINE_COLUMN
-    prevCharIsLF = prevCharIsCR = false;
-#fi
-    tokenBegin = inBuf = maxNextCharInd = 0;
-    nextCharInd = bufpos = -1;
-  }
-
-/** Reinitialise. */
-  public void ReInit(java.io.Reader dstream,
-                                        int startline, int startcolumn)
-  {
-    ReInit(dstream, startline, startcolumn, 4096);
-  }
-
-/** Reinitialise. */
-  public void ReInit(java.io.Reader dstream)
-  {
-    ReInit(dstream, 1, 1, 4096);
-  }
 /** Constructor. */
   public JavaCharStream(java.io.InputStream dstream, String encoding, int startline,
   int startcolumn, int buffersize) throws java.io.UnsupportedEncodingException
@@ -559,45 +512,8 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharS
     this(dstream, 1, 1, 4096);
   }
 
-/** Reinitialise. */
-  public void ReInit(java.io.InputStream dstream, String encoding, int startline,
-  int startcolumn, int buffersize) throws java.io.UnsupportedEncodingException
-  {
-    ReInit(encoding == null ? new java.io.InputStreamReader(dstream) : new java.io.InputStreamReader(dstream, encoding), startline, startcolumn, buffersize);
-  }
-
-/** Reinitialise. */
-  public void ReInit(java.io.InputStream dstream, int startline,
-  int startcolumn, int buffersize)
-  {
-    ReInit(new java.io.InputStreamReader(dstream), startline, startcolumn, buffersize);
-  }
-/** Reinitialise. */
-  public void ReInit(java.io.InputStream dstream, String encoding, int startline,
-                     int startcolumn) throws java.io.UnsupportedEncodingException
-  {
-    ReInit(dstream, encoding, startline, startcolumn, 4096);
-  }
-/** Reinitialise. */
-  public void ReInit(java.io.InputStream dstream, int startline,
-                     int startcolumn)
-  {
-    ReInit(dstream, startline, startcolumn, 4096);
-  }
-/** Reinitialise. */
-  public void ReInit(java.io.InputStream dstream, String encoding) throws java.io.UnsupportedEncodingException
-  {
-    ReInit(dstream, encoding, 1, 1, 4096);
-  }
-
-/** Reinitialise. */
-  public void ReInit(java.io.InputStream dstream)
-  {
-    ReInit(dstream, 1, 1, 4096);
-  }
-
   /** @return token image as String */
-  ${PREFIX}public String GetImage()
+  public String GetImage()
   {
     if (bufpos >= tokenBegin)
       return new String(buffer, tokenBegin, bufpos - tokenBegin + 1);
@@ -607,7 +523,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharS
   }
 
   /** @return suffix */
-  ${PREFIX}public char[] GetSuffix(int len)
+  public char[] GetSuffix(int len)
   {
     char[] ret = new char[len];
 
@@ -624,7 +540,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharS
   }
 
   /** Set buffers back to null when finished. */
-  ${PREFIX}public void Done()
+  public void Done()
   {
     nextCharBuf = null;
     buffer = null;
@@ -638,7 +554,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharS
   /**
    * Method to adjust line and column numbers for the start of a token.
    */
-  ${PREFIX}public void adjustBeginLineColumn(int newLine, int newCol)
+  public void adjustBeginLineColumn(int newLine, int newCol)
   {
     int start = tokenBegin;
     int len;

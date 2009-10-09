@@ -28,6 +28,9 @@
 
 package org.javacc.parser;
 
+import org.javacc.Version;
+import org.javacc.utils.JavaFileGenerator;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -35,9 +38,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.javacc.Version;
-import org.javacc.utils.JavaFileGenerator;
 
 /**
  * Generate CharStream, TokenManager and Exceptions.
@@ -190,13 +190,11 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
           }
         }
       }
-      String prefix = (Options.getStatic() ? "static " : "");
       Map options = new HashMap(Options.getOptions());
-      options.put("PREFIX", prefix);
-      
+
       JavaFileGenerator generator = new JavaFileGenerator(
           "/templates/JavaCharStream.template", options);
-      
+
       generator.generate(ostr);
 
       ostr.close();
@@ -235,13 +233,11 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
           }
         }
       }
-      String prefix = (Options.getStatic() ? "static " : "");
       Map options = new HashMap(Options.getOptions());
-      options.put("PREFIX", prefix);
-      
+
       JavaFileGenerator generator = new JavaFileGenerator(
           "/templates/SimpleCharStream.template", options);
-      
+
       generator.generate(ostr);
 
       ostr.close();
@@ -280,10 +276,10 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
           }
         }
       }
-      
+
       JavaFileGenerator generator = new JavaFileGenerator(
           "/templates/CharStream.template", Options.getOptions());
-      
+
       generator.generate(ostr);
 
       ostr.close();
@@ -322,10 +318,10 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
           }
         }
       }
-      
+
       JavaFileGenerator generator = new JavaFileGenerator(
           "/templates/ParseException.template", Options.getOptions());
-      
+
       generator.generate(ostr);
 
       ostr.close();
@@ -364,10 +360,10 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
           }
         }
       }
-      
+
       JavaFileGenerator generator = new JavaFileGenerator(
           "/templates/TokenMgrError.template", Options.getOptions());
-      
+
       generator.generate(ostr);
 
       ostr.close();
@@ -406,12 +402,12 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
           }
         }
       }
-      
+
       JavaFileGenerator generator = new JavaFileGenerator(
           "/templates/Token.template", Options.getOptions());
-      
+
       generator.generate(ostr);
- 
+
       ostr.close();
     } catch (IOException e) {
       System.err.println("Failed to create Token " + e);
@@ -451,9 +447,9 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
 
       JavaFileGenerator generator = new JavaFileGenerator(
           "/templates/TokenManager.template", Options.getOptions());
-      
+
       generator.generate(ostr);
-      
+
       ostr.close();
     } catch (IOException e) {
       System.err.println("Failed to create TokenManager " + e);

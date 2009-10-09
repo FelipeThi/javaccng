@@ -343,14 +343,6 @@ public class JavaCCGlobals {
     }
   }
 
-  static public String staticOpt() {
-    if (Options.getStatic()) {
-      return "static ";
-    } else {
-      return "";
-    }
-  }
-
   static public String add_escapes(String str) {
     String retval = "";
     char ch;
@@ -444,7 +436,7 @@ public class JavaCCGlobals {
       t = (Token)it.next();
       printToken(t, ostr);
     }
-    
+
     if (t != null)
       printTrailingComments(t, ostr);
   }

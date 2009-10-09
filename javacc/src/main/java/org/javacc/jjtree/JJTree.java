@@ -28,11 +28,10 @@
 
 package org.javacc.jjtree;
 
+import org.javacc.parser.JavaCCGlobals;
+
 import java.util.ArrayList;
 import java.util.Hashtable;
-
-
-import org.javacc.parser.JavaCCGlobals;
 
 public class JJTree {
 
@@ -156,7 +155,7 @@ public class JJTree {
       JJTreeGlobals.toolList.add("JJTree");
 
       try {
-        JJTreeParser parser = new JJTreeParser(io.getIn());
+        JJTreeParser parser = new JJTreeParser(new JJTreeParserTokenManager(new JavaCharStream(io.getIn())));
         parser.javacc_input();
 
         ASTGrammar root = (ASTGrammar)parser.jjtree.rootNode();

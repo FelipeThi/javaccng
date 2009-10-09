@@ -32,7 +32,11 @@ package org.javacc.jjdoc;
 
 import org.javacc.parser.JavaCCErrors;
 import org.javacc.parser.JavaCCParser;
+import org.javacc.parser.JavaCCParserTokenManager;
+import org.javacc.parser.JavaCharStream;
 import org.javacc.parser.Main;
+
+import java.io.BufferedReader;
 
 /**
  * Main class.
@@ -129,7 +133,7 @@ public final class JJDocMain extends JJDocGlobals {
 
     if (args[args.length-1].equals("-")) {
       info("Reading from standard input . . .");
-      parser = new JavaCCParser(new java.io.DataInputStream(System.in));
+      parser = new JavaCCParser(new JavaCCParserTokenManager(new JavaCharStream(new java.io.DataInputStream(System.in))));
       JJDocGlobals.input_file = "standard input";
       JJDocGlobals.output_file = "standard output";
     } else {
@@ -145,7 +149,8 @@ public final class JJDocMain extends JJDocGlobals {
            return 1;
         }
         JJDocGlobals.input_file = fp.getName();
-        parser = new JavaCCParser(new java.io.BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream(args[args.length-1]), JJDocOptions.getGrammarEncoding())));
+        final BufferedReader bufferedReader = new BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream(args[args.length - 1]), JJDocOptions.getGrammarEncoding()));
+        parser = new JavaCCParser(new JavaCCParserTokenManager(new JavaCharStream(bufferedReader)));
       } catch (SecurityException se) {
         error("Security violation while trying to open " + args[args.length-1]);
         return 1;

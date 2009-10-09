@@ -14,7 +14,7 @@ public final class OptionsTest extends TestCase {
         Options.init();
         JavaCCErrors.reInit();
 
-        assertEquals(31, Options.optionValues.size());
+        assertEquals(30, Options.optionValues.size());
 
         assertEquals(true, Options.getBuildParser());
         assertEquals(true, Options.getBuildTokenManager());
@@ -29,7 +29,6 @@ public final class OptionsTest extends TestCase {
         assertEquals(false, Options.getJavaUnicodeEscape());
         assertEquals(true, Options.getKeepLineColumn());
         assertEquals(true, Options.getSanityCheck());
-        assertEquals(true, Options.getStatic());
         assertEquals(false, Options.getUnicodeInput());
         assertEquals(false, Options.getUserCharStream());
         assertEquals(false, Options.getUserTokenManager());
@@ -54,10 +53,6 @@ public final class OptionsTest extends TestCase {
     public void testSetBooleanOption() {
         Options.init();
         JavaCCErrors.reInit();
-
-        assertEquals(true, Options.getStatic());
-        Options.setCmdLineOption("-NOSTATIC");
-        assertEquals(false, Options.getStatic());
 
         assertEquals(false, Options.getJavaUnicodeEscape());
         Options.setCmdLineOption("-JAVA_UNICODE_ESCAPE:true");
@@ -164,13 +159,13 @@ public final class OptionsTest extends TestCase {
       Options.init();
       JavaCCErrors.reInit();
 
-      Options.setCmdLineOption("-STATIC=False");
+      Options.setCmdLineOption("-UNICODE_INPUT=False");
       Options.setCmdLineOption("-IGNORE_CASE=True");
       String[] options = {
-          "STATIC",
+          "UNICODE_INPUT",
           "IGNORE_CASE"
       };
       String optionString = Options.getOptionsString(options);
-      assertEquals("STATIC=false,IGNORE_CASE=true", optionString);
+      assertEquals("UNICODE_INPUT=false,IGNORE_CASE=true", optionString);
     }
 }

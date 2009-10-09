@@ -28,11 +28,11 @@
 
 package org.javacc.jjtree;
 
+import org.javacc.parser.OutputFile;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-
-import org.javacc.parser.OutputFile;
 
 /**
  * Generate the State of a tree.
@@ -43,16 +43,8 @@ final class JJTreeState
   private JJTreeState() {}
 
   static void insertParserMembers(IO io) {
-    String s;
-
-    if (JJTreeOptions.getStatic()) {
-      s = "static ";
-    } else {
-      s = "";
-    }
-
     io.println();
-    io.println("  protected " + s + nameState() +
+    io.println("  protected " + nameState() +
          " jjtree = new " + nameState() + "();");
     io.println();
   }

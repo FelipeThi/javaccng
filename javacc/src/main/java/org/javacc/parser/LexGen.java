@@ -41,7 +41,6 @@ import java.util.List;
 public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
 {
   static private java.io.PrintWriter ostr;
-  static private String staticString;
   static private String tokMgrClassName;
 
   // Hashtable of vectors
@@ -176,7 +175,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
       if (commonTokenActionNeeded && !commonTokenActionSeen)
         JavaCCErrors.warning("You have the COMMON_TOKEN_ACTION option set. " +
             "But it appears you have not defined the method :\n"+
-            "      " + staticString + "void CommonTokenAction(Token t)\n" +
+            "      void CommonTokenAction(Token t)\n" +
         "in your TOKEN_MGR_DECLS. The generated token manager will not compile.");
 
     }
@@ -184,17 +183,17 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
     {
       JavaCCErrors.warning("You have the COMMON_TOKEN_ACTION option set. " +
           "But you have not defined the method :\n"+
-          "      " + staticString + "void CommonTokenAction(Token t)\n" +
+          "      void CommonTokenAction(Token t)\n" +
       "in your TOKEN_MGR_DECLS. The generated token manager will not compile.");
     }
 
     ostr.println("");
     ostr.println("  /** Debug output. */");
-    ostr.println("  public " + staticString + " java.io.PrintStream debugStream = System.out;");
+    ostr.println("  public  java.io.PrintStream debugStream = System.out;");
     ostr.println("  /** Set debug output. */");
-    ostr.println("  public " + staticString + " void setDebugStream(java.io.PrintStream ds) { debugStream = ds; }");
+    ostr.println("  public  void setDebugStream(java.io.PrintStream ds) { debugStream = ds; }");
 
-    if(Options.getTokenManagerUsesParser() && !Options.getStatic()){
+    if(Options.getTokenManagerUsesParser()){
       ostr.println("");
       ostr.println("  /** The parser. */");
       ostr.println("  public " + cu_name + " parser = null;");
@@ -204,8 +203,8 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
   static void DumpDebugMethods()
   {
 
-    ostr.println("  " + staticString + " int kindCnt = 0;");
-    ostr.println("  protected " + staticString + " final String jjKindsForBitVector(int i, long vec)");
+    ostr.println("   int kindCnt = 0;");
+    ostr.println("  protected  final String jjKindsForBitVector(int i, long vec)");
     ostr.println("  {");
     ostr.println("    String retVal = \"\";");
     ostr.println("    if (i == 0)");
@@ -225,7 +224,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
     ostr.println("  }");
     ostr.println("");
 
-    ostr.println("  protected " + staticString + " final String jjKindsForStateVector(" +
+    ostr.println("  protected  final String jjKindsForStateVector(" +
     "int lexState, int[] vec, int start, int end)");
     ostr.println("  {");
     ostr.println("    boolean[] kindDone = new boolean[" + maxOrdinal + "];");
@@ -353,7 +352,6 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
     TokenProduction tp;
     int i, j;
 
-    staticString = (Options.getStatic() ? "static " : "");
     tokMgrClassName = cu_name + "TokenManager";
 
     PrintClassHead();
@@ -550,9 +548,9 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
 
     if (hasLoop)
     {
-      ostr.println(staticString + "int[] jjemptyLineNo = new int[" + maxLexStates + "];");
-      ostr.println(staticString + "int[] jjemptyColNo = new int[" + maxLexStates + "];");
-      ostr.println(staticString + "boolean[] jjbeenHere = new boolean[" + maxLexStates + "];");
+      ostr.println("int[] jjemptyLineNo = new int[" + maxLexStates + "];");
+      ostr.println("int[] jjemptyColNo = new int[" + maxLexStates + "];");
+      ostr.println("boolean[] jjbeenHere = new boolean[" + maxLexStates + "];");
     }
 
     if (hasSkipActions)
@@ -734,24 +732,24 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
       ostr.println("\n};");
     }
 
-    ostr.println(staticString + "protected CharStream input_stream;");
+    ostr.println("protected CharStream input_stream;");
 
-    ostr.println(staticString + "private final int[] jjrounds = " +
+    ostr.println("private final int[] jjrounds = " +
         "new int[" + stateSetSize + "];");
-    ostr.println(staticString + "private final int[] jjstateSet = " +
+    ostr.println("private final int[] jjstateSet = " +
         "new int[" + (2 * stateSetSize) + "];");
 
     if (hasMoreActions || hasSkipActions || hasTokenActions)
     {
-      ostr.println("private " + staticString + "final " + Options.stringBufOrBuild() + " jjimage = new " + Options.stringBufOrBuild() + "();");
-      ostr.println("private " + staticString + Options.stringBufOrBuild() + " image = jjimage;");
-      ostr.println("private " + staticString + "int jjimageLen;");
-      ostr.println("private " + staticString + "int lengthOfMatch;");
+      ostr.println("private final " + Options.stringBufOrBuild() + " jjimage = new " + Options.stringBufOrBuild() + "();");
+      ostr.println("private " + Options.stringBufOrBuild() + " image = jjimage;");
+      ostr.println("private int jjimageLen;");
+      ostr.println("private int lengthOfMatch;");
     }
 
-    ostr.println(staticString + "protected char curChar;");
+    ostr.println("protected char curChar;");
 
-    if(Options.getTokenManagerUsesParser() && !Options.getStatic()){
+    if(Options.getTokenManagerUsesParser()){
       ostr.println("");
       ostr.println("/** Constructor with parser. */");
       ostr.println("public " + tokMgrClassName + "(" + cu_name + " parserArg, CharStream stream){");
@@ -761,28 +759,11 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
       ostr.println("public " + tokMgrClassName + "(CharStream stream){");
     }
 
-    if (Options.getStatic() && !Options.getUserCharStream())
-    {
-      ostr.println("   if (input_stream != null)");
-      ostr.println("      throw new TokenMgrError(\"ERROR: Second call to constructor of static lexer. " +
-      "You must use ReInit() to initialize the static variables.\", TokenMgrError.STATIC_LEXER_ERROR);");
-    }
-    else if (!Options.getUserCharStream())
-    {
-      if (Options.getJavaUnicodeEscape())
-        ostr.println("   if (JavaCharStream.staticFlag)");
-      else
-        ostr.println("   if (SimpleCharStream.staticFlag)");
-
-      ostr.println("      throw new Error(\"ERROR: Cannot use a static CharStream class with a " +
-      "non-static lexical analyzer.\");");
-    }
-
     ostr.println("   input_stream = stream;");
 
     ostr.println("}");
 
-    if(Options.getTokenManagerUsesParser() && !Options.getStatic()){
+    if(Options.getTokenManagerUsesParser()){
       ostr.println("");
       ostr.println("/** Constructor with parser. */");
       ostr.println("public " + tokMgrClassName + "(" + cu_name + " parserArg, CharStream stream, int lexState){");
@@ -799,7 +780,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
     // Reinit method for reinitializing the parser (for static parsers).
     ostr.println("");
     ostr.println("/** Reinitialise parser. */");
-    ostr.println(staticString + "public void ReInit(CharStream stream)");
+    ostr.println("public void ReInit(CharStream stream)");
     ostr.println("{");
     ostr.println("   jjmatchedPos = jjnewStateCnt = 0;");
     ostr.println("   curLexState = defaultLexState;");
@@ -808,7 +789,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
     ostr.println("}");
 
     // Method to reinitialize the jjrounds array.
-    ostr.println(staticString + "private void ReInitRounds()");
+    ostr.println("private void ReInitRounds()");
     ostr.println("{");
     ostr.println("   int i;");
     ostr.println("   jjround = 0x" + Integer.toHexString(Integer.MIN_VALUE + 1)+ ";");
@@ -819,7 +800,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
     // Reinit method for reinitializing the parser (for static parsers).
     ostr.println("");
     ostr.println("/** Reinitialise parser. */");
-    ostr.println(staticString + "public void ReInit(CharStream stream, int lexState)");
+    ostr.println("public void ReInit(CharStream stream, int lexState)");
     ostr.println("{");
     ostr.println("   ReInit(stream);");
     ostr.println("   SwitchTo(lexState);");
@@ -827,7 +808,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
 
     ostr.println("");
     ostr.println("/** Switch to specified lex state. */");
-    ostr.println(staticString + "public void SwitchTo(int lexState)");
+    ostr.println("public void SwitchTo(int lexState)");
     ostr.println("{");
     ostr.println("   if (lexState >= " + lexStateName.length + " || lexState < 0)");
     ostr.println("      throw new TokenMgrError(\"Error: Ignoring invalid lexical state : \"" +
@@ -854,7 +835,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
     final double tokenVersion = JavaFiles.getVersion("Token.java");
     final boolean hasBinaryNewToken = tokenVersion > 4.09;
 
-    ostr.println(staticString + "protected Token jjFillToken()");
+    ostr.println("protected Token jjFillToken()");
     ostr.println("{");
     ostr.println("   final Token t;");
     ostr.println("   final String curTokenImage;");
@@ -941,15 +922,15 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
     int i;
 
     ostr.println("");
-    ostr.println(staticString + "int curLexState = " + defaultLexState + ";");
-    ostr.println(staticString + "int defaultLexState = " + defaultLexState + ";");
-    ostr.println(staticString + "int jjnewStateCnt;");
-    ostr.println(staticString + "int jjround;");
-    ostr.println(staticString + "int jjmatchedPos;");
-    ostr.println(staticString + "int jjmatchedKind;");
+    ostr.println("int curLexState = " + defaultLexState + ";");
+    ostr.println("int defaultLexState = " + defaultLexState + ";");
+    ostr.println("int jjnewStateCnt;");
+    ostr.println("int jjround;");
+    ostr.println("int jjmatchedPos;");
+    ostr.println("int jjmatchedKind;");
     ostr.println("");
     ostr.println("/** Get the next Token. */");
-    ostr.println("public " + staticString + "Token getNextToken()" +
+    ostr.println("public Token getNextToken()" +
     " ");
     ostr.println("{");
     if (hasSpecial) {
@@ -1303,7 +1284,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
   {
     Action act;
 
-    ostr.println(staticString + "void SkipLexicalActions(Token matchedToken)");
+    ostr.println("void SkipLexicalActions(Token matchedToken)");
     ostr.println("{");
     ostr.println("   switch(jjmatchedKind)");
     ostr.println("   {");
@@ -1375,7 +1356,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
   {
     Action act;
 
-    ostr.println(staticString + "void MoreLexicalActions()");
+    ostr.println("void MoreLexicalActions()");
     ostr.println("{");
     ostr.println("   jjimageLen += (lengthOfMatch = jjmatchedPos + 1);");
     ostr.println("   switch(jjmatchedKind)");
@@ -1452,7 +1433,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
     Action act;
     int i;
 
-    ostr.println(staticString + "void TokenLexicalActions(Token matchedToken)");
+    ostr.println("void TokenLexicalActions(Token matchedToken)");
     ostr.println("{");
     ostr.println("   switch(jjmatchedKind)");
     ostr.println("   {");
@@ -1531,7 +1512,6 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
   public static void reInit()
   {
     ostr = null;
-    staticString = null;
     tokMgrClassName = null;
     allTpsForState = new Hashtable();
     lexStateIndex = 0;

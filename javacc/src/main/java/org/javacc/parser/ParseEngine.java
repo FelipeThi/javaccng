@@ -475,7 +475,7 @@ public class ParseEngine extends JavaCCGlobals {
     }
     printTokenSetup(t); ccol = 1;
     printLeadingComments(t, ostr);
-    ostr.print("  " + staticOpt() + "final " +(p.getAccessMod() != null ? p.getAccessMod() : "public")+ " ");
+    ostr.print("  final " +(p.getAccessMod() != null ? p.getAccessMod() : "public")+ " ");
     cline = t.beginLine; ccol = t.beginColumn;
     printTokenOnly(t, ostr);
     for (int i = 1; i < p.getReturnTypeTokens().size(); i++) {
@@ -740,7 +740,7 @@ public class ParseEngine extends JavaCCGlobals {
 
   static void buildPhase2Routine(Lookahead la) {
     Expansion e = la.getLaExpansion();
-    ostr.println("  " + staticOpt() + "private boolean jj_2" + e.internal_name + "(int xla) {");
+    ostr.println("  private boolean jj_2" + e.internal_name + "(int xla) {");
     ostr.println("    jj_la = xla; jj_lastpos = jj_scanpos = token;");
     ostr.println("    try { return !jj_3" + e.internal_name + "(); }");
     ostr.println("    catch(LookaheadSuccess ls) { return true; }");
@@ -884,7 +884,7 @@ public class ParseEngine extends JavaCCGlobals {
       return;
 
     if (!recursive_call) {
-      ostr.println("  " + staticOpt() + "private boolean jj_3" + e.internal_name + "() {");
+      ostr.println("  private boolean jj_3" + e.internal_name + "() {");
       xsp_declared = false;
       if (Options.getDebugLookahead() && e.parent instanceof NormalProduction) {
         ostr.print("    ");
@@ -1123,7 +1123,7 @@ public class ParseEngine extends JavaCCGlobals {
         t = (Token)(jp.getReturnTypeTokens().get(0));
         printTokenSetup(t); ccol = 1;
         printLeadingComments(t, ostr);
-        ostr.print("  " + staticOpt() + (p.getAccessMod() != null ? p.getAccessMod() + " " : ""));
+        ostr.print("  " + (p.getAccessMod() != null ? p.getAccessMod() + " " : ""));
         cline = t.beginLine; ccol = t.beginColumn;
         printTokenOnly(t, ostr);
         for (int i = 1; i < jp.getReturnTypeTokens().size(); i++) {

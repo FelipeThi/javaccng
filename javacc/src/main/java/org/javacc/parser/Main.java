@@ -27,6 +27,8 @@
  */
 package org.javacc.parser;
 
+import java.io.BufferedReader;
+
 /**
  * Entry point.
  */
@@ -40,13 +42,13 @@ public final class Main {
     System.out.println("\"option-settings\" is a sequence of settings separated by spaces.");
     System.out.println("Each option setting must be of one of the following forms:");
     System.out.println("");
-    System.out.println("    -optionname=value (e.g., -STATIC=false)");
-    System.out.println("    -optionname:value (e.g., -STATIC:false)");
-    System.out.println("    -optionname       (equivalent to -optionname=true.  e.g., -STATIC)");
-    System.out.println("    -NOoptionname     (equivalent to -optionname=false. e.g., -NOSTATIC)");
+    System.out.println("    -optionname=value (e.g., -IGNORE_CASE=false)");
+    System.out.println("    -optionname:value (e.g., -IGNORE_CASE:false)");
+    System.out.println("    -optionname       (equivalent to -optionname=true.  e.g., -IGNORE_CASE)");
+    System.out.println("    -NOoptionname     (equivalent to -optionname=false. e.g., -NOIGNORE_CASE)");
     System.out.println("");
-    System.out.println("Option settings are not case-sensitive, so one can say \"-nOsTaTiC\" instead");
-    System.out.println("of \"-NOSTATIC\".  Option values must be appropriate for the corresponding");
+    System.out.println("Option settings are not case-sensitive, so one can say \"-nOiGnOrE_cAsE\" instead");
+    System.out.println("of \"-NOIGNORE_CASE\".  Option values must be appropriate for the corresponding");
     System.out.println("option, and must be either an integer, a boolean, or a string value.");
     System.out.println("");
     System.out.println("The integer valued options are:");
@@ -57,7 +59,6 @@ public final class Main {
     System.out.println("");
     System.out.println("The boolean valued options are:");
     System.out.println("");
-    System.out.println("    STATIC                 (default true)");
     System.out.println("    SUPPORT_CLASS_VISIBILITY_PUBLIC (default true)");
     System.out.println("    DEBUG_PARSER           (default false)");
     System.out.println("    DEBUG_LOOKAHEAD        (default false)");
@@ -86,7 +87,7 @@ public final class Main {
     System.out.println("    GRAMMAR_ENCODING       (defaults to platform file encoding)");
     System.out.println("");
     System.out.println("EXAMPLE:");
-    System.out.println("    javacc -STATIC=false -LOOKAHEAD:2 -debug_parser mygrammar.jj");
+    System.out.println("    javacc -IGNORE_CASE=false -LOOKAHEAD:2 -debug_parser mygrammar.jj");
     System.out.println("");
   }
 
@@ -141,7 +142,8 @@ public final class Main {
          System.out.println(args[args.length-1] + " is a directory. Please use a valid file name.");
          return 1;
       }
-      parser = new JavaCCParser(new java.io.BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream(args[args.length-1]), Options.getGrammarEncoding())));
+      final BufferedReader bufferedReader = new BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream(args[args.length - 1]), Options.getGrammarEncoding()));
+      parser = new JavaCCParser(new JavaCCParserTokenManager(new JavaCharStream(bufferedReader)));
     } catch (SecurityException se) {
       System.out.println("Security violation while trying to open " + args[args.length-1]);
       return 1;

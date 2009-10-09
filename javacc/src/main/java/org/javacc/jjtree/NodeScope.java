@@ -119,8 +119,7 @@ public class NodeScope
     NodeFiles.ensure(io, type);
 
     io.print(indent + nodeClass + " " + nodeVar + " = ");
-    String p = JJTreeOptions.getStatic() ? "null" : "this";
-    String parserArg = JJTreeOptions.getNodeUsesParser() ? (p + ", ") : "";
+    String parserArg = JJTreeOptions.getNodeUsesParser() ? ("this" + ", ") : "";
 
     if (JJTreeOptions.getNodeFactory().equals("*")) {
       // Old-style multiple-implementations.
