@@ -101,16 +101,7 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
       ParseEngine.build(ostr);
 
       ostr.println("  /** Either generated or user defined Token Manager. */");
-      ostr.println("  public TokenManager token_source;");
-      if (!Options.getUserTokenManager()) {
-        if (!Options.getUserCharStream()) {
-          if (Options.getJavaUnicodeEscape()) {
-            ostr.println("  JavaCharStream jj_input_stream;");
-          } else {
-            ostr.println("  SimpleCharStream jj_input_stream;");
-          }
-        }
-      }
+      ostr.println("  public final TokenManager tokenManager;");
       ostr.println("  /** Current token. */");
       ostr.println("  public Token token;");
       ostr.println("  /** Next token. */");
@@ -129,7 +120,7 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
       }
       if (Options.getErrorReporting()) {
         ostr.println("  private int jj_gen;");
-        ostr.println("  final private int[] jj_la1 = new int[" + maskindex + "];");
+        ostr.println("  private final int[] jj_la1 = new int[" + maskindex + "];");
         int tokenMaskSize = (tokenCount-1)/32 + 1;
         for (int i = 0; i < tokenMaskSize; i++)
           ostr.println("  static private int[] jj_la1_" + i + ";");
@@ -157,10 +148,10 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
 
       ostr.println("  /** Constructor with either generated or user provided Token Manager. */");
       ostr.println("  public " + cu_name + "(TokenManager tm) {");
-      ostr.println("    token_source = tm;");
+      ostr.println("    tokenManager = tm;");
       ostr.println("    token = new Token();");
       if (Options.getCacheTokens()) {
-        ostr.println("    token.next = jj_nt = token_source.getNextToken();");
+        ostr.println("    token.next = jj_nt = tokenManager.getNextToken();");
       } else {
         ostr.println("    jj_ntk = -1;");
       }
@@ -177,11 +168,11 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
       if (Options.getCacheTokens()) {
         ostr.println("    Token oldToken = token;");
         ostr.println("    if ((token = jj_nt).next != null) jj_nt = jj_nt.next;");
-        ostr.println("    else jj_nt = jj_nt.next = token_source.getNextToken();");
+        ostr.println("    else jj_nt = jj_nt.next = tokenManager.getNextToken();");
       } else {
         ostr.println("    Token oldToken;");
         ostr.println("    if ((oldToken = token).next != null) token = token.next;");
-        ostr.println("    else token = token.next = token_source.getNextToken();");
+        ostr.println("    else token = token.next = tokenManager.getNextToken();");
         ostr.println("    jj_ntk = -1;");
       }
       ostr.println("    if (token.kind == kind) {");
@@ -216,13 +207,13 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
       ostr.println("  }");
       ostr.println("");
       if (jj2index != 0) {
-        ostr.println("  static private final class LookaheadSuccess extends java.lang.Error { }");
-        ostr.println("  final private LookaheadSuccess jj_ls = new LookaheadSuccess();");
+        ostr.println("  private static final class LookaheadSuccess extends Error {}");
+        ostr.println("  private final LookaheadSuccess jj_ls = new LookaheadSuccess();");
         ostr.println("  private boolean jj_scan_token(int kind) {");
         ostr.println("    if (jj_scanpos == jj_lastpos) {");
         ostr.println("      jj_la--;");
         ostr.println("      if (jj_scanpos.next == null) {");
-        ostr.println("        jj_lastpos = jj_scanpos = jj_scanpos.next = token_source.getNextToken();");
+        ostr.println("        jj_lastpos = jj_scanpos = jj_scanpos.next = tokenManager.getNextToken();");
         ostr.println("      } else {");
         ostr.println("        jj_lastpos = jj_scanpos = jj_scanpos.next;");
         ostr.println("      }");
@@ -253,10 +244,10 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
       ostr.println("  final public Token getNextToken() {");
       if (Options.getCacheTokens()) {
         ostr.println("    if ((token = jj_nt).next != null) jj_nt = jj_nt.next;");
-        ostr.println("    else jj_nt = jj_nt.next = token_source.getNextToken();");
+        ostr.println("    else jj_nt = jj_nt.next = tokenManager.getNextToken();");
       } else {
         ostr.println("    if (token.next != null) token = token.next;");
-        ostr.println("    else token = token.next = token_source.getNextToken();");
+        ostr.println("    else token = token.next = tokenManager.getNextToken();");
         ostr.println("    jj_ntk = -1;");
       }
       if (Options.getErrorReporting()) {
@@ -277,7 +268,7 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
       }
       ostr.println("    for (int i = 0; i < index; i++) {");
       ostr.println("      if (t.next != null) t = t.next;");
-      ostr.println("      else t = t.next = token_source.getNextToken();");
+      ostr.println("      else t = t.next = tokenManager.getNextToken();");
       ostr.println("    }");
       ostr.println("    return t;");
       ostr.println("  }");
@@ -285,7 +276,7 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
       if (!Options.getCacheTokens()) {
         ostr.println("  private int jj_ntk() {");
         ostr.println("    if ((jj_nt=token.next) == null)");
-        ostr.println("      return (jj_ntk = (token.next=token_source.getNextToken()).kind);");
+        ostr.println("      return (jj_ntk = (token.next=tokenManager.getNextToken()).kind);");
         ostr.println("    else");
         ostr.println("      return (jj_ntk = jj_nt.kind);");
         ostr.println("  }");
@@ -295,7 +286,7 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
         if (!Options.getGenerateGenerics())
           ostr.println("  private java.util.List jj_expentries = new java.util.ArrayList();");
         else
-          ostr.println("  private java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();");
+          ostr.println("  private final java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();");
         ostr.println("  private int[] jj_expentry;");
         ostr.println("  private int jj_kind = -1;");
         if (jj2index != 0) {

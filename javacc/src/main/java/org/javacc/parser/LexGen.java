@@ -866,7 +866,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
       ostr.println("   else");
       ostr.println("   {");
       ostr.println("      String im = jjstrLiteralImages[jjmatchedKind];");
-      ostr.println("      curTokenImage = (im == null) ? input_stream.GetImage() : im;");
+      ostr.println("      curTokenImage = (im == null) ? input_stream.getImage() : im;");
 
       if (keepLineCol)
       {
@@ -881,7 +881,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
     else
     {
       ostr.println("   String im = jjstrLiteralImages[jjmatchedKind];");
-      ostr.println("   curTokenImage = (im == null) ? input_stream.GetImage() : im;");
+      ostr.println("   curTokenImage = (im == null) ? input_stream.getImage() : im;");
       if (keepLineCol)
       {
         ostr.println("   beginLine = input_stream.getBeginLine();");
@@ -943,7 +943,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
     ostr.println("  {");
     ostr.println("   try");
     ostr.println("   {");
-    ostr.println("      curChar = input_stream.BeginToken();");
+    ostr.println("      curChar = input_stream.beginToken();");
     ostr.println("   }");
     ostr.println("   catch(java.io.IOException e)");
     ostr.println("   {");
@@ -1041,7 +1041,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
                   "\"Skipping character : \" + " +
           "TokenMgrError.addEscapes(String.valueOf(curChar)) + \" (\" + (int)curChar + \")\");");
         }
-        ostr.println(prefix + "      curChar = input_stream.BeginToken();");
+        ostr.println(prefix + "      curChar = input_stream.beginToken();");
 
         if (Options.getDebugTokenManager())
           ostr.println(prefix + "}");
@@ -1132,7 +1132,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
       {
         ostr.println("    debugStream.println(" +
             "\"****** FOUND A \" + tokenImage[jjmatchedKind] + \" MATCH " +
-            "(\" + TokenMgrError.addEscapes(new String(input_stream.GetSuffix(jjmatchedPos + 1))) + " +
+            "(\" + TokenMgrError.addEscapes(new String(input_stream.getSuffix(jjmatchedPos + 1))) + " +
         "\") ******\\n\");");
       }
 
@@ -1256,7 +1256,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
       ostr.println(prefix + "   try { input_stream.readChar(); input_stream.backup(1); }");
       ostr.println(prefix + "   catch (java.io.IOException e1) {");
       ostr.println(prefix + "      EOFSeen = true;");
-      ostr.println(prefix + "      error_after = curPos <= 1 ? \"\" : input_stream.GetImage();");
+      ostr.println(prefix + "      error_after = curPos <= 1 ? \"\" : input_stream.getImage();");
       ostr.println(prefix + "      if (curChar == '\\n' || curChar == '\\r') {");
       ostr.println(prefix + "         error_line++;");
       ostr.println(prefix + "         error_column = 0;");
@@ -1266,7 +1266,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
       ostr.println(prefix + "   }");
       ostr.println(prefix + "   if (!EOFSeen) {");
       ostr.println(prefix + "      input_stream.backup(1);");
-      ostr.println(prefix + "      error_after = curPos <= 1 ? \"\" : input_stream.GetImage();");
+      ostr.println(prefix + "      error_after = curPos <= 1 ? \"\" : input_stream.getImage();");
       ostr.println(prefix + "   }");
       ostr.println(prefix + "   throw new TokenMgrError(" +
       "EOFSeen, curLexState, error_line, error_column, error_after, curChar, TokenMgrError.LEXICAL_ERROR);");
@@ -1330,7 +1330,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
             ostr.println("(jjstrLiteralImages[" + i + "]);");
             ostr.println("        lengthOfMatch = jjstrLiteralImages[" + i + "].length();");
           } else {
-            ostr.println("(input_stream.GetSuffix(jjimageLen + (lengthOfMatch = jjmatchedPos + 1)));");
+            ostr.println("(input_stream.getSuffix(jjimageLen + (lengthOfMatch = jjmatchedPos + 1)));");
           }
 
           printTokenSetup((Token)act.getActionTokens().get(0));
@@ -1405,7 +1405,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
           if (RStringLiteral.allImages[i] != null)
             ostr.println("(jjstrLiteralImages[" + i + "]);");
           else
-            ostr.println("(input_stream.GetSuffix(jjimageLen));");
+            ostr.println("(input_stream.getSuffix(jjimageLen));");
 
           ostr.println("         jjimageLen = 0;");
           printTokenSetup((Token)act.getActionTokens().get(0));
@@ -1486,7 +1486,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
               ostr.println("(jjstrLiteralImages[" + i + "]);");
               ostr.println("        lengthOfMatch = jjstrLiteralImages[" + i + "].length();");
             } else {
-              ostr.println("(input_stream.GetSuffix(jjimageLen + (lengthOfMatch = jjmatchedPos + 1)));");
+              ostr.println("(input_stream.getSuffix(jjimageLen + (lengthOfMatch = jjmatchedPos + 1)));");
             }
           }
 

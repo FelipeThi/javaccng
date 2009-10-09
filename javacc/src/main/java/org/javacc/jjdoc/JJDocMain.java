@@ -133,7 +133,7 @@ public final class JJDocMain extends JJDocGlobals {
 
     if (args[args.length-1].equals("-")) {
       info("Reading from standard input . . .");
-      parser = new JavaCCParser(new JavaCCParserTokenManager(new JavaCharStream(new java.io.DataInputStream(System.in))));
+      parser = new JavaCCParser(new JavaCCParserTokenManager(new JavaCharStream(new java.io.InputStreamReader(System.in))));
       JJDocGlobals.input_file = "standard input";
       JJDocGlobals.output_file = "standard output";
     } else {
