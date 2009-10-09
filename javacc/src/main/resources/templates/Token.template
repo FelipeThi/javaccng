@@ -20,13 +20,13 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class Token implements java.io.Serial
    */
   public int kind;
 
-  /** Index of the first token character. */
+  /** Index of the first token character, inclusive. */
   public int beginOffset;
 
   /**
-   * Index of the last token character.
+   * Index of the last token character, exclusive.
    * If <code>beginOffset == endOffset</code> then the token
-   * is exactly one character long.
+   * is is empty.
    */
   public int endOffset;
 #if KEEP_LINE_COLUMN
