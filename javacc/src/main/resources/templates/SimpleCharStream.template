@@ -229,24 +229,24 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class SimpleCharStream implements Cha
   }
 
   /** Constructor. */
-  public SimpleCharStream(java.io.Reader reader, int startline, int startcolumn, int buffersize) {
+  public SimpleCharStream(java.io.Reader reader, int startLine, int startColumn, int bufferSize) {
     inputStream = reader;
 #if KEEP_LINE_COLUMN
-    line = startline;
-    column = startcolumn - 1;
+    line = startLine;
+    column = startColumn - 1;
 #fi
 
-    available = bufSize = buffersize;
-    buffer = new char[buffersize];
+    available = bufSize = bufferSize;
+    buffer = new char[bufferSize];
 #if KEEP_LINE_COLUMN
-    bufLine = new int[buffersize];
-    bufColumn = new int[buffersize];
+    bufLine = new int[bufferSize];
+    bufColumn = new int[bufferSize];
 #fi
   }
 
   /** Constructor. */
-  public SimpleCharStream(java.io.Reader reader, int startline, int startcolumn) {
-    this(reader, startline, startcolumn, 4096);
+  public SimpleCharStream(java.io.Reader reader, int startLine, int startColumn) {
+    this(reader, startLine, startColumn, 4096);
   }
 
   /** Constructor. */
@@ -289,7 +289,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class SimpleCharStream implements Cha
   /**
    * Method to adjust line and column numbers for the start of a token.
    */
-  public void adjustBeginLineColumn(int newLine, int newCol) {
+  public void adjustBeginLineColumn(int newLine, int newColumn) {
     int start = tokenBegin;
     int len;
 
@@ -306,14 +306,14 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class SimpleCharStream implements Cha
     while (i < len && bufLine[j = start % bufSize] == bufLine[k = ++start % bufSize]) {
       bufLine[j] = newLine;
       nextColDiff = columnDiff + bufColumn[k] - bufColumn[j];
-      bufColumn[j] = newCol + columnDiff;
+      bufColumn[j] = newColumn + columnDiff;
       columnDiff = nextColDiff;
       i++;
     }
 
     if (i < len) {
       bufLine[j] = newLine++;
-      bufColumn[j] = newCol + columnDiff;
+      bufColumn[j] = newColumn + columnDiff;
 
       while (i++ < len) {
         if (bufLine[j = start % bufSize] != bufLine[++start % bufSize])
