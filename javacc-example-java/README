@@ -1,0 +1,21 @@
+
+This directory contains the JavaCC grammar for parsing (the proposed)
+JDK 1.5 Java language syntax. It handles generics, new for loops, static
+imports and annotation types.
+
+BUILDING
+--------
+
+Just run
+
+   mvn test
+
+in this directory and it will build the parser.
+
+REPORTING BUGS
+--------------
+
+If you find bugs in the grammar, please file an issue at
+javacc.dev.java.net, by logging in and clicking on the 'Issue Tracking'
+link on the navigation bar on the left side. You can also send email to:
+sreeni@viswanadha.net.
