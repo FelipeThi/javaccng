@@ -472,7 +472,7 @@ public class RStringLiteral extends RegularExpression {
                 "+ (jjmatchedPos + 1) + \" characters as a \" + tokenImage[jjmatchedKind] + \" token.\");");
      }
 
-     ostr.println("   try { curChar = input_stream.readChar(); }");
+     ostr.println("   try { curChar = charStream.readChar(); }");
      ostr.println("   catch(java.io.IOException e) { return pos + 1; }");
 
      if (Options.getDebugTokenManager())
@@ -480,7 +480,7 @@ public class RStringLiteral extends RegularExpression {
                 (LexGen.maxLexStates > 1 ? "\"<\" + lexStateNames[curLexState] + \">\" + " : "") +
                 "\"Current character : \" + " +
                 "TokenMgrError.addEscapes(String.valueOf(curChar)) + \" (\" + (int)curChar + \") " +
-                "at line \" + input_stream.getEndLine() + \" column \" + input_stream.getEndColumn());");
+                "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
 
      ostr.println("   return jjMoveNfa" + LexGen.lexStateSuffix + "(state, pos + 1);");
      ostr.println("}");
@@ -679,7 +679,7 @@ public class RStringLiteral extends RegularExpression {
               ostr.println(" + \" } \");");
            }
 
-           ostr.println("   try { curChar = input_stream.readChar(); }");
+           ostr.println("   try { curChar = charStream.readChar(); }");
            ostr.println("   catch(java.io.IOException e) {");
 
            if (!LexGen.mixed[LexGen.lexStateIndex] && NfaState.generatedStates != 0)
@@ -720,7 +720,7 @@ public class RStringLiteral extends RegularExpression {
                    (LexGen.maxLexStates > 1 ? "\"<\" + lexStateNames[curLexState] + \">\" + " : "") +
                    "\"Current character : \" + " +
                    "TokenMgrError.addEscapes(String.valueOf(curChar)) + \" (\" + (int)curChar + \") " +
-                   "at line \" + input_stream.getEndLine() + \" column \" + input_stream.getEndColumn());");
+                   "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
 
         ostr.println("   switch(curChar)");
         ostr.println("   {");

@@ -219,7 +219,7 @@ TOKEN_MGR_DECLS :
    void restoreBeginLineCol()
    {
       depth--;
-      ((JavaCharStream)input_stream).adjustBeginLineColumn(beginLine[depth], beginCol[depth]);
+      ((JavaCharStream)charStream).adjustBeginLineColumn(beginLine[depth], beginCol[depth]);
    }
 }
 
@@ -268,7 +268,7 @@ SKIP :
 
 <AFTER_EGEN> SKIP :
 {
-  <~[]> { restoreBeginLineCol(); input_stream.backup(1); } : DEFAULT
+  <~[]> { restoreBeginLineCol(); charStream.backup(1); } : DEFAULT
 }
 
 /* COMMENTS */
@@ -277,14 +277,14 @@ MORE :
 {
   "//" : IN_SINGLE_LINE_COMMENT
 |
-  <"/**" ~["/"]> { input_stream.backup(1); } : IN_FORMAL_COMMENT
+  <"/**" ~["/"]> { charStream.backup(1); } : IN_FORMAL_COMMENT
 |
   "/*" : IN_MULTI_LINE_COMMENT
 |
   "/*@bgen(jjtree"
      {
-        saveBeginLineCol(input_stream.getBeginLine(),
-                         input_stream.getBeginColumn());
+        saveBeginLineCol(charStream.getBeginLine(),
+                         charStream.getBeginColumn());
      } : IN_MULTI_LINE_COMMENT
 }
 
@@ -500,14 +500,14 @@ TOKEN :
   {
      matchedToken.kind = GT;
      ((Token.GTToken)matchedToken).realKind = RUNSIGNEDSHIFT;
-     input_stream.backup(2);
+     charStream.backup(2);
      matchedToken.image = ">";
   }
 | < RSIGNEDSHIFT: ">>" >
   {
      matchedToken.kind = GT;
      ((Token.GTToken)matchedToken).realKind = RSIGNEDSHIFT;
-     input_stream.backup(1);
+     charStream.backup(1);
      matchedToken.image = ">";
   }
 | < GT: ">" >

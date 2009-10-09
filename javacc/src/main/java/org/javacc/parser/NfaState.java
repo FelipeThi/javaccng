@@ -2787,8 +2787,8 @@ public class NfaState
          ostr.println("   int strKind = jjmatchedKind;");
          ostr.println("   int strPos = jjmatchedPos;");
          ostr.println("   int seenUpto;");
-         ostr.println("   input_stream.backup(seenUpto = curPos + 1);");
-         ostr.println("   try { curChar = input_stream.readChar(); }");
+         ostr.println("   charStream.backup(seenUpto = curPos + 1);");
+         ostr.println("   try { curChar = charStream.readChar(); }");
          ostr.println("   catch(java.io.IOException e) { throw new Error(\"Internal Error\"); }");
          ostr.println("   curPos = 0;");
       }
@@ -2807,7 +2807,7 @@ public class NfaState
                  "\"<\" + lexStateNames[curLexState] + \">\" + " :
                  "") + "\"Current character : \" + " +
                  "TokenMgrError.addEscapes(String.valueOf(curChar)) + \" (\" + (int)curChar + \") " +
-                 "at line \" + input_stream.getEndLine() + \" column \" + input_stream.getEndColumn());");
+                 "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
 
       ostr.println("   int kind = 0x" + Integer.toHexString(Integer.MAX_VALUE) + ";");
       ostr.println("   for (;;)");
@@ -2864,7 +2864,7 @@ public class NfaState
          ostr.println("      debugStream.println(\"   Possible kinds of longer matches : \" + " +
                  "jjKindsForStateVector(curLexState, jjstateSet, startsAt, i));");
 
-      ostr.println("      try { curChar = input_stream.readChar(); }");
+      ostr.println("      try { curChar = charStream.readChar(); }");
 
       if (LexGen.mixed[LexGen.lexStateIndex])
          ostr.println("      catch(java.io.IOException e) { break; }");
@@ -2876,7 +2876,7 @@ public class NfaState
                  "\"<\" + lexStateNames[curLexState] + \">\" + " :
                  "") + "\"Current character : \" + " +
                  "TokenMgrError.addEscapes(String.valueOf(curChar)) + \" (\" + (int)curChar + \") " +
-                 "at line \" + input_stream.getEndLine() + \" column \" + input_stream.getEndColumn());");
+                 "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
 
       ostr.println("   }");
 
@@ -2889,7 +2889,7 @@ public class NfaState
          ostr.println("");
          ostr.println("   if (curPos < toRet)");
          ostr.println("      for (i = toRet - Math.min(curPos, seenUpto); i-- > 0; )");
-         ostr.println("         try { curChar = input_stream.readChar(); }");
+         ostr.println("         try { curChar = charStream.readChar(); }");
          ostr.println("         catch(java.io.IOException e) { " +
                  "throw new Error(\"Internal Error : Please send a bug report.\"); }");
          ostr.println("");
