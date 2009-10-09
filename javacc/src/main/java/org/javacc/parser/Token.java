@@ -19,6 +19,10 @@ public class Token {
    */
   public int kind;
 
+  public int beginOffset;
+
+  public int endOffset;
+
   /** The line number of the first character of this Token. */
   public int beginLine;
   /** The column number of the first character of this Token. */

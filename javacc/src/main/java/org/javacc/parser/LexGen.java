@@ -837,7 +837,6 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
 
     ostr.println("protected Token jjFillToken()");
     ostr.println("{");
-    ostr.println("   final Token t;");
     ostr.println("   final String curTokenImage;");
     if (keepLineCol)
     {
@@ -892,17 +891,20 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants
     }
 
     if (Options.getTokenFactory().length() > 0) {
-      ostr.println("   t = " + Options.getTokenFactory() + ".newToken(jjmatchedKind, curTokenImage);");
+      ostr.println("   final Token t = " + Options.getTokenFactory() + ".newToken(jjmatchedKind, curTokenImage);");
     } else if (hasBinaryNewToken)
     {
-      ostr.println("   t = Token.newToken(jjmatchedKind, curTokenImage);");
+      ostr.println("   final Token t = Token.newToken(jjmatchedKind, curTokenImage);");
     }
     else
     {
-      ostr.println("   t = Token.newToken(jjmatchedKind);");
+      ostr.println("   final Token t = Token.newToken(jjmatchedKind);");
       ostr.println("   t.kind = jjmatchedKind;");
       ostr.println("   t.image = curTokenImage;");
     }
+
+    ostr.println("   t.beginOffset = charStream.getBeginOffset();");
+    ostr.println("   t.endOffset = charStream.getEndOffset();");
 
     if (keepLineCol) {
       ostr.println("");

@@ -23,6 +23,30 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}interface CharStream extends java.io.
   char readChar() throws java.io.IOException;
 
   /**
+   * Returns index of the first character for current token (being
+   * matched after the last call to {@link #beginToken beginToken()}).
+   */
+  int getBeginOffset();
+
+  /**
+   * Returns index of the last character for current token (being
+   * matched after the last call to {@link #beginToken beginToken()}).
+   */
+  int getEndOffset();
+
+  /**
+   * Returns the line number of the first character for current token (being
+   * matched after the last call to {@link #beginToken beginToken()}).
+   */
+  int getBeginLine();
+
+  /**
+   * Returns the column number of the first character for current token (being
+   * matched after the last call to {@link #beginToken beginToken()}).
+   */
+  int getBeginColumn();
+
+  /**
    * Returns the column number of the last character for current token (being
    * matched after the last call to {@link #beginToken beginToken()}).
    */
@@ -33,18 +57,6 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}interface CharStream extends java.io.
    * matched after the last call to {@link #beginToken beginToken()}).
    */
   int getEndLine();
-
-  /**
-   * Returns the column number of the first character for current token (being
-   * matched after the last call to {@link #beginToken beginToken()}).
-   */
-  int getBeginColumn();
-
-  /**
-   * Returns the line number of the first character for current token (being
-   * matched after the last call to {@link #beginToken beginToken()}).
-   */
-  int getBeginLine();
 
   /**
    * Backs up the input stream by amount steps. Lexer calls this method if it

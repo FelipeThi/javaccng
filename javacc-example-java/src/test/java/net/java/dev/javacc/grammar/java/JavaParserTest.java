@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 
 /** Parses all java files in the current project. */
 public class JavaParserTest {
@@ -30,9 +31,9 @@ public class JavaParserTest {
   private void parseJavaFile(final File file) throws IOException, ParseException {
     final InputStream inputStream = new FileInputStream(file);
     try {
-      final InputStreamReader streamReader = new InputStreamReader(inputStream, "UTF-8");
-      final JavaCharStream charStream = new JavaCharStream(streamReader);
-      final JavaParserTokenManager tokenManager = new JavaParserTokenManager(charStream);
+      final Reader streamReader = new InputStreamReader(inputStream, "UTF-8");
+      final CharStream charStream = new JavaCharStream(streamReader);
+      final TokenManager tokenManager = new JavaParserTokenManager(charStream);
       final JavaParser parser = new JavaParser(tokenManager);
       parser.CompilationUnit();
     }

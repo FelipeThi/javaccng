@@ -5,7 +5,7 @@ import java.util.Map;
 
 /** An example class with generics. */
 public class JavaGenerics {
-  private Map<String, List> map;
+  private Map<String, List<String>> map;
 
   public void jriat() {
     int i = 1 >>> 4;

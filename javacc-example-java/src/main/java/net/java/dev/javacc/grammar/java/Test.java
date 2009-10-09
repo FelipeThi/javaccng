@@ -18,8 +18,8 @@ class Test {
     else {
       reader = new InputStreamReader(new FileInputStream(new File(args[0])));
     }
-    final JavaCharStream charStream = new JavaCharStream(reader);
-    final JavaParserTokenManager tokenManager = new JavaParserTokenManager(charStream);
+    final CharStream charStream = new JavaCharStream(reader);
+    final TokenManager tokenManager = new JavaParserTokenManager(charStream);
     final JavaParser parser = new JavaParser(tokenManager);
     parser.CompilationUnit();
   }

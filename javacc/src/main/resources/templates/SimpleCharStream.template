@@ -6,30 +6,53 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class SimpleCharStream implements Cha
   int bufSize;
   int available;
   int tokenBegin;
-/** Position in buffer. */
-  public int bufPos = -1;
+  int bufPos = -1;
 #if KEEP_LINE_COLUMN
-  protected int bufLine[];
-  protected int bufColumn[];
+  int bufLine[];
+  int bufColumn[];
 
-  protected int column = 0;
-  protected int line = 1;
+  int column = 0;
+  int line = 1;
 
-  protected boolean prevCharIsCR = false;
-  protected boolean prevCharIsLF = false;
+  boolean prevCharIsCR = false;
+  boolean prevCharIsLF = false;
 #fi
 
-  protected java.io.Reader inputStream;
+  final java.io.Reader inputStream;
 
-  protected char[] buffer;
-  protected int maxNextCharInd = 0;
-  protected int inBuf = 0;
-  protected int tabSize = 8;
+  char[] buffer;
+  int maxNextCharInd = 0;
+  int inBuf = 0;
+  int tabSize = 8;
+  int beginOffset, endOffset;
 
-  protected void setTabSize(int i) { tabSize = i; }
-  protected int getTabSize(int i) { return tabSize; }
+  public void setTabSize(int i) { tabSize = i; }
+  public int getTabSize(int i) { return tabSize; }
 
-  protected void expandBuff(boolean wrapAround) {
+  public SimpleCharStream(java.io.Reader reader) {
+    this(reader, 1, 1, 4096);
+  }
+
+  public SimpleCharStream(java.io.Reader reader, int startLine, int startColumn) {
+    this(reader, startLine, startColumn, 4096);
+  }
+
+  public SimpleCharStream(java.io.Reader reader, int startLine, int startColumn, int bufferSize) {
+    inputStream = reader;
+#if KEEP_LINE_COLUMN
+    line = startLine;
+    column = startColumn - 1;
+#fi
+
+    available = bufSize = bufferSize;
+    buffer = new char[bufferSize];
+#if KEEP_LINE_COLUMN
+    bufLine = new int[bufferSize];
+    bufColumn = new int[bufferSize];
+#fi
+  }
+
+  void expandBuff(boolean wrapAround) {
     char[] newBuffer = new char[bufSize + 2048];
 #if KEEP_LINE_COLUMN
     int newBufLine[] = new int[bufSize + 2048];
@@ -78,7 +101,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class SimpleCharStream implements Cha
     tokenBegin = 0;
   }
 
-  protected void fillBuff() throws java.io.IOException {
+  void fillBuff() throws java.io.IOException {
     if (maxNextCharInd == available) {
       if (available == bufSize) {
         if (tokenBegin > 2048) {
@@ -119,6 +142,8 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class SimpleCharStream implements Cha
 
 /** Start. */
   public char beginToken() throws java.io.IOException {
+    beginOffset = endOffset;
+
     tokenBegin = -1;
     char c = readChar();
     tokenBegin = bufPos;
@@ -127,7 +152,9 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class SimpleCharStream implements Cha
   }
 #if KEEP_LINE_COLUMN
 
-  protected void updateLineColumn(char c) {
+  void updateLineColumn(char c) {
+    endOffset++;
+
     column++;
 
     if (prevCharIsLF) {
@@ -163,10 +190,11 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class SimpleCharStream implements Cha
   }
 #fi
 
-/** Read a character. */
   public char readChar() throws java.io.IOException {
     if (inBuf > 0) {
       --inBuf;
+
+      endOffset++;
 
       if (++bufPos == bufSize)
         bufPos = 0;
@@ -185,34 +213,14 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class SimpleCharStream implements Cha
     return c;
   }
 
-  /** Get token end column number. */
-  public int getEndColumn() {
-#if KEEP_LINE_COLUMN
-    return bufColumn[bufPos];
-#else
-    return -1;
-#fi
+  public int getBeginOffset() {
+    return beginOffset;
   }
 
-  /** Get token end line number. */
-  public int getEndLine() {
-#if KEEP_LINE_COLUMN
-     return bufLine[bufPos];
-#else
-    return -1;
-#fi
+  public int getEndOffset() {
+    return endOffset;
   }
 
-  /** Get token beginning column number. */
-  public int getBeginColumn() {
-#if KEEP_LINE_COLUMN
-    return bufColumn[tokenBegin];
-#else
-    return -1;
-#fi
-  }
-
-  /** Get token beginning line number. */
   public int getBeginLine() {
 #if KEEP_LINE_COLUMN
     return bufLine[tokenBegin];
@@ -221,40 +229,37 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class SimpleCharStream implements Cha
 #fi
   }
 
-/** Backup a number of characters. */
+  public int getBeginColumn() {
+#if KEEP_LINE_COLUMN
+    return bufColumn[tokenBegin];
+#else
+    return -1;
+#fi
+  }
+
+  public int getEndLine() {
+#if KEEP_LINE_COLUMN
+     return bufLine[bufPos];
+#else
+    return -1;
+#fi
+  }
+
+  public int getEndColumn() {
+#if KEEP_LINE_COLUMN
+    return bufColumn[bufPos];
+#else
+    return -1;
+#fi
+  }
+
   public void backup(int amount) {
+    endOffset -= amount;
     inBuf += amount;
     if ((bufPos -= amount) < 0)
       bufPos += bufSize;
   }
 
-  /** Constructor. */
-  public SimpleCharStream(java.io.Reader reader, int startLine, int startColumn, int bufferSize) {
-    inputStream = reader;
-#if KEEP_LINE_COLUMN
-    line = startLine;
-    column = startColumn - 1;
-#fi
-
-    available = bufSize = bufferSize;
-    buffer = new char[bufferSize];
-#if KEEP_LINE_COLUMN
-    bufLine = new int[bufferSize];
-    bufColumn = new int[bufferSize];
-#fi
-  }
-
-  /** Constructor. */
-  public SimpleCharStream(java.io.Reader reader, int startLine, int startColumn) {
-    this(reader, startLine, startColumn, 4096);
-  }
-
-  /** Constructor. */
-  public SimpleCharStream(java.io.Reader reader) {
-    this(reader, 1, 1, 4096);
-  }
-
-  /** Get token literal value. */
   public String getImage() {
     if (bufPos >= tokenBegin)
       return new String(buffer, tokenBegin, bufPos - tokenBegin + 1);
@@ -262,7 +267,6 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class SimpleCharStream implements Cha
       return new String(buffer, tokenBegin, bufSize - tokenBegin) + new String(buffer, 0, bufPos + 1);
   }
 
-  /** Get the suffix. */
   public char[] getSuffix(int len) {
     char[] ret = new char[len];
 
@@ -276,7 +280,6 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class SimpleCharStream implements Cha
     return ret;
   }
 
-  /** Reset buffer when finished. */
   public void close() {
     buffer = null;
 #if KEEP_LINE_COLUMN
@@ -289,7 +292,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class SimpleCharStream implements Cha
   /**
    * Method to adjust line and column numbers for the start of a token.
    */
-  public void adjustBeginLineColumn(int newLine, int newColumn) {
+  void adjustBeginLineColumn(int newLine, int newColumn) {
     int start = tokenBegin;
     int len;
 

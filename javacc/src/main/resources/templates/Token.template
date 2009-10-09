@@ -1,13 +1,11 @@
 /**
  * Describes the input token stream.
  */
-
 #if TOKEN_EXTENDS
 ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class Token extends ${TOKEN_EXTENDS} implements java.io.Serializable {
 #else
 ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class Token implements java.io.Serializable {
 #fi
-
   /**
    * The version identifier for this Serializable class.
    * Increment only if the <i>serialized</i> form of the
@@ -21,14 +19,27 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class Token implements java.io.Serial
    * stored in the file ...Constants.java.
    */
   public int kind;
+
+  /** Index of the first token character. */
+  public int beginOffset;
+
+  /**
+   * Index of the last token character.
+   * If <code>beginOffset == endOffset</code> then the token
+   * is exactly one character long.
+   */
+  public int endOffset;
 #if KEEP_LINE_COLUMN
 
   /** The line number of the first character of this Token. */
   public int beginLine;
+
   /** The column number of the first character of this Token. */
   public int beginColumn;
+
   /** The line number of the last character of this Token. */
   public int endLine;
+
   /** The column number of the last character of this Token. */
   public int endColumn;
 #fi
@@ -82,16 +93,14 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class Token implements java.io.Serial
   /**
    * Constructs a new token for the specified Image.
    */
-  public Token(int kind)
-  {
+  public Token(int kind) {
     this(kind, null);
   }
 
   /**
    * Constructs a new token for the specified Image and Kind.
    */
-  public Token(int kind, String image)
-  {
+  public Token(int kind, String image) {
     this.kind = kind;
     this.image = image;
   }
@@ -99,8 +108,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class Token implements java.io.Serial
   /**
    * Returns the image.
    */
-  public String toString()
-  {
+  public String toString() {
     return image;
   }
 
@@ -116,17 +124,13 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class Token implements java.io.Serial
    * to the following switch statement. Then you can cast matchedToken
    * variable to the appropriate type and use sit in your lexical actions.
    */
-  public static Token newToken(int ofKind, String image)
-  {
-    switch(ofKind)
-    {
+  public static Token newToken(int ofKind, String image) {
+    switch(ofKind) {
       default : return new Token(ofKind, image);
     }
   }
 
-  public static Token newToken(int ofKind)
-  {
+  public static Token newToken(int ofKind) {
     return newToken(ofKind, null);
   }
-
 }
