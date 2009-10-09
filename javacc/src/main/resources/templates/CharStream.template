@@ -12,36 +12,37 @@
  * by the lexer. Hence their implementation won't affect the generated lexer's
  * operation.
  */
-
-${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}interface CharStream {
+${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}interface CharStream extends java.io.Closeable {
   /**
    * Returns the next character from the selected input.  The method
    * of selecting the input is the responsibility of the class
-   * implementing this interface.  Can throw any java.io.IOException.
+   * implementing this interface.
+   *
+   * @throws java.io.IOException If any I/O error occurs.
    */
   char readChar() throws java.io.IOException;
 
   /**
    * Returns the column number of the last character for current token (being
-   * matched after the last call to BeginTOken).
+   * matched after the last call to {@link #beginToken beginToken()}).
    */
   int getEndColumn();
 
   /**
    * Returns the line number of the last character for current token (being
-   * matched after the last call to BeginTOken).
+   * matched after the last call to {@link #beginToken beginToken()}).
    */
   int getEndLine();
 
   /**
    * Returns the column number of the first character for current token (being
-   * matched after the last call to BeginTOken).
+   * matched after the last call to {@link #beginToken beginToken()}).
    */
   int getBeginColumn();
 
   /**
    * Returns the line number of the first character for current token (being
-   * matched after the last call to BeginTOken).
+   * matched after the last call to {@link #beginToken beginToken()}).
    */
   int getBeginLine();
 
@@ -57,6 +58,8 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}interface CharStream {
    * Returns the next character that marks the beginning of the next token.
    * All characters must remain in the buffer between two successive calls
    * to this method to implement backup correctly.
+   *
+   * @throws java.io.IOException If any I/O error occurs.
    */
   char beginToken() throws java.io.IOException;
 
@@ -69,17 +72,18 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}interface CharStream {
   String getImage();
 
   /**
-   * Returns an array of characters that make up the suffix of length 'len' for
+   * Returns an array of characters that make up the suffix of length 'length' for
    * the currently matched token. This is used to build up the matched string
    * for use in actions in the case of MORE. A simple and inefficient
    * implementation of this is as follows :
-   *
-   *   {
-   *      String t = getImage();
-   *      return t.substring(t.length() - len, t.length()).toCharArray();
-   *   }
+   * <pre>
+   * {
+   *    String t = getImage();
+   *    return t.substring(t.length() - length, t.length()).toCharArray();
+   * }
+   * </pre>
    */
-  char[] getSuffix(int len);
+  char[] getSuffix(int length);
 
   /**
    * The lexer calls this function to indicate that it is done with the stream
@@ -87,5 +91,5 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}interface CharStream {
    * Again, the body of this function can be just empty and it will not
    * affect the lexer's operation.
    */
-  void done();
+  void close() throws java.io.IOException;
 }

@@ -427,7 +427,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharS
   }
 
   /** Set buffers back to null when finished. */
-  public void done() {
+  public void close() {
     nextCharBuf = null;
     buffer = null;
 #if KEEP_LINE_COLUMN

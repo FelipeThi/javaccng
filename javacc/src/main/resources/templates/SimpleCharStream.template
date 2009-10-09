@@ -277,7 +277,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class SimpleCharStream implements Cha
   }
 
   /** Reset buffer when finished. */
-  public void done() {
+  public void close() {
     buffer = null;
 #if KEEP_LINE_COLUMN
     bufLine = null;
