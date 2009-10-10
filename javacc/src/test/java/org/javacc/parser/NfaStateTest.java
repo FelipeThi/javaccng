@@ -1,54 +1,27 @@
-package org.javacc.parser.test;
+package org.javacc.parser;
 
 import org.javacc.JavaCCTestCase;
-import org.javacc.parser.JavaCCGlobals;
-import org.javacc.parser.JavaCCParser;
-import org.javacc.parser.JavaCCParserTokenManager;
-import org.javacc.parser.JavaCharStream;
-import org.javacc.parser.LexGen;
-import org.javacc.parser.Main;
-import org.javacc.parser.NfaState;
-import org.javacc.parser.Options;
-import org.javacc.parser.Semanticize;
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-
 
 /**
  * A sea anchor, to ensure that code is not inadvertently broken.
  *
  * @author timp
  * @since 16 Mar 2007
- *
  */
 public class NfaStateTest extends JavaCCTestCase {
-
   String parserInput = getJJInputDirectory() + "JavaCC.jj";
-  /**
-   * @param name
-   */
-  public NfaStateTest(String name) {
-    super(name);
-  }
 
-  /**
-   * {@inheritDoc}
-   * @see junit.framework.TestCase#setUp()
-   */
-  protected void setUp() throws Exception {
-    super.setUp();
+  @Before
+  public void setUp() throws Exception {
     Options.init();
     Main.reInitAll();
-  }
-
-  /**
-   * {@inheritDoc}
-   * @see junit.framework.TestCase#tearDown()
-   */
-  protected void tearDown() throws Exception {
-    super.tearDown();
   }
 
   protected void setupState() throws Exception {
@@ -61,52 +34,39 @@ public class NfaStateTest extends JavaCCTestCase {
     Semanticize.start();
     LexGen.start();
   }
-  /**
-   * Test method for {@link org.javacc.parser.NfaState#ReInit()}.
-   */
+
+  /** Test method for {@link org.javacc.parser.NfaState#ReInit()}. */
   public void testReInit() {
   }
 
-  /**
-   * Test method for {@link org.javacc.parser.NfaState#HasTransitions()}.
-   */
+  /** Test method for {@link org.javacc.parser.NfaState#HasTransitions()}. */
   public void testHasTransitions() {
   }
 
-  /**
-   * Test method for {@link org.javacc.parser.NfaState#ComputeClosures()}.
-   */
+  /** Test method for {@link org.javacc.parser.NfaState#ComputeClosures()}. */
   public void testComputeClosures() {
   }
 
-  /**
-   * Test method for {@link org.javacc.parser.NfaState#CanStartNfaUsingAscii(char)}.
-   */
+  /** Test method for {@link org.javacc.parser.NfaState#CanStartNfaUsingAscii(char)}. */
   public void testCanStartNfaUsingAscii() {
   }
 
-  /**
-   * Test method for {@link org.javacc.parser.NfaState#getFirstValidPos(java.lang.String, int, int)}.
-   */
+  /** Test method for {@link org.javacc.parser.NfaState#getFirstValidPos(java.lang.String, int, int)}. */
   public void testGetFirstValidPos() {
   }
 
-  /**
-   * Test method for {@link org.javacc.parser.NfaState#MoveFrom(char, java.util.Vector)}.
-   */
+  /** Test method for {@link org.javacc.parser.NfaState#MoveFrom(char, java.util.Vector)}. */
   public void testMoveFrom() {
   }
 
-  /**
-   * Test method for {@link org.javacc.parser.NfaState#MoveFromSet(char, java.util.Vector, java.util.Vector)}.
-   */
+  /** Test method for {@link org.javacc.parser.NfaState#MoveFromSet(char, java.util.Vector, java.util.Vector)}. */
   public void testMoveFromSet() {
   }
 
   /**
    * Test method for {@link org.javacc.parser.NfaState#
-   *     moveFromSetForRegEx(char, org.javacc.parser.NfaState[],
-   *                         org.javacc.parser.NfaState[], int)}.
+   * moveFromSetForRegEx(char, org.javacc.parser.NfaState[],
+   * org.javacc.parser.NfaState[], int)}.
    */
   public void testMoveFromSetForRegEx() {
   }
@@ -120,20 +80,22 @@ public class NfaStateTest extends JavaCCTestCase {
 
   /**
    * Test method for {@link org.javacc.parser.NfaState#
-   *     DumpStateSets(java.io.PrintWriter)}.
+   * DumpStateSets(java.io.PrintWriter)}.
    */
+  @Test
   public void testDumpStateSets() {
     StringWriter output = new StringWriter();
     PrintWriter contentWriter = new PrintWriter(output);
     NfaState.DumpStateSets(contentWriter);
-    assertEquals("static final int[] jjnextStates = {\n};\n" ,
-            output.toString().replaceAll("\r", ""));
+    assertEquals("static final int[] jjnextStates = {\n};\n",
+                 output.toString().replaceAll("\r", ""));
   }
 
   /**
    * Test method for {@link org.javacc.parser.NfaState#
-   *     DumpStateSets(java.io.PrintWriter)}.
+   * DumpStateSets(java.io.PrintWriter)}.
    */
+  @Test
   public void testDumpStateSetsInitialised() throws Exception {
     StringWriter output = new StringWriter();
     PrintWriter contentWriter = new PrintWriter(output);
@@ -144,35 +106,37 @@ public class NfaStateTest extends JavaCCTestCase {
         "   59, 8, 9, 12, 23, 24, 28, 26, 34, 35, 12, 44, 45, 12, 53, 54, \n" +
         "   60, 61, 62, 10, 11, 17, 18, 20, 25, 27, 29, 36, 37, 40, 41, 46, \n" +
         "   47, 55, 56, 57, 58, 63, 64, \n" +
-        "};\n" ,
-        output.toString().replaceAll("\r", ""));
+        "};\n",
+                 output.toString().replaceAll("\r", ""));
   }
 
   /**
    * Test method for {@link org.javacc.parser.NfaState#
-   *     DumpCharAndRangeMoves(java.io.PrintWriter)}.
+   * DumpCharAndRangeMoves(java.io.PrintWriter)}.
    */
+  @Test
   public void testDumpCharAndRangeMoves() throws Exception {
     StringWriter output = new StringWriter();
     PrintWriter contentWriter = new PrintWriter(output);
     NfaState.DumpCharAndRangeMoves(contentWriter);
     assertEquals(
         "         int i2 = (curChar & 0xff) >> 6;\n" +
-        "         long l2 = 1L << (curChar & 077);\n" +
-        "         do\n" +
-        "         {\n" +
-        "            switch(jjstateSet[--i])\n" +
-        "            {\n" +
-        "               default : break;\n" +
-        "            }\n" +
-        "         } while(i != startsAt);\n"
-        ,output.toString().replaceAll("\r", ""));
+            "         long l2 = 1L << (curChar & 077);\n" +
+            "         do\n" +
+            "         {\n" +
+            "            switch(jjstateSet[--i])\n" +
+            "            {\n" +
+            "               default : break;\n" +
+            "            }\n" +
+            "         } while(i != startsAt);\n"
+        , output.toString().replaceAll("\r", ""));
   }
 
   /**
    * Test method for {@link org.javacc.parser.NfaState#
-   *     DumpCharAndRangeMoves(java.io.PrintWriter)}.
+   * DumpCharAndRangeMoves(java.io.PrintWriter)}.
    */
+  @Test
   public void testDumpCharAndRangeMovesInitialised() throws Exception {
     StringWriter output = new StringWriter();
     PrintWriter contentWriter = new PrintWriter(output);
@@ -180,24 +144,25 @@ public class NfaStateTest extends JavaCCTestCase {
     NfaState.DumpCharAndRangeMoves(contentWriter);
     assertEquals(
         "         int hiByte = (int)(curChar >> 8);\n" +
-        "         int i1 = hiByte >> 6;\n" +
-        "         long l1 = 1L << (hiByte & 077);\n" +
-        "         int i2 = (curChar & 0xff) >> 6;\n" +
-        "         long l2 = 1L << (curChar & 077);\n" +
-        "         do\n" +
-        "         {\n" +
-        "            switch(jjstateSet[--i])\n" +
-        "            {\n" +
-        "               default : break;\n" +
-        "            }\n" +
-        "         } while(i != startsAt);\n"
-        ,output.toString().replaceAll("\r", ""));
+            "         int i1 = hiByte >> 6;\n" +
+            "         long l1 = 1L << (hiByte & 077);\n" +
+            "         int i2 = (curChar & 0xff) >> 6;\n" +
+            "         long l2 = 1L << (curChar & 077);\n" +
+            "         do\n" +
+            "         {\n" +
+            "            switch(jjstateSet[--i])\n" +
+            "            {\n" +
+            "               default : break;\n" +
+            "            }\n" +
+            "         } while(i != startsAt);\n"
+        , output.toString().replaceAll("\r", ""));
   }
 
   /**
    * Test method for {@link org.javacc.parser.NfaState#
-   *     DumpNonAsciiMoveMethods(java.io.PrintWriter)}.
+   * DumpNonAsciiMoveMethods(java.io.PrintWriter)}.
    */
+  @Test
   public void testDumpNonAsciiMoveMethods() {
     StringWriter output = new StringWriter();
     PrintWriter contentWriter = new PrintWriter(output);
@@ -207,8 +172,9 @@ public class NfaStateTest extends JavaCCTestCase {
 
   /**
    * Test method for {@link org.javacc.parser.NfaState#
-   *     DumpNonAsciiMoveMethods(java.io.PrintWriter)}.
+   * DumpNonAsciiMoveMethods(java.io.PrintWriter)}.
    */
+  @Test
   public void testDumpNonAsciiMoveMethodsInitialised() throws Exception {
     StringWriter output = new StringWriter();
     PrintWriter contentWriter = new PrintWriter(output);
@@ -396,16 +362,16 @@ public class NfaStateTest extends JavaCCTestCase {
         "}\n", output.toString().replaceAll("\r", ""));
   }
 
-  /**
-   * Test method for {@link org.javacc.parser.NfaState#DumpMoveNfa(java.io.PrintWriter)}.
-   */
+  /** Test method for {@link org.javacc.parser.NfaState#DumpMoveNfa(java.io.PrintWriter)}. */
+  @Test
   public void testDumpMoveNfa() {
     StringWriter output = new StringWriter();
     PrintWriter contentWriter = new PrintWriter(output);
     try {
       NfaState.DumpMoveNfa(contentWriter);
       fail("Should have bombed");
-    } catch (ArrayIndexOutOfBoundsException e) {
+    }
+    catch (ArrayIndexOutOfBoundsException e) {
       e = null;
     }
     assertEquals("", output.toString());
@@ -444,9 +410,8 @@ public class NfaStateTest extends JavaCCTestCase {
         */
   }
 
-  /**
-   * Test method for {@link org.javacc.parser.NfaState#DumpMoveNfa(java.io.PrintWriter)}.
-   */
+  /** Test method for {@link org.javacc.parser.NfaState#DumpMoveNfa(java.io.PrintWriter)}. */
+  @Test
   public void testDumpMoveNfaInitialised() throws Exception {
     StringWriter output = new StringWriter();
     PrintWriter contentWriter = new PrintWriter(output);
@@ -460,20 +425,22 @@ public class NfaStateTest extends JavaCCTestCase {
 
   /**
    * Test method for {@link org.javacc.parser.NfaState#
-   *     DumpStatesForState(java.io.PrintWriter)}.
+   * DumpStatesForState(java.io.PrintWriter)}.
    */
+  @Test
   public void testDumpStatesForState() throws Exception {
     StringWriter output = new StringWriter();
     PrintWriter contentWriter = new PrintWriter(output);
     NfaState.DumpStatesForState(contentWriter);
-    assertEquals("protected static final int[][][] statesForState = null;\n" ,
-            output.toString().replaceAll("\r", ""));
+    assertEquals("protected static final int[][][] statesForState = null;\n",
+                 output.toString().replaceAll("\r", ""));
   }
 
   /**
    * Test method for {@link org.javacc.parser.NfaState#
-   *     DumpStatesForState(java.io.PrintWriter)}.
+   * DumpStatesForState(java.io.PrintWriter)}.
    */
+  @Test
   public void testDumpStatesForStateInitialised() throws Exception {
     StringWriter output = new StringWriter();
     PrintWriter contentWriter = new PrintWriter(output);
@@ -557,24 +524,22 @@ public class NfaStateTest extends JavaCCTestCase {
         " null,\n" +
         "\n" +
         "};\n",
-        output.toString().replaceAll("\r", ""));
+                 output.toString().replaceAll("\r", ""));
   }
 
-  /**
-   * Test method for {@link org.javacc.parser.NfaState#DumpStatesForKind(java.io.PrintWriter)}.
-   */
+  /** Test method for {@link org.javacc.parser.NfaState#DumpStatesForKind(java.io.PrintWriter)}. */
+  @Test
   public void testDumpStatesForKind() {
     StringWriter output = new StringWriter();
     PrintWriter contentWriter = new PrintWriter(output);
     NfaState.DumpStatesForKind(contentWriter);
     assertEquals("protected static final int[][][] statesForState = null;\n" +
-                 "protected static final int[][] kindForState = null;\n" ,
-            output.toString().replaceAll("\r", ""));
+        "protected static final int[][] kindForState = null;\n",
+                 output.toString().replaceAll("\r", ""));
   }
 
-  /**
-   * Test method for {@link org.javacc.parser.NfaState#DumpStatesForKind(java.io.PrintWriter)}.
-   */
+  /** Test method for {@link org.javacc.parser.NfaState#DumpStatesForKind(java.io.PrintWriter)}. */
+  @Test
   public void testDumpStatesForKindInitialised() throws Exception {
     StringWriter output = new StringWriter();
     PrintWriter contentWriter = new PrintWriter(output);
@@ -670,17 +635,10 @@ public class NfaStateTest extends JavaCCTestCase {
         "null\n,\n" +
         "null\n\n" +
         "};\n",
-            output.toString().replaceAll("\r", ""));
+                 output.toString().replaceAll("\r", ""));
   }
 
-
-
-
-
-  /**
-   * Test method for {@link org.javacc.parser.NfaState#reInit()}.
-   */
+  /** Test method for {@link org.javacc.parser.NfaState#reInit()}. */
   public void testReInit1() {
   }
-
 }

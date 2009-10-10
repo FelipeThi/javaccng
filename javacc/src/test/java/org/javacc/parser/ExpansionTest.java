@@ -28,92 +28,103 @@
 
 package org.javacc.parser;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
 
-public final class ExpansionTest extends TestCase {
+public final class ExpansionTest {
+  private Token t;
+  private Expansion e;
 
-    private Token t;
-    private Expansion e;
+  @Before
+  public void setUp() {
+    t = new Token();
+    t.beginColumn = 2;
+    t.beginLine = 3;
+    e = new Expansion();
+    e.setColumn(5);
+    e.setLine(6);
+  }
 
-    public void setUp() {
-        t = new Token();
-        t.beginColumn = 2;
-        t.beginLine = 3;
-        e = new Expansion();
-        e.setColumn(5);
-        e.setLine(6);
-    }
-    public void testZeroOrOneConstructor() {
-        ZeroOrOne zoo = new ZeroOrOne(t, e);
-        assertEquals(t.beginColumn, zoo.getColumn());
-        assertEquals(t.beginLine, zoo.getLine());
-        assertEquals(e, zoo.expansion);
-        assertSame(e.parent, zoo);
-    }
+  @Test
+  public void testZeroOrOneConstructor() {
+    ZeroOrOne zoo = new ZeroOrOne(t, e);
+    assertEquals(t.beginColumn, zoo.getColumn());
+    assertEquals(t.beginLine, zoo.getLine());
+    assertEquals(e, zoo.expansion);
+    assertSame(e.parent, zoo);
+  }
 
-    public void testZeroOrMoreConstructor() {
-        ZeroOrMore zom = new ZeroOrMore(t, e);
-        assertEquals(t.beginColumn, zom.getColumn());
-        assertEquals(t.beginLine, zom.getLine());
-        assertEquals(e, zom.expansion);
-        assertEquals(e.parent, zom);
-    }
+  @Test
+  public void testZeroOrMoreConstructor() {
+    ZeroOrMore zom = new ZeroOrMore(t, e);
+    assertEquals(t.beginColumn, zom.getColumn());
+    assertEquals(t.beginLine, zom.getLine());
+    assertEquals(e, zom.expansion);
+    assertEquals(e.parent, zom);
+  }
 
-    public void testRZeroOrMoreConstructor() {
-        RegularExpression r = new RChoice();
-        RZeroOrMore rzom = new RZeroOrMore(t, r);
-        assertEquals(t.beginColumn, rzom.getColumn());
-        assertEquals(t.beginLine, rzom.getLine());
-        assertEquals(r, rzom.regexpr);
-    }
+  @Test
+  public void testRZeroOrMoreConstructor() {
+    RegularExpression r = new RChoice();
+    RZeroOrMore rzom = new RZeroOrMore(t, r);
+    assertEquals(t.beginColumn, rzom.getColumn());
+    assertEquals(t.beginLine, rzom.getLine());
+    assertEquals(r, rzom.regexpr);
+  }
 
-    public void testROneOrMoreConstructor() {
-        RegularExpression r = new RChoice();
-        ROneOrMore room = new ROneOrMore(t, r);
-        assertEquals(t.beginColumn, room.getColumn());
-        assertEquals(t.beginLine, room.getLine());
-        assertEquals(r, room.regexpr);
-    }
+  @Test
+  public void testROneOrMoreConstructor() {
+    RegularExpression r = new RChoice();
+    ROneOrMore room = new ROneOrMore(t, r);
+    assertEquals(t.beginColumn, room.getColumn());
+    assertEquals(t.beginLine, room.getLine());
+    assertEquals(r, room.regexpr);
+  }
 
-    public void testOneOrMoreConstructor() {
-        Expansion rce = new RChoice();
-        OneOrMore oom = new OneOrMore(t, rce);
-        assertEquals(t.beginColumn, oom.getColumn());
-        assertEquals(t.beginLine, oom.getLine());
-        assertEquals(rce, oom.expansion);
-        assertEquals(rce.parent, oom);
-    }
+  @Test
+  public void testOneOrMoreConstructor() {
+    Expansion rce = new RChoice();
+    OneOrMore oom = new OneOrMore(t, rce);
+    assertEquals(t.beginColumn, oom.getColumn());
+    assertEquals(t.beginLine, oom.getLine());
+    assertEquals(rce, oom.expansion);
+    assertEquals(rce.parent, oom);
+  }
 
+  @Test
+  public void testRStringLiteralConstructor() {
+    RStringLiteral r = new RStringLiteral(t, "hey");
+    assertEquals(t.beginColumn, r.getColumn());
+    assertEquals(t.beginLine, r.getLine());
+    assertEquals("hey", r.image);
+  }
 
-    public void testRStringLiteralConstructor() {
-        RStringLiteral r = new RStringLiteral(t, "hey");
-        assertEquals(t.beginColumn, r.getColumn());
-        assertEquals(t.beginLine, r.getLine());
-        assertEquals("hey", r.image);
-    }
+  @Test
+  public void testChoiceConstructor() {
+    Choice c = new Choice(t);
+    assertEquals(t.beginColumn, c.getColumn());
+    assertEquals(t.beginLine, c.getLine());
+    c = new Choice(e);
+    assertEquals(e.getColumn(), c.getColumn());
+    assertEquals(e.getLine(), c.getLine());
+    assertEquals(e, c.getChoices().get(0));
+  }
 
-    public void testChoiceConstructor() {
-        Choice c = new Choice(t);
-        assertEquals(t.beginColumn, c.getColumn());
-        assertEquals(t.beginLine, c.getLine());
-        c = new Choice(e);
-        assertEquals(e.getColumn(), c.getColumn());
-        assertEquals(e.getLine(), c.getLine());
-        assertEquals(e, c.getChoices().get(0));
-    }
+  @Test
+  public void testRJustNameConstructor() {
+    RJustName r = new RJustName(t, "hey");
+    assertEquals(t.beginColumn, r.getColumn());
+    assertEquals(t.beginLine, r.getLine());
+    assertEquals("hey", r.label);
+  }
 
-    public void testRJustNameConstructor() {
-        RJustName r = new RJustName(t, "hey");
-        assertEquals(t.beginColumn, r.getColumn());
-        assertEquals(t.beginLine, r.getLine());
-        assertEquals("hey", r.label);
-    }
-
-    public void testSequenceConstructor() {
-        Lookahead la = new Lookahead();
-        Sequence s = new Sequence(t, la);
-        assertEquals(t.beginColumn, s.getColumn());
-        assertEquals(t.beginLine, s.getLine());
-        assertSame(la, s.units.get(0));
-    }
+  @Test
+  public void testSequenceConstructor() {
+    Lookahead la = new Lookahead();
+    Sequence s = new Sequence(t, la);
+    assertEquals(t.beginColumn, s.getColumn());
+    assertEquals(t.beginLine, s.getLine());
+    assertSame(la, s.units.get(0));
+  }
 }
