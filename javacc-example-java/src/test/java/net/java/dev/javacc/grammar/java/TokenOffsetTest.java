@@ -13,28 +13,26 @@ import java.io.StringReader;
 public class TokenOffsetTest {
   @Test
   public void providesValidOffset() throws ParseException, IOException {
-    final String source = "12345";
-    final CharStream charStream = new JavaCharStream(new StringReader(source));
+    final String source = "<\\uuu005a>";
+    assertEquals(10, source.length());
+    final JavaCharStream charStream = new JavaCharStream(new StringReader(source));
     assertEquals(0, charStream.getBeginOffset());
     assertEquals(0, charStream.getEndOffset());
-    charStream.beginToken();
+    assertEquals('<', charStream.beginToken());
+    assertEquals('Z', charStream.readChar());
+    assertEquals('>', charStream.readChar());
     assertEquals(0, charStream.getBeginOffset());
-    assertEquals(1, charStream.getEndOffset());
-    charStream.readChar();
+    assertEquals(10, charStream.getEndOffset());
+    assertEquals(1, charStream.getBeginLine());
+    assertEquals(1, charStream.getBeginColumn());
+    assertEquals(1, charStream.getEndLine());
+    assertEquals(10, charStream.getEndColumn());
+    charStream.backup(3);
+    assertEquals('<', charStream.readChar());
+    assertEquals('Z', charStream.readChar());
+    assertEquals('>', charStream.readChar());
     assertEquals(0, charStream.getBeginOffset());
-    assertEquals(2, charStream.getEndOffset());
-    charStream.readChar();
-    assertEquals(0, charStream.getBeginOffset());
-    assertEquals(3, charStream.getEndOffset());
-    charStream.backup(1);
-    assertEquals(0, charStream.getBeginOffset());
-    assertEquals(2, charStream.getEndOffset());
-    charStream.beginToken();
-    assertEquals(2, charStream.getBeginOffset());
-    assertEquals(3, charStream.getEndOffset());
-    charStream.readChar();
-    assertEquals(2, charStream.getBeginOffset());
-    assertEquals(4, charStream.getEndOffset());
+    assertEquals(10, charStream.getEndOffset());
   }
 
   @Test
