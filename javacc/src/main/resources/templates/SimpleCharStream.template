@@ -141,7 +141,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class SimpleCharStream implements Cha
   }
 
 /** Start. */
-  public char beginToken() throws java.io.IOException {
+  public int beginToken() throws java.io.IOException {
     beginOffset = endOffset;
 
     tokenBegin = -1;
@@ -190,7 +190,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class SimpleCharStream implements Cha
   }
 #fi
 
-  public char readChar() throws java.io.IOException {
+  public int readChar() throws java.io.IOException {
     if (inBuf > 0) {
       --inBuf;
 

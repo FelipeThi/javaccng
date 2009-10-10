@@ -747,7 +747,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
       ostr.println("private int lengthOfMatch;");
     }
 
-    ostr.println("protected char curChar;");
+    ostr.println("protected int curChar;");
 
     if (Options.getTokenManagerUsesParser()) {
       ostr.println("");

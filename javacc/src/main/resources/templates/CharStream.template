@@ -14,13 +14,30 @@
  */
 ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}interface CharStream extends java.io.Closeable {
   /**
+   * Returns the next character that marks the beginning of the next token.
+   * All characters must remain in the buffer between two successive calls
+   * to this method to implement backup correctly.
+   *
+   * @throws java.io.IOException If any I/O error occurs.
+   */
+  int beginToken() throws java.io.IOException;
+
+  /**
    * Returns the next character from the selected input.  The method
    * of selecting the input is the responsibility of the class
    * implementing this interface.
    *
    * @throws java.io.IOException If any I/O error occurs.
    */
-  char readChar() throws java.io.IOException;
+  int readChar() throws java.io.IOException;
+
+  /**
+   * Backs up the input stream by amount steps. Lexer calls this method if it
+   * had already read some characters, but could not use them to match a
+   * (longer) token. So, they will be used again as the prefix of the next
+   * token and it is the implemetation's responsibility to do this right.
+   */
+  void backup(int amount);
 
   /**
    * Returns index of the first character for current token (being
@@ -57,23 +74,6 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}interface CharStream extends java.io.
    * matched after the last call to {@link #beginToken beginToken()}).
    */
   int getEndLine();
-
-  /**
-   * Backs up the input stream by amount steps. Lexer calls this method if it
-   * had already read some characters, but could not use them to match a
-   * (longer) token. So, they will be used again as the prefix of the next
-   * token and it is the implemetation's responsibility to do this right.
-   */
-  void backup(int amount);
-
-  /**
-   * Returns the next character that marks the beginning of the next token.
-   * All characters must remain in the buffer between two successive calls
-   * to this method to implement backup correctly.
-   *
-   * @throws java.io.IOException If any I/O error occurs.
-   */
-  char beginToken() throws java.io.IOException;
 
   /**
    * Returns a string made up of characters from the marked token beginning

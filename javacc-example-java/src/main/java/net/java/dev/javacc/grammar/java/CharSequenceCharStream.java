@@ -16,7 +16,7 @@ public final class CharSequenceCharStream implements CharStream {
     this.chars = chars;
   }
 
-  public char readChar() throws IOException {
+  public int readChar() throws IOException {
     if (next >= chars.length()) {
       throw new IOException("end of stream");
     }
@@ -26,7 +26,7 @@ public final class CharSequenceCharStream implements CharStream {
     return c;
   }
 
-  public char beginToken() throws IOException {
+  public int beginToken() throws IOException {
     beginOffset = endOffset;
     return readChar();
   }
