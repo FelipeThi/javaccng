@@ -236,6 +236,8 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharS
     if ((buffer[bufPos] = c = readByte()) == '\\') {
 #if KEEP_LINE_COLUMN
       updateLineColumn(c);
+#else
+      endOffset++;
 #fi
 
       int backSlashCnt = 1;
@@ -250,9 +252,9 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharS
             updateLineColumn(c);
             // found a non-backslash char.
             if ((c == 'u') && ((backSlashCnt & 1) == 1)) {
-              if (--bufPos < 0)
+              if (--bufPos < 0) {
                 bufPos = bufSize - 1;
-
+              }
               break;
             }
 
@@ -268,20 +270,23 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharS
           return '\\';
         }
 
+        endOffset++;
 #if KEEP_LINE_COLUMN
         updateLineColumn(c);
+#else
+        endOffset++;
 #fi
         backSlashCnt++;
       }
 
       // Here, we have seen an odd number of backslash's followed by a 'u'
       try {
-        while ((c = readByte()) == 'u')
+        while ((c = readByte()) == 'u') {
+          endOffset++;
 #if KEEP_LINE_COLUMN
-          ++column;
-#else
-          ;
+          column++;
 #fi
+        }
 
         buffer[bufPos] = c = (char)(hexValue(c) << 12 |
                                     hexValue(readByte()) << 8 |
@@ -289,6 +294,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharS
                                     hexValue(readByte()));
 
 #if KEEP_LINE_COLUMN
+        endOffset += 4;
         column += 4;
 #fi
       }
@@ -311,6 +317,8 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class JavaCharStream implements CharS
     else {
 #if KEEP_LINE_COLUMN
       updateLineColumn(c);
+#else
+      endOffset++;
 #fi
       return c;
     }
