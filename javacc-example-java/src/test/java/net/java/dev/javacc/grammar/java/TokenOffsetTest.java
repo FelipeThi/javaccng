@@ -12,8 +12,8 @@ import java.io.StringReader;
 
 public class TokenOffsetTest {
   @Test
-  public void charStreamProvidesValidOffset() throws ParseException, IOException {
-    final String source = "/** Doc. */\npublic class Jazz {}";
+  public void providesValidOffset() throws ParseException, IOException {
+    final String source = "12345";
     final CharStream charStream = new JavaCharStream(new StringReader(source));
     assertEquals(0, charStream.getBeginOffset());
     assertEquals(0, charStream.getEndOffset());

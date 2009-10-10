@@ -1,5 +1,6 @@
 package net.java.dev.javacc.grammar.java;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
@@ -35,7 +36,12 @@ public class JavaParserTest {
       final CharStream charStream = new JavaCharStream(streamReader);
       final TokenManager tokenManager = new JavaParserTokenManager(charStream);
       final JavaParser parser = new JavaParser(tokenManager);
-      parser.CompilationUnit();
+      try {
+        parser.CompilationUnit();
+      }
+      catch (ParseException ex) {
+        Assert.fail("Failed parsing file " + file.getName());
+      }
     }
     finally {
       inputStream.close();
