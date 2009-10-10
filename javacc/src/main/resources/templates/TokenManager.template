@@ -10,5 +10,5 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}interface TokenManager {
    *
    * @return Next token from the input stream.
    */
-  Token getNextToken();
+  Token getNextToken() throws java.io.IOException;
 }
