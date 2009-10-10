@@ -936,11 +936,8 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
     ostr.println("");
     ostr.println("  EOFLoop :\n  for (;;)");
     ostr.println("  {");
-    ostr.println("   try");
-    ostr.println("   {");
     ostr.println("   curChar = charStream.beginToken();");
-    ostr.println("   }");
-    ostr.println("   catch(java.io.IOException e)");
+    ostr.println("   if (curChar == -1)");
     ostr.println("   {");
 
     if (Options.getDebugTokenManager()) {
@@ -999,7 +996,8 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
 
       if (singlesToSkip[i].HasTransitions()) {
         // added the backup(0) to make JIT happy
-        ostr.println(prefix + "try { charStream.backup(0);");
+        ostr.println(prefix + "// added the backup(0) to make JIT happy");
+        ostr.println(prefix + "charStream.backup(0);");
         if (singlesToSkip[i].asciiMoves[0] != 0L &&
             singlesToSkip[i].asciiMoves[1] != 0L) {
           ostr.println(prefix + "   while ((curChar < 64" + " && (0x" +
@@ -1024,8 +1022,8 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
               "L & (1L << (curChar & 077))) != 0L)");
         }
 
+        ostr.println(prefix + "    {");
         if (Options.getDebugTokenManager()) {
-          ostr.println(prefix + "{");
           ostr.println("      debugStream.println(" +
               (maxLexStates > 1 ?
                   "\"<\" + lexStateNames[curLexState] + \">\" + " : "") +
@@ -1033,13 +1031,9 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
               "TokenMgrError.addEscapes(String.valueOf(curChar)) + \" (\" + (int)curChar + \")\");");
         }
         ostr.println(prefix + "      curChar = charStream.beginToken();");
+        ostr.println(prefix + "      if (curChar == -1) { continue EOFLoop; }");
 
-        if (Options.getDebugTokenManager()) {
-          ostr.println(prefix + "}");
-        }
-
-        ostr.println(prefix + "}");
-        ostr.println(prefix + "catch (java.io.IOException e1) { continue EOFLoop; }");
+        ostr.println(prefix + "    }");
       }
 
       if (initMatch[i] != Integer.MAX_VALUE && initMatch[i] != 0) {
@@ -1229,8 +1223,8 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
           ostr.println(prefix + "      curPos = 0;");
           ostr.println(prefix + "      jjmatchedKind = 0x" + Integer.toHexString(Integer.MAX_VALUE) + ";");
 
-          ostr.println(prefix + "      try {");
-          ostr.println(prefix + "         curChar = charStream.readChar();");
+          ostr.println(prefix + "      curChar = charStream.readChar();");
+          ostr.println(prefix + "      if (curChar != -1) {");
 
           if (Options.getDebugTokenManager()) {
             ostr.println("   debugStream.println(" +
@@ -1241,7 +1235,6 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
           }
           ostr.println(prefix + "         continue;");
           ostr.println(prefix + "      }");
-          ostr.println(prefix + "      catch (java.io.IOException e1) { }");
         }
       }
 
@@ -1250,8 +1243,10 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
       ostr.println(prefix + "   int error_column = charStream.getEndColumn();");
       ostr.println(prefix + "   String error_after = null;");
       ostr.println(prefix + "   boolean EOFSeen = false;");
-      ostr.println(prefix + "   try { charStream.readChar(); charStream.backup(1); }");
-      ostr.println(prefix + "   catch (java.io.IOException e1) {");
+      ostr.println(prefix + "   int c = charStream.readChar();");
+      ostr.println(prefix + "   if (c != -1) {");
+      ostr.println(prefix + "      charStream.backup(1);");
+      ostr.println(prefix + "   } else {");
       ostr.println(prefix + "      EOFSeen = true;");
       ostr.println(prefix + "      error_after = curPos <= 1 ? \"\" : charStream.getImage();");
       ostr.println(prefix + "      if (curChar == '\\n' || curChar == '\\r') {");

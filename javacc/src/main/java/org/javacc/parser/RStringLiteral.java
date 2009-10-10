@@ -460,7 +460,7 @@ public class RStringLiteral extends RegularExpression {
   static void DumpStartWithStates(java.io.PrintWriter ostr)
   {
      ostr.println("private int " +
-                  "jjStartNfaWithStates" + LexGen.lexStateSuffix + "(int pos, int kind, int state)");
+                  "jjStartNfaWithStates" + LexGen.lexStateSuffix + "(int pos, int kind, int state) throws java.io.IOException");
      ostr.println("{");
      ostr.println("   jjmatchedKind = kind;");
      ostr.println("   jjmatchedPos = pos;");
@@ -472,8 +472,8 @@ public class RStringLiteral extends RegularExpression {
                 "+ (jjmatchedPos + 1) + \" characters as a \" + tokenImage[jjmatchedKind] + \" token.\");");
      }
 
-     ostr.println("   try { curChar = charStream.readChar(); }");
-     ostr.println("   catch(java.io.IOException e) { return pos + 1; }");
+     ostr.println("   curChar = charStream.readChar();");
+     ostr.println("   if (curChar == -1) { return pos + 1; }");
 
      if (Options.getDebugTokenManager())
         ostr.println("   debugStream.println(" +
@@ -544,7 +544,7 @@ public class RStringLiteral extends RegularExpression {
      if (maxLen == 0)
      {
         ostr.println("private int " +
-                       "jjMoveStringLiteralDfa0" + LexGen.lexStateSuffix + "()");
+                       "jjMoveStringLiteralDfa0" + LexGen.lexStateSuffix + "() throws java.io.IOException");
 
         DumpNullStrLiterals(ostr);
         return;
@@ -608,7 +608,7 @@ public class RStringLiteral extends RegularExpression {
               }
            }
         }
-        ostr.println(")");
+        ostr.println(") throws java.io.IOException");
         ostr.println("{");
 
         if (i != 0)
@@ -679,8 +679,8 @@ public class RStringLiteral extends RegularExpression {
               ostr.println(" + \" } \");");
            }
 
-           ostr.println("   try { curChar = charStream.readChar(); }");
-           ostr.println("   catch(java.io.IOException e) {");
+           ostr.println("   curChar = charStream.readChar();");
+           ostr.println("   if (curChar == -1) {");
 
            if (!LexGen.mixed[LexGen.lexStateIndex] && NfaState.generatedStates != 0)
            {
@@ -1308,7 +1308,7 @@ public class RStringLiteral extends RegularExpression {
                   LexGen.lexStateSuffix + "(int pos, ");
      for (i = 0; i < maxKindsReqd - 1; i++)
         ostr.print("long active" + i + ", ");
-     ostr.println("long active" + i + ")\n{");
+     ostr.println("long active" + i + ") throws java.io.IOException \n{");
 
      if (LexGen.mixed[LexGen.lexStateIndex])
      {

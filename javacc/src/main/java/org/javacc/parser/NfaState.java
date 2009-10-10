@@ -2772,7 +2772,7 @@ public class NfaState
       kinds[LexGen.lexStateIndex] = kindsForStates;
 
       ostr.println("private int " +
-                    "jjMoveNfa" + LexGen.lexStateSuffix + "(int startState, int curPos)");
+                    "jjMoveNfa" + LexGen.lexStateSuffix + "(int startState, int curPos) throws java.io.IOException");
       ostr.println("{");
 
       if (generatedStates == 0)
@@ -2788,8 +2788,8 @@ public class NfaState
          ostr.println("   int strPos = jjmatchedPos;");
          ostr.println("   int seenUpto;");
          ostr.println("   charStream.backup(seenUpto = curPos + 1);");
-         ostr.println("   try { curChar = charStream.readChar(); }");
-         ostr.println("   catch(java.io.IOException e) { throw new Error(\"Internal Error\"); }");
+         ostr.println("   curChar = charStream.readChar();");
+         ostr.println("   if (curChar == -1) { throw new Error(\"Internal Error\"); }");
          ostr.println("   curPos = 0;");
       }
 
@@ -2864,12 +2864,12 @@ public class NfaState
          ostr.println("      debugStream.println(\"   Possible kinds of longer matches : \" + " +
                  "jjKindsForStateVector(curLexState, jjstateSet, startsAt, i));");
 
-      ostr.println("      try { curChar = charStream.readChar(); }");
+      ostr.println("      curChar = charStream.readChar();");
 
       if (LexGen.mixed[LexGen.lexStateIndex])
-         ostr.println("      catch(java.io.IOException e) { break; }");
+         ostr.println("      if (curChar == -1) { break; }");
       else
-         ostr.println("      catch(java.io.IOException e) { return curPos; }");
+         ostr.println("      if (curChar == -1) { return curPos; }");
 
       if (Options.getDebugTokenManager())
          ostr.println("      debugStream.println(" + (LexGen.maxLexStates > 1 ?
@@ -2889,8 +2889,8 @@ public class NfaState
          ostr.println("");
          ostr.println("   if (curPos < toRet)");
          ostr.println("      for (i = toRet - Math.min(curPos, seenUpto); i-- > 0; )");
-         ostr.println("         try { curChar = charStream.readChar(); }");
-         ostr.println("         catch(java.io.IOException e) { " +
+         ostr.println("         curChar = charStream.readChar();");
+         ostr.println("         if (curChar == -1) { " +
                  "throw new Error(\"Internal Error : Please send a bug report.\"); }");
          ostr.println("");
          ostr.println("   if (jjmatchedPos < strPos)");

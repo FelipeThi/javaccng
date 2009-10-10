@@ -417,7 +417,7 @@ public class NfaStateTest extends JavaCCTestCase {
     PrintWriter contentWriter = new PrintWriter(output);
     setupState();
     NfaState.DumpMoveNfa(contentWriter);
-    assertEquals("private int jjMoveNfa_3(int startState, int curPos)\n" +
+    assertEquals("private int jjMoveNfa_3(int startState, int curPos) throws java.io.IOException\n" +
         "{\n" +
         "   return curPos;\n" +
         "}\n", output.toString().replaceAll("\r", ""));
