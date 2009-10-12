@@ -936,7 +936,8 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
     ostr.println("");
     ostr.println("  EOFLoop :\n  for (;;)");
     ostr.println("  {");
-    ostr.println("   curChar = charStream.beginToken();");
+    ostr.println("   charStream.beginToken();");
+    ostr.println("   curChar = charStream.readChar();");
     ostr.println("   if (curChar == -1)");
     ostr.println("   {");
 
@@ -1030,7 +1031,8 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
               "\"Skipping character : \" + " +
               "TokenMgrError.addEscapes(String.valueOf(curChar)) + \" (\" + (int)curChar + \")\");");
         }
-        ostr.println(prefix + "      curChar = charStream.beginToken();");
+        ostr.println(prefix + "      charStream.beginToken();");
+        ostr.println(prefix + "      curChar = charStream.readChar();");
         ostr.println(prefix + "      if (curChar == -1) { continue EOFLoop; }");
 
         ostr.println(prefix + "    }");
@@ -1239,29 +1241,34 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
       }
 
       ostr.println(prefix + "   }");
-      ostr.println(prefix + "   int error_line = charStream.getEndLine();");
-      ostr.println(prefix + "   int error_column = charStream.getEndColumn();");
-      ostr.println(prefix + "   String error_after = null;");
-      ostr.println(prefix + "   boolean EOFSeen = false;");
-      ostr.println(prefix + "   int c = charStream.readChar();");
-      ostr.println(prefix + "   if (c != -1) {");
-      ostr.println(prefix + "      charStream.backup(1);");
-      ostr.println(prefix + "   } else {");
-      ostr.println(prefix + "      EOFSeen = true;");
-      ostr.println(prefix + "      error_after = curPos <= 1 ? \"\" : charStream.getImage();");
-      ostr.println(prefix + "      if (curChar == '\\n' || curChar == '\\r') {");
-      ostr.println(prefix + "         error_line++;");
-      ostr.println(prefix + "         error_column = 0;");
-      ostr.println(prefix + "      }");
-      ostr.println(prefix + "      else");
-      ostr.println(prefix + "         error_column++;");
-      ostr.println(prefix + "   }");
-      ostr.println(prefix + "   if (!EOFSeen) {");
-      ostr.println(prefix + "      charStream.backup(1);");
-      ostr.println(prefix + "      error_after = curPos <= 1 ? \"\" : charStream.getImage();");
-      ostr.println(prefix + "   }");
-      ostr.println(prefix + "   throw new TokenMgrError(" +
-          "EOFSeen, curLexState, error_line, error_column, error_after, curChar, TokenMgrError.LEXICAL_ERROR);");
+      ostr.println(prefix + "   String prefix = null;");
+      ostr.println(prefix + "   boolean eof = false;");
+      if (keepLineCol) {
+        ostr.println(prefix + "   int errorLine = charStream.getEndLine();");
+        ostr.println(prefix + "   int errorColumn = charStream.getEndColumn();");
+        ostr.println(prefix + "   int c = charStream.readChar();");
+        ostr.println(prefix + "   if (c != -1) {");
+        ostr.println(prefix + "      charStream.backup(1);");
+        ostr.println(prefix + "   } else {");
+        ostr.println(prefix + "      eof = true;");
+        ostr.println(prefix + "      prefix = curPos <= 1 ? \"\" : charStream.getImage();");
+        ostr.println(prefix + "      errorLine = charStream.getEndLine();");
+        ostr.println(prefix + "      errorColumn = charStream.getEndColumn();");
+        ostr.println(prefix + "   }");
+        ostr.println(prefix + "   throw new TokenMgrError(" +
+            "eof, curLexState, errorLine, errorColumn, prefix, curChar, TokenMgrError.LEXICAL_ERROR);");
+      }
+      else {
+        ostr.println(prefix + "   int c = charStream.readChar();");
+        ostr.println(prefix + "   if (c != -1) {");
+        ostr.println(prefix + "      charStream.backup(1);");
+        ostr.println(prefix + "   } else {");
+        ostr.println(prefix + "      eof = true;");
+        ostr.println(prefix + "      prefix = curPos <= 1 ? \"\" : charStream.getImage();");
+        ostr.println(prefix + "   }");
+        ostr.println(prefix + "   throw new TokenMgrError(" +
+            "eof, curLexState, -1, -1, prefix, curChar, TokenMgrError.LEXICAL_ERROR);");
+      }
     }
 
     if (hasMore) {

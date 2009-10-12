@@ -1186,7 +1186,7 @@ public class RStringLiteral extends RegularExpression {
      boolean condGenerated = false;
      int ind = 0;
 
-     ostr.print("private final int jjStopStringLiteralDfa" +
+     ostr.print("private int jjStopStringLiteralDfa" +
                   LexGen.lexStateSuffix + "(int pos, ");
      for (i = 0; i < maxKindsReqd - 1; i++)
         ostr.print("long active" + i + ", ");
@@ -1304,7 +1304,7 @@ public class RStringLiteral extends RegularExpression {
      ostr.println("   }");
      ostr.println("}");
 
-     ostr.print("private final int jjStartNfa" +
+     ostr.print("private int jjStartNfa" +
                   LexGen.lexStateSuffix + "(int pos, ");
      for (i = 0; i < maxKindsReqd - 1; i++)
         ostr.print("long active" + i + ", ");

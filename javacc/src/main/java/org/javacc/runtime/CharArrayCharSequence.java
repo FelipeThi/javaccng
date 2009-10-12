@@ -1,11 +1,7 @@
-package net.java.dev.javacc.grammar.java;
+package org.javacc.runtime;
 
 /**
  * Character sequence that wraps array of characters.
- * <p>
- * This implementation does not escape unicode sequences.
- * <p>
- * This implementation does track line and column numbers.
  * <p>
  * Do not modify content of the underlying array otherwise this char sequence
  * will provide erroneous characters on subsequent calls since it does not clone

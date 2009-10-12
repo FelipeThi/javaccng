@@ -1,4 +1,4 @@
-package net.java.dev.javacc.grammar.java;
+package org.javacc.runtime;
 
 import static org.junit.Assert.*;
 import org.junit.Test;

@@ -1,13 +1,18 @@
-package net.java.dev.javacc.grammar.java;
+package org.javacc.runtime;
 
 import java.io.IOException;
 
-/** A char stream that reads characters from the provided CharSequence. */
+/**
+ * A char stream that reads characters from the provided CharSequence.
+ * <p>
+ * This implementation does not process java-like unicode escapes.
+ * <p>
+ * This implementation does track line and column numbers (yet).
+ */
 public final class CharSequenceCharStream implements CharStream {
   private final CharSequence chars;
   private int next;
   private int beginOffset, endOffset;
-  private int line, column;
 
   public CharSequenceCharStream(final CharSequence chars) {
     if (chars == null) {
@@ -16,19 +21,18 @@ public final class CharSequenceCharStream implements CharStream {
     this.chars = chars;
   }
 
+  public void beginToken() throws IOException {
+    beginOffset = endOffset;
+  }
+
   public int readChar() throws IOException {
     if (next >= chars.length()) {
-      throw new IOException("end of stream");
+      return -1;
     }
     char c = chars.charAt(next);
     next++;
     endOffset++;
     return c;
-  }
-
-  public int beginToken() throws IOException {
-    beginOffset = endOffset;
-    return readChar();
   }
 
   public void backup(final int amount) {
@@ -57,19 +61,19 @@ public final class CharSequenceCharStream implements CharStream {
   }
 
   public int getBeginLine() {
-    return 0;
+    throw new UnsupportedOperationException();
   }
 
   public int getBeginColumn() {
-    return 0;
-  }
-
-  public int getEndColumn() {
-    return 0;
+    throw new UnsupportedOperationException();
   }
 
   public int getEndLine() {
-    return 0;
+    throw new UnsupportedOperationException();
+  }
+
+  public int getEndColumn() {
+    throw new UnsupportedOperationException();
   }
 
   public void close() throws IOException {

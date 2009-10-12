@@ -218,7 +218,7 @@ TOKEN_MGR_DECLS :
    void restoreBeginLineCol()
    {
       depth--;
-      ((JavaCharStream)charStream).adjustBeginLineColumn(beginLine[depth], beginCol[depth]);
+      // TODO uncomment this line later: ((JavaCharStream)charStream).adjustBeginLineColumn(beginLine[depth], beginCol[depth]);
    }
 }
 
