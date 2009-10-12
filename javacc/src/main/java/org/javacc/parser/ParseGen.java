@@ -75,10 +75,10 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
         ccol = 1;
         for (Iterator it = cu_to_insertion_point_1.iterator(); it.hasNext();) {
           t = (Token) it.next();
-          if (t.kind == IMPLEMENTS) {
+          if (t.getKind() == IMPLEMENTS) {
             implementsExists = true;
           }
-          else if (t.kind == CLASS) {
+          else if (t.getKind() == CLASS) {
             implementsExists = false;
           }
           printToken(t, ostr);
@@ -183,7 +183,7 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
         ostr.println("    else token = token.next = tokenManager.getNextToken();");
         ostr.println("    jj_ntk = -1;");
       }
-      ostr.println("    if (token.kind == kind) {");
+      ostr.println("    if (token.getKind() == kind) {");
       if (Options.getErrorReporting()) {
         ostr.println("      jj_gen++;");
         if (jj2index != 0) {
@@ -242,7 +242,7 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
         else if (Options.getDebugLookahead()) {
           ostr.println("    trace_scan(jj_scanpos, kind);");
         }
-        ostr.println("    if (jj_scanpos.kind != kind) return true;");
+        ostr.println("    if (jj_scanpos.getKind() != kind) return true;");
         ostr.println("    if (jj_la == 0 && jj_scanpos == jj_lastpos) throw jj_ls;");
         ostr.println("    return false;");
         ostr.println("  }");
@@ -287,9 +287,9 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
       if (!Options.getCacheTokens()) {
         ostr.println("  private int jj_ntk() throws java.io.IOException {");
         ostr.println("    if ((jj_nt=token.next) == null)");
-        ostr.println("      return (jj_ntk = (token.next=tokenManager.getNextToken()).kind);");
+        ostr.println("      return (jj_ntk = (token.next=tokenManager.getNextToken()).getKind());");
         ostr.println("    else");
-        ostr.println("      return (jj_ntk = jj_nt.kind);");
+        ostr.println("      return (jj_ntk = jj_nt.getKind());");
         ostr.println("  }");
         ostr.println("");
       }
@@ -391,7 +391,7 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
         if (Options.getKeepLineColumn()) {
           ostr.println("    int line = errortok.beginLine, column = errortok.beginColumn;");
         }
-        ostr.println("    String mess = (errortok.kind == 0) ? tokenImage[0] : errortok.image;");
+        ostr.println("    String mess = (errortok.getKind() == 0) ? tokenImage[0] : errortok.image;");
         if (Options.getKeepLineColumn()) {
           ostr.println("    return new ParseException(" +
               "\"Parse error at line \" + line + \", column \" + column + \".  " +
@@ -438,8 +438,8 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
         ostr.println("  private void trace_token(Token t, String where) {");
         ostr.println("    if (trace_enabled) {");
         ostr.println("      for (int i = 0; i < trace_indent; i++) { System.out.print(\" \"); }");
-        ostr.println("      System.out.print(\"Consumed token: <\" + tokenImage[t.kind]);");
-        ostr.println("      if (t.kind != 0 && !tokenImage[t.kind].equals(\"\\\"\" + t.image + \"\\\"\")) {");
+        ostr.println("      System.out.print(\"Consumed token: <\" + tokenImage[t.getKind()]);");
+        ostr.println("      if (t.getKind() != 0 && !tokenImage[t.getKind()].equals(\"\\\"\" + t.image + \"\\\"\")) {");
         ostr.println("        System.out.print(\": \\\"\" + t.image + \"\\\"\");");
         ostr.println("      }");
         ostr.println("      System.out.println(\" at line \" + t.beginLine + " +
@@ -450,8 +450,8 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
         ostr.println("  private void trace_scan(Token t1, int t2) {");
         ostr.println("    if (trace_enabled) {");
         ostr.println("      for (int i = 0; i < trace_indent; i++) { System.out.print(\" \"); }");
-        ostr.println("      System.out.print(\"Visited token: <\" + tokenImage[t1.kind]);");
-        ostr.println("      if (t1.kind != 0 && !tokenImage[t1.kind].equals(\"\\\"\" + t1.image + \"\\\"\")) {");
+        ostr.println("      System.out.print(\"Visited token: <\" + tokenImage[t1.getKind()]);");
+        ostr.println("      if (t1.getKind() != 0 && !tokenImage[t1.getKind()].equals(\"\\\"\" + t1.image + \"\\\"\")) {");
         ostr.println("        System.out.print(\": \\\"\" + t1.image + \"\\\"\");");
         ostr.println("      }");
         ostr.println("      System.out.println(\" at line \" + t1.beginLine + \"" +

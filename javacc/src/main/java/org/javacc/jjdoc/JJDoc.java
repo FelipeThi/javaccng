@@ -27,39 +27,10 @@
  */
 
 package org.javacc.jjdoc;
-import java.util.Enumeration;
+import org.javacc.parser.*;
+
 import java.util.Iterator;
 import java.util.List;
-import org.javacc.parser.Action;
-import org.javacc.parser.BNFProduction;
-import org.javacc.parser.CharacterRange;
-import org.javacc.parser.Choice;
-import org.javacc.parser.Expansion;
-import org.javacc.parser.JavaCCParserInternals;
-import org.javacc.parser.JavaCodeProduction;
-import org.javacc.parser.Lookahead;
-import org.javacc.parser.NonTerminal;
-import org.javacc.parser.NormalProduction;
-import org.javacc.parser.OneOrMore;
-import org.javacc.parser.RCharacterList;
-import org.javacc.parser.RChoice;
-import org.javacc.parser.REndOfFile;
-import org.javacc.parser.RJustName;
-import org.javacc.parser.ROneOrMore;
-import org.javacc.parser.RSequence;
-import org.javacc.parser.RStringLiteral;
-import org.javacc.parser.RZeroOrMore;
-import org.javacc.parser.RZeroOrOne;
-import org.javacc.parser.RRepetitionRange;
-import org.javacc.parser.RegExprSpec;
-import org.javacc.parser.RegularExpression;
-import org.javacc.parser.Sequence;
-import org.javacc.parser.SingleCharacter;
-import org.javacc.parser.Token;
-import org.javacc.parser.TokenProduction;
-import org.javacc.parser.TryBlock;
-import org.javacc.parser.ZeroOrMore;
-import org.javacc.parser.ZeroOrOne;
 
 /**
  * The main entry point for JJDoc.
@@ -80,19 +51,19 @@ public class JJDoc extends JJDocGlobals {
     }
     return (t != tok) ? t : null;
   }
-  private static void emitTopLevelSpecialTokens(Token tok, Generator gen) {
-    if (tok == null) {
+  private static void emitTopLevelSpecialTokens(Token token, Generator gen) {
+    if (token == null) {
       // Strange ...
       return;
     }
-    tok = getPrecedingSpecialToken(tok);
+    token = getPrecedingSpecialToken(token);
     String s = "";
-    if (tok != null) {
-      cline = tok.beginLine;
-      ccol = tok.beginColumn;
-      while (tok != null) {
-        s += printTokenOnly(tok);
-        tok = tok.next;
+    if (token != null) {
+      cline = token.getBeginLine();
+      ccol = token.getBeginColumn();
+      while (token != null) {
+        s += printTokenOnly(token);
+        token = token.next;
       }
     }
     if (!s.equals(""))
@@ -141,7 +112,7 @@ public class JJDoc extends JJDocGlobals {
           token += emitRE(res.rexp);
 
           if (res.nsTok != null) {
-            token += " : " + res.nsTok.image;
+            token += " : " + res.nsTok.getImage();
           }
 
           token += "\n";

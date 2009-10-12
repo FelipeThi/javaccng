@@ -49,8 +49,8 @@ public class Choice extends Expansion {
   public Choice() {}
 
   public Choice(Token token) {
-    this.setLine(token.beginLine);
-    this.setColumn(token.beginColumn);
+    this.setLine(token.getBeginLine());
+    this.setColumn(token.getBeginColumn());
   }
 
   public Choice(Expansion expansion) {

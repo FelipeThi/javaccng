@@ -74,10 +74,10 @@ public class OtherFilesGen extends JavaCCGlobals implements JavaCCParserConstant
     ostr.println("/* " + getIdString(tn, cu_name + "Constants.java") + " */");
 
     if (cu_to_insertion_point_1.size() != 0 &&
-        ((Token)cu_to_insertion_point_1.get(0)).kind == PACKAGE
+        ((Token)cu_to_insertion_point_1.get(0)).getKind() == PACKAGE
        ) {
       for (int i = 1; i < cu_to_insertion_point_1.size(); i++) {
-        if (((Token)cu_to_insertion_point_1.get(i)).kind == SEMICOLON) {
+        if (((Token)cu_to_insertion_point_1.get(i)).getKind() == SEMICOLON) {
           printTokenSetup((Token)(cu_to_insertion_point_1.get(0)));
           for (int j = 0; j <= i; j++) {
             t = (Token)(cu_to_insertion_point_1.get(j));

@@ -244,7 +244,7 @@ public class NodeScope
     if (expansion_unit instanceof ASTBNFNonTerminal) {
       /* Should really make the nonterminal explicitly maintain its
          name. */
-      String nt = expansion_unit.getFirstToken().image;
+      String nt = expansion_unit.getFirstToken().getImage();
       ASTProduction prod = (ASTProduction)JJTreeGlobals.productions.get(nt);
       if (prod != null) {
         Enumeration e = prod.throws_list.elements();

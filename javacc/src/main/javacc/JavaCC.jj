@@ -95,9 +95,8 @@ public class JavaCCParser extends JavaCCParserInternals {
    * It is used to decide when the end of an "expansion" has been reached.
    */
   private boolean notTailOfExpansionUnit() throws java.io.IOException {
-    Token t;
-    t = getToken(1);
-    if (t.kind == BIT_OR || t.kind == COMMA || t.kind == RPAREN || t.kind == RBRACE || t.kind == RBRACKET) return false;
+    final Token t = getToken(1);
+    if (t.getKind() == BIT_OR || t.getKind() == COMMA || t.getKind() == RPAREN || t.getKind() == RBRACE || t.getKind() == RBRACKET) return false;
     return true;
   }
 
@@ -497,17 +496,17 @@ TOKEN :
 {
   < RUNSIGNEDSHIFT: ">>>" >
   {
-     matchedToken.kind = GT;
+     matchedToken.setKind(GT);
      ((Token.GTToken)matchedToken).realKind = RUNSIGNEDSHIFT;
      charStream.backup(2);
-     matchedToken.image = ">";
+     matchedToken.setImage(">");
   }
 | < RSIGNEDSHIFT: ">>" >
   {
-     matchedToken.kind = GT;
+     matchedToken.setKind(GT);
      ((Token.GTToken)matchedToken).realKind = RSIGNEDSHIFT;
      charStream.backup(1);
-     matchedToken.image = ">";
+     matchedToken.setImage(">");
   }
 | < GT: ">" >
 }
@@ -549,7 +548,7 @@ void javacc_input() :
 void javacc_options() :
 {}
 {
-  [ LOOKAHEAD({ getToken(1).image.equals("options") }) <IDENTIFIER>  "{" ( option_binding() )* "}" ]
+  [ LOOKAHEAD({ getToken(1).getImage().equals("options") }) <IDENTIFIER>  "{" ( option_binding() )* "}" ]
 	{
 	  Options.normalize();
 	}
@@ -566,7 +565,7 @@ void option_binding() :
 {
   ( <IDENTIFIER> | "LOOKAHEAD" | "IGNORE_CASE" | "static" )
 	{
-	  option_name = t.image;
+	  option_name = t.getImage();
 	}
   "="
   (
@@ -626,8 +625,8 @@ void javacode_production() :
 	  p.setFirstToken(t);
 	  java.util.List excName;
 	  p.setThrowsList(new java.util.ArrayList());
-	  p.setLine(t.beginLine);
-	  p.setColumn(t.beginColumn);
+	  p.setLine(t.getBeginLine());
+	  p.setColumn(t.getBeginColumn());
 	}
 {
   "JAVACODE"
@@ -669,8 +668,8 @@ void bnf_production() :
 	  java.util.List excName;
 	  String lhs;
 	  p.setThrowsList(new java.util.ArrayList());
-	  p.setLine(t.beginLine);
-	  p.setColumn(t.beginColumn);
+	  p.setLine(t.getBeginLine());
+	  p.setColumn(t.getBeginColumn());
 	  jumpPatched = false;
 	}
 {
@@ -715,7 +714,7 @@ void AccessModifier(NormalProduction p) :
 	( t = "public" | t = "protected" | t = "private" )?
 	{
 	  if(t != null){
-	    p.setAccessMod(t.image);
+	    p.setAccessMod(t.getImage());
 	  }
 	}
 }
@@ -725,8 +724,8 @@ void regular_expr_production() :
 	  TokenProduction p = new TokenProduction();
 	  java.util.List states;
 	  Token t = p.firstToken = getToken(1);
-	  p.setLine(t.beginLine);
-	  p.setColumn(t.beginColumn);
+	  p.setLine(t.getBeginLine());
+	  p.setColumn(t.getBeginColumn());
 	}
 {
 	{
@@ -746,11 +745,11 @@ void regular_expr_production() :
 	}
       t=<IDENTIFIER>
 	{
-	  states.add(t.image);
+	  states.add(t.getImage());
 	}
       ( "," t=<IDENTIFIER>
 	{
-	  states.add(t.image);
+	  states.add(t.getImage());
 	}
       )*
     ">"
@@ -850,7 +849,7 @@ void regexpr_spec(TokenProduction p) :
   ]
   [ ":" t=<IDENTIFIER>
 	{
-	  res.nextState = t.image;
+	  res.nextState = t.getImage();
 	  if (res.rexp.private_rexp) {
 	    JavaCCErrors.parse_error(t, "Lexical state changes are not permitted after private (#) regular expressions.");
 	  }
@@ -898,10 +897,10 @@ void expansion(Container c1) :
 	  Container c2 = new Container();
 	  Lookahead la = new Lookahead();
 	  Token t = getToken(1);
-	  seq.setLine(t.beginLine);
-	  seq.setColumn(t.beginColumn);
-	  la.setLine(t.beginLine);
-	  la.setColumn(t.beginColumn);
+	  seq.setLine(t.getBeginLine());
+	  seq.setColumn(t.getBeginColumn());
+	  la.setLine(t.getBeginLine());
+	  la.setColumn(t.getBeginColumn());
 	}
 {
 	{
@@ -941,8 +940,8 @@ Lookahead local_lookahead() :
 	  Lookahead la = new Lookahead();
 	  la.setExplicit(true);
 	  Token t = getToken(1);
-	  la.setLine(t.beginLine);
-	  la.setColumn(t.beginColumn);
+	  la.setLine(t.getBeginLine());
+	  la.setColumn(t.getBeginColumn());
 	  la.setLaExpansion(null);
 	  Container c = new Container();
 	  boolean commaAtEnd = false, emptyLA = true;
@@ -964,20 +963,20 @@ Lookahead local_lookahead() :
 	  la.setAmount(laAmount);
 	}
   ]
-  [ LOOKAHEAD(0, { !emptyLA && (getToken(1).kind != RPAREN) } )
+  [ LOOKAHEAD(0, { !emptyLA && (getToken(1).getKind() != RPAREN) } )
     ","
 	{
 	  commaAtEnd = true;
 	}
   ]
-  [ LOOKAHEAD(0, { getToken(1).kind != RPAREN && getToken(1).kind != LBRACE } )
+  [ LOOKAHEAD(0, { getToken(1).getKind() != RPAREN && getToken(1).getKind() != LBRACE } )
     expansion_choices(c)
 	{
 	  emptyLA = false; commaAtEnd = false;
 	  la.setLaExpansion((Expansion)c.member);
 	}
   ]
-  [ LOOKAHEAD(0, { !emptyLA && !commaAtEnd && (getToken(1).kind != RPAREN) } )
+  [ LOOKAHEAD(0, { !emptyLA && !commaAtEnd && (getToken(1).getKind() != RPAREN) } )
     ","
 	{
 	  commaAtEnd = true;
@@ -1022,8 +1021,8 @@ void expansion_unit(Container c) :
 	  Sequence seq = new Sequence(t, la);
 	  la.parent = seq; la.ordinal = 0;
 	  act = new Action();
-	  act.setLine(t.beginLine);
-	  act.setColumn(t.beginColumn);
+	  act.setLine(t.getBeginLine());
+	  act.setColumn(t.getBeginColumn());
 	  seq.units.add(act);
 	  act.parent = seq; act.ordinal = 1;
 	  ch.getChoices().add(seq);
@@ -1041,8 +1040,8 @@ void expansion_unit(Container c) :
 	{
 	  act = new Action();
 	  t = getToken(1);
-	  act.setLine(t.beginLine);
-	  act.setColumn(t.beginColumn);
+	  act.setLine(t.getBeginLine());
+	  act.setColumn(t.getBeginColumn());
 	  inAction = true;
 	}
   Block(act.getActionTokens())
@@ -1130,8 +1129,8 @@ void expansion_unit(Container c) :
 	{
 	  nt = new NonTerminal();
 	  t = getToken(1);
-	  nt.setLine(t.beginLine);
-	  nt.setColumn(t.beginColumn);
+	  nt.setLine(t.getBeginLine());
+	  nt.setColumn(t.getBeginColumn());
 	  nt.setLhsTokens(lhsTokens);
 	}
    name=identifier() Arguments(nt.getArgumentTokens())
@@ -1193,8 +1192,8 @@ void regular_expression(Container c) :
 	  }
 	  re.label = image;
 	  re.private_rexp = private_rexp;
-	  re.setLine(t.beginLine);
-	  re.setColumn(t.beginColumn);
+	  re.setLine(t.getBeginLine());
+	  re.setColumn(t.getBeginColumn());
 	  c.member = re;
 	}
 |
@@ -1207,8 +1206,8 @@ void regular_expression(Container c) :
   "<" "EOF" ">"
 	{
 	  ef = new REndOfFile();
-	  ef.setLine(t.beginLine);
-	  ef.setColumn(t.beginColumn);
+	  ef.setLine(t.getBeginLine());
+	  ef.setColumn(t.getBeginColumn());
 	  ef.ordinal = 0;
 	  c.member = ef;
 	}
@@ -1305,8 +1304,8 @@ void complex_regular_expression_unit(Container c) :
    | "?"
 	{
 	  RZeroOrOne zorexp = new RZeroOrOne();
-	  zorexp.setLine(t.beginLine);
-	  zorexp.setColumn(t.beginColumn);
+	  zorexp.setLine(t.getBeginLine());
+	  zorexp.setColumn(t.getBeginColumn());
 	  zorexp.regexpr = (RegularExpression)c.member;
 	  c.member = zorexp;
 	}
@@ -1315,8 +1314,8 @@ void complex_regular_expression_unit(Container c) :
      "}"
 	{
 	  RRepetitionRange rrrexp = new RRepetitionRange();
-	  rrrexp.setLine(t.beginLine);
-	  rrrexp.setColumn(t.beginColumn);
+	  rrrexp.setLine(t.getBeginLine());
+	  rrrexp.setColumn(t.getBeginColumn());
 	  rrrexp.min = r1;
 	  rrrexp.max = r2;
         rrrexp.hasMax = hasMax;
@@ -1330,8 +1329,8 @@ void character_list(Container c1) :
 	{
 	  RCharacterList chlist = new RCharacterList();
 	  Token t = getToken(1);
-	  chlist.setLine(t.beginLine);
-	  chlist.setColumn(t.beginColumn);
+	  chlist.setLine(t.getBeginLine());
+	  chlist.setColumn(t.getBeginColumn());
 	  Container c2 = new Container();
 	}
 {
@@ -1377,15 +1376,15 @@ void character_descriptor(Container c) :
 	{
 	  if (isrange) {
 	    CharacterRange cr = new CharacterRange();
-	    cr.setLine(t.beginLine);
-	    cr.setColumn(t.beginColumn);
+	    cr.setLine(t.getBeginLine());
+	    cr.setColumn(t.getBeginColumn());
         cr.setLeft(c1);
         cr.setRight(c2);
 	    c.member = cr;
 	  } else {
 	    SingleCharacter sc = new SingleCharacter();
-	    sc.setLine(t.beginLine);
-	    sc.setColumn(t.beginColumn);
+	    sc.setLine(t.getBeginLine());
+	    sc.setColumn(t.getBeginColumn());
 	    sc.ch = c1;
 	    c.member = sc;
 	  }
@@ -1399,7 +1398,7 @@ String identifier() :
 {
   t=<IDENTIFIER>
 	{
-	  return t.image;
+	  return t.getImage();
 	}
 }
 
@@ -1435,9 +1434,9 @@ Token JavaIdentifier() :
 | "EOF"
 )
 	{
-	  Token retval = getToken(0);
-	  retval.kind = IDENTIFIER;
-	  return retval;
+	  final Token t = getToken(0);
+	  t.setKind(IDENTIFIER);
+	  return t;
 	}
 }
 
@@ -1556,7 +1555,7 @@ void ClassOrInterfaceDeclaration(int modifiers, List tokens):
   [ ExtendsList(isInterface) ]
   [ ImplementsList(isInterface) ]
 	{
-	  if (t.image.equals(parser_class_name) && class_nesting == 1 && processing_cu) {
+	  if (t.getImage().equals(parser_class_name) && class_nesting == 1 && processing_cu) {
 	    is_parser_class = true;
 	    setinsertionpoint(getToken(1), 1);
 	  }
@@ -2193,7 +2192,7 @@ int IntegerLiteral() :
   <INTEGER_LITERAL>
 	{
 	  try {
-	    return Integer.parseInt(token.image);
+	    return Integer.parseInt(token.getImage());
 	  } catch (NumberFormatException e) {
 	    throw new Error();
 	  }
@@ -2221,7 +2220,7 @@ String StringLiteral() :
 {
   t=<STRING_LITERAL>
 	{
-	  return remove_escapes_and_quotes(t, t.image);
+	  return remove_escapes_and_quotes(t, t.getImage());
 	}
 }
 
@@ -2524,7 +2523,7 @@ void ReturnStatement() :
 	  // Add if statement to prevent subsequent code generated
 	  // from being dead code.
 	  if (inAction) {
-	    t.image = "{if (true) return";
+	    t.setImage("{if (true) return");
 	    jumpPatched = true;
 	  }
 	}
@@ -2535,7 +2534,7 @@ void ReturnStatement() :
 	{
 	  // Add closing brace for above if statement.
 	  if (inAction) {
-	    t.image = ";}";
+	    t.setImage(";}");
 	  }
 	}
 }
@@ -2550,7 +2549,7 @@ void ThrowStatement() :
 	  // Add if statement to prevent subsequent code generated
 	  // from being dead code.
 	  if (inAction) {
-	    t.image = "{if (true) throw";
+	    t.setImage("{if (true) throw");
 	    jumpPatched = true;
 	  }
 	}
@@ -2559,7 +2558,7 @@ void ThrowStatement() :
 	{
 	  // Add closing brace for above if statement.
 	  if (inAction) {
-	    t.image = ";}";
+	    t.setImage(";}");
 	  }
 	}
 }
@@ -2589,7 +2588,7 @@ void TryStatement():
 void RUNSIGNEDSHIFT():
 {}
 {
-  ( LOOKAHEAD({ getToken(1).kind == GT &&
+  ( LOOKAHEAD({ getToken(1).getKind() == GT &&
                 ((Token.GTToken)getToken(1)).realKind == RUNSIGNEDSHIFT} )
    ">" ">" ">"
   )
@@ -2598,7 +2597,7 @@ void RUNSIGNEDSHIFT():
 void RSIGNEDSHIFT():
 {}
 {
-  ( LOOKAHEAD({ getToken(1).kind == GT &&
+  ( LOOKAHEAD({ getToken(1).getKind() == GT &&
                 ((Token.GTToken)getToken(1)).realKind == RSIGNEDSHIFT} )
   ">" ">"
   )

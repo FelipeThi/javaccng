@@ -82,8 +82,8 @@ public class ParseException extends Exception {
    * gets displayed.
    */
   private static String initialise(Token currentToken,
-                           int[][] expectedTokenSequences,
-                           String[] tokenImage) {
+                                   int[][] expectedTokenSequences,
+                                   String[] tokenImage) {
     String eol = System.getProperty("line.separator", "\n");
     StringBuffer expected = new StringBuffer();
     int maxSize = 0;
@@ -99,31 +99,34 @@ public class ParseException extends Exception {
       }
       expected.append(eol).append("    ");
     }
-    String retval = "Encountered \"";
-    Token tok = currentToken.next;
+    String s = "Encountered \"";
+    Token t = currentToken.next;
     for (int i = 0; i < maxSize; i++) {
-      if (i != 0) retval += " ";
-      if (tok.kind == 0) {
-        retval += tokenImage[0];
+      if (i != 0) {
+        s += " ";
+      }
+      if (t.getKind() == 0) {
+        s += tokenImage[0];
         break;
       }
-      retval += " " + tokenImage[tok.kind];
-      retval += " \"";
-      retval += escape(tok.image);
-      retval += " \"";
-      tok = tok.next;
+      s += " " + tokenImage[t.getKind()];
+      s += " \"";
+      s += escape(t.getImage());
+      s += " \"";
+      t = t.next;
     }
 #if KEEP_LINE_COLUMN
-    retval += "\" at line " + currentToken.next.beginLine + ", column " + currentToken.next.beginColumn;
+    s += "\" at line " + currentToken.next.getBeginLine() + ", column " + currentToken.next.getBeginColumn();
 #fi
-    retval += "." + eol;
+    s += "." + eol;
     if (expectedTokenSequences.length == 1) {
-      retval += "Was expecting:" + eol + "    ";
-    } else {
-      retval += "Was expecting one of:" + eol + "    ";
+      s += "Was expecting:" + eol + "    ";
     }
-    retval += expected.toString();
-    return retval;
+    else {
+      s += "Was expecting one of:" + eol + "    ";
+    }
+    s += expected.toString();
+    return s;
   }
 
   /**

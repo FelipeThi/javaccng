@@ -295,8 +295,8 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
       return;
     }
     TryBlock tblk = new TryBlock();
-    tblk.setLine(tryLoc.beginLine);
-    tblk.setColumn(tryLoc.beginColumn);
+    tblk.setLine(tryLoc.getBeginLine());
+    tblk.setColumn(tryLoc.getBeginColumn());
     tblk.exp = (Expansion)(nestedExp.member);
     tblk.exp.parent = tblk;
     tblk.exp.ordinal = 0;

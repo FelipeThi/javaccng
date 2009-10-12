@@ -41,11 +41,11 @@ public final class TokenUtils
     if (tt != null) {
       while (tt.specialToken != null) tt = tt.specialToken;
       while (tt != null) {
-        io.print(addUnicodeEscapes(tt.image));
+        io.print(addUnicodeEscapes(tt.getImage()));
         tt = tt.next;
       }
     }
-    String i = t.image;
+    String i = t.getImage();
     if (in != null && i.equals(in)) {
       i = out;
     }

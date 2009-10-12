@@ -49,8 +49,8 @@ public class RJustName extends RegularExpression {
     public RJustName() {}
 
     public RJustName(Token token, String image) {
-        this.setLine(token.beginLine);
-        this.setColumn(token.beginColumn);
+        this.setLine(token.getBeginLine());
+        this.setColumn(token.getBeginColumn());
         this.label = image;
     }
 

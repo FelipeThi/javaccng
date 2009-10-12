@@ -333,7 +333,7 @@ public class ParseEngine extends JavaCCGlobals {
             case NOOPENSTM:
               retval += "\n" + "switch (";
               if (Options.getCacheTokens()) {
-                retval += "jj_nt.kind) {\u0001";
+                retval += "jj_nt.getKind()) {\u0001";
               }
               else {
                 retval += "(jj_ntk==-1)?jj_ntk():jj_ntk) {\u0001";
@@ -493,15 +493,15 @@ public class ParseEngine extends JavaCCGlobals {
     Token t;
     t = (Token) (p.getReturnTypeTokens().get(0));
     boolean voidReturn = false;
-    if (t.kind == JavaCCParserConstants.VOID) {
+    if (t.getKind() == JavaCCParserConstants.VOID) {
       voidReturn = true;
     }
     printTokenSetup(t);
     ccol = 1;
     printLeadingComments(t, ostr);
     ostr.print("  final " + (p.getAccessMod() != null ? p.getAccessMod() : "public") + " ");
-    cline = t.beginLine;
-    ccol = t.beginColumn;
+    cline = t.getBeginLine();
+    ccol = t.getBeginColumn();
     printTokenOnly(t, ostr);
     for (int i = 1; i < p.getReturnTypeTokens().size(); i++) {
       t = (Token) (p.getReturnTypeTokens().get(i));
@@ -523,7 +523,7 @@ public class ParseEngine extends JavaCCGlobals {
       java.util.List name = (java.util.List) it.next();
       for (java.util.Iterator it2 = name.iterator(); it2.hasNext();) {
         t = (Token) it2.next();
-        ostr.print(t.image);
+        ostr.print(t.getImage());
       }
     }
     ostr.print(" {");
@@ -582,7 +582,7 @@ public class ParseEngine extends JavaCCGlobals {
         retval += printTrailingComments(t);
         retval += " = ";
       }
-      String tail = e_nrw.rhsToken == null ? ");" : ")." + e_nrw.rhsToken.image + ";";
+      String tail = e_nrw.rhsToken == null ? ");" : ")." + e_nrw.rhsToken.getImage() + ";";
       if (e_nrw.label.equals("")) {
         Object label = names_of_tokens.get(new Integer(e_nrw.ordinal));
         if (label != null) {
@@ -1203,8 +1203,8 @@ public class ParseEngine extends JavaCCGlobals {
         ccol = 1;
         printLeadingComments(t, ostr);
         ostr.print("  " + (p.getAccessMod() != null ? p.getAccessMod() + " " : ""));
-        cline = t.beginLine;
-        ccol = t.beginColumn;
+        cline = t.getBeginLine();
+        ccol = t.getBeginColumn();
         printTokenOnly(t, ostr);
         for (int i = 1; i < jp.getReturnTypeTokens().size(); i++) {
           t = (Token) (jp.getReturnTypeTokens().get(i));
@@ -1226,7 +1226,7 @@ public class ParseEngine extends JavaCCGlobals {
           java.util.List name = (java.util.List) it.next();
           for (java.util.Iterator it2 = name.iterator(); it2.hasNext();) {
             t = (Token) it2.next();
-            ostr.print(t.image);
+            ostr.print(t.getImage());
           }
         }
         ostr.print(" {");

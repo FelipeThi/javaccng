@@ -51,7 +51,7 @@ public class ASTCompilationUnit extends JJTreeNode {
       }
 
       if (t == JJTreeGlobals.parserImplements) {
-        if (t.image.equals("implements")) {
+        if (t.getImage().equals("implements")) {
           print(t, io);
           openJJTreeComment(io, null);
           io.getOut().print(" " + NodeFiles.nodeConstants() + ", ");

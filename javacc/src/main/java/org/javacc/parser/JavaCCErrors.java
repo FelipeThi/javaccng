@@ -53,7 +53,7 @@ public final class JavaCCErrors {
       System.err.print("Line " + n.getLine() + ", Column " + n.getColumn() + ": ");
     } else if (node instanceof Token) {
       Token t = (Token)node;
-      System.err.print("Line " + t.beginLine + ", Column " + t.beginColumn + ": ");
+      System.err.print("Line " + t.getBeginLine() + ", Column " + t.getBeginColumn() + ": ");
     }
   }
 

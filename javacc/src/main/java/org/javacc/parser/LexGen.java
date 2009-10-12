@@ -105,18 +105,18 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
           break;
         }
 
-        kind = ((Token) cu_to_insertion_point_1.get(l)).kind;
+        kind = ((Token) cu_to_insertion_point_1.get(l)).getKind();
         if (kind == PACKAGE || kind == IMPORT) {
           for (; i < cu_to_insertion_point_1.size(); i++) {
-            kind = ((Token) cu_to_insertion_point_1.get(i)).kind;
+            kind = ((Token) cu_to_insertion_point_1.get(i)).getKind();
             if (kind == SEMICOLON ||
                 kind == ABSTRACT ||
                 kind == FINAL ||
                 kind == PUBLIC ||
                 kind == CLASS ||
                 kind == INTERFACE) {
-              cline = ((Token) (cu_to_insertion_point_1.get(l))).beginLine;
-              ccol = ((Token) (cu_to_insertion_point_1.get(l))).beginColumn;
+              cline = ((Token) (cu_to_insertion_point_1.get(l))).getBeginLine();
+              ccol = ((Token) (cu_to_insertion_point_1.get(l))).getBeginColumn();
               for (j = l; j < i; j++) {
                 printToken((Token) (cu_to_insertion_point_1.get(j)), ostr);
               }
@@ -158,10 +158,10 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
 
       for (j = 0; j < token_mgr_decls.size(); j++) {
         t = (Token) token_mgr_decls.get(j);
-        if (t.kind == IDENTIFIER &&
+        if (t.getKind() == IDENTIFIER &&
             commonTokenActionNeeded &&
             !commonTokenActionSeen) {
-          commonTokenActionSeen = t.image.equals("CommonTokenAction");
+          commonTokenActionSeen = t.getImage().equals("CommonTokenAction");
         }
 
         printToken(t, ostr);
@@ -183,10 +183,14 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
     }
 
     ostr.println("");
-    ostr.println("  /** Debug output. */");
-    ostr.println("  public  java.io.PrintStream debugStream = System.out;");
-    ostr.println("  /** Set debug output. */");
-    ostr.println("  public  void setDebugStream(java.io.PrintStream ds) { debugStream = ds; }");
+    if (Options.getDebugTokenManager()) {
+      ostr.println("  /** Debug output. */");
+      ostr.println("  public  java.io.PrintStream debugStream = System.out;");
+      ostr.println("");
+      ostr.println("  /** Set debug output. */");
+      ostr.println("  public  void setDebugStream(java.io.PrintStream ds) { debugStream = ds; }");
+      ostr.println("");
+    }
 
     if (Options.getTokenManagerUsesParser()) {
       ostr.println("");
@@ -733,7 +737,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
       ostr.println("\n};");
     }
 
-    ostr.println("protected CharStream charStream;");
+    ostr.println("protected final CharStream charStream;");
 
     ostr.println("private final int[] jjrounds = " +
         "new int[" + stateSetSize + "];");
@@ -814,18 +818,9 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
   }
 
   static void DumpFillToken() {
-    final double tokenVersion = JavaFiles.getVersion("Token.java");
-    final boolean hasBinaryNewToken = tokenVersion > 4.09;
-
     ostr.println("protected Token jjFillToken()");
     ostr.println("{");
     ostr.println("   final String curTokenImage;");
-    if (keepLineCol) {
-      ostr.println("   final int beginLine;");
-      ostr.println("   final int endLine;");
-      ostr.println("   final int beginColumn;");
-      ostr.println("   final int endColumn;");
-    }
 
     if (hasEmptyMatch) {
       ostr.println("   if (jjmatchedPos < 0)");
@@ -836,60 +831,50 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
       ostr.println("         curTokenImage = image.toString();");
 
       if (keepLineCol) {
-        ostr.println("      beginLine = endLine = charStream.getBeginLine();");
-        ostr.println("      beginColumn = endColumn = charStream.getBeginColumn();");
+        ostr.println("   final int beginLine = charStream.getBeginLine();");
+        ostr.println("   final int beginColumn = charStream.getBeginColumn();");
+        ostr.println("   final int endLine = charStream.getBeginLine();");
+        ostr.println("   final int endColumn = charStream.getBeginColumn();");
       }
 
       ostr.println("   }");
       ostr.println("   else");
       ostr.println("   {");
-      ostr.println("      String im = jjstrLiteralImages[jjmatchedKind];");
-      ostr.println("      curTokenImage = (im == null) ? charStream.getImage() : im;");
+      ostr.println("      final String literalImage = jjstrLiteralImages[jjmatchedKind];");
+      ostr.println("      curTokenImage = literalImage == null ? charStream.getImage() : literalImage;");
 
       if (keepLineCol) {
-        ostr.println("      beginLine = charStream.getBeginLine();");
-        ostr.println("      beginColumn = charStream.getBeginColumn();");
-        ostr.println("      endLine = charStream.getEndLine();");
-        ostr.println("      endColumn = charStream.getEndColumn();");
+        ostr.println("      final int beginLine = charStream.getBeginLine();");
+        ostr.println("      final int beginColumn = charStream.getBeginColumn();");
+        ostr.println("      final int endLine = charStream.getEndLine();");
+        ostr.println("      final int endColumn = charStream.getEndColumn();");
       }
 
       ostr.println("   }");
     }
     else {
-      ostr.println("   String im = jjstrLiteralImages[jjmatchedKind];");
-      ostr.println("   curTokenImage = (im == null) ? charStream.getImage() : im;");
+      ostr.println("   final String literalImage = jjstrLiteralImages[jjmatchedKind];");
+      ostr.println("   curTokenImage = literalImage == null ? charStream.getImage() : literalImage;");
       if (keepLineCol) {
-        ostr.println("   beginLine = charStream.getBeginLine();");
-        ostr.println("   beginColumn = charStream.getBeginColumn();");
-        ostr.println("   endLine = charStream.getEndLine();");
-        ostr.println("   endColumn = charStream.getEndColumn();");
+        ostr.println("   final int beginLine = charStream.getBeginLine();");
+        ostr.println("   final int beginColumn = charStream.getBeginColumn();");
+        ostr.println("   final int endLine = charStream.getEndLine();");
+        ostr.println("   final int endColumn = charStream.getEndColumn();");
       }
     }
 
     if (Options.getTokenFactory().length() > 0) {
       ostr.println("   final Token t = " + Options.getTokenFactory() + ".newToken(jjmatchedKind, curTokenImage);");
     }
-    else if (hasBinaryNewToken) {
+    else {
       ostr.println("   final Token t = Token.newToken(jjmatchedKind, curTokenImage);");
     }
-    else {
-      ostr.println("   final Token t = Token.newToken(jjmatchedKind);");
-      ostr.println("   t.kind = jjmatchedKind;");
-      ostr.println("   t.image = curTokenImage;");
-    }
 
-    ostr.println("   t.beginOffset = charStream.getBeginOffset();");
-    ostr.println("   t.endOffset = charStream.getEndOffset();");
-
+    ostr.println("   t.setOffset(charStream.getBeginOffset(), charStream.getEndOffset());");
     if (keepLineCol) {
-      ostr.println("");
-      ostr.println("   t.beginLine = beginLine;");
-      ostr.println("   t.endLine = endLine;");
-      ostr.println("   t.beginColumn = beginColumn;");
-      ostr.println("   t.endColumn = endColumn;");
+      ostr.println("   t.setLineColumn(beginLine, beginColumn, endLine, endColumn);");
     }
 
-    ostr.println("");
     ostr.println("   return t;");
     ostr.println("}");
   }

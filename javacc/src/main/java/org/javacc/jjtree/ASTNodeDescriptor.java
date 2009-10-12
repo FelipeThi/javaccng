@@ -30,7 +30,6 @@ package org.javacc.jjtree;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Vector;
 
 public class ASTNodeDescriptor extends JJTreeNode {
   ASTNodeDescriptor(int id) {
@@ -133,15 +132,15 @@ public class ASTNodeDescriptor extends JJTreeNode {
 
   private String expression_text()
   {
-    if (expression.getFirstToken().image.equals(")") &&
-      expression.getLastToken().image.equals("(")) {
+    if (expression.getFirstToken().getImage().equals(")") &&
+      expression.getLastToken().getImage().equals("(")) {
       return "true";
     }
 
     String s = "";
     Token t = expression.getFirstToken();
     while (true) {
-       s += " " + t.image;
+       s += " " + t.getImage();
        if (t == expression.getLastToken()) {
          break;
        }

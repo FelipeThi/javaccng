@@ -110,15 +110,15 @@ public class JJTreeNode extends SimpleNode {
 
   String translateImage(Token t)
   {
-    return t.image;
+    return t.getImage();
   }
 
   String whiteOut(Token t)
   {
-    StringBuffer sb = new StringBuffer(t.image.length());
+    StringBuffer sb = new StringBuffer(t.getImage().length());
 
-    for (int i = 0; i < t.image.length(); ++i) {
-      char ch = t.image.charAt(i);
+    for (int i = 0; i < t.getImage().length(); ++i) {
+      char ch = t.getImage().charAt(i);
       if (ch != '\t' && ch != '\n' && ch != '\r' && ch != '\f') {
         sb.append(' ');
       } else {
@@ -162,14 +162,14 @@ public class JJTreeNode extends SimpleNode {
       return;
     }
 
-    if (t.image.equals("jjtThis")) {
+    if (t.getImage().equals("jjtThis")) {
       io.print(s.getNodeVariable());
       return;
-    } else if (t.image.equals("jjtree")) {
-      if (t.next.image.equals(".")) {
-        if (t.next.next.image.equals("currentNode")) {
-          if (t.next.next.next.image.equals("(")) {
-            if (t.next.next.next.next.image.equals(")")) {
+    } else if (t.getImage().equals("jjtree")) {
+      if (t.next.getImage().equals(".")) {
+        if (t.next.next.getImage().equals("currentNode")) {
+          if (t.next.next.next.getImage().equals("(")) {
+            if (t.next.next.next.next.getImage().equals(")")) {
               /* Found `jjtree.currentNode()' so go into white out
                  mode.  We'll stay in this mode until we find the
                  closing parenthesis. */
@@ -180,14 +180,14 @@ public class JJTreeNode extends SimpleNode {
       }
     }
     if (whitingOut) {
-      if (t.image.equals("jjtree")) {
+      if (t.getImage().equals("jjtree")) {
         io.print(s.getNodeVariable());
         io.print(" ");
-      } else if (t.image.equals(")")) {
+      } else if (t.getImage().equals(")")) {
         io.print(" ");
         whitingOut = false;
       } else {
-        for (int i = 0; i < t.image.length(); ++i) {
+        for (int i = 0; i < t.getImage().length(); ++i) {
           io.print(" ");
         }
       }
@@ -223,7 +223,7 @@ public class JJTreeNode extends SimpleNode {
   String getIndentation(JJTreeNode n, int offset)
   {
     String s = "";
-    for (int i = offset + 1; i < n.getFirstToken().beginColumn; ++i) {
+    for (int i = offset + 1; i < n.getFirstToken().getBeginColumn(); ++i) {
       s += " ";
     }
     return s;

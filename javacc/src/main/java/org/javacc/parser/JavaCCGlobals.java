@@ -27,11 +27,11 @@
  */
 package org.javacc.parser;
 
+import org.javacc.Version;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.javacc.Version;
 
 /**
  * This package contains data created as a result of parsing and semanticizing
@@ -394,25 +394,25 @@ public class JavaCCGlobals {
   static protected void printTokenSetup(Token t) {
     Token tt = t;
     while (tt.specialToken != null) tt = tt.specialToken;
-    cline = tt.beginLine;
-    ccol = tt.beginColumn;
+    cline = tt.getBeginLine();
+    ccol = tt.getBeginColumn();
   }
 
   static protected void printTokenOnly(Token t, java.io.PrintWriter ostr) {
-    for (; cline < t.beginLine; cline++) {
+    for (; cline < t.getBeginLine(); cline++) {
       ostr.println(""); ccol = 1;
     }
-    for (; ccol < t.beginColumn; ccol++) {
+    for (; ccol < t.getBeginColumn(); ccol++) {
       ostr.print(" ");
     }
-    if (t.kind == JavaCCParserConstants.STRING_LITERAL ||
-        t.kind == JavaCCParserConstants.CHARACTER_LITERAL)
-       ostr.print(addUnicodeEscapes(t.image));
+    if (t.getKind() == JavaCCParserConstants.STRING_LITERAL ||
+        t.getKind() == JavaCCParserConstants.CHARACTER_LITERAL)
+       ostr.print(addUnicodeEscapes(t.getImage()));
     else
-       ostr.print(t.image);
-    cline = t.endLine;
-    ccol = t.endColumn+1;
-    char last = t.image.charAt(t.image.length()-1);
+       ostr.print(t.getImage());
+    cline = t.getEndLine();
+    ccol = t.getEndColumn() +1;
+    char last = t.getImage().charAt(t.getImage().length()-1);
     if (last == '\n' || last == '\r') {
       cline++; ccol = 1;
     }
@@ -449,7 +449,7 @@ public class JavaCCGlobals {
       printTokenOnly(tt, ostr);
       tt = tt.next;
     }
-    if (ccol != 1 && cline != t.beginLine) {
+    if (ccol != 1 && cline != t.getBeginLine()) {
       ostr.println("");
       cline++; ccol = 1;
     }
@@ -462,20 +462,20 @@ public class JavaCCGlobals {
 
   static protected String printTokenOnly(Token t) {
     String retval = "";
-    for (; cline < t.beginLine; cline++) {
+    for (; cline < t.getBeginLine(); cline++) {
       retval += "\n"; ccol = 1;
     }
-    for (; ccol < t.beginColumn; ccol++) {
+    for (; ccol < t.getBeginColumn(); ccol++) {
       retval += " ";
     }
-    if (t.kind == JavaCCParserConstants.STRING_LITERAL ||
-        t.kind == JavaCCParserConstants.CHARACTER_LITERAL)
-       retval += addUnicodeEscapes(t.image);
+    if (t.getKind() == JavaCCParserConstants.STRING_LITERAL ||
+        t.getKind() == JavaCCParserConstants.CHARACTER_LITERAL)
+       retval += addUnicodeEscapes(t.getImage());
     else
-       retval += t.image;
-    cline = t.endLine;
-    ccol = t.endColumn+1;
-    char last = t.image.charAt(t.image.length()-1);
+       retval += t.getImage();
+    cline = t.getEndLine();
+    ccol = t.getEndColumn() +1;
+    char last = t.getImage().charAt(t.getImage().length()-1);
     if (last == '\n' || last == '\r') {
       cline++; ccol = 1;
     }
@@ -505,7 +505,7 @@ public class JavaCCGlobals {
       retval += printTokenOnly(tt);
       tt = tt.next;
     }
-    if (ccol != 1 && cline != t.beginLine) {
+    if (ccol != 1 && cline != t.getBeginLine()) {
       retval += "\n";
       cline++; ccol = 1;
     }

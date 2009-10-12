@@ -6,36 +6,16 @@
 
 package org.javacc.jjtree;
 
-/**
- * Describes the input token stream.
- */
-
+/** Describes the input token stream. */
 public class Token {
-
-  /**
-   * An integer that describes the kind of this token.  This numbering
-   * system is determined by JavaCCParser, and a table of these numbers is
-   * stored in the file ...Constants.java.
-   */
-  public int kind;
-
-  public int beginOffset;
-
-  public int endOffset;
-
-  /** The line number of the first character of this Token. */
-  public int beginLine;
-  /** The column number of the first character of this Token. */
-  public int beginColumn;
-  /** The line number of the last character of this Token. */
-  public int endLine;
-  /** The column number of the last character of this Token. */
-  public int endColumn;
-
-  /**
-   * The string image of the token.
-   */
-  public String image;
+  private int kind;
+  private int beginOffset;
+  private int endOffset;
+  private int beginLine;
+  private int beginColumn;
+  private int endLine;
+  private int endColumn;
+  private String image;
 
   /**
    * A reference to the next regular (non-special) token from the input
@@ -61,45 +41,117 @@ public class Token {
    */
   public Token specialToken;
 
-  /**
-   * An optional attribute value of the Token.
-   * Tokens which are not used as syntactic sugar will often contain
-   * meaningful values that will be used later on by the compiler or
-   * interpreter. This attribute value is often different from the image.
-   * Any subclass of Token that actually wants to return a non-null value can
-   * override this method as appropriate.
-   */
-  public Object getValue() {
-    return null;
-  }
-
-  /**
-   * No-argument contructor
-   */
+  /** No-argument contructor */
   public Token() {}
 
-  /**
-   * Constructs a new token for the specified Image.
-   */
-  public Token(int kind)
-  {
+  /** Constructs a new token for the specified Image. */
+  public Token(int kind) {
     this(kind, null);
   }
 
-  /**
-   * Constructs a new token for the specified Image and Kind.
-   */
-  public Token(int kind, String image)
-  {
+  /** Constructs a new token for the specified Image and Kind. */
+  public Token(int kind, String image) {
     this.kind = kind;
     this.image = image;
   }
 
   /**
-   * Returns the image.
+   * Gets an integer that describes the kind of this token.
+   *
+   * This numbering system is determined by JavaCCParser, and a table of these numbers is
+   * stored in the file ...Constants.java.
+   *
+   * @return Token kind.
    */
-  public String toString()
-  {
+  public int getKind() {
+    return kind;
+  }
+
+  /**
+   * Change token kind.
+   *
+   * @param kind New token kind.
+   */
+  public void setKind(final int kind) {
+    this.kind = kind;
+  }
+
+  /**
+   * Gets text matched by this token.
+   *
+   * @return Token image.
+   */
+  public String getImage() {
+    return image;
+  }
+
+  /**
+   * Change token image.
+   *
+   * @param image New token image.
+   */
+  public void setImage(final String image) {
+    this.image = image;
+  }
+
+  /** @return Index of the first character of the token, inclusive. */
+  public int getBeginOffset() {
+    return beginOffset;
+  }
+
+  /** @return Index of the last character of the token, exclusive. */
+  public int getEndOffset() {
+    return endOffset;
+  }
+
+  /**
+   * Set index of first and last token character.
+   *
+   * @param begin Index of the first character of the token, inclusive.
+   * @param end   Index of the last character of the token, exclusive.
+   */
+  public void setOffset(int begin, int end) {
+    beginOffset = begin;
+    endOffset = end;
+  }
+
+  /** @return The line number of the first character of this token. */
+  public int getBeginLine() {
+    return beginLine;
+  }
+
+  /** @return The column number of the first character of this token. */
+  public int getBeginColumn() {
+    return beginColumn;
+  }
+
+  /** @return The line number of the last character of this token. */
+  public int getEndLine() {
+    return endLine;
+  }
+
+  /** @return The column number of the last character of this token. */
+  public int getEndColumn() {
+    return endColumn;
+  }
+
+  /**
+   * Set token line and column numbers.
+   *
+   * @param beginLine   The line number of the first character of this token
+   * @param beginColumn The column number of the first character of this token.
+   * @param endLine     The line number of the last character of this token.
+   * @param endColumn   The column number of the last character of this token.
+   */
+  public void setLineColumn(int beginLine, int beginColumn, int endLine, int endColumn) {
+    this.beginLine = beginLine;
+    this.beginColumn = beginColumn;
+    this.endLine = endLine;
+    this.endColumn = endColumn;
+  }
+
+  /** Returns the image. */
+  public String toString() {
     return image;
   }
 
@@ -110,35 +162,33 @@ public class Token {
    * For example, if you have a subclass of Token called IDToken that
    * you want to create if ofKind is ID, simply add something like :
    *
-   *    case MyParserConstants.ID : return new IDToken(ofKind, image);
+   * case MyParserConstants.ID : return new IDToken(ofKind, image);
    *
    * to the following switch statement. Then you can cast matchedToken
    * variable to the appropriate type and use it in your lexical actions.
+   *
+   * @param ofKind Token kind.
+   * @param image  Token image.
+   * @return New token instance.
    */
-  public static final Token newToken(int ofKind, String image)
-  {
-    switch(ofKind)
-    {
-    default : return new Token(ofKind, image);
-    case JJTreeParserConstants.RUNSIGNEDSHIFT:
-    case JJTreeParserConstants.RSIGNEDSHIFT:
-    case JJTreeParserConstants.GT:
-      return new GTToken(ofKind, image);
+  public static Token newToken(int ofKind, String image) {
+    switch (ofKind) {
+      default:
+        return new Token(ofKind, image);
+      case JJTreeParserConstants.RUNSIGNEDSHIFT:
+      case JJTreeParserConstants.RSIGNEDSHIFT:
+      case JJTreeParserConstants.GT:
+        return new GTToken(ofKind, image);
     }
   }
 
-  public static final Token newToken(int ofKind)
-  {
+  public static Token newToken(int ofKind) {
     return newToken(ofKind, null);
   }
 
-  /**
-   * Greater than Token.
-   */
-  public static class GTToken extends Token
-  {
-    public GTToken(int kind, String image)
-    {
+  /** Greater than Token. */
+  public static class GTToken extends Token {
+    public GTToken(int kind, String image) {
       super(kind, image);
     }
 

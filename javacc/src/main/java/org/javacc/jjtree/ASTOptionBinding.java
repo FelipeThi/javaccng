@@ -65,7 +65,7 @@ public class ASTOptionBinding extends JJTreeNode {
     if (suppressed) {
       return whiteOut(t);
     } else {
-      return t.image;
+      return t.getImage();
     }
   }
 }
