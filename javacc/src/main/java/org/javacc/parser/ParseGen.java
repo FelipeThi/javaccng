@@ -153,7 +153,7 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
       ostr.println("");
 
       ostr.println("  /** Constructor with either generated or user provided Token Manager. */");
-      ostr.println("  public " + cu_name + "(TokenManager tm) {");
+      ostr.println("  public " + cu_name + "(TokenManager tm) throws java.io.IOException, ParseException {");
       ostr.println("    tokenManager = tm;");
       ostr.println("    token = new Token();");
       if (Options.getCacheTokens()) {
