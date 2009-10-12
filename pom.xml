@@ -8,6 +8,7 @@
   <packaging>pom</packaging>
   <modules>
     <module>javacc</module>
+    <module>javacc-tests</module>
     <module>javacc-examples</module>
     <module>javacc-example-java</module>
     <!--<module>javacc-maven-plugin</module>-->

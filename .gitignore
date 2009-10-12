@@ -1,5 +1,6 @@
 javacc-maven-plugin
 target
+out-dir
 *~
 *.iml
 *.ipr
