@@ -3,7 +3,7 @@
  * is never expected to throw this exception.
  * Therefore it extends Error rather than Exception.
  */
-${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class TokenMgrError extends Error {
+${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class TokenManagerError extends Error {
 /** lexical error occurred. */
   public static final int LEXICAL_ERROR = 0;
 
@@ -20,7 +20,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class TokenMgrError extends Error {
   private final int errorCode;
 
   /** Constructor with message and reason. */
-  public TokenMgrError(String message, int errorCode) {
+  public TokenManagerError(String message, int errorCode) {
     super(message);
     this.errorCode = errorCode;
   }
@@ -35,7 +35,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class TokenMgrError extends Error {
    * @param prefix   Prefix that was seen before this error occurred.
    * @param curChar  The offending character.
    */
-  public TokenMgrError(boolean eof, int lexState, int line, int column, String prefix, int curChar, int errorCode) {
+  public TokenManagerError(boolean eof, int lexState, int line, int column, String prefix, int curChar, int errorCode) {
     this(lexicalError(eof, lexState, line, column, prefix, curChar), errorCode);
   }
 
@@ -74,7 +74,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class TokenMgrError extends Error {
    * @param prefix   Prefix that was seen before this error occurred.
    * @param curChar  The offending character.
    */
-  protected static String lexicalError(boolean eof, int lexState, int line, int column, String prefix, int curChar) {
+  static String lexicalError(boolean eof, int lexState, int line, int column, String prefix, int curChar) {
     return "Lexical error at line " +
         line + ", column " +
         column + ".  Encountered: " +
@@ -86,7 +86,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class TokenMgrError extends Error {
    * Replaces unprintable characters by their escaped (or unicode escaped)
    * equivalents in the given string
    */
-  protected static String escape(final String string) {
+  static String escape(final String string) {
     final StringBuffer b = new StringBuffer(string.length());
     char ch;
     for (int i = 0; i < string.length(); i++) {

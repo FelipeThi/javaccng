@@ -2806,7 +2806,7 @@ public class NfaState
          ostr.println("      debugStream.println(" + (LexGen.maxLexStates > 1 ?
                  "\"<\" + lexStateNames[curLexState] + \">\" + " :
                  "") + "\"Current character : \" + " +
-                 "TokenMgrError.addEscapes(String.valueOf(curChar)) + \" (\" + (int)curChar + \") " +
+                 "TokenManagerError.escape(String.valueOf(curChar)) + \" (\" + (int)curChar + \") " +
                  "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
 
       ostr.println("   int kind = 0x" + Integer.toHexString(Integer.MAX_VALUE) + ";");
@@ -2875,7 +2875,7 @@ public class NfaState
          ostr.println("      debugStream.println(" + (LexGen.maxLexStates > 1 ?
                  "\"<\" + lexStateNames[curLexState] + \">\" + " :
                  "") + "\"Current character : \" + " +
-                 "TokenMgrError.addEscapes(String.valueOf(curChar)) + \" (\" + (int)curChar + \") " +
+                 "TokenManagerError.escape(String.valueOf(curChar)) + \" (\" + (int)curChar + \") " +
                  "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
 
       ostr.println("   }");

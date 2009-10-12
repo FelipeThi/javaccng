@@ -67,7 +67,7 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
   static final String parseExceptionVersion = "5.0";
 
   /**
-   * ID of the latest version (of JavaCC) in which the TokenMgrError class is
+   * ID of the latest version (of JavaCC) in which the TokenManagerError class is
    * modified.
    */
   static final String tokenMgrErrorVersion = "5.0";
@@ -334,7 +334,7 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
 
   public static void gen_TokenMgrError() {
     try {
-      final File file = new File(Options.getOutputDirectory(), "TokenMgrError.java");
+      final File file = new File(Options.getOutputDirectory(), "TokenManagerError.java");
       final OutputFile outputFile = new OutputFile(file, tokenMgrErrorVersion, new String[0]);
 
       if (!outputFile.needToWrite)
@@ -362,14 +362,14 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
       }
 
       JavaFileGenerator generator = new JavaFileGenerator(
-          "/templates/TokenMgrError.template", Options.getOptions());
+          "/templates/TokenManagerError.template", Options.getOptions());
 
       generator.generate(ostr);
 
       ostr.close();
     } catch (IOException e) {
-      System.err.println("Failed to create TokenMgrError " + e);
-      JavaCCErrors.semantic_error("Could not open file TokenMgrError.java for writing.");
+      System.err.println("Failed to create TokenManagerError " + e);
+      JavaCCErrors.semantic_error("Could not open file TokenManagerError.java for writing.");
       throw new Error();
     }
   }
