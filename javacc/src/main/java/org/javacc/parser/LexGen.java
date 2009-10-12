@@ -779,17 +779,6 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
     ostr.println("   SwitchTo(lexState);");
     ostr.println("}");
 
-    // Reinit method for reinitializing the parser (for static parsers).
-    ostr.println("");
-    ostr.println("/** Reinitialise parser. */");
-    ostr.println("public void ReInit(CharStream stream)");
-    ostr.println("{");
-    ostr.println("   jjmatchedPos = jjnewStateCnt = 0;");
-    ostr.println("   curLexState = defaultLexState;");
-    ostr.println("   charStream = stream;");
-    ostr.println("   ReInitRounds();");
-    ostr.println("}");
-
     // Method to reinitialize the jjrounds array.
     ostr.println("private void ReInitRounds()");
     ostr.println("{");
@@ -797,15 +786,6 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
     ostr.println("   jjround = 0x" + Integer.toHexString(Integer.MIN_VALUE + 1) + ";");
     ostr.println("   for (i = " + stateSetSize + "; i-- > 0;)");
     ostr.println("      jjrounds[i] = 0x" + Integer.toHexString(Integer.MIN_VALUE) + ";");
-    ostr.println("}");
-
-    // Reinit method for reinitializing the parser (for static parsers).
-    ostr.println("");
-    ostr.println("/** Reinitialise parser. */");
-    ostr.println("public void ReInit(CharStream stream, int lexState)");
-    ostr.println("{");
-    ostr.println("   ReInit(stream);");
-    ostr.println("   SwitchTo(lexState);");
     ostr.println("}");
 
     ostr.println("");
