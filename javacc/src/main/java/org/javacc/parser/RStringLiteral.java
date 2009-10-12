@@ -123,7 +123,7 @@ public class RStringLiteral extends RegularExpression {
 
     ostr.println("");
     ostr.println("/** Token literal values. */");
-    ostr.println("public static final String[] jjstrLiteralImages = {");
+    ostr.println("public static final String[] jjliteralImages = {");
 
     if (allImages == null || allImages.length == 0)
     {
@@ -158,17 +158,17 @@ public class RStringLiteral extends RegularExpression {
 
       String toPrint = "\"";
 
-      for (int j = 0; j < image.length(); j++)
-      {
-        if (image.charAt(j) <= 0xff)
-          toPrint += ("\\" + Integer.toOctalString((int)image.charAt(j)));
-        else
-        {
-          String hexVal = Integer.toHexString((int)image.charAt(j));
-
-          if (hexVal.length() == 3)
+      for (int j = 0; j < image.length(); j++) {
+        final char c = image.charAt(j);
+        if (c >= 0x20 && c < 0x80) {
+          toPrint += c;
+        }
+        else {
+          String hexVal = Integer.toHexString((int) c);
+          while (hexVal.length() < 4) {
             hexVal = "0" + hexVal;
-          toPrint += ("\\u" + hexVal);
+          }
+          toPrint += "\\u" + hexVal;
         }
       }
 
