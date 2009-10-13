@@ -123,7 +123,7 @@ public class RStringLiteral extends RegularExpression {
 
     ostr.println("");
     ostr.println("/** Token literal values. */");
-    ostr.println("public static final String[] jjliteralImages = {");
+    ostr.println("public static final String[] jjLiteralImages = {");
 
     if (allImages == null || allImages.length == 0)
     {
@@ -470,24 +470,24 @@ public class RStringLiteral extends RegularExpression {
      ostr.println("private int " +
                   "jjStartNfaWithStates" + LexGen.lexStateSuffix + "(int pos, int kind, int state) throws java.io.IOException");
      ostr.println("{");
-     ostr.println("   jjmatchedKind = kind;");
-     ostr.println("   jjmatchedPos = pos;");
+     ostr.println("   jjMatchedKind = kind;");
+     ostr.println("   jjMatchedPos = pos;");
 
      if (Options.getDebugTokenManager())
      {
         ostr.println("   debugStream.println(\"   No more string literal token matches are possible.\");");
         ostr.println("   debugStream.println(\"   Currently matched the first \" " +
-                "+ (jjmatchedPos + 1) + \" characters as a \" + tokenImage[jjmatchedKind] + \" token.\");");
+                "+ (jjMatchedPos + 1) + \" characters as a \" + tokenImage[jjMatchedKind] + \" token.\");");
      }
 
-     ostr.println("   curChar = charStream.readChar();");
-     ostr.println("   if (curChar == -1) { return pos + 1; }");
+     ostr.println("   jjChar = charStream.readChar();");
+     ostr.println("   if (jjChar == -1) { return pos + 1; }");
 
      if (Options.getDebugTokenManager())
         ostr.println("   debugStream.println(" +
-                (LexGen.maxLexStates > 1 ? "\"<\" + lexStateNames[curLexState] + \">\" + " : "") +
+                (LexGen.maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
                 "\"Current character : \" + " +
-                "TokenManagerError.escape(String.valueOf(curChar)) + \" (\" + (int)curChar + \") " +
+                "TokenManagerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
                 "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
 
      ostr.println("   return jjMoveNfa" + LexGen.lexStateSuffix + "(state, pos + 1);");
@@ -500,14 +500,14 @@ public class RStringLiteral extends RegularExpression {
      ostr.println("private int " +
                   "jjStopAtPos(int pos, int kind)");
      ostr.println("{");
-     ostr.println("   jjmatchedKind = kind;");
-     ostr.println("   jjmatchedPos = pos;");
+     ostr.println("   jjMatchedKind = kind;");
+     ostr.println("   jjMatchedPos = pos;");
 
      if (Options.getDebugTokenManager())
      {
         ostr.println("   debugStream.println(\"   No more string literal token matches are possible.\");");
-        ostr.println("   debugStream.println(\"   Currently matched the first \" + (jjmatchedPos + 1) + " +
-                "\" characters as a \" + tokenImage[jjmatchedKind] + \" token.\");");
+        ostr.println("   debugStream.println(\"   Currently matched the first \" + (jjMatchedPos + 1) + " +
+                "\" characters as a \" + tokenImage[jjMatchedKind] + \" token.\");");
      }
 
      ostr.println("   return pos + 1;");
@@ -667,10 +667,10 @@ public class RStringLiteral extends RegularExpression {
 
            if (i != 0 && Options.getDebugTokenManager())
            {
-              ostr.println("   if (jjmatchedKind != 0 && jjmatchedKind != 0x" +
+              ostr.println("   if (jjMatchedKind != 0 && jjMatchedKind != 0x" +
                       Integer.toHexString(Integer.MAX_VALUE) + ")");
               ostr.println("      debugStream.println(\"   Currently matched the first \" + " +
-                      "(jjmatchedPos + 1) + \" characters as a \" + tokenImage[jjmatchedKind] + \" token.\");");
+                      "(jjMatchedPos + 1) + \" characters as a \" + tokenImage[jjMatchedKind] + \" token.\");");
 
               ostr.println("   debugStream.println(\"   Possible string literal matches : { \"");
 
@@ -687,8 +687,8 @@ public class RStringLiteral extends RegularExpression {
               ostr.println(" + \" } \");");
            }
 
-           ostr.println("   curChar = charStream.readChar();");
-           ostr.println("   if (curChar == -1) {");
+           ostr.println("   jjChar = charStream.readChar();");
+           ostr.println("   if (jjChar == -1) {");
 
            if (!LexGen.mixed[LexGen.lexStateIndex] && NfaState.generatedStates != 0)
            {
@@ -707,10 +707,10 @@ public class RStringLiteral extends RegularExpression {
 
               if (i != 0 && Options.getDebugTokenManager())
               {
-                 ostr.println("      if (jjmatchedKind != 0 && jjmatchedKind != 0x" +
+                 ostr.println("      if (jjMatchedKind != 0 && jjMatchedKind != 0x" +
                          Integer.toHexString(Integer.MAX_VALUE) + ")");
                  ostr.println("         debugStream.println(\"   Currently matched the first \" + " +
-                         "(jjmatchedPos + 1) + \" characters as a \" + tokenImage[jjmatchedKind] + \" token.\");");
+                         "(jjMatchedPos + 1) + \" characters as a \" + tokenImage[jjMatchedKind] + \" token.\");");
               }
               ostr.println("      return " + i + ";");
            }
@@ -725,12 +725,12 @@ public class RStringLiteral extends RegularExpression {
 
         if (i != 0 && Options.getDebugTokenManager())
            ostr.println("   debugStream.println(" +
-                   (LexGen.maxLexStates > 1 ? "\"<\" + lexStateNames[curLexState] + \">\" + " : "") +
+                   (LexGen.maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
                    "\"Current character : \" + " +
-                   "TokenManagerError.escape(String.valueOf(curChar)) + \" (\" + (int)curChar + \") " +
+                   "TokenManagerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
                    "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
 
-        ostr.println("   switch(curChar)");
+        ostr.println("   switch(jjChar)");
         ostr.println("   {");
 
         CaseLoop:
@@ -874,13 +874,13 @@ public class RStringLiteral extends RegularExpression {
                             i != 0)
                        {
                           ostr.println("         {");
-                          ostr.println(prefix + "jjmatchedKind = " +
+                          ostr.println(prefix + "jjMatchedKind = " +
                                                      kindToPrint + ";");
-                          ostr.println(prefix + "jjmatchedPos = " + i + ";");
+                          ostr.println(prefix + "jjMatchedPos = " + i + ";");
                           ostr.println("         }");
                        }
                        else
-                          ostr.println(prefix + "jjmatchedKind = " +
+                          ostr.println(prefix + "jjMatchedKind = " +
                                                      kindToPrint + ";");
                     }
                  }
@@ -1060,7 +1060,7 @@ public class RStringLiteral extends RegularExpression {
      boolean[] seen = new boolean[NfaState.generatedStates];
      Hashtable stateSets = new Hashtable();
      String stateSetString  = "";
-     int i, j, kind, jjmatchedPos = 0;
+     int i, j, kind, jjMatchedPos = 0;
      int maxKindsReqd = maxStrKind / 64 + 1;
      long[] actives;
      List newStates = new ArrayList();
@@ -1096,7 +1096,7 @@ public class RStringLiteral extends RegularExpression {
 
         intermediateKinds[i] = new int[image.length()];
         intermediateMatchedPos[i] = new int[image.length()];
-        jjmatchedPos = 0;
+        jjMatchedPos = 0;
         kind = Integer.MAX_VALUE;
 
         for (j = 0; j < image.length(); j++)
@@ -1105,7 +1105,7 @@ public class RStringLiteral extends RegularExpression {
            {
               // Here, j > 0
               kind = intermediateKinds[i][j] = intermediateKinds[i][j - 1];
-              jjmatchedPos = intermediateMatchedPos[i][j] = intermediateMatchedPos[i][j - 1];
+              jjMatchedPos = intermediateMatchedPos[i][j] = intermediateMatchedPos[i][j - 1];
            }
            else
            {
@@ -1120,19 +1120,19 @@ public class RStringLiteral extends RegularExpression {
               if (GetStrKind(image.substring(0, j + 1)) < kind)
               {
                  intermediateKinds[i][j] = kind = Integer.MAX_VALUE;
-                 jjmatchedPos = 0;
+                 jjMatchedPos = 0;
               }
               else if (kind != Integer.MAX_VALUE)
               {
                  intermediateKinds[i][j] = kind;
-                 jjmatchedPos = intermediateMatchedPos[i][j] = j;
+                 jjMatchedPos = intermediateMatchedPos[i][j] = j;
               }
               else if (j == 0)
                  kind = intermediateKinds[i][j] = Integer.MAX_VALUE;
               else
               {
                  kind = intermediateKinds[i][j] = intermediateKinds[i][j - 1];
-                 jjmatchedPos = intermediateMatchedPos[i][j] = intermediateMatchedPos[i][j - 1];
+                 jjMatchedPos = intermediateMatchedPos[i][j] = intermediateMatchedPos[i][j - 1];
               }
 
               stateSetString = NfaState.GetStateSetString(newStates);
@@ -1168,10 +1168,10 @@ public class RStringLiteral extends RegularExpression {
               statesForPos[j] = new Hashtable();
 
            if ((actives = ((long[])statesForPos[j].get(kind + ", " +
-                                    jjmatchedPos + ", " + stateSetString))) == null)
+                                    jjMatchedPos + ", " + stateSetString))) == null)
            {
               actives = new long[maxKindsReqd];
-              statesForPos[j].put(kind + ", " + jjmatchedPos + ", " +
+              statesForPos[j].put(kind + ", " + jjMatchedPos + ", " +
                                                  stateSetString, actives);
            }
 
@@ -1241,7 +1241,7 @@ public class RStringLiteral extends RegularExpression {
               String kindStr = stateSetString.substring(0,
                                        ind = stateSetString.indexOf(", "));
               String afterKind = stateSetString.substring(ind + 2);
-              int jjmatchedPos = Integer.parseInt(
+              int jjMatchedPos = Integer.parseInt(
                            afterKind.substring(0, afterKind.indexOf(", ")));
 
               if (!kindStr.equals(String.valueOf(Integer.MAX_VALUE)))
@@ -1251,37 +1251,37 @@ public class RStringLiteral extends RegularExpression {
               {
                  if (i == 0)
                  {
-                    ostr.println("            jjmatchedKind = " + kindStr + ";");
+                    ostr.println("            jjMatchedKind = " + kindStr + ";");
 
                     if ((LexGen.initMatch[LexGen.lexStateIndex] != 0 &&
                         LexGen.initMatch[LexGen.lexStateIndex] != Integer.MAX_VALUE))
-                       ostr.println("            jjmatchedPos = 0;");
+                       ostr.println("            jjMatchedPos = 0;");
                  }
-                 else if (i == jjmatchedPos)
+                 else if (i == jjMatchedPos)
                  {
                     if (subStringAtPos[i])
                     {
-                       ostr.println("            if (jjmatchedPos != " + i + ")");
+                       ostr.println("            if (jjMatchedPos != " + i + ")");
                        ostr.println("            {");
-                       ostr.println("               jjmatchedKind = " + kindStr + ";");
-                       ostr.println("               jjmatchedPos = " + i + ";");
+                       ostr.println("               jjMatchedKind = " + kindStr + ";");
+                       ostr.println("               jjMatchedPos = " + i + ";");
                        ostr.println("            }");
                     }
                     else
                     {
-                       ostr.println("            jjmatchedKind = " + kindStr + ";");
-                       ostr.println("            jjmatchedPos = " + i + ";");
+                       ostr.println("            jjMatchedKind = " + kindStr + ";");
+                       ostr.println("            jjMatchedPos = " + i + ";");
                     }
                  }
                  else
                  {
-                    if (jjmatchedPos > 0)
-                       ostr.println("            if (jjmatchedPos < " + jjmatchedPos + ")");
+                    if (jjMatchedPos > 0)
+                       ostr.println("            if (jjMatchedPos < " + jjMatchedPos + ")");
                     else
-                       ostr.println("            if (jjmatchedPos == 0)");
+                       ostr.println("            if (jjMatchedPos == 0)");
                     ostr.println("            {");
-                    ostr.println("               jjmatchedKind = " + kindStr + ";");
-                    ostr.println("               jjmatchedPos = " + jjmatchedPos + ";");
+                    ostr.println("               jjMatchedKind = " + kindStr + ";");
+                    ostr.println("               jjMatchedPos = " + jjMatchedPos + ";");
                     ostr.println("            }");
                  }
               }

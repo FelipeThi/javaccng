@@ -232,7 +232,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
     ostr.println("    {");
     ostr.println("     if (vec[i] == -1)");
     ostr.println("       continue;");
-    ostr.println("     int[] stateSet = statesForState[curLexState][vec[i]];");
+    ostr.println("     int[] stateSet = statesForState[jjLexState][vec[i]];");
     ostr.println("     for (int j = 0; j < stateSet.length; j++)");
     ostr.println("     {");
     ostr.println("       int state = stateSet[j];");
@@ -550,9 +550,9 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
     }
 
     if (hasLoop) {
-      ostr.println("int[] jjemptyLineNo = new int[" + maxLexStates + "];");
-      ostr.println("int[] jjemptyColNo = new int[" + maxLexStates + "];");
-      ostr.println("boolean[] jjbeenHere = new boolean[" + maxLexStates + "];");
+      ostr.println("int[] jjEmptyLineNo = new int[" + maxLexStates + "];");
+      ostr.println("int[] jjEmptyColumnNo = new int[" + maxLexStates + "];");
+      ostr.println("boolean[] jjBeenHere = new boolean[" + maxLexStates + "];");
     }
 
     if (hasSkipActions) {
@@ -663,7 +663,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
 
     ostr.println("");
     ostr.println("/** Lexer state names. */");
-    ostr.println("public static final String[] lexStateNames = {");
+    ostr.println("public static final String[] jjLexStateNames = {");
     for (i = 0; i < maxLexStates; i++) {
       ostr.println("   \"" + lexStateName[i] + "\",");
     }
@@ -672,7 +672,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
     if (maxLexStates > 1) {
       ostr.println("");
       ostr.println("/** Lex State array. */");
-      ostr.print("public static final int[] jjnewLexState = {");
+      ostr.print("public static final int[] jjNewLexState = {");
 
       for (i = 0; i < maxOrdinal; i++) {
         if (i % 25 == 0) {
@@ -691,7 +691,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
 
     if (hasSkip || hasMore || hasSpecial) {
       // Bit vector for TOKEN
-      ostr.print("static final long[] jjtoToken = {");
+      ostr.print("static final long[] jjToToken = {");
       for (i = 0; i < maxOrdinal / 64 + 1; i++) {
         if (i % 4 == 0) {
           ostr.print("\n   ");
@@ -703,7 +703,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
 
     if (hasSkip || hasSpecial) {
       // Bit vector for SKIP
-      ostr.print("static final long[] jjtoSkip = {");
+      ostr.print("static final long[] jjToSkip = {");
       for (i = 0; i < maxOrdinal / 64 + 1; i++) {
         if (i % 4 == 0) {
           ostr.print("\n   ");
@@ -715,7 +715,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
 
     if (hasSpecial) {
       // Bit vector for SPECIAL
-      ostr.print("static final long[] jjtoSpecial = {");
+      ostr.print("static final long[] jjToSpecial = {");
       for (i = 0; i < maxOrdinal / 64 + 1; i++) {
         if (i % 4 == 0) {
           ostr.print("\n   ");
@@ -727,7 +727,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
 
     if (hasMore) {
       // Bit vector for MORE
-      ostr.print("static final long[] jjtoMore = {");
+      ostr.print("static final long[] jjToMore = {");
       for (i = 0; i < maxOrdinal / 64 + 1; i++) {
         if (i % 4 == 0) {
           ostr.print("\n   ");
@@ -739,19 +739,19 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
 
     ostr.println("protected final CharStream charStream;");
 
-    ostr.println("private final int[] jjrounds = " +
+    ostr.println("private final int[] jjRounds = " +
         "new int[" + stateSetSize + "];");
-    ostr.println("private final int[] jjstateSet = " +
+    ostr.println("private final int[] jjStateSet = " +
         "new int[" + (2 * stateSetSize) + "];");
 
     if (hasMoreActions || hasSkipActions || hasTokenActions) {
-      ostr.println("private final " + Options.stringBufOrBuild() + " jjimage = new " + Options.stringBufOrBuild() + "();");
-      ostr.println("private " + Options.stringBufOrBuild() + " image = jjimage;");
-      ostr.println("private int jjimageLen;");
+      ostr.println("private final " + Options.stringBufOrBuild() + " jjImage = new " + Options.stringBufOrBuild() + "();");
+      ostr.println("private " + Options.stringBufOrBuild() + " image = jjImage;");
+      ostr.println("private int jjImageLength;");
       ostr.println("private int lengthOfMatch;");
     }
 
-    ostr.println("protected int curChar;");
+    ostr.println("protected int jjChar;");
 
     if (Options.getTokenManagerUsesParser()) {
       ostr.println("");
@@ -780,27 +780,27 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
       ostr.println("public " + tokMgrClassName + "(CharStream stream, int lexState){");
       ostr.println("   this(stream);");
     }
-    ostr.println("   SwitchTo(lexState);");
+    ostr.println("   switchTo(lexState);");
     ostr.println("}");
 
-    // Method to reinitialize the jjrounds array.
+    // Method to reinitialize the jjRounds array.
     ostr.println("private void ReInitRounds()");
     ostr.println("{");
     ostr.println("   int i;");
-    ostr.println("   jjround = 0x" + Integer.toHexString(Integer.MIN_VALUE + 1) + ";");
+    ostr.println("   jjRound = 0x" + Integer.toHexString(Integer.MIN_VALUE + 1) + ";");
     ostr.println("   for (i = " + stateSetSize + "; i-- > 0;)");
-    ostr.println("      jjrounds[i] = 0x" + Integer.toHexString(Integer.MIN_VALUE) + ";");
+    ostr.println("      jjRounds[i] = 0x" + Integer.toHexString(Integer.MIN_VALUE) + ";");
     ostr.println("}");
 
     ostr.println("");
     ostr.println("/** Switch to specified lex state. */");
-    ostr.println("public void SwitchTo(int lexState)");
+    ostr.println("public void switchTo(int lexState)");
     ostr.println("{");
     ostr.println("   if (lexState >= " + lexStateName.length + " || lexState < 0)");
     ostr.println("      throw new TokenManagerError(\"Error: Ignoring invalid lexical state : \"" +
         " + lexState + \". State unchanged.\", TokenManagerError.INVALID_LEXICAL_STATE);");
     ostr.println("   else");
-    ostr.println("      curLexState = lexState;");
+    ostr.println("      jjLexState = lexState;");
     ostr.println("}");
 
     ostr.println("");
@@ -823,7 +823,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
     ostr.println("   final String curTokenImage;");
 
     if (hasEmptyMatch) {
-      ostr.println("   if (jjmatchedPos < 0)");
+      ostr.println("   if (jjMatchedPos < 0)");
       ostr.println("   {");
       ostr.println("      if (image == null)");
       ostr.println("         curTokenImage = \"\";");
@@ -840,7 +840,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
       ostr.println("   }");
       ostr.println("   else");
       ostr.println("   {");
-      ostr.println("      final String literalImage = jjliteralImages[jjmatchedKind];");
+      ostr.println("      final String literalImage = jjLiteralImages[jjMatchedKind];");
       ostr.println("      curTokenImage = literalImage == null ? charStream.getImage() : literalImage;");
 
       if (keepLineCol) {
@@ -853,7 +853,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
       ostr.println("   }");
     }
     else {
-      ostr.println("   final String literalImage = jjliteralImages[jjmatchedKind];");
+      ostr.println("   final String literalImage = jjLiteralImages[jjMatchedKind];");
       ostr.println("   curTokenImage = literalImage == null ? charStream.getImage() : literalImage;");
       if (keepLineCol) {
         ostr.println("   final int beginLine = charStream.getBeginLine();");
@@ -864,10 +864,10 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
     }
 
     if (Options.getTokenFactory().length() > 0) {
-      ostr.println("   final Token t = " + Options.getTokenFactory() + ".newToken(jjmatchedKind, curTokenImage);");
+      ostr.println("   final Token t = " + Options.getTokenFactory() + ".newToken(jjMatchedKind, curTokenImage);");
     }
     else {
-      ostr.println("   final Token t = Token.newToken(jjmatchedKind, curTokenImage);");
+      ostr.println("   final Token t = Token.newToken(jjMatchedKind, curTokenImage);");
     }
 
     ostr.println("   t.setOffset(charStream.getBeginOffset(), charStream.getEndOffset());");
@@ -883,12 +883,11 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
     int i;
 
     ostr.println("");
-    ostr.println("int curLexState = " + defaultLexState + ";");
-    ostr.println("int defaultLexState = " + defaultLexState + ";");
-    ostr.println("int jjnewStateCnt;");
-    ostr.println("int jjround;");
-    ostr.println("int jjmatchedPos;");
-    ostr.println("int jjmatchedKind;");
+    ostr.println("int jjLexState = " + defaultLexState + ";");
+    ostr.println("int jjNewStateCount;");
+    ostr.println("int jjRound;");
+    ostr.println("int jjMatchedPos;");
+    ostr.println("int jjMatchedKind;");
     ostr.println("");
     ostr.println("/** Get the next Token. */");
     ostr.println("public Token getNextToken() throws java.io.IOException");
@@ -899,18 +898,18 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
     ostr.println("  Token matchedToken;");
     ostr.println("  int curPos = 0;");
     ostr.println("");
-    ostr.println("  EOFLoop :\n  for (;;)");
+    ostr.println("  loop:\n  while (true)");
     ostr.println("  {");
     ostr.println("   charStream.beginToken();");
-    ostr.println("   curChar = charStream.readChar();");
-    ostr.println("   if (curChar == -1)");
+    ostr.println("   jjChar = charStream.readChar();");
+    ostr.println("   if (jjChar == -1)");
     ostr.println("   {");
 
     if (Options.getDebugTokenManager()) {
       ostr.println("      debugStream.println(\"Returning the <EOF> token.\");");
     }
 
-    ostr.println("      jjmatchedKind = 0;");
+    ostr.println("      jjMatchedKind = 0;");
     ostr.println("      matchedToken = jjFillToken();");
 
     if (hasSpecial) {
@@ -918,7 +917,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
     }
 
     if (nextStateForEof != null || actForEof != null) {
-      ostr.println("      TokenLexicalActions(matchedToken);");
+      ostr.println("      tokenLexicalActions(matchedToken);");
     }
 
     if (Options.getCommonTokenAction()) {
@@ -929,16 +928,16 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
     ostr.println("   }");
 
     if (hasMoreActions || hasSkipActions || hasTokenActions) {
-      ostr.println("   image = jjimage;");
+      ostr.println("   image = jjImage;");
       ostr.println("   image.setLength(0);");
-      ostr.println("   jjimageLen = 0;");
+      ostr.println("   jjImageLength = 0;");
     }
 
     ostr.println("");
 
     String prefix = "";
     if (hasMore) {
-      ostr.println("   for (;;)");
+      ostr.println("   while (true)");
       ostr.println("   {");
       prefix = "  ";
     }
@@ -947,7 +946,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
     String caseStr = "";
     // this also sets up the start state of the nfa
     if (maxLexStates > 1) {
-      ostr.println(prefix + "   switch(curLexState)");
+      ostr.println(prefix + "   switch(jjLexState)");
       ostr.println(prefix + "   {");
       endSwitch = prefix + "   }";
       caseStr = prefix + "     case ";
@@ -966,39 +965,39 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
         ostr.println(prefix + "charStream.backup(0);");
         if (singlesToSkip[i].asciiMoves[0] != 0L &&
             singlesToSkip[i].asciiMoves[1] != 0L) {
-          ostr.println(prefix + "   while ((curChar < 64" + " && (0x" +
+          ostr.println(prefix + "   while ((jjChar < 64" + " && (0x" +
               Long.toHexString(singlesToSkip[i].asciiMoves[0]) +
-              "L & (1L << curChar)) != 0L) || \n" +
-              prefix + "          (curChar >> 6) == 1" +
+              "L & (1L << jjChar)) != 0L) || \n" +
+              prefix + "          (jjChar >> 6) == 1" +
               " && (0x" +
               Long.toHexString(singlesToSkip[i].asciiMoves[1]) +
-              "L & (1L << (curChar & 077))) != 0L)");
+              "L & (1L << (jjChar & 077))) != 0L)");
         }
         else if (singlesToSkip[i].asciiMoves[1] == 0L) {
-          ostr.println(prefix + "   while (curChar <= " +
+          ostr.println(prefix + "   while (jjChar <= " +
               (int) MaxChar(singlesToSkip[i].asciiMoves[0]) + " && (0x" +
               Long.toHexString(singlesToSkip[i].asciiMoves[0]) +
-              "L & (1L << curChar)) != 0L)");
+              "L & (1L << jjChar)) != 0L)");
         }
         else if (singlesToSkip[i].asciiMoves[0] == 0L) {
-          ostr.println(prefix + "   while (curChar > 63 && curChar <= " +
+          ostr.println(prefix + "   while (jjChar > 63 && jjChar <= " +
               ((int) MaxChar(singlesToSkip[i].asciiMoves[1]) + 64) +
               " && (0x" +
               Long.toHexString(singlesToSkip[i].asciiMoves[1]) +
-              "L & (1L << (curChar & 077))) != 0L)");
+              "L & (1L << (jjChar & 077))) != 0L)");
         }
 
         ostr.println(prefix + "    {");
         if (Options.getDebugTokenManager()) {
           ostr.println("      debugStream.println(" +
               (maxLexStates > 1 ?
-                  "\"<\" + lexStateNames[curLexState] + \">\" + " : "") +
+                  "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
               "\"Skipping character : \" + " +
-              "TokenManagerError.escape(String.valueOf(curChar)) + \" (\" + (int)curChar + \")\");");
+              "TokenManagerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \")\");");
         }
         ostr.println(prefix + "      charStream.beginToken();");
-        ostr.println(prefix + "      curChar = charStream.readChar();");
-        ostr.println(prefix + "      if (curChar == -1) { continue EOFLoop; }");
+        ostr.println(prefix + "      jjChar = charStream.readChar();");
+        ostr.println(prefix + "      if (jjChar == -1) { continue loop; }");
 
         ostr.println(prefix + "    }");
       }
@@ -1009,20 +1008,20 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
               initMatch[i] + "] + \" token.\");");
         }
 
-        ostr.println(prefix + "jjmatchedKind = " + initMatch[i] + ";");
-        ostr.println(prefix + "jjmatchedPos = -1;");
+        ostr.println(prefix + "jjMatchedKind = " + initMatch[i] + ";");
+        ostr.println(prefix + "jjMatchedPos = -1;");
         ostr.println(prefix + "curPos = 0;");
       }
       else {
-        ostr.println(prefix + "jjmatchedKind = 0x" + Integer.toHexString(Integer.MAX_VALUE) + ";");
-        ostr.println(prefix + "jjmatchedPos = 0;");
+        ostr.println(prefix + "jjMatchedKind = 0x" + Integer.toHexString(Integer.MAX_VALUE) + ";");
+        ostr.println(prefix + "jjMatchedPos = 0;");
       }
 
       if (Options.getDebugTokenManager()) {
         ostr.println("      debugStream.println(" +
-            (maxLexStates > 1 ? "\"<\" + lexStateNames[curLexState] + \">\" + " : "") +
+            (maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
             "\"Current character : \" + " +
-            "TokenManagerError.escape(String.valueOf(curChar)) + \" (\" + (int)curChar + \") " +
+            "TokenManagerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
             "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
       }
 
@@ -1030,11 +1029,11 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
 
       if (canMatchAnyChar[i] != -1) {
         if (initMatch[i] != Integer.MAX_VALUE && initMatch[i] != 0) {
-          ostr.println(prefix + "if (jjmatchedPos < 0 || (jjmatchedPos == 0 && jjmatchedKind > " +
+          ostr.println(prefix + "if (jjMatchedPos < 0 || (jjMatchedPos == 0 && jjMatchedKind > " +
               canMatchAnyChar[i] + "))");
         }
         else {
-          ostr.println(prefix + "if (jjmatchedPos == 0 && jjmatchedKind > " +
+          ostr.println(prefix + "if (jjMatchedPos == 0 && jjMatchedKind > " +
               canMatchAnyChar[i] + ")");
         }
         ostr.println(prefix + "{");
@@ -1043,10 +1042,10 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
           ostr.println("           debugStream.println(\"   Current character matched as a \" + tokenImage[" +
               canMatchAnyChar[i] + "] + \" token.\");");
         }
-        ostr.println(prefix + "   jjmatchedKind = " + canMatchAnyChar[i] + ";");
+        ostr.println(prefix + "   jjMatchedKind = " + canMatchAnyChar[i] + ";");
 
         if (initMatch[i] != Integer.MAX_VALUE && initMatch[i] != 0) {
-          ostr.println(prefix + "   jjmatchedPos = 0;");
+          ostr.println(prefix + "   jjMatchedPos = 0;");
         }
 
         ostr.println(prefix + "}");
@@ -1061,7 +1060,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
       ostr.println(endSwitch);
     }
     else if (maxLexStates == 0) {
-      ostr.println("       jjmatchedKind = 0x" + Integer.toHexString(Integer.MAX_VALUE) + ";");
+      ostr.println("       jjMatchedKind = 0x" + Integer.toHexString(Integer.MAX_VALUE) + ";");
     }
 
     if (maxLexStates > 1) {
@@ -1072,17 +1071,17 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
     }
 
     if (maxLexStates > 0) {
-      ostr.println(prefix + "   if (jjmatchedKind != 0x" + Integer.toHexString(Integer.MAX_VALUE) + ")");
+      ostr.println(prefix + "   if (jjMatchedKind != 0x" + Integer.toHexString(Integer.MAX_VALUE) + ")");
       ostr.println(prefix + "   {");
-      ostr.println(prefix + "      if (jjmatchedPos + 1 < curPos)");
+      ostr.println(prefix + "      if (jjMatchedPos + 1 < curPos)");
 
       if (Options.getDebugTokenManager()) {
         ostr.println(prefix + "      {");
         ostr.println(prefix + "         debugStream.println(" +
-            "\"   Putting back \" + (curPos - jjmatchedPos - 1) + \" characters into the input stream.\");");
+            "\"   Putting back \" + (curPos - jjMatchedPos - 1) + \" characters into the input stream.\");");
       }
 
-      ostr.println(prefix + "         charStream.backup(curPos - jjmatchedPos - 1);");
+      ostr.println(prefix + "         charStream.backup(curPos - jjMatchedPos - 1);");
 
       if (Options.getDebugTokenManager()) {
         ostr.println(prefix + "      }");
@@ -1090,14 +1089,14 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
 
       if (Options.getDebugTokenManager()) {
         ostr.println("    debugStream.println(" +
-            "\"****** FOUND A \" + tokenImage[jjmatchedKind] + \" MATCH " +
-            "(\" + TokenManagerError.escape(new String(charStream.getSuffix(jjmatchedPos + 1))) + " +
+            "\"****** FOUND A \" + tokenImage[jjMatchedKind] + \" MATCH " +
+            "(\" + TokenManagerError.escape(new String(charStream.getSuffix(jjMatchedPos + 1))) + " +
             "\") ******\\n\");");
       }
 
       if (hasSkip || hasMore || hasSpecial) {
-        ostr.println(prefix + "      if ((jjtoToken[jjmatchedKind >> 6] & " +
-            "(1L << (jjmatchedKind & 077))) != 0L)");
+        ostr.println(prefix + "      if ((jjToToken[jjMatchedKind >> 6] & " +
+            "(1L << (jjMatchedKind & 077))) != 0L)");
         ostr.println(prefix + "      {");
       }
 
@@ -1108,12 +1107,12 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
       }
 
       if (hasTokenActions) {
-        ostr.println(prefix + "         TokenLexicalActions(matchedToken);");
+        ostr.println(prefix + "         tokenLexicalActions(matchedToken);");
       }
 
       if (maxLexStates > 1) {
-        ostr.println("       if (jjnewLexState[jjmatchedKind] != -1)");
-        ostr.println(prefix + "       curLexState = jjnewLexState[jjmatchedKind];");
+        ostr.println("       if (jjNewLexState[jjMatchedKind] != -1)");
+        ostr.println(prefix + "       jjLexState = jjNewLexState[jjMatchedKind];");
       }
 
       if (Options.getCommonTokenAction()) {
@@ -1127,8 +1126,8 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
 
         if (hasSkip || hasSpecial) {
           if (hasMore) {
-            ostr.println(prefix + "      else if ((jjtoSkip[jjmatchedKind >> 6] & " +
-                "(1L << (jjmatchedKind & 077))) != 0L)");
+            ostr.println(prefix + "      else if ((jjToSkip[jjMatchedKind >> 6] & " +
+                "(1L << (jjMatchedKind & 077))) != 0L)");
           }
           else {
             ostr.println(prefix + "      else");
@@ -1137,8 +1136,8 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
           ostr.println(prefix + "      {");
 
           if (hasSpecial) {
-            ostr.println(prefix + "         if ((jjtoSpecial[jjmatchedKind >> 6] & " +
-                "(1L << (jjmatchedKind & 077))) != 0L)");
+            ostr.println(prefix + "         if ((jjToSpecial[jjMatchedKind >> 6] & " +
+                "(1L << (jjMatchedKind & 077))) != 0L)");
             ostr.println(prefix + "         {");
 
             ostr.println(prefix + "            matchedToken = jjFillToken();");
@@ -1148,56 +1147,56 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
             ostr.println(prefix + "            else");
             ostr.println(prefix + "            {");
             ostr.println(prefix + "               matchedToken.specialToken = specialToken;");
-            ostr.println(prefix + "               specialToken = (specialToken.next = matchedToken);");
+            ostr.println(prefix + "               specialToken = specialToken.next = matchedToken;");
             ostr.println(prefix + "            }");
 
             if (hasSkipActions) {
-              ostr.println(prefix + "            SkipLexicalActions(matchedToken);");
+              ostr.println(prefix + "            skipLexicalActions(matchedToken);");
             }
 
             ostr.println(prefix + "         }");
 
             if (hasSkipActions) {
               ostr.println(prefix + "         else");
-              ostr.println(prefix + "            SkipLexicalActions(null);");
+              ostr.println(prefix + "            skipLexicalActions(null);");
             }
           }
           else if (hasSkipActions) {
-            ostr.println(prefix + "         SkipLexicalActions(null);");
+            ostr.println(prefix + "         skipLexicalActions(null);");
           }
 
           if (maxLexStates > 1) {
-            ostr.println("         if (jjnewLexState[jjmatchedKind] != -1)");
-            ostr.println(prefix + "         curLexState = jjnewLexState[jjmatchedKind];");
+            ostr.println("         if (jjNewLexState[jjMatchedKind] != -1)");
+            ostr.println(prefix + "         jjLexState = jjNewLexState[jjMatchedKind];");
           }
 
-          ostr.println(prefix + "         continue EOFLoop;");
+          ostr.println(prefix + "         continue loop;");
           ostr.println(prefix + "      }");
         }
 
         if (hasMore) {
           if (hasMoreActions) {
-            ostr.println(prefix + "      MoreLexicalActions();");
+            ostr.println(prefix + "      moreLexicalActions();");
           }
           else if (hasSkipActions || hasTokenActions) {
-            ostr.println(prefix + "      jjimageLen += jjmatchedPos + 1;");
+            ostr.println(prefix + "      jjImageLength += jjMatchedPos + 1;");
           }
 
           if (maxLexStates > 1) {
-            ostr.println("      if (jjnewLexState[jjmatchedKind] != -1)");
-            ostr.println(prefix + "      curLexState = jjnewLexState[jjmatchedKind];");
+            ostr.println("      if (jjNewLexState[jjMatchedKind] != -1)");
+            ostr.println(prefix + "      jjLexState = jjNewLexState[jjMatchedKind];");
           }
           ostr.println(prefix + "      curPos = 0;");
-          ostr.println(prefix + "      jjmatchedKind = 0x" + Integer.toHexString(Integer.MAX_VALUE) + ";");
+          ostr.println(prefix + "      jjMatchedKind = 0x" + Integer.toHexString(Integer.MAX_VALUE) + ";");
 
-          ostr.println(prefix + "      curChar = charStream.readChar();");
-          ostr.println(prefix + "      if (curChar != -1) {");
+          ostr.println(prefix + "      jjChar = charStream.readChar();");
+          ostr.println(prefix + "      if (jjChar != -1) {");
 
           if (Options.getDebugTokenManager()) {
             ostr.println("   debugStream.println(" +
-                (maxLexStates > 1 ? "\"<\" + lexStateNames[curLexState] + \">\" + " : "") +
+                (maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
                 "\"Current character : \" + " +
-                "TokenManagerError.escape(String.valueOf(curChar)) + \" (\" + (int)curChar + \") " +
+                "TokenManagerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
                 "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
           }
           ostr.println(prefix + "         continue;");
@@ -1221,7 +1220,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
         ostr.println(prefix + "      errorColumn = charStream.getEndColumn();");
         ostr.println(prefix + "   }");
         ostr.println(prefix + "   throw new TokenManagerError(" +
-            "eof, curLexState, errorLine, errorColumn, prefix, curChar, TokenManagerError.LEXICAL_ERROR);");
+            "eof, jjLexState, errorLine, errorColumn, prefix, jjChar, TokenManagerError.LEXICAL_ERROR);");
       }
       else {
         ostr.println(prefix + "   int c = charStream.readChar();");
@@ -1232,7 +1231,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
         ostr.println(prefix + "      prefix = curPos <= 1 ? \"\" : charStream.getImage();");
         ostr.println(prefix + "   }");
         ostr.println(prefix + "   throw new TokenManagerError(" +
-            "eof, curLexState, -1, -1, prefix, curChar, TokenManagerError.LEXICAL_ERROR);");
+            "eof, jjLexState, -1, -1, prefix, jjChar, TokenManagerError.LEXICAL_ERROR);");
       }
     }
 
@@ -1248,9 +1247,9 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
   public static void DumpSkipActions() {
     Action act;
 
-    ostr.println("void SkipLexicalActions(Token matchedToken)");
+    ostr.println("void skipLexicalActions(Token matchedToken)");
     ostr.println("{");
-    ostr.println("   switch(jjmatchedKind)");
+    ostr.println("   switch(jjMatchedKind)");
     ostr.println("   {");
 
     Outer:
@@ -1269,18 +1268,18 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
         ostr.println("      case " + i + " :");
 
         if (initMatch[lexStates[i]] == i && canLoop[lexStates[i]]) {
-          ostr.println("         if (jjmatchedPos == -1)");
+          ostr.println("         if (jjMatchedPos == -1)");
           ostr.println("         {");
-          ostr.println("            if (jjbeenHere[" + lexStates[i] + "] &&");
-          ostr.println("                jjemptyLineNo[" + lexStates[i] + "] == charStream.getBeginLine() &&");
-          ostr.println("                jjemptyColNo[" + lexStates[i] + "] == charStream.getBeginColumn())");
+          ostr.println("            if (jjBeenHere[" + lexStates[i] + "] &&");
+          ostr.println("                jjEmptyLineNo[" + lexStates[i] + "] == charStream.getBeginLine() &&");
+          ostr.println("                jjEmptyColumnNo[" + lexStates[i] + "] == charStream.getBeginColumn())");
           ostr.println("               throw new TokenManagerError(" +
               "(\"Error: Bailing out of infinite loop caused by repeated empty string matches " +
               "at line \" + charStream.getBeginLine() + \", " +
               "column \" + charStream.getBeginColumn() + \".\"), TokenManagerError.LOOP_DETECTED);");
-          ostr.println("            jjemptyLineNo[" + lexStates[i] + "] = charStream.getBeginLine();");
-          ostr.println("            jjemptyColNo[" + lexStates[i] + "] = charStream.getBeginColumn();");
-          ostr.println("            jjbeenHere[" + lexStates[i] + "] = true;");
+          ostr.println("            jjEmptyLineNo[" + lexStates[i] + "] = charStream.getBeginLine();");
+          ostr.println("            jjEmptyColumnNo[" + lexStates[i] + "] = charStream.getBeginColumn();");
+          ostr.println("            jjBeenHere[" + lexStates[i] + "] = true;");
           ostr.println("         }");
         }
 
@@ -1291,11 +1290,11 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
 
         ostr.print("         image.append");
         if (RStringLiteral.allImages[i] != null) {
-          ostr.println("(jjliteralImages[" + i + "]);");
-          ostr.println("        lengthOfMatch = jjliteralImages[" + i + "].length();");
+          ostr.println("(jjLiteralImages[" + i + "]);");
+          ostr.println("        lengthOfMatch = jjLiteralImages[" + i + "].length();");
         }
         else {
-          ostr.println("(charStream.getSuffix(jjimageLen + (lengthOfMatch = jjmatchedPos + 1)));");
+          ostr.println("(charStream.getSuffix(jjImageLength + (lengthOfMatch = jjMatchedPos + 1)));");
         }
 
         printTokenSetup((Token) act.getActionTokens().get(0));
@@ -1321,10 +1320,10 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
   public static void DumpMoreActions() {
     Action act;
 
-    ostr.println("void MoreLexicalActions()");
+    ostr.println("void moreLexicalActions()");
     ostr.println("{");
-    ostr.println("   jjimageLen += (lengthOfMatch = jjmatchedPos + 1);");
-    ostr.println("   switch(jjmatchedKind)");
+    ostr.println("   jjImageLength += (lengthOfMatch = jjMatchedPos + 1);");
+    ostr.println("   switch(jjMatchedKind)");
     ostr.println("   {");
 
     Outer:
@@ -1343,18 +1342,18 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
         ostr.println("      case " + i + " :");
 
         if (initMatch[lexStates[i]] == i && canLoop[lexStates[i]]) {
-          ostr.println("         if (jjmatchedPos == -1)");
+          ostr.println("         if (jjMatchedPos == -1)");
           ostr.println("         {");
-          ostr.println("            if (jjbeenHere[" + lexStates[i] + "] &&");
-          ostr.println("                jjemptyLineNo[" + lexStates[i] + "] == charStream.getBeginLine() &&");
-          ostr.println("                jjemptyColNo[" + lexStates[i] + "] == charStream.getBeginColumn())");
+          ostr.println("            if (jjBeenHere[" + lexStates[i] + "] &&");
+          ostr.println("                jjEmptyLineNo[" + lexStates[i] + "] == charStream.getBeginLine() &&");
+          ostr.println("                jjEmptyColumnNo[" + lexStates[i] + "] == charStream.getBeginColumn())");
           ostr.println("               throw new TokenManagerError(" +
               "(\"Error: Bailing out of infinite loop caused by repeated empty string matches " +
               "at line \" + charStream.getBeginLine() + \", " +
               "column \" + charStream.getBeginColumn() + \".\"), TokenManagerError.LOOP_DETECTED);");
-          ostr.println("            jjemptyLineNo[" + lexStates[i] + "] = charStream.getBeginLine();");
-          ostr.println("            jjemptyColNo[" + lexStates[i] + "] = charStream.getBeginColumn();");
-          ostr.println("            jjbeenHere[" + lexStates[i] + "] = true;");
+          ostr.println("            jjEmptyLineNo[" + lexStates[i] + "] = charStream.getBeginLine();");
+          ostr.println("            jjEmptyColumnNo[" + lexStates[i] + "] = charStream.getBeginColumn();");
+          ostr.println("            jjBeenHere[" + lexStates[i] + "] = true;");
           ostr.println("         }");
         }
 
@@ -1366,13 +1365,13 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
         ostr.print("         image.append");
 
         if (RStringLiteral.allImages[i] != null) {
-          ostr.println("(jjliteralImages[" + i + "]);");
+          ostr.println("(jjLiteralImages[" + i + "]);");
         }
         else {
-          ostr.println("(charStream.getSuffix(jjimageLen));");
+          ostr.println("(charStream.getSuffix(jjImageLength));");
         }
 
-        ostr.println("         jjimageLen = 0;");
+        ostr.println("         jjImageLength = 0;");
         printTokenSetup((Token) act.getActionTokens().get(0));
         ccol = 1;
 
@@ -1398,9 +1397,9 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
     Action act;
     int i;
 
-    ostr.println("void TokenLexicalActions(Token matchedToken)");
+    ostr.println("void tokenLexicalActions(Token matchedToken)");
     ostr.println("{");
-    ostr.println("   switch(jjmatchedKind)");
+    ostr.println("   switch(jjMatchedKind)");
     ostr.println("   {");
 
     Outer:
@@ -1419,18 +1418,18 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
         ostr.println("      case " + i + " :");
 
         if (initMatch[lexStates[i]] == i && canLoop[lexStates[i]]) {
-          ostr.println("         if (jjmatchedPos == -1)");
+          ostr.println("         if (jjMatchedPos == -1)");
           ostr.println("         {");
-          ostr.println("            if (jjbeenHere[" + lexStates[i] + "] &&");
-          ostr.println("                jjemptyLineNo[" + lexStates[i] + "] == charStream.getBeginLine() &&");
-          ostr.println("                jjemptyColNo[" + lexStates[i] + "] == charStream.getBeginColumn())");
+          ostr.println("            if (jjBeenHere[" + lexStates[i] + "] &&");
+          ostr.println("                jjEmptyLineNo[" + lexStates[i] + "] == charStream.getBeginLine() &&");
+          ostr.println("                jjEmptyColumnNo[" + lexStates[i] + "] == charStream.getBeginColumn())");
           ostr.println("               throw new TokenManagerError(" +
               "(\"Error: Bailing out of infinite loop caused by repeated empty string matches " +
               "at line \" + charStream.getBeginLine() + \", " +
               "column \" + charStream.getBeginColumn() + \".\"), TokenManagerError.LOOP_DETECTED);");
-          ostr.println("            jjemptyLineNo[" + lexStates[i] + "] = charStream.getBeginLine();");
-          ostr.println("            jjemptyColNo[" + lexStates[i] + "] = charStream.getBeginColumn();");
-          ostr.println("            jjbeenHere[" + lexStates[i] + "] = true;");
+          ostr.println("            jjEmptyLineNo[" + lexStates[i] + "] = charStream.getBeginLine();");
+          ostr.println("            jjEmptyColumnNo[" + lexStates[i] + "] = charStream.getBeginColumn();");
+          ostr.println("            jjBeenHere[" + lexStates[i] + "] = true;");
           ostr.println("         }");
         }
 
@@ -1446,11 +1445,11 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
           ostr.print("        image.append");
 
           if (RStringLiteral.allImages[i] != null) {
-            ostr.println("(jjliteralImages[" + i + "]);");
-            ostr.println("        lengthOfMatch = jjliteralImages[" + i + "].length();");
+            ostr.println("(jjLiteralImages[" + i + "]);");
+            ostr.println("        lengthOfMatch = jjLiteralImages[" + i + "].length();");
           }
           else {
-            ostr.println("(charStream.getSuffix(jjimageLen + (lengthOfMatch = jjmatchedPos + 1)));");
+            ostr.println("(charStream.getSuffix(jjImageLength + (lengthOfMatch = jjMatchedPos + 1)));");
           }
         }
 

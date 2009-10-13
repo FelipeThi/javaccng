@@ -87,7 +87,7 @@ public class NfaStateTest extends JavaCCTestCase {
     StringWriter output = new StringWriter();
     PrintWriter contentWriter = new PrintWriter(output);
     NfaState.DumpStateSets(contentWriter);
-    assertEquals("static final int[] jjnextStates = {\n};\n",
+    assertEquals("static final int[] jjNextStates = {\n};\n",
                  output.toString().replaceAll("\r", ""));
   }
 
@@ -101,7 +101,7 @@ public class NfaStateTest extends JavaCCTestCase {
     PrintWriter contentWriter = new PrintWriter(output);
     setupState();
     NfaState.DumpStateSets(contentWriter);
-    assertEquals("static final int[] jjnextStates = {\n" +
+    assertEquals("static final int[] jjNextStates = {\n" +
         "   34, 35, 12, 38, 39, 42, 43, 23, 24, 26, 14, 16, 49, 51, 6, 52, \n" +
         "   59, 8, 9, 12, 23, 24, 28, 26, 34, 35, 12, 44, 45, 12, 53, 54, \n" +
         "   60, 61, 62, 10, 11, 17, 18, 20, 25, 27, 29, 36, 37, 40, 41, 46, \n" +
@@ -120,11 +120,11 @@ public class NfaStateTest extends JavaCCTestCase {
     PrintWriter contentWriter = new PrintWriter(output);
     NfaState.DumpCharAndRangeMoves(contentWriter);
     assertEquals(
-        "         int i2 = (curChar & 0xff) >> 6;\n" +
-            "         long l2 = 1L << (curChar & 077);\n" +
+        "         int i2 = (jjChar & 0xff) >> 6;\n" +
+            "         long l2 = 1L << (jjChar & 077);\n" +
             "         do\n" +
             "         {\n" +
-            "            switch(jjstateSet[--i])\n" +
+            "            switch(jjStateSet[--i])\n" +
             "            {\n" +
             "               default : break;\n" +
             "            }\n" +
@@ -143,14 +143,14 @@ public class NfaStateTest extends JavaCCTestCase {
     setupState();
     NfaState.DumpCharAndRangeMoves(contentWriter);
     assertEquals(
-        "         int hiByte = (int)(curChar >> 8);\n" +
+        "         int hiByte = (int)(jjChar >> 8);\n" +
             "         int i1 = hiByte >> 6;\n" +
             "         long l1 = 1L << (hiByte & 077);\n" +
-            "         int i2 = (curChar & 0xff) >> 6;\n" +
-            "         long l2 = 1L << (curChar & 077);\n" +
+            "         int i2 = (jjChar & 0xff) >> 6;\n" +
+            "         long l2 = 1L << (jjChar & 077);\n" +
             "         do\n" +
             "         {\n" +
-            "            switch(jjstateSet[--i])\n" +
+            "            switch(jjStateSet[--i])\n" +
             "            {\n" +
             "               default : break;\n" +
             "            }\n" +
@@ -180,7 +180,7 @@ public class NfaStateTest extends JavaCCTestCase {
     PrintWriter contentWriter = new PrintWriter(output);
     setupState();
     NfaState.DumpNonAsciiMoveMethods(contentWriter);
-    assertEquals("private static final boolean jjCanMove_0(int hiByte, int i1, int i2, long l1, long l2)\n" +
+    assertEquals("private static boolean jjCanMove_0(int hiByte, int i1, int i2, long l1, long l2)\n" +
         "{\n" +
         "   switch(hiByte)\n" +
         "   {\n" +
@@ -192,7 +192,7 @@ public class NfaStateTest extends JavaCCTestCase {
         "         return false;\n" +
         "   }\n" +
         "}\n" +
-        "private static final boolean jjCanMove_1(int hiByte, int i1, int i2, long l1, long l2)\n" +
+        "private static boolean jjCanMove_1(int hiByte, int i1, int i2, long l1, long l2)\n" +
         "{\n" +
         "   switch(hiByte)\n" +
         "   {\n" +
@@ -276,7 +276,7 @@ public class NfaStateTest extends JavaCCTestCase {
         "         return false;\n" +
         "   }\n" +
         "}\n" +
-        "private static final boolean jjCanMove_2(int hiByte, int i1, int i2, long l1, long l2)\n" +
+        "private static boolean jjCanMove_2(int hiByte, int i1, int i2, long l1, long l2)\n" +
         "{\n" +
         "   switch(hiByte)\n" +
         "   {\n" +
@@ -378,16 +378,16 @@ public class NfaStateTest extends JavaCCTestCase {
     /*
      assertEquals("static private final void jjCheckNAdd(int state)\n" +
         "{\n" +
-        "   if (jjrounds[state] != jjround)\n" +
+        "   if (jjRounds[state] != jjRound)\n" +
         "   {\n" +
-        "      jjstateSet[jjnewStateCnt++] = state;\n" +
-        "      jjrounds[state] = jjround;\n" +
+        "      jjStateSet[jjNewStateCount++] = state;\n" +
+        "      jjRounds[state] = jjRound;\n" +
         "   }\n" +
         "}\n" +
         "static private final void jjAddStates(int start, int end)\n" +
         "{\n" +
         "   do {\n" +
-        "      jjstateSet[jjnewStateCnt++] = jjnextStates[start];\n" +
+        "      jjStateSet[jjNewStateCount++] = jjNextStates[start];\n" +
         "   } while (start++ != end);\n" +
         "}\n" +
         "static private final void jjCheckNAddTwoStates(int state1, int state2)\n" +
