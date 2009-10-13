@@ -161,7 +161,15 @@ public class RStringLiteral extends RegularExpression {
       for (int j = 0; j < image.length(); j++) {
         final char c = image.charAt(j);
         if (c >= 0x20 && c < 0x80) {
-          toPrint += c;
+          if (c == '"') {
+            toPrint += "\"";
+          }
+          else if (c == '\\') {
+            toPrint += "\\\\";
+          }
+          else {
+            toPrint += c;
+          }
         }
         else {
           String hexVal = Integer.toHexString((int) c);
