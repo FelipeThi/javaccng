@@ -9,7 +9,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
-public class NfaStates {
+final class NfaStates {
 
   public boolean unicodeWarningGiven = false;
   public int generatedStates = 0;
@@ -43,7 +43,7 @@ public class NfaStates {
   public int[][] kinds;
   public int[][][] statesForState;
 
-  public void ReInit() {
+  void ReInit() {
     generatedStates = 0;
     idCnt = 0;
     dummyStateIndex = -1;

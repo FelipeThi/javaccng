@@ -43,47 +43,48 @@ public class LexGen implements JavaCCParserConstants {
   private String tokMgrClassName;
 
   // Hashtable of vectors
-   Hashtable allTpsForState = new Hashtable();
-  public int lexStateIndex = 0;
+  Hashtable allTpsForState = new Hashtable();
+  int lexStateIndex;
   int[] kinds;
-  public int maxOrdinal = 1;
-  public String lexStateSuffix;
+  int maxOrdinal = 1;
+  String lexStateSuffix;
   String[] newLexState;
-  public int[] lexStates;
-  public boolean[] ignoreCase;
-  public Action[] actions;
-  public Hashtable initStates = new Hashtable();
-  public int stateSetSize;
-  public int maxLexStates;
-  public String[] lexStateName;
+  int[] lexStates;
+  boolean[] ignoreCase;
+  Action[] actions;
+  Hashtable initStates = new Hashtable();
+  int stateSetSize;
+  int maxLexStates;
+  String[] lexStateName;
   NfaState[] singlesToSkip;
-  public long[] toSkip;
-  public long[] toSpecial;
-  public long[] toMore;
-  public long[] toToken;
-  public int defaultLexState;
-  public RegularExpression[] rexprs;
-  public int[] maxLongsReqd;
-  public int[] initMatch;
-  public int[] canMatchAnyChar;
-  public boolean hasEmptyMatch;
-  public boolean[] canLoop;
-  public boolean[] stateHasActions;
-  public boolean hasLoop = false;
-  public boolean[] canReachOnMore;
-  public boolean[] hasNfa;
-  public boolean[] mixed;
-  public NfaState initialState;
-  public int curKind;
-  boolean hasSkipActions = false;
-  boolean hasMoreActions = false;
-  boolean hasTokenActions = false;
-  boolean hasSpecial = false;
-  boolean hasSkip = false;
-  boolean hasMore = false;
-  public RegularExpression curRE;
-  public boolean keepLineCol;
+  long[] toSkip;
+  long[] toSpecial;
+  long[] toMore;
+  long[] toToken;
+  int defaultLexState;
+  RegularExpression[] rexprs;
+  int[] maxLongsReqd;
+  int[] initMatch;
+  int[] canMatchAnyChar;
+  boolean hasEmptyMatch;
+  boolean[] canLoop;
+  boolean[] stateHasActions;
+  boolean hasLoop;
+  boolean[] canReachOnMore;
+  boolean[] hasNfa;
+  boolean[] mixed;
+  NfaState initialState;
+  int curKind;
+  boolean hasSkipActions;
+  boolean hasMoreActions;
+  boolean hasTokenActions;
+  boolean hasSpecial;
+  boolean hasSkip;
+  boolean hasMore;
+  RegularExpression curRE;
+  boolean keepLineCol;
   final NfaStates nfaStates = new NfaStates();
+  final StringLiterals stringLiterals = new StringLiterals();
 
   void PrintClassHead() {
     int i, j;
@@ -322,7 +323,7 @@ public class LexGen implements JavaCCParserConstants {
     lexStates = new int[maxOrdinal];
     ignoreCase = new boolean[maxOrdinal];
     rexprs = new RegularExpression[maxOrdinal];
-    RStringLiteral.allImages = new String[maxOrdinal];
+    stringLiterals.allImages = new String[maxOrdinal];
     canReachOnMore = new boolean[maxLexStates];
   }
 
@@ -365,7 +366,7 @@ public class LexGen implements JavaCCParserConstants {
 
     while (e.hasMoreElements()) {
       nfaStates.ReInit();
-      RStringLiteral.ReInit();
+      stringLiterals.ReInit();
 
       String key = (String) e.nextElement();
 
@@ -519,13 +520,13 @@ public class LexGen implements JavaCCParserConstants {
         initMatch[lexStateIndex] = Integer.MAX_VALUE;
       }
 
-      RStringLiteral.FillSubString(this);
+      stringLiterals.FillSubString(this);
 
       if (hasNfa[lexStateIndex] && !mixed[lexStateIndex]) {
-        RStringLiteral.GenerateNfaStartStates(this, ostr, initialState);
+        stringLiterals.GenerateNfaStartStates(this, ostr, initialState);
       }
 
-      RStringLiteral.DumpDfaCode(this, ostr);
+      stringLiterals.DumpDfaCode(this, ostr);
 
       if (hasNfa[lexStateIndex]) {
         nfaStates.DumpMoveNfa(this, ostr);
@@ -543,7 +544,7 @@ public class LexGen implements JavaCCParserConstants {
     nfaStates.DumpStateSets(ostr);
     CheckEmptyStringMatch();
     nfaStates.DumpNonAsciiMoveMethods(ostr);
-    RStringLiteral.DumpStrLiteralImages(this, ostr);
+    stringLiterals.DumpStrLiteralImages(this, ostr);
     DumpStaticVarDeclarations();
     DumpFillToken();
     DumpGetNextToken();
@@ -571,7 +572,7 @@ public class LexGen implements JavaCCParserConstants {
 
     nfaStates.PrintBoilerPlate(ostr);
     ostr.unindent();
-    ostr.println(/*{*/ "}");
+    ostr.println("}");
     ostr.close();
   }
 
@@ -1385,7 +1386,7 @@ public class LexGen implements JavaCCParserConstants {
         }
 
         ostr.print("         image.append");
-        if (RStringLiteral.allImages[i] != null) {
+        if (stringLiterals.allImages[i] != null) {
           ostr.println("(jjLiteralImages[" + i + "]);");
           ostr.println("        lengthOfMatch = jjLiteralImages[" + i + "].length();");
         }
@@ -1460,7 +1461,7 @@ public class LexGen implements JavaCCParserConstants {
 
         ostr.print("         image.append");
 
-        if (RStringLiteral.allImages[i] != null) {
+        if (stringLiterals.allImages[i] != null) {
           ostr.println("(jjLiteralImages[" + i + "]);");
         }
         else {
@@ -1540,7 +1541,7 @@ public class LexGen implements JavaCCParserConstants {
         else {
           ostr.print("        image.append");
 
-          if (RStringLiteral.allImages[i] != null) {
+          if (stringLiterals.allImages[i] != null) {
             ostr.println("(jjLiteralImages[" + i + "]);");
             ostr.println("        lengthOfMatch = jjLiteralImages[" + i + "].length();");
           }
