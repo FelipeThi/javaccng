@@ -35,10 +35,10 @@ import java.util.List;
 /**
  * Generates the Constants file.
  */
-public class OtherFilesGen extends JavaCCGlobals implements JavaCCParserConstants {
+public class OtherFilesGen implements JavaCCParserConstants {
 
-  public static boolean keepLineCol;
-  static public void start(LexGen lexGen) throws MetaParseException {
+  public boolean keepLineCol;
+  public void start(LexGen lexGen) throws MetaParseException {
 
     Token t = null;
     keepLineCol = Options.getKeepLineColumn();
@@ -61,31 +61,31 @@ public class OtherFilesGen extends JavaCCGlobals implements JavaCCParserConstant
       ostr = new IndentingPrintWriter(
                 new java.io.BufferedWriter(
                    new java.io.FileWriter(
-                     new java.io.File(Options.getOutputDirectory(), cu_name + "Constants.java")
+                     new java.io.File(Options.getOutputDirectory(), JavaCCGlobals.cu_name + "Constants.java")
                    ),
                    8192
                 )
              );
     } catch (java.io.IOException e) {
-      JavaCCErrors.semantic_error("Could not open file " + cu_name + "Constants.java for writing.");
+      JavaCCErrors.semantic_error("Could not open file " + JavaCCGlobals.cu_name + "Constants.java for writing.");
       throw new Error();
     }
 
-    List tn = new ArrayList(toolNames);
-    tn.add(toolName);
-    ostr.println("/* " + getIdString(tn, cu_name + "Constants.java") + " */");
+    List tn = new ArrayList(JavaCCGlobals.toolNames);
+    tn.add(JavaCCGlobals.toolName);
+    ostr.println("/* " + JavaCCGlobals.getIdString(tn, JavaCCGlobals.cu_name + "Constants.java") + " */");
 
-    if (cu_to_insertion_point_1.size() != 0 &&
-        ((Token)cu_to_insertion_point_1.get(0)).getKind() == PACKAGE
+    if (JavaCCGlobals.cu_to_insertion_point_1.size() != 0 &&
+        ((Token) JavaCCGlobals.cu_to_insertion_point_1.get(0)).getKind() == PACKAGE
        ) {
-      for (int i = 1; i < cu_to_insertion_point_1.size(); i++) {
-        if (((Token)cu_to_insertion_point_1.get(i)).getKind() == SEMICOLON) {
-          printTokenSetup((Token)(cu_to_insertion_point_1.get(0)));
+      for (int i = 1; i < JavaCCGlobals.cu_to_insertion_point_1.size(); i++) {
+        if (((Token) JavaCCGlobals.cu_to_insertion_point_1.get(i)).getKind() == SEMICOLON) {
+          JavaCCGlobals.printTokenSetup((Token)(JavaCCGlobals.cu_to_insertion_point_1.get(0)));
           for (int j = 0; j <= i; j++) {
-            t = (Token)(cu_to_insertion_point_1.get(j));
-            printToken(t, ostr);
+            t = (Token)(JavaCCGlobals.cu_to_insertion_point_1.get(j));
+            JavaCCGlobals.printToken(t, ostr);
           }
-          printTrailingComments(t, ostr);
+          JavaCCGlobals.printTrailingComments(t, ostr);
           ostr.println("");
           ostr.println("");
           break;
@@ -100,12 +100,12 @@ public class OtherFilesGen extends JavaCCGlobals implements JavaCCParserConstant
     if(Options.getSupportClassVisibilityPublic()) {
     	ostr.print("public ");
     }
-    ostr.println("interface " + cu_name + "Constants {");
+    ostr.println("interface " + JavaCCGlobals.cu_name + "Constants {");
     ostr.println("");
     RegularExpression re;
     ostr.println("  /** End of File. */");
     ostr.println("  int EOF = 0;");
-    for (java.util.Iterator it = ordered_named_tokens.iterator(); it.hasNext();) {
+    for (java.util.Iterator it = JavaCCGlobals.ordered_named_tokens.iterator(); it.hasNext();) {
       re = (RegularExpression)it.next();
       ostr.println("  /** RegularExpression Id. */");
       ostr.println("  int " + re.label + " = " + re.ordinal + ";");
@@ -122,14 +122,14 @@ public class OtherFilesGen extends JavaCCGlobals implements JavaCCParserConstant
     ostr.println("  String[] tokenImage = {");
     ostr.println("    \"<EOF>\",");
 
-    for (java.util.Iterator it = rexprlist.iterator(); it.hasNext();) {
+    for (java.util.Iterator it = JavaCCGlobals.rexprlist.iterator(); it.hasNext();) {
       TokenProduction tp = (TokenProduction)(it.next());
       List respecs = tp.respecs;
       for (java.util.Iterator it2 = respecs.iterator(); it2.hasNext();) {
         RegExprSpec res = (RegExprSpec)(it2.next());
         re = res.rexp;
         if (re instanceof RStringLiteral) {
-          ostr.println("    \"\\\"" + add_escapes(add_escapes(((RStringLiteral)re).image)) + "\\\"\",");
+          ostr.println("    \"\\\"" + JavaCCGlobals.add_escapes(JavaCCGlobals.add_escapes(((RStringLiteral)re).image)) + "\\\"\",");
         } else if (!re.label.equals("")) {
           ostr.println("    \"<" + re.label + ">\",");
         } else {
@@ -149,11 +149,6 @@ public class OtherFilesGen extends JavaCCGlobals implements JavaCCParserConstant
 
   }
 
-  static private IndentingPrintWriter ostr;
-
-  public static void reInit()
-  {
-    ostr = null;
-  }
+  private IndentingPrintWriter ostr;
 
 }

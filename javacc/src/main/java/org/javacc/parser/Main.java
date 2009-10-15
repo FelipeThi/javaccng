@@ -172,7 +172,8 @@ public final class Main {
       parseGen.start();
       final LexGen lexGen = new LexGen();
       lexGen.start();
-      OtherFilesGen.start(lexGen);
+      final OtherFilesGen otherFilesGen = new OtherFilesGen();
+      otherFilesGen.start(lexGen);
 
       if ((JavaCCErrors.get_error_count() == 0) && (Options.getBuildParser() || Options.getBuildTokenManager())) {
         if (JavaCCErrors.get_warning_count() == 0) {
@@ -212,7 +213,6 @@ public final class Main {
       org.javacc.parser.MatchInfo.reInit();
       org.javacc.parser.LookaheadWalk.reInit();
       org.javacc.parser.Semanticize.reInit();
-      org.javacc.parser.OtherFilesGen.reInit();
       org.javacc.parser.ParseEngine.reInit();
    }
 
