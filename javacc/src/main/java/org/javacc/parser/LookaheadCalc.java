@@ -106,11 +106,11 @@ public class LookaheadCalc {
     List v;
     boolean overlapDetected;
     for (int la = 1; la <= Options.getChoiceAmbiguityCheck(); la++) {
-      MatchInfo.laLimit = la;
+      lookaheadWalk.laLimit = la;
       lookaheadWalk.considerSemanticLA = !Options.getForceLaCheck();
       for (int i = first; i < ch.getChoices().size()-1; i++) {
         lookaheadWalk.sizeLimitedMatches = new ArrayList();
-        m = new MatchInfo();
+        m = new MatchInfo(lookaheadWalk.laLimit);
         m.firstFreeLoc = 0;
         v = new ArrayList();
         v.add(m);
@@ -120,7 +120,7 @@ public class LookaheadCalc {
       lookaheadWalk.considerSemanticLA = false;
       for (int i = first+1; i < ch.getChoices().size(); i++) {
         lookaheadWalk.sizeLimitedMatches = new ArrayList();
-        m = new MatchInfo();
+        m = new MatchInfo(lookaheadWalk.laLimit);
         m.firstFreeLoc = 0;
         v = new ArrayList();
         v.add(m);
@@ -224,9 +224,9 @@ public class LookaheadCalc {
     List v, first, follow;
     int la;
     for (la = 1; la <= Options.getOtherAmbiguityCheck(); la++) {
-      MatchInfo.laLimit = la;
+      lookaheadWalk.laLimit = la;
       lookaheadWalk.sizeLimitedMatches = new ArrayList();
-      m = new MatchInfo();
+      m = new MatchInfo(lookaheadWalk.laLimit);
       m.firstFreeLoc = 0;
       v = new ArrayList();
       v.add(m);

@@ -204,7 +204,6 @@ public final class Main {
       org.javacc.parser.JavaCCErrors.reInit();
       org.javacc.parser.JavaCCGlobals.reInit();
       Options.init();
-      org.javacc.parser.MatchInfo.reInit();
    }
 
 }

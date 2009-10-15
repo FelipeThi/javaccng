@@ -45,18 +45,20 @@ public final class LookaheadWalk {
    */
   public long nextGenerationIndex = 1;
 
+  public int laLimit;
+
   public List genFirstSet(List partialMatches, Expansion exp) {
     if (exp instanceof RegularExpression) {
       List retval = new ArrayList();
       for (int i = 0; i < partialMatches.size(); i++) {
         MatchInfo m = (MatchInfo)partialMatches.get(i);
-        MatchInfo mnew = new MatchInfo();
+        MatchInfo mnew = new MatchInfo(laLimit);
         for (int j = 0; j < m.firstFreeLoc; j++) {
           mnew.match[j] = m.match[j];
         }
         mnew.firstFreeLoc = m.firstFreeLoc;
         mnew.match[mnew.firstFreeLoc++] = ((RegularExpression)exp).ordinal;
-        if (mnew.firstFreeLoc == MatchInfo.laLimit) {
+        if (mnew.firstFreeLoc == laLimit) {
           sizeLimitedMatches.add(mnew);
         } else {
           retval.add(mnew);
