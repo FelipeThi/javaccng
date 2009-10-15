@@ -350,7 +350,7 @@ public class JJDoc extends JJDocGlobals {
       }
     } else if (re instanceof RStringLiteral) {
       RStringLiteral sl = (RStringLiteral)re;
-      returnString += ("\"" + JavaCCParserInternals.add_escapes(sl.image) + "\"");
+      returnString += ("\"" + JavaCCGlobals.add_escapes(sl.image) + "\"");
     } else if (re instanceof RZeroOrMore) {
       RZeroOrMore zm = (RZeroOrMore)re;
       returnString += "(";

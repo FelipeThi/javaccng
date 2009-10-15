@@ -207,7 +207,6 @@ public final class Main {
       org.javacc.parser.JavaCCErrors.reInit();
       org.javacc.parser.JavaCCGlobals.reInit();
       Options.init();
-      org.javacc.parser.JavaCCParserInternals.reInit();
       org.javacc.parser.RStringLiteral.reInit();
       org.javacc.parser.NfaState.reInit();
       org.javacc.parser.MatchInfo.reInit();
