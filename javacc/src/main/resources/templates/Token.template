@@ -175,7 +175,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class Token implements java.io.Serial
    */
   public static Token newToken(int ofKind, String image) {
     switch(ofKind) {
-      default : return new Token(ofKind, image);
+      default: return new Token(ofKind, image);
     }
   }
 

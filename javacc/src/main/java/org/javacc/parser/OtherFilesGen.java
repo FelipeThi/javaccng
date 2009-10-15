@@ -27,6 +27,8 @@
  */
 package org.javacc.parser;
 
+import org.javacc.utils.io.IndentingPrintWriter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +58,7 @@ public class OtherFilesGen extends JavaCCGlobals implements JavaCCParserConstant
     }
 
     try {
-      ostr = new java.io.PrintWriter(
+      ostr = new IndentingPrintWriter(
                 new java.io.BufferedWriter(
                    new java.io.FileWriter(
                      new java.io.File(Options.getOutputDirectory(), cu_name + "Constants.java")
@@ -147,7 +149,7 @@ public class OtherFilesGen extends JavaCCGlobals implements JavaCCParserConstant
 
   }
 
-  static private java.io.PrintWriter ostr;
+  static private IndentingPrintWriter ostr;
 
   public static void reInit()
   {

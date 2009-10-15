@@ -28,18 +28,18 @@
 
 package org.javacc.jjtree;
 
+import org.javacc.parser.Options;
+import org.javacc.parser.OutputFile;
+import org.javacc.utils.JavaFileGenerator;
+import org.javacc.utils.io.IndentingPrintWriter;
+
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.javacc.parser.Options;
-import org.javacc.parser.OutputFile;
-import org.javacc.utils.JavaFileGenerator;
 
 final class NodeFiles {
   private NodeFiles() {}
@@ -91,17 +91,13 @@ final class NodeFiles {
       } else {
         generateMULTINode_java(outputFile, nodeType);
       }
-
-      outputFile.close();
-
     } catch (IOException e) {
       throw new Error(e.toString());
     }
   }
 
 
-  static void generatePrologue(PrintWriter ostr)
-  {
+  static void generatePrologue(IndentingPrintWriter ostr) {
     // Output the node's package name. JJTreeGlobals.nodePackageName
     // will be the value of NODE_PACKAGE in OPTIONS; if that wasn't set it
     // will default to the parser's package name.
@@ -131,7 +127,7 @@ final class NodeFiles {
 
     try {
       OutputFile outputFile = new OutputFile(file);
-      PrintWriter ostr = outputFile.getPrintWriter();
+      IndentingPrintWriter ostr = outputFile.getPrintWriter();
 
       List nodeIds = ASTNodeDescriptor.getNodeIds();
       List nodeNames = ASTNodeDescriptor.getNodeNames();
@@ -180,7 +176,7 @@ final class NodeFiles {
 
     try {
       OutputFile outputFile = new OutputFile(file);
-      PrintWriter ostr = outputFile.getPrintWriter();
+      IndentingPrintWriter ostr = outputFile.getPrintWriter();
 
       List nodeNames = ASTNodeDescriptor.getNodeNames();
 
@@ -227,16 +223,16 @@ final class NodeFiles {
 
   private static void generateNode_java(OutputFile outputFile) throws IOException
   {
-    PrintWriter ostr = outputFile.getPrintWriter();
+    IndentingPrintWriter ostr = outputFile.getPrintWriter();
 
     generatePrologue(ostr);
-    
+
     Map options = new HashMap(Options.getOptions());
     options.put("PARSER_NAME", JJTreeGlobals.parserName);
-    
+
     JavaFileGenerator generator = new JavaFileGenerator(
         "/templates/Node.template", options);
-    
+
     generator.generate(ostr);
 
     ostr.close();
@@ -245,17 +241,17 @@ final class NodeFiles {
 
   private static void generateSimpleNode_java(OutputFile outputFile) throws IOException
   {
-    PrintWriter ostr = outputFile.getPrintWriter();
+    IndentingPrintWriter ostr = outputFile.getPrintWriter();
 
     generatePrologue(ostr);
-    
+
     Map options = new HashMap(Options.getOptions());
     options.put("PARSER_NAME", JJTreeGlobals.parserName);
     options.put("VISITOR_RETURN_TYPE_VOID", Boolean.valueOf(JJTreeOptions.getVisitorReturnType().equals("void")));
-    
+
     JavaFileGenerator generator = new JavaFileGenerator(
         "/templates/SimpleNode.template", options);
-    
+
     generator.generate(ostr);
 
     ostr.close();
@@ -264,7 +260,7 @@ final class NodeFiles {
 
   private static void generateMULTINode_java(OutputFile outputFile, String nodeType) throws IOException
   {
-    PrintWriter ostr = outputFile.getPrintWriter();
+    IndentingPrintWriter ostr = outputFile.getPrintWriter();
 
     generatePrologue(ostr);
 
@@ -272,10 +268,10 @@ final class NodeFiles {
     options.put("PARSER_NAME", JJTreeGlobals.parserName);
     options.put("NODE_TYPE", nodeType);
     options.put("VISITOR_RETURN_TYPE_VOID", Boolean.valueOf(JJTreeOptions.getVisitorReturnType().equals("void")));
-    
+
     JavaFileGenerator generator = new JavaFileGenerator(
         "/templates/MultiNode.template", options);
-    
+
     generator.generate(ostr);
 
     ostr.close();

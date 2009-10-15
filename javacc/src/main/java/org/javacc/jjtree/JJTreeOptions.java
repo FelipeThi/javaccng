@@ -28,10 +28,10 @@
 
 package org.javacc.jjtree;
 
-import java.io.File;
-
 import org.javacc.parser.JavaCCErrors;
 import org.javacc.parser.Options;
+
+import java.io.File;
 
 /**
  * The JJTree-specific options.

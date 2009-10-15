@@ -28,14 +28,14 @@
 
 package org.javacc.jjdoc;
 
-import java.util.Hashtable;
-
 import org.javacc.parser.Expansion;
 import org.javacc.parser.JavaCodeProduction;
 import org.javacc.parser.NonTerminal;
 import org.javacc.parser.NormalProduction;
 import org.javacc.parser.RegularExpression;
 import org.javacc.parser.TokenProduction;
+
+import java.util.Hashtable;
 
 /**
  * Output BNF in HTML 3.2 format.

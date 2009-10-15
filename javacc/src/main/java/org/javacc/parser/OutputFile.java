@@ -25,6 +25,9 @@
 
 package org.javacc.parser;
 
+import org.javacc.Version;
+import org.javacc.utils.io.IndentingPrintWriter;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -33,12 +36,11 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
-import org.javacc.Version;
 
 /**
  * This class handles the creation and maintenance of the boiler-plate classes,
@@ -237,7 +239,7 @@ public class OutputFile {
    * @return
    * @throws IOException
    */
-  public PrintWriter getPrintWriter() throws IOException {
+  public IndentingPrintWriter getPrintWriter() throws IOException {
     if (pw == null) {
       MessageDigest digest;
       try {
@@ -309,10 +311,10 @@ public class OutputFile {
     }
   }
 
-  private class TrapClosePrintWriter extends PrintWriter {
+  private class TrapClosePrintWriter extends IndentingPrintWriter {
 
     public TrapClosePrintWriter(OutputStream os) {
-      super(os);
+      super(new OutputStreamWriter(os));
     }
 
     public void closePrintWriter() {

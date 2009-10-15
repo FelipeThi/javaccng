@@ -27,14 +27,22 @@
  */
 package org.javacc.jjdoc;
 
-import java.util.*;
-import org.javacc.parser.*;
-import java.io.*;
+import org.javacc.parser.Expansion;
+import org.javacc.parser.JavaCodeProduction;
+import org.javacc.parser.NonTerminal;
+import org.javacc.parser.NormalProduction;
+import org.javacc.parser.RCharacterList;
+import org.javacc.parser.RJustName;
+import org.javacc.parser.RegularExpression;
+import org.javacc.parser.TokenProduction;
+import org.javacc.utils.io.IndentingPrintWriter;
+
+import java.util.Hashtable;
 
 public class BNFGenerator implements Generator {
   private Hashtable id_map = new Hashtable();
   private int id = 1;
-  protected PrintWriter ostr;
+  protected IndentingPrintWriter ostr;
   private boolean printing = true;
 
   protected String get_id(String nt) {
@@ -46,11 +54,11 @@ public class BNFGenerator implements Generator {
     return i;
   }
 
-  protected PrintWriter create_output_stream() {
+  protected IndentingPrintWriter create_output_stream() {
 
     if (JJDocOptions.getOutputFile().equals("")) {
       if (JJDocGlobals.input_file.equals("standard input")) {
-        return new java.io.PrintWriter(
+        return new IndentingPrintWriter(
                                        new java.io.OutputStreamWriter(
                                                                       System.out));
       } else {
@@ -72,13 +80,13 @@ public class BNFGenerator implements Generator {
       JJDocGlobals.output_file = JJDocOptions.getOutputFile();
     }
     try {
-      ostr = new java.io.PrintWriter(
+      ostr = new IndentingPrintWriter(
                                      new java.io.FileWriter(
                                                             JJDocGlobals.output_file));
     } catch (java.io.IOException e) {
       error("JJDoc: can't open output stream on file "
           + JJDocGlobals.output_file + ".  Using standard output.");
-      ostr = new java.io.PrintWriter(new java.io.OutputStreamWriter(System.out));
+      ostr = new IndentingPrintWriter(new java.io.OutputStreamWriter(System.out));
     }
 
     return ostr;

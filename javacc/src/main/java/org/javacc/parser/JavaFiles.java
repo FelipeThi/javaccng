@@ -30,12 +30,12 @@ package org.javacc.parser;
 
 import org.javacc.Version;
 import org.javacc.utils.JavaFileGenerator;
+import org.javacc.utils.io.IndentingPrintWriter;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -172,7 +172,7 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
         return;
       }
 
-      final PrintWriter ostr = outputFile.getPrintWriter();
+      final IndentingPrintWriter ostr = outputFile.getPrintWriter();
 
       if (cu_to_insertion_point_1.size() != 0 &&
           ((Token)cu_to_insertion_point_1.get(0)).getKind() == PACKAGE
@@ -215,7 +215,7 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
         return;
       }
 
-      final PrintWriter ostr = outputFile.getPrintWriter();
+      final IndentingPrintWriter ostr = outputFile.getPrintWriter();
 
       if (cu_to_insertion_point_1.size() != 0 &&
           ((Token)cu_to_insertion_point_1.get(0)).getKind() == PACKAGE
@@ -258,7 +258,7 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
         return;
       }
 
-      final PrintWriter ostr = outputFile.getPrintWriter();
+      final IndentingPrintWriter ostr = outputFile.getPrintWriter();
 
       if (cu_to_insertion_point_1.size() != 0 &&
           ((Token)cu_to_insertion_point_1.get(0)).getKind() == PACKAGE
@@ -300,7 +300,7 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
         return;
       }
 
-      final PrintWriter ostr = outputFile.getPrintWriter();
+      final IndentingPrintWriter ostr = outputFile.getPrintWriter();
 
       if (cu_to_insertion_point_1.size() != 0 &&
           ((Token)cu_to_insertion_point_1.get(0)).getKind() == PACKAGE
@@ -342,7 +342,7 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
         return;
       }
 
-      final PrintWriter ostr = outputFile.getPrintWriter();
+      final IndentingPrintWriter ostr = outputFile.getPrintWriter();
 
       if (cu_to_insertion_point_1.size() != 0 &&
           ((Token)cu_to_insertion_point_1.get(0)).getKind() == PACKAGE
@@ -384,7 +384,7 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
         return;
       }
 
-      final PrintWriter ostr = outputFile.getPrintWriter();
+      final IndentingPrintWriter ostr = outputFile.getPrintWriter();
 
       if (cu_to_insertion_point_1.size() != 0 &&
           ((Token)cu_to_insertion_point_1.get(0)).getKind() == PACKAGE
@@ -426,7 +426,7 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
         return;
       }
 
-      final PrintWriter ostr = outputFile.getPrintWriter();
+      final IndentingPrintWriter ostr = outputFile.getPrintWriter();
 
       if (cu_to_insertion_point_1.size() != 0 &&
           ((Token)cu_to_insertion_point_1.get(0)).getKind() == PACKAGE

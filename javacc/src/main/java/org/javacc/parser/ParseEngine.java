@@ -27,6 +27,8 @@
  */
 package org.javacc.parser;
 
+import org.javacc.utils.io.IndentingPrintWriter;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -35,7 +37,7 @@ import java.util.List;
 
 public class ParseEngine extends JavaCCGlobals {
 
-  static private java.io.PrintWriter ostr;
+  static private IndentingPrintWriter ostr;
   static private int gensymindex = 0;
   static private int indentamt;
   static private boolean jj2LA;
@@ -1187,7 +1189,7 @@ public class ParseEngine extends JavaCCGlobals {
     return retval;
   }
 
-  static void build(java.io.PrintWriter ps) {
+  static void build(IndentingPrintWriter ps) {
     NormalProduction p;
     JavaCodeProduction jp;
     Token t = null;

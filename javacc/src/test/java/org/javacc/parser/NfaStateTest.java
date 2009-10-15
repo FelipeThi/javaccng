@@ -1,12 +1,12 @@
 package org.javacc.parser;
 
 import org.javacc.JavaCCTestCase;
+import org.javacc.utils.io.IndentingPrintWriter;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.BufferedReader;
-import java.io.PrintWriter;
 import java.io.StringWriter;
 
 /**
@@ -73,19 +73,19 @@ public class NfaStateTest extends JavaCCTestCase {
 
   /**
    * Test method for {@link org.javacc.parser.NfaState#
-   * GenerateInitMoves(java.io.PrintWriter)}.
+   * GenerateInitMoves(IndentingPrintWriter)}.
    */
   public void testGenerateInitMoves() {
   }
 
   /**
    * Test method for {@link org.javacc.parser.NfaState#
-   * DumpStateSets(java.io.PrintWriter)}.
+   * DumpStateSets(IndentingPrintWriter)}.
    */
   @Test
   public void testDumpStateSets() {
     StringWriter output = new StringWriter();
-    PrintWriter contentWriter = new PrintWriter(output);
+    IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     NfaState.DumpStateSets(contentWriter);
     assertEquals("static final int[] jjNextStates = {\n};\n",
                  output.toString().replaceAll("\r", ""));
@@ -93,12 +93,12 @@ public class NfaStateTest extends JavaCCTestCase {
 
   /**
    * Test method for {@link org.javacc.parser.NfaState#
-   * DumpStateSets(java.io.PrintWriter)}.
+   * DumpStateSets(IndentingPrintWriter)}.
    */
   @Test
   public void testDumpStateSetsInitialised() throws Exception {
     StringWriter output = new StringWriter();
-    PrintWriter contentWriter = new PrintWriter(output);
+    IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     setupState();
     NfaState.DumpStateSets(contentWriter);
     assertEquals("static final int[] jjNextStates = {\n" +
@@ -112,12 +112,12 @@ public class NfaStateTest extends JavaCCTestCase {
 
   /**
    * Test method for {@link org.javacc.parser.NfaState#
-   * DumpCharAndRangeMoves(java.io.PrintWriter)}.
+   * DumpCharAndRangeMoves(IndentingPrintWriter)}.
    */
   @Test
   public void testDumpCharAndRangeMoves() throws Exception {
     StringWriter output = new StringWriter();
-    PrintWriter contentWriter = new PrintWriter(output);
+    IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     NfaState.DumpCharAndRangeMoves(contentWriter);
     assertEquals(
         "         int i2 = (jjChar & 0xff) >> 6;\n" +
@@ -126,7 +126,7 @@ public class NfaStateTest extends JavaCCTestCase {
             "         {\n" +
             "            switch(jjStateSet[--i])\n" +
             "            {\n" +
-            "               default : break;\n" +
+            "               default: break;\n" +
             "            }\n" +
             "         } while(i != startsAt);\n"
         , output.toString().replaceAll("\r", ""));
@@ -134,12 +134,12 @@ public class NfaStateTest extends JavaCCTestCase {
 
   /**
    * Test method for {@link org.javacc.parser.NfaState#
-   * DumpCharAndRangeMoves(java.io.PrintWriter)}.
+   * DumpCharAndRangeMoves(IndentingPrintWriter)}.
    */
   @Test
   public void testDumpCharAndRangeMovesInitialised() throws Exception {
     StringWriter output = new StringWriter();
-    PrintWriter contentWriter = new PrintWriter(output);
+    IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     setupState();
     NfaState.DumpCharAndRangeMoves(contentWriter);
     assertEquals(
@@ -152,7 +152,7 @@ public class NfaStateTest extends JavaCCTestCase {
             "         {\n" +
             "            switch(jjStateSet[--i])\n" +
             "            {\n" +
-            "               default : break;\n" +
+            "               default: break;\n" +
             "            }\n" +
             "         } while(i != startsAt);\n"
         , output.toString().replaceAll("\r", ""));
@@ -160,24 +160,24 @@ public class NfaStateTest extends JavaCCTestCase {
 
   /**
    * Test method for {@link org.javacc.parser.NfaState#
-   * DumpNonAsciiMoveMethods(java.io.PrintWriter)}.
+   * DumpNonAsciiMoveMethods(IndentingPrintWriter)}.
    */
   @Test
   public void testDumpNonAsciiMoveMethods() {
     StringWriter output = new StringWriter();
-    PrintWriter contentWriter = new PrintWriter(output);
+    IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     NfaState.DumpNonAsciiMoveMethods(contentWriter);
     assertEquals("", output.toString());
   }
 
   /**
    * Test method for {@link org.javacc.parser.NfaState#
-   * DumpNonAsciiMoveMethods(java.io.PrintWriter)}.
+   * DumpNonAsciiMoveMethods(IndentingPrintWriter)}.
    */
   @Test
   public void testDumpNonAsciiMoveMethodsInitialised() throws Exception {
     StringWriter output = new StringWriter();
-    PrintWriter contentWriter = new PrintWriter(output);
+    IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     setupState();
     NfaState.DumpNonAsciiMoveMethods(contentWriter);
     assertEquals("private static boolean jjCanMove_0(int hiByte, int i1, int i2, long l1, long l2)\n" +
@@ -186,7 +186,7 @@ public class NfaStateTest extends JavaCCTestCase {
         "   {\n" +
         "      case 0:\n" +
         "         return ((jjbitVec2[i2] & l2) != 0L);\n" +
-        "      default :\n" +
+        "      default:\n" +
         "         if ((jjbitVec0[i1] & l1) != 0L)\n" +
         "            return true;\n" +
         "         return false;\n" +
@@ -270,7 +270,7 @@ public class NfaStateTest extends JavaCCTestCase {
         "         return ((jjbitVec38[i2] & l2) != 0L);\n" +
         "      case 255:\n" +
         "         return ((jjbitVec39[i2] & l2) != 0L);\n" +
-        "      default :\n" +
+        "      default:\n" +
         "         if ((jjbitVec3[i1] & l1) != 0L)\n" +
         "            return true;\n" +
         "         return false;\n" +
@@ -354,7 +354,7 @@ public class NfaStateTest extends JavaCCTestCase {
         "         return ((jjbitVec60[i2] & l2) != 0L);\n" +
         "      case 255:\n" +
         "         return ((jjbitVec61[i2] & l2) != 0L);\n" +
-        "      default :\n" +
+        "      default:\n" +
         "         if ((jjbitVec3[i1] & l1) != 0L)\n" +
         "            return true;\n" +
         "         return false;\n" +
@@ -362,11 +362,11 @@ public class NfaStateTest extends JavaCCTestCase {
         "}\n", output.toString().replaceAll("\r", ""));
   }
 
-  /** Test method for {@link org.javacc.parser.NfaState#DumpMoveNfa(java.io.PrintWriter)}. */
+  /** Test method for {@link org.javacc.parser.NfaState#DumpMoveNfa(IndentingPrintWriter)}. */
   @Test
   public void testDumpMoveNfa() {
     StringWriter output = new StringWriter();
-    PrintWriter contentWriter = new PrintWriter(output);
+    IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     try {
       NfaState.DumpMoveNfa(contentWriter);
       fail("Should have bombed");
@@ -410,11 +410,11 @@ public class NfaStateTest extends JavaCCTestCase {
         */
   }
 
-  /** Test method for {@link org.javacc.parser.NfaState#DumpMoveNfa(java.io.PrintWriter)}. */
+  /** Test method for {@link org.javacc.parser.NfaState#DumpMoveNfa(IndentingPrintWriter)}. */
   @Test
   public void testDumpMoveNfaInitialised() throws Exception {
     StringWriter output = new StringWriter();
-    PrintWriter contentWriter = new PrintWriter(output);
+    IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     setupState();
     NfaState.DumpMoveNfa(contentWriter);
     assertEquals("private int jjMoveNfa_3(int startState, int curPos) throws java.io.IOException\n" +
@@ -425,12 +425,12 @@ public class NfaStateTest extends JavaCCTestCase {
 
   /**
    * Test method for {@link org.javacc.parser.NfaState#
-   * DumpStatesForState(java.io.PrintWriter)}.
+   * DumpStatesForState(IndentingPrintWriter)}.
    */
   @Test
   public void testDumpStatesForState() throws Exception {
     StringWriter output = new StringWriter();
-    PrintWriter contentWriter = new PrintWriter(output);
+    IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     NfaState.DumpStatesForState(contentWriter);
     assertEquals("protected static final int[][][] statesForState = null;\n",
                  output.toString().replaceAll("\r", ""));
@@ -438,12 +438,12 @@ public class NfaStateTest extends JavaCCTestCase {
 
   /**
    * Test method for {@link org.javacc.parser.NfaState#
-   * DumpStatesForState(java.io.PrintWriter)}.
+   * DumpStatesForState(IndentingPrintWriter)}.
    */
   @Test
   public void testDumpStatesForStateInitialised() throws Exception {
     StringWriter output = new StringWriter();
-    PrintWriter contentWriter = new PrintWriter(output);
+    IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     setupState();
     NfaState.DumpStatesForState(contentWriter);
     assertEquals("protected static final int[][][] statesForState = {\n" +
@@ -527,22 +527,22 @@ public class NfaStateTest extends JavaCCTestCase {
                  output.toString().replaceAll("\r", ""));
   }
 
-  /** Test method for {@link org.javacc.parser.NfaState#DumpStatesForKind(java.io.PrintWriter)}. */
+  /** Test method for {@link org.javacc.parser.NfaState#DumpStatesForKind(IndentingPrintWriter)}. */
   @Test
   public void testDumpStatesForKind() {
     StringWriter output = new StringWriter();
-    PrintWriter contentWriter = new PrintWriter(output);
+    IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     NfaState.DumpStatesForKind(contentWriter);
     assertEquals("protected static final int[][][] statesForState = null;\n" +
         "protected static final int[][] kindForState = null;\n",
                  output.toString().replaceAll("\r", ""));
   }
 
-  /** Test method for {@link org.javacc.parser.NfaState#DumpStatesForKind(java.io.PrintWriter)}. */
+  /** Test method for {@link org.javacc.parser.NfaState#DumpStatesForKind(IndentingPrintWriter)}. */
   @Test
   public void testDumpStatesForKindInitialised() throws Exception {
     StringWriter output = new StringWriter();
-    PrintWriter contentWriter = new PrintWriter(output);
+    IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     setupState();
     NfaState.DumpStatesForKind(contentWriter);
     assertEquals("protected static final int[][][] statesForState = {\n" +

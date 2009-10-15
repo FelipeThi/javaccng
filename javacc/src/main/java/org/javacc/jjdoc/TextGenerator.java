@@ -29,20 +29,19 @@
 
 package org.javacc.jjdoc;
 
-import java.io.PrintWriter;
-
 import org.javacc.parser.Expansion;
 import org.javacc.parser.JavaCodeProduction;
 import org.javacc.parser.NonTerminal;
 import org.javacc.parser.NormalProduction;
 import org.javacc.parser.RegularExpression;
 import org.javacc.parser.TokenProduction;
+import org.javacc.utils.io.IndentingPrintWriter;
 
 /**
  * Output BNF in text format.
  */
 public class TextGenerator implements Generator {
-  protected PrintWriter ostr;
+  protected IndentingPrintWriter ostr;
 
   public TextGenerator() {
   }
@@ -202,11 +201,11 @@ public class TextGenerator implements Generator {
    * based on the name of the parser, but if that fails use the standard output
    * stream.
    */
-  protected PrintWriter create_output_stream() {
+  protected IndentingPrintWriter create_output_stream() {
 
     if (JJDocOptions.getOutputFile().equals("")) {
       if (JJDocGlobals.input_file.equals("standard input")) {
-        return new java.io.PrintWriter(
+        return new IndentingPrintWriter(
                                        new java.io.OutputStreamWriter(
                                                                       System.out));
       } else {
@@ -232,13 +231,13 @@ public class TextGenerator implements Generator {
     }
 
     try {
-      ostr = new java.io.PrintWriter(
+      ostr = new IndentingPrintWriter(
                                      new java.io.FileWriter(
                                                             JJDocGlobals.output_file));
     } catch (java.io.IOException e) {
       error("JJDoc: can't open output stream on file "
           + JJDocGlobals.output_file + ".  Using standard output.");
-      ostr = new java.io.PrintWriter(new java.io.OutputStreamWriter(System.out));
+      ostr = new IndentingPrintWriter(new java.io.OutputStreamWriter(System.out));
     }
 
     return ostr;

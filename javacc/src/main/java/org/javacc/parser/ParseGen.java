@@ -27,11 +27,12 @@
  */
 package org.javacc.parser;
 
+import org.javacc.utils.io.IndentingPrintWriter;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -50,7 +51,7 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
     if (Options.getBuildParser()) {
 
       try {
-        ostr = new PrintWriter(
+        ostr = new IndentingPrintWriter(
             new BufferedWriter(
                 new FileWriter(
                     new File(Options.getOutputDirectory(), cu_name + ".java")
@@ -529,7 +530,7 @@ public class ParseGen extends JavaCCGlobals implements JavaCCParserConstants {
     } // matches "if (Options.getBuildParser())"
   }
 
-  static private PrintWriter ostr;
+  static private IndentingPrintWriter ostr;
 
   public static void reInit() {
     ostr = null;

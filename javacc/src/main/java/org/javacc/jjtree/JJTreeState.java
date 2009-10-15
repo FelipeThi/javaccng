@@ -29,10 +29,10 @@
 package org.javacc.jjtree;
 
 import org.javacc.parser.OutputFile;
+import org.javacc.utils.io.IndentingPrintWriter;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 /**
  * Generate the State of a tree.
@@ -61,7 +61,7 @@ final class JJTreeState
 
     try {
       OutputFile outputFile = new OutputFile(file);
-      PrintWriter ostr = outputFile.getPrintWriter();
+      IndentingPrintWriter ostr = outputFile.getPrintWriter();
       NodeFiles.generatePrologue(ostr);
       insertState(ostr);
       outputFile.close();
@@ -71,7 +71,7 @@ final class JJTreeState
   }
 
 
-  private static void insertState(PrintWriter ostr) {
+  private static void insertState(IndentingPrintWriter ostr) {
     ostr.println("public class " + nameState() + " {");
 
     if (!JJTreeOptions.getGenerateGenerics())

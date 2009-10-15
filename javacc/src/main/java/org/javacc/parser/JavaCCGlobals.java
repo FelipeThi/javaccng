@@ -28,6 +28,7 @@
 package org.javacc.parser;
 
 import org.javacc.Version;
+import org.javacc.utils.io.IndentingPrintWriter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -398,7 +399,7 @@ public class JavaCCGlobals {
     ccol = tt.getBeginColumn();
   }
 
-  static protected void printTokenOnly(Token t, java.io.PrintWriter ostr) {
+  static protected void printTokenOnly(Token t, IndentingPrintWriter ostr) {
     for (; cline < t.getBeginLine(); cline++) {
       ostr.println(""); ccol = 1;
     }
@@ -418,7 +419,7 @@ public class JavaCCGlobals {
     }
   }
 
-  static protected void printToken(Token t, java.io.PrintWriter ostr) {
+  static protected void printToken(Token t, IndentingPrintWriter ostr) {
     Token tt = t.specialToken;
     if (tt != null) {
       while (tt.specialToken != null) tt = tt.specialToken;
@@ -430,7 +431,7 @@ public class JavaCCGlobals {
     printTokenOnly(t, ostr);
   }
 
-  static protected void printTokenList(List list, java.io.PrintWriter ostr) {
+  static protected void printTokenList(List list, IndentingPrintWriter ostr) {
     Token t = null;
     for (java.util.Iterator it = list.iterator(); it.hasNext();) {
       t = (Token)it.next();
@@ -441,7 +442,7 @@ public class JavaCCGlobals {
       printTrailingComments(t, ostr);
   }
 
-  static protected void printLeadingComments(Token t, java.io.PrintWriter ostr) {
+  static protected void printLeadingComments(Token t, IndentingPrintWriter ostr) {
     if (t.specialToken == null) return;
     Token tt = t.specialToken;
     while (tt.specialToken != null) tt = tt.specialToken;
@@ -455,7 +456,7 @@ public class JavaCCGlobals {
     }
   }
 
-  static protected void printTrailingComments(Token t, java.io.PrintWriter ostr) {
+  static protected void printTrailingComments(Token t, IndentingPrintWriter ostr) {
     if (t.next == null) return;
     printLeadingComments(t.next);
   }

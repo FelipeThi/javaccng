@@ -27,6 +27,8 @@
  */
 package org.javacc.parser;
 
+import org.javacc.utils.io.IndentingPrintWriter;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -859,7 +861,7 @@ public class NfaState
       (Need a better comment). */
 
    static int[] tmpIndices = new int[512]; // 2 * 256
-   void GenerateNonAsciiMoves(java.io.PrintWriter ostr)
+   void GenerateNonAsciiMoves(IndentingPrintWriter ostr)
    {
       int i = 0, j = 0;
       char hiByte;
@@ -1201,7 +1203,7 @@ public class NfaState
       return -1;
    }
 
-   public void GenerateInitMoves(java.io.PrintWriter ostr)
+   public void GenerateInitMoves(IndentingPrintWriter ostr)
    {
       GetEpsilonMovesString();
 
@@ -1233,7 +1235,7 @@ public class NfaState
       return ret;
    }
 
-   public static void DumpStateSets(java.io.PrintWriter ostr)
+   public static void DumpStateSets(IndentingPrintWriter ostr)
    {
       int cnt = 0;
 
@@ -1612,7 +1614,7 @@ public class NfaState
       return false;
    }
 
-   private static void DumpHeadForCase(java.io.PrintWriter ostr, int byteNum)
+   private static void DumpHeadForCase(IndentingPrintWriter ostr, int byteNum)
    {
       if (byteNum == 0)
          ostr.println("         long l = 1L << jjChar;");
@@ -1701,7 +1703,7 @@ public class NfaState
       return partition;
    }
 
-   private String PrintNoBreak(java.io.PrintWriter ostr, int byteNum, boolean[] dumped)
+   private String PrintNoBreak(IndentingPrintWriter ostr, int byteNum, boolean[] dumped)
    {
       if (inNextOf != 1)
          throw new Error("JavaCC Bug: Please send mail to sankar@cs.stanford.edu");
@@ -1727,7 +1729,7 @@ public class NfaState
       return ("               case " + stateName + ":\n");
    }
 
-   private static void DumpCompositeStatesAsciiMoves(java.io.PrintWriter ostr,
+   private static void DumpCompositeStatesAsciiMoves(IndentingPrintWriter ostr,
                                 String key, int byteNum, boolean[] dumped)
    {
       int i;
@@ -1835,7 +1837,7 @@ public class NfaState
       return ElemOccurs(stateName, set) >= 0;
    }
 
-   private void DumpAsciiMoveForCompositeState(java.io.PrintWriter ostr, int byteNum, boolean elseNeeded)
+   private void DumpAsciiMoveForCompositeState(IndentingPrintWriter ostr, int byteNum, boolean elseNeeded)
    {
       boolean nextIntersects = selfLoop();
 
@@ -1877,8 +1879,8 @@ public class NfaState
             ostr.println("                  {");
          }
 
-         ostr.println(prefix + "                  if (kind > " + kindToPrint + ")");
-         ostr.println(prefix + "                     kind = " + kindToPrint + ";");
+         ostr.println("                  if (kind > " + kindToPrint + ")");
+         ostr.println("                     kind = " + kindToPrint + ";");
       }
 
       if (next != null && next.usefulEpsilonMoves > 0)
@@ -1890,13 +1892,13 @@ public class NfaState
             int name = stateNames[0];
 
             if (nextIntersects)
-               ostr.println(prefix + "                  jjCheckNAdd(" + name + ");");
+               ostr.println("                  jjCheckNAdd(" + name + ");");
             else
-               ostr.println(prefix + "                  jjStateSet[jjNewStateCount++] = " + name + ";");
+               ostr.println("                  jjStateSet[jjNewStateCount++] = " + name + ";");
          }
          else if (next.usefulEpsilonMoves == 2 && nextIntersects)
          {
-            ostr.println(prefix + "                  jjCheckNAddTwoStates(" +
+            ostr.println("                  jjCheckNAddTwoStates(" +
                stateNames[0] + ", " + stateNames[1] + ");");
          }
          else
@@ -1905,7 +1907,7 @@ public class NfaState
             boolean notTwo = (indices[0] + 1 != indices[1]);
 
             if (nextIntersects) {
-              ostr.print(prefix + "                  jjCheckNAddStates(" + indices[0]);
+              ostr.print("                  jjCheckNAddStates(" + indices[0]);
               if (notTwo) {
                 jjCheckNAddStatesDualNeeded = true;
                 ostr.print(", " + indices[1]);
@@ -1914,7 +1916,7 @@ public class NfaState
               }
               ostr.println(");");
             } else
-               ostr.println(prefix + "                  jjAddStates(" +
+               ostr.println("                  jjAddStates(" +
                                      indices[0] + ", " + indices[1] + ");");
          }
       }
@@ -1923,7 +1925,7 @@ public class NfaState
          ostr.println("                  }");
    }
 
-   private void DumpAsciiMove(java.io.PrintWriter ostr, int byteNum, boolean dumped[])
+   private void DumpAsciiMove(IndentingPrintWriter ostr, int byteNum, boolean dumped[])
    {
       boolean nextIntersects = selfLoop() && isComposite;
       boolean onlyState = true;
@@ -2039,13 +2041,13 @@ public class NfaState
          {
             int name = stateNames[0];
             if (nextIntersects)
-               ostr.println(prefix + "                  jjCheckNAdd(" + name + ");");
+               ostr.println("                  jjCheckNAdd(" + name + ");");
             else
-               ostr.println(prefix + "                  jjStateSet[jjNewStateCount++] = " + name + ";");
+               ostr.println("                  jjStateSet[jjNewStateCount++] = " + name + ";");
          }
          else if (next.usefulEpsilonMoves == 2 && nextIntersects)
          {
-            ostr.println(prefix + "                  jjCheckNAddTwoStates(" +
+            ostr.println("                  jjCheckNAddTwoStates(" +
                stateNames[0] + ", " + stateNames[1] + ");");
          }
          else
@@ -2054,7 +2056,7 @@ public class NfaState
             boolean notTwo = (indices[0] + 1 != indices[1]);
 
             if (nextIntersects) {
-              ostr.print(prefix + "                  jjCheckNAddStates(" + indices[0]);
+              ostr.print("                  jjCheckNAddStates(" + indices[0]);
               if (notTwo) {
                 jjCheckNAddStatesDualNeeded = true;
                 ostr.print(", " + indices[1]);
@@ -2063,7 +2065,7 @@ public class NfaState
               }
               ostr.println(");");
             } else
-               ostr.println(prefix + "                  jjAddStates(" +
+               ostr.println("                  jjAddStates(" +
                                      indices[0] + ", " + indices[1] + ");");
          }
       }
@@ -2074,7 +2076,7 @@ public class NfaState
          ostr.println("                  break;");
    }
 
-   private static void DumpAsciiMoves(java.io.PrintWriter ostr, int byteNum)
+   private static void DumpAsciiMoves(IndentingPrintWriter ostr, int byteNum)
    {
       boolean[] dumped = new boolean[Math.max(generatedStates, dummyStateIndex + 1)];
       Enumeration e = compositeStateTable.keys();
@@ -2125,12 +2127,12 @@ public class NfaState
          temp.DumpAsciiMove(ostr, byteNum, dumped);
       }
 
-      ostr.println("               default : break;");
+      ostr.println("               default: break;");
       ostr.println("            }");
       ostr.println("         } while(i != startsAt);");
    }
 
-   private static void DumpCompositeStatesNonAsciiMoves(java.io.PrintWriter ostr,
+   private static void DumpCompositeStatesNonAsciiMoves(IndentingPrintWriter ostr,
                                       String key, boolean[] dumped)
    {
       int i;
@@ -2221,7 +2223,7 @@ public class NfaState
          ostr.println("                  break;");
    }
 
-   private final void DumpNonAsciiMoveForCompositeState(java.io.PrintWriter ostr)
+   private final void DumpNonAsciiMoveForCompositeState(IndentingPrintWriter ostr)
    {
       boolean nextIntersects = selfLoop();
       for (int j = 0; j < allStates.size(); j++)
@@ -2300,7 +2302,7 @@ public class NfaState
          ostr.println("                  }");
    }
 
-   private final void DumpNonAsciiMove(java.io.PrintWriter ostr, boolean dumped[])
+   private final void DumpNonAsciiMove(IndentingPrintWriter ostr, boolean dumped[])
    {
       boolean nextIntersects = selfLoop() && isComposite;
 
@@ -2395,13 +2397,13 @@ public class NfaState
          {
             int name = stateNames[0];
             if (nextIntersects)
-               ostr.println(prefix + "                  jjCheckNAdd(" + name + ");");
+               ostr.println("                  jjCheckNAdd(" + name + ");");
             else
-               ostr.println(prefix + "                  jjStateSet[jjNewStateCount++] = " + name + ";");
+               ostr.println("                  jjStateSet[jjNewStateCount++] = " + name + ";");
          }
          else if (next.usefulEpsilonMoves == 2 && nextIntersects)
          {
-            ostr.println(prefix + "                  jjCheckNAddTwoStates(" +
+            ostr.println("                  jjCheckNAddTwoStates(" +
                stateNames[0] + ", " + stateNames[1] + ");");
          }
          else
@@ -2410,7 +2412,7 @@ public class NfaState
             boolean notTwo = (indices[0] + 1 != indices[1]);
 
             if (nextIntersects) {
-              ostr.print(prefix + "                  jjCheckNAddStates(" + indices[0]);
+              ostr.print("                  jjCheckNAddStates(" + indices[0]);
               if (notTwo) {
                 jjCheckNAddStatesDualNeeded = true;
                 ostr.print(", " + indices[1]);
@@ -2419,14 +2421,14 @@ public class NfaState
               }
               ostr.println(");");
             } else
-              ostr.println(prefix + "                  jjAddStates(" + indices[0] + ", " + indices[1] + ");");
+              ostr.println("                  jjAddStates(" + indices[0] + ", " + indices[1] + ");");
          }
       }
 
       ostr.println("                  break;");
    }
 
-   public static void DumpCharAndRangeMoves(java.io.PrintWriter ostr)
+   public static void DumpCharAndRangeMoves(IndentingPrintWriter ostr)
    {
       boolean[] dumped = new boolean[Math.max(generatedStates, dummyStateIndex + 1)];
       Enumeration e = compositeStateTable.keys();
@@ -2478,12 +2480,12 @@ public class NfaState
          temp.DumpNonAsciiMove(ostr, dumped);
       }
 
-      ostr.println("               default : break;");
+      ostr.println("               default: break;");
       ostr.println("            }");
       ostr.println("         } while(i != startsAt);");
    }
 
-   public static void DumpNonAsciiMoveMethods(java.io.PrintWriter ostr)
+   public static void DumpNonAsciiMoveMethods(IndentingPrintWriter ostr)
    {
       if (!Options.getJavaUnicodeEscape() && !unicodeWarningGiven)
          return;
@@ -2498,7 +2500,7 @@ public class NfaState
       }
    }
 
-   void DumpNonAsciiMoveMethod(java.io.PrintWriter ostr)
+   void DumpNonAsciiMoveMethod(IndentingPrintWriter ostr)
    {
       int j;
       ostr.println("private static boolean jjCanMove_" + nonAsciiMethod +
@@ -2525,7 +2527,7 @@ public class NfaState
          }
       }
 
-      ostr.println("      default :");
+      ostr.println("      default:");
 
       if (nonAsciiMoveIndices != null &&
           (j = nonAsciiMoveIndices.length) > 0)
@@ -2570,7 +2572,7 @@ public class NfaState
    }
 
    //private static boolean boilerPlateDumped = false;
-   static void PrintBoilerPlate(java.io.PrintWriter ostr)
+   static void PrintBoilerPlate(IndentingPrintWriter ostr)
    {
       ostr.println("private void " +
                     "jjCheckNAdd(int state)");
@@ -2717,7 +2719,7 @@ public class NfaState
 
    static int[][] kinds;
    static int[][][] statesForState;
-   public static void DumpMoveNfa(java.io.PrintWriter ostr)
+   public static void DumpMoveNfa(IndentingPrintWriter ostr)
    {
       //if (!boilerPlateDumped)
       //   PrintBoilerPlate(ostr);
@@ -2799,11 +2801,11 @@ public class NfaState
       ostr.println("   jjStateSet[0] = startState;");
 
       if (Options.getDebugTokenManager())
-         ostr.println("      debugStream.println(\"   Starting NFA to match one of : \" + " +
+         ostr.println("      debugPrinter.println(\"   Starting NFA to match one of : \" + " +
                  "jjKindsForStateVector(jjLexState, jjStateSet, 0, 1));");
 
       if (Options.getDebugTokenManager())
-         ostr.println("      debugStream.println(" + (LexGen.maxLexStates > 1 ?
+         ostr.println("      debugPrinter.println(" + (LexGen.maxLexStates > 1 ?
                  "\"<\" + jjLexStateNames[jjLexState] + \">\" + " :
                  "") + "\"Current character : \" + " +
                  "TokenManagerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
@@ -2848,7 +2850,7 @@ public class NfaState
       {
         ostr.println("      if (jjMatchedKind != 0 && jjMatchedKind != 0x" +
                 Integer.toHexString(Integer.MAX_VALUE) + ")");
-        ostr.println("         debugStream.println(" +
+        ostr.println("         debugPrinter.println(" +
                  "\"   Currently matched the first \" + (jjMatchedPos + 1) + \" characters as" +
                  " a \" + tokenImage[jjMatchedKind] + \" token.\");");
       }
@@ -2861,7 +2863,7 @@ public class NfaState
          ostr.println("         return curPos;");
 
       if (Options.getDebugTokenManager())
-         ostr.println("      debugStream.println(\"   Possible kinds of longer matches : \" + " +
+         ostr.println("      debugPrinter.println(\"   Possible kinds of longer matches : \" + " +
                  "jjKindsForStateVector(jjLexState, jjStateSet, startsAt, i));");
 
       ostr.println("      jjChar = charStream.readChar();");
@@ -2872,7 +2874,7 @@ public class NfaState
          ostr.println("      if (jjChar == -1) { return curPos; }");
 
       if (Options.getDebugTokenManager())
-         ostr.println("      debugStream.println(" + (LexGen.maxLexStates > 1 ?
+         ostr.println("      debugPrinter.println(" + (LexGen.maxLexStates > 1 ?
                  "\"<\" + jjLexStateNames[jjLexState] + \">\" + " :
                  "") + "\"Current character : \" + " +
                  "TokenManagerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
@@ -2908,7 +2910,7 @@ public class NfaState
       allStates.clear();
    }
 
-   public static void DumpStatesForState(java.io.PrintWriter ostr)
+   public static void DumpStatesForState(IndentingPrintWriter ostr)
    {
       ostr.print("protected static final int[][][] statesForState = ");
 
@@ -2953,7 +2955,7 @@ public class NfaState
       ostr.println("\n};");
    }
 
-   public static void DumpStatesForKind(java.io.PrintWriter ostr)
+   public static void DumpStatesForKind(IndentingPrintWriter ostr)
    {
       DumpStatesForState(ostr);
       boolean moreThanOne = false;

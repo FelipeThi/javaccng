@@ -28,6 +28,8 @@
 
 package org.javacc.parser;
 
+import org.javacc.utils.io.IndentingPrintWriter;
+
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -115,7 +117,7 @@ public class RStringLiteral extends RegularExpression {
     statesForPos = null;
   }
 
-  public static void DumpStrLiteralImages(java.io.PrintWriter ostr)
+  public static void DumpStrLiteralImages(IndentingPrintWriter ostr)
   {
     String image;
     int i;
@@ -209,7 +211,7 @@ public class RStringLiteral extends RegularExpression {
   /**
    * Used for top level string literals.
    */
-  public void GenerateDfa(java.io.PrintWriter ostr, int kind)
+  public void GenerateDfa(IndentingPrintWriter ostr, int kind)
   {
      String s;
      Hashtable temp;
@@ -333,15 +335,16 @@ public class RStringLiteral extends RegularExpression {
      return new Nfa(theStartState, finalState);
   }
 
-  static void DumpNullStrLiterals(java.io.PrintWriter ostr)
+  static void DumpNullStrLiterals(IndentingPrintWriter ostr)
   {
      ostr.println("{");
-
+    ostr.indent();
      if (NfaState.generatedStates != 0)
-        ostr.println("   return jjMoveNfa" + LexGen.lexStateSuffix + "(" + NfaState.InitStateName() + ", 0);");
+        ostr.println("return jjMoveNfa" + LexGen.lexStateSuffix + "(" + NfaState.InitStateName() + ", 0);");
      else
-        ostr.println("   return 1;");
+        ostr.println("return 1;");
 
+    ostr.unindent();
      ostr.println("}");
   }
 
@@ -465,52 +468,56 @@ public class RStringLiteral extends RegularExpression {
      }
   }
 
-  static void DumpStartWithStates(java.io.PrintWriter ostr)
+  static void DumpStartWithStates(IndentingPrintWriter ostr)
   {
      ostr.println("private int " +
                   "jjStartNfaWithStates" + LexGen.lexStateSuffix + "(int pos, int kind, int state) throws java.io.IOException");
      ostr.println("{");
-     ostr.println("   jjMatchedKind = kind;");
-     ostr.println("   jjMatchedPos = pos;");
+    ostr.indent();
+     ostr.println("jjMatchedKind = kind;");
+     ostr.println("jjMatchedPos = pos;");
 
      if (Options.getDebugTokenManager())
      {
-        ostr.println("   debugStream.println(\"   No more string literal token matches are possible.\");");
-        ostr.println("   debugStream.println(\"   Currently matched the first \" " +
+        ostr.println("debugPrinter.println(\"   No more string literal token matches are possible.\");");
+        ostr.println("debugPrinter.println(\"   Currently matched the first \" " +
                 "+ (jjMatchedPos + 1) + \" characters as a \" + tokenImage[jjMatchedKind] + \" token.\");");
      }
 
-     ostr.println("   jjChar = charStream.readChar();");
-     ostr.println("   if (jjChar == -1) { return pos + 1; }");
+     ostr.println("jjChar = charStream.readChar();");
+     ostr.println("if (jjChar == -1) { return pos + 1; }");
 
      if (Options.getDebugTokenManager())
-        ostr.println("   debugStream.println(" +
+        ostr.println("debugPrinter.println(" +
                 (LexGen.maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
                 "\"Current character : \" + " +
                 "TokenManagerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
                 "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
 
-     ostr.println("   return jjMoveNfa" + LexGen.lexStateSuffix + "(state, pos + 1);");
+     ostr.println("return jjMoveNfa" + LexGen.lexStateSuffix + "(state, pos + 1);");
+    ostr.unindent();
      ostr.println("}");
   }
 
   private static boolean boilerPlateDumped = false;
-  static void DumpBoilerPlate(java.io.PrintWriter ostr)
+  static void DumpBoilerPlate(IndentingPrintWriter ostr)
   {
      ostr.println("private int " +
                   "jjStopAtPos(int pos, int kind)");
      ostr.println("{");
-     ostr.println("   jjMatchedKind = kind;");
-     ostr.println("   jjMatchedPos = pos;");
+    ostr.indent();
+     ostr.println("jjMatchedKind = kind;");
+     ostr.println("jjMatchedPos = pos;");
 
      if (Options.getDebugTokenManager())
      {
-        ostr.println("   debugStream.println(\"   No more string literal token matches are possible.\");");
-        ostr.println("   debugStream.println(\"   Currently matched the first \" + (jjMatchedPos + 1) + " +
+        ostr.println("debugPrinter.println(\"   No more string literal token matches are possible.\");");
+        ostr.println("debugPrinter.println(\"   Currently matched the first \" + (jjMatchedPos + 1) + " +
                 "\" characters as a \" + tokenImage[jjMatchedKind] + \" token.\");");
      }
 
-     ostr.println("   return pos + 1;");
+     ostr.println("return pos + 1;");
+    ostr.unindent();
      ostr.println("}");
   }
 
@@ -539,7 +546,7 @@ public class RStringLiteral extends RegularExpression {
      return ret;
   }
 
-  static void DumpDfaCode(java.io.PrintWriter ostr)
+  static void DumpDfaCode(IndentingPrintWriter ostr)
   {
      Hashtable tab;
      String key;
@@ -618,13 +625,13 @@ public class RStringLiteral extends RegularExpression {
         }
         ostr.println(") throws java.io.IOException");
         ostr.println("{");
-
+        ostr.indent();
         if (i != 0)
         {
            if (i > 1)
            {
               atLeastOne = false;
-              ostr.print("   if ((");
+              ostr.print("if ((");
 
               for (j = 0; j < maxLongsReqd - 1; j++)
                  if (i <= maxLenForActive[j] + 1)
@@ -644,9 +651,10 @@ public class RStringLiteral extends RegularExpression {
               }
 
               ostr.println(") == 0L)");
+             ostr.indent();
               if (!LexGen.mixed[LexGen.lexStateIndex] && NfaState.generatedStates != 0)
               {
-                 ostr.print("      return jjStartNfa" + LexGen.lexStateSuffix +
+                 ostr.print("return jjStartNfa" + LexGen.lexStateSuffix +
                                  "(" + (i - 2) + ", ");
                  for (j = 0; j < maxLongsReqd - 1; j++)
                     if (i <= maxLenForActive[j] + 1)
@@ -657,42 +665,47 @@ public class RStringLiteral extends RegularExpression {
                     ostr.println("old" + j + ");");
                  else
                     ostr.println("0L);");
+
               }
               else if (NfaState.generatedStates != 0)
-                 ostr.println("      return jjMoveNfa" + LexGen.lexStateSuffix +
+                 ostr.println("return jjMoveNfa" + LexGen.lexStateSuffix +
                          "(" + NfaState.InitStateName() + ", " + (i - 1) + ");");
               else
-                 ostr.println("      return " + i + ";");
+                 ostr.println("return " + i + ";");
+             ostr.unindent();
            }
 
            if (i != 0 && Options.getDebugTokenManager())
            {
-              ostr.println("   if (jjMatchedKind != 0 && jjMatchedKind != 0x" +
+              ostr.println("if (jjMatchedKind != 0 && jjMatchedKind != 0x" +
                       Integer.toHexString(Integer.MAX_VALUE) + ")");
-              ostr.println("      debugStream.println(\"   Currently matched the first \" + " +
+              ostr.println("debugPrinter.println(\"   Currently matched the first \" + " +
                       "(jjMatchedPos + 1) + \" characters as a \" + tokenImage[jjMatchedKind] + \" token.\");");
 
-              ostr.println("   debugStream.println(\"   Possible string literal matches : { \"");
+              ostr.print("debugPrinter.println(\"   Possible string literal matches : { \"");
 
               for (int vecs = 0; vecs < maxStrKind / 64 + 1; vecs++)
               {
                  if (i <= maxLenForActive[vecs])
                  {
-                    ostr.println(" +");
-                    ostr.print("         jjKindsForBitVector(" + vecs + ", ");
+                    ostr.print(" + ");
+                    ostr.print("jjKindsForBitVector(" + vecs + ", ");
                     ostr.print("active" + vecs + ") ");
                  }
               }
 
-              ostr.println(" + \" } \");");
+              ostr.print(" + \" } \");");
+             ostr.println();
            }
 
-           ostr.println("   jjChar = charStream.readChar();");
-           ostr.println("   if (jjChar == -1) {");
+           ostr.println("jjChar = charStream.readChar();");
+           ostr.println("if (jjChar == -1)");
+           ostr.println("{");
+          ostr.indent();
 
            if (!LexGen.mixed[LexGen.lexStateIndex] && NfaState.generatedStates != 0)
            {
-              ostr.print("      jjStopStringLiteralDfa" + LexGen.lexStateSuffix + "(" + (i - 1) + ", ");
+              ostr.print("jjStopStringLiteralDfa" + LexGen.lexStateSuffix + "(" + (i - 1) + ", ");
               for (k = 0; k < maxLongsReqd - 1; k++)
                  if (i <= maxLenForActive[k])
                     ostr.print("active" + k + ", ");
@@ -707,31 +720,33 @@ public class RStringLiteral extends RegularExpression {
 
               if (i != 0 && Options.getDebugTokenManager())
               {
-                 ostr.println("      if (jjMatchedKind != 0 && jjMatchedKind != 0x" +
+                 ostr.println("if (jjMatchedKind != 0 && jjMatchedKind != 0x" +
                          Integer.toHexString(Integer.MAX_VALUE) + ")");
-                 ostr.println("         debugStream.println(\"   Currently matched the first \" + " +
+                 ostr.println("debugPrinter.println(\"   Currently matched the first \" + " +
                          "(jjMatchedPos + 1) + \" characters as a \" + tokenImage[jjMatchedKind] + \" token.\");");
               }
-              ostr.println("      return " + i + ";");
+              ostr.println("return " + i + ";");
            }
            else if (NfaState.generatedStates != 0)
-              ostr.println("   return jjMoveNfa" + LexGen.lexStateSuffix + "(" + NfaState.InitStateName() +
+              ostr.println("return jjMoveNfa" + LexGen.lexStateSuffix + "(" + NfaState.InitStateName() +
                       ", " + (i - 1) + ");");
            else
-              ostr.println("      return " + i + ";");
+              ostr.println("return " + i + ";");
 
-           ostr.println("   }");
+          ostr.unindent();
+           ostr.println("}");
         }
 
         if (i != 0 && Options.getDebugTokenManager())
-           ostr.println("   debugStream.println(" +
+           ostr.println("debugPrinter.println(" +
                    (LexGen.maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
                    "\"Current character : \" + " +
                    "TokenManagerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
                    "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
 
-        ostr.println("   switch(jjChar)");
-        ostr.println("   {");
+        ostr.println("switch(jjChar)");
+        ostr.println("{");
+       ostr.indent();
 
         CaseLoop:
         for (int q = 0; q < keys.length; q++)
@@ -785,16 +800,16 @@ public class RStringLiteral extends RegularExpression {
            if (Options.getIgnoreCase())
            {
               if (c != Character.toUpperCase(c))
-                 ostr.println("      case " + (int)Character.toUpperCase(c) + ":");
+                 ostr.println("case " + (int)Character.toUpperCase(c) + ":");
 
               if (c != Character.toLowerCase(c))
-                 ostr.println("      case " + (int)Character.toLowerCase(c) + ":");
+                 ostr.println("case " + (int)Character.toLowerCase(c) + ":");
            }
 
-           ostr.println("      case " + (int)c + ":");
+           ostr.println("case " + (int)c + ":");
+          ostr.indent();
 
            long matchedKind;
-           String prefix = (i == 0) ? "         " : "            ";
 
            if (info.finalKindCnt != 0)
            {
@@ -810,10 +825,10 @@ public class RStringLiteral extends RegularExpression {
 
                     if (ifGenerated)
                     {
-                       ostr.print("         else if ");
+                       ostr.print("else if ");
                     }
                     else if (i != 0)
-                       ostr.print("         if ");
+                       ostr.print("if ");
 
                     ifGenerated = true;
 
@@ -860,12 +875,17 @@ public class RStringLiteral extends RegularExpression {
                        if (stateSetName != -1)
                        {
                           createStartNfa = true;
-                          ostr.println(prefix + "return jjStartNfaWithStates" +
+                         ostr.indent();
+                          ostr.println("return jjStartNfaWithStates" +
                               LexGen.lexStateSuffix + "(" + i +
                               ", " + kindToPrint + ", " + stateSetName + ");");
+                         ostr.unindent();
                        }
-                       else
-                          ostr.println(prefix + "return jjStopAtPos" + "(" + i + ", " + kindToPrint + ");");
+                       else {
+                         ostr.indent();
+                          ostr.println("return jjStopAtPos" + "(" + i + ", " + kindToPrint + ");");
+                          ostr.unindent();
+                       }
                     }
                     else
                     {
@@ -873,14 +893,16 @@ public class RStringLiteral extends RegularExpression {
                             LexGen.initMatch[LexGen.lexStateIndex] != Integer.MAX_VALUE) ||
                             i != 0)
                        {
-                          ostr.println("         {");
-                          ostr.println(prefix + "jjMatchedKind = " +
+                          ostr.println("{");
+                         ostr.indent();
+                          ostr.println("jjMatchedKind = " +
                                                      kindToPrint + ";");
-                          ostr.println(prefix + "jjMatchedPos = " + i + ";");
-                          ostr.println("         }");
+                          ostr.println("jjMatchedPos = " + i + ";");
+                         ostr.unindent();
+                          ostr.println("}");
                        }
                        else
-                          ostr.println(prefix + "jjMatchedKind = " +
+                          ostr.println("jjMatchedKind = " +
                                                      kindToPrint + ";");
                     }
                  }
@@ -893,9 +915,8 @@ public class RStringLiteral extends RegularExpression {
 
               if (i == 0)
               {
-                 ostr.print("         return ");
 
-                 ostr.print("jjMoveStringLiteralDfa" + (i + 1) +
+                 ostr.print("return jjMoveStringLiteralDfa" + (i + 1) +
                                 LexGen.lexStateSuffix + "(");
                  for (j = 0; j < maxLongsReqd - 1; j++)
                     if ((i + 1) <= maxLenForActive[j])
@@ -916,12 +937,11 @@ public class RStringLiteral extends RegularExpression {
                     ostr.print("0x" + Long.toHexString(info.validKinds[j]) + "L");
                  }
                  ostr.println(");");
+                //ostr.unindent();
               }
               else
               {
-                 ostr.print("         return ");
-
-                 ostr.print("jjMoveStringLiteralDfa" + (i + 1) +
+                 ostr.print("return jjMoveStringLiteralDfa" + (i + 1) +
                                 LexGen.lexStateSuffix + "(");
 
                  for (j = 0; j < maxLongsReqd - 1; j++)
@@ -951,6 +971,7 @@ public class RStringLiteral extends RegularExpression {
                  }
 
                  ostr.println(");");
+                //ostr.unindent();
               }
            }
            else
@@ -960,25 +981,28 @@ public class RStringLiteral extends RegularExpression {
               {
 
                  if (NfaState.generatedStates != 0)
-                    ostr.println("         return jjMoveNfa" + LexGen.lexStateSuffix +
+                    ostr.println("return jjMoveNfa" + LexGen.lexStateSuffix +
                             "(" + NfaState.InitStateName() + ", 0);");
                  else
-                    ostr.println("         return 1;");
+                    ostr.println("return 1;");
               }
               else if (i != 0) // No more str literals to look for
               {
-                 ostr.println("         break;");
+                 ostr.println("break;");
+                //ostr.unindent();
                  startNfaNeeded = true;
               }
            }
+
+          ostr.unindent();
         }
 
         /* default means that the current character is not in any of the
            strings at this position. */
-        ostr.println("      default :");
+        ostr.println("default:");
 
         if (Options.getDebugTokenManager())
-           ostr.println("      debugStream.println(\"   No string literal matches possible.\");");
+           ostr.println("debugPrinter.println(\"   No string literal matches possible.\");");
 
         if (NfaState.generatedStates != 0)
         {
@@ -986,22 +1010,23 @@ public class RStringLiteral extends RegularExpression {
            {
               /* This means no string literal is possible. Just move nfa with
                  this guy and return. */
-              ostr.println("         return jjMoveNfa" + LexGen.lexStateSuffix +
+              ostr.println("return jjMoveNfa" + LexGen.lexStateSuffix +
                       "(" + NfaState.InitStateName() + ", 0);");
            }
            else
            {
-              ostr.println("         break;");
+              ostr.println("break;");
+             //ostr.unindent();
               startNfaNeeded = true;
            }
         }
         else
         {
-           ostr.println("         return " + (i + 1) + ";");
+           ostr.println("return " + (i + 1) + ";");
         }
 
-
-        ostr.println("   }");
+       ostr.unindent();
+        ostr.println("}");
 
         if (i != 0)
         {
@@ -1013,7 +1038,7 @@ public class RStringLiteral extends RegularExpression {
                  string literals are possible. So set the kind and state set
                  upto and including this position for the matched string. */
 
-              ostr.print("   return jjStartNfa" + LexGen.lexStateSuffix + "(" + (i - 1) + ", ");
+              ostr.print("return jjStartNfa" + LexGen.lexStateSuffix + "(" + (i - 1) + ", ");
               for (k = 0; k < maxLongsReqd - 1; k++)
                  if (i <= maxLenForActive[k])
                     ostr.print("active" + k + ", ");
@@ -1025,13 +1050,14 @@ public class RStringLiteral extends RegularExpression {
                  ostr.println("0L);");
            }
            else if (NfaState.generatedStates != 0)
-              ostr.println("   return jjMoveNfa" + LexGen.lexStateSuffix +
+              ostr.println("return jjMoveNfa" + LexGen.lexStateSuffix +
                       "(" + NfaState.InitStateName() + ", " + i + ");");
            else
-              ostr.println("   return " + (i + 1) + ";");
+              ostr.println("return " + (i + 1) + ";");
           }
         }
 
+       ostr.unindent();
         ostr.println("}");
      }
 
@@ -1054,7 +1080,7 @@ public class RStringLiteral extends RegularExpression {
      return Integer.MAX_VALUE;
   }
 
-  static void GenerateNfaStartStates(java.io.PrintWriter ostr,
+  static void GenerateNfaStartStates(IndentingPrintWriter ostr,
                                                 NfaState initialState)
   {
      boolean[] seen = new boolean[NfaState.generatedStates];
@@ -1184,7 +1210,7 @@ public class RStringLiteral extends RegularExpression {
   }
 
   static void DumpNfaStartStatesCode(Hashtable[] statesForPos,
-                                              java.io.PrintWriter ostr)
+                                              IndentingPrintWriter ostr)
   {
       if (maxStrKind == 0) { // No need to generate this function
          return;
@@ -1201,7 +1227,7 @@ public class RStringLiteral extends RegularExpression {
      ostr.println("long active" + i + ")\n{");
 
      if (Options.getDebugTokenManager())
-        ostr.println("      debugStream.println(\"   No more string literal token matches are possible.\");");
+        ostr.println("debugPrinter.println(\"   No more string literal token matches are possible.\");");
 
      ostr.println("   switch (pos)\n   {");
 
@@ -1307,7 +1333,7 @@ public class RStringLiteral extends RegularExpression {
         ostr.println("         return -1;");
      }
 
-     ostr.println("      default :");
+     ostr.println("      default:");
      ostr.println("         return -1;");
      ostr.println("   }");
      ostr.println("}");

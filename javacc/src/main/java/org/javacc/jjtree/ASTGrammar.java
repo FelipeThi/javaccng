@@ -28,9 +28,9 @@
 
 package org.javacc.jjtree;
 
-import java.io.File;
-
 import org.javacc.parser.JavaCCGlobals;
+
+import java.io.File;
 
 
 public class ASTGrammar extends JJTreeNode {
