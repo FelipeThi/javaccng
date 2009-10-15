@@ -203,7 +203,6 @@ public final class Main {
 
    public static void reInitAll()
    {
-      org.javacc.parser.Expansion.reInit();
       org.javacc.parser.JavaCCErrors.reInit();
       org.javacc.parser.JavaCCGlobals.reInit();
       Options.init();

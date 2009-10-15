@@ -235,7 +235,7 @@ public class LookaheadCalc {
       first = lookaheadWalk.sizeLimitedMatches;
       lookaheadWalk.sizeLimitedMatches = new ArrayList();
       lookaheadWalk.considerSemanticLA = false;
-      lookaheadWalk.genFollowSet(v, exp, Expansion.nextGenerationIndex++);
+      lookaheadWalk.genFollowSet(v, exp, lookaheadWalk.nextGenerationIndex++);
       follow = lookaheadWalk.sizeLimitedMatches;
       if (la == 1) {
         if (javaCodeCheck(first)) {
