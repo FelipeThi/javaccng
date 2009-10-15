@@ -497,6 +497,7 @@ public class RStringLiteral extends RegularExpression {
      ostr.println("return jjMoveNfa" + LexGen.lexStateSuffix + "(state, pos + 1);");
     ostr.unindent();
      ostr.println("}");
+    ostr.println();
   }
 
   private static boolean boilerPlateDumped = false;
@@ -519,6 +520,7 @@ public class RStringLiteral extends RegularExpression {
      ostr.println("return pos + 1;");
     ostr.unindent();
      ostr.println("}");
+    ostr.println();
   }
 
   static String[] ReArrange(Hashtable tab)
@@ -562,6 +564,7 @@ public class RStringLiteral extends RegularExpression {
                        "jjMoveStringLiteralDfa0" + LexGen.lexStateSuffix + "() throws java.io.IOException");
 
         DumpNullStrLiterals(ostr);
+       ostr.println();
         return;
      }
 
@@ -1059,6 +1062,7 @@ public class RStringLiteral extends RegularExpression {
 
        ostr.unindent();
         ostr.println("}");
+       ostr.println();
      }
 
      if (!LexGen.mixed[LexGen.lexStateIndex] && NfaState.generatedStates != 0 && createStartNfa)
@@ -1338,6 +1342,7 @@ public class RStringLiteral extends RegularExpression {
      ostr.println("   }");
      ostr.println("}");
 
+    ostr.println();
      ostr.print("private int jjStartNfa" +
                   LexGen.lexStateSuffix + "(int pos, ");
      for (i = 0; i < maxKindsReqd - 1; i++)
@@ -1363,6 +1368,7 @@ public class RStringLiteral extends RegularExpression {
      ostr.print("active" + i + ")");
      ostr.println(", pos + 1);");
      ostr.println("}");
+    ostr.println();
   }
   /**
    * Return to original state.
