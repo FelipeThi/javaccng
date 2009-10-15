@@ -45,16 +45,17 @@ public class OtherFilesGen implements JavaCCParserConstants {
 
     if (JavaCCErrors.get_error_count() != 0) throw new MetaParseException();
 
-    JavaFiles.gen_TokenMgrError();
-    JavaFiles.gen_ParseException();
-    JavaFiles.gen_Token();
-    JavaFiles.gen_TokenManager();
-    JavaFiles.gen_CharStream();
+    final JavaFiles javaFiles = new JavaFiles();
+    javaFiles.gen_TokenMgrError();
+    javaFiles.gen_ParseException();
+    javaFiles.gen_Token();
+    javaFiles.gen_TokenManager();
+    javaFiles.gen_CharStream();
     if (Options.getJavaUnicodeEscape()) {
-      JavaFiles.gen_JavaCharStream();
+      javaFiles.gen_JavaCharStream();
     }
     else {
-      JavaFiles.gen_SimpleCharStream();
+      javaFiles.gen_SimpleCharStream();
     }
 
     try {
