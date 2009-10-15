@@ -103,7 +103,8 @@ public class ParseGen implements JavaCCParserConstants {
       ostr.println("");
       ostr.println("");
 
-      ParseEngine.build(ostr);
+      final ParseEngine parseEngine = new ParseEngine();
+      parseEngine.build(ostr);
 
       ostr.println("  /** Either generated or user defined Token Manager. */");
       ostr.println("  public final TokenManager tokenManager;");

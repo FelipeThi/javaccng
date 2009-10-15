@@ -212,7 +212,6 @@ public final class Main {
       org.javacc.parser.MatchInfo.reInit();
       org.javacc.parser.LookaheadWalk.reInit();
       org.javacc.parser.Semanticize.reInit();
-      org.javacc.parser.ParseEngine.reInit();
    }
 
 }
