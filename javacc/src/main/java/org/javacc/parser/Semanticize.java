@@ -654,7 +654,7 @@ public class Semanticize {
    * Objects of this class are created from class Semanticize to work on
    * references to regular expressions from RJustName's.
    */
-  class FixRJustNames extends JavaCCGlobals implements TreeWalkerOp {
+  class FixRJustNames implements TreeWalkerOp {
 
     public RegularExpression root;
 
@@ -665,7 +665,7 @@ public class Semanticize {
     public void action(Expansion e) {
       if (e instanceof RJustName) {
         RJustName jn = (RJustName)e;
-        RegularExpression rexp = (RegularExpression)named_tokens_table.get(jn.label);
+        RegularExpression rexp = (RegularExpression) JavaCCGlobals.named_tokens_table.get(jn.label);
         if (rexp == null) {
          JavaCCErrors.semantic_error(e, "Undefined lexical token name \"" + jn.label + "\".");
         } else if (jn == root && !jn.tpContext.isExplicit && rexp.private_rexp) {
@@ -683,7 +683,7 @@ public class Semanticize {
 
   }
 
-  class LookaheadFixer extends JavaCCGlobals implements TreeWalkerOp {
+  class LookaheadFixer implements TreeWalkerOp {
 
     public boolean goDeeper(Expansion e) {
       if (e instanceof RegularExpression) {
@@ -742,7 +742,7 @@ public class Semanticize {
 
   }
 
-  class ProductionDefinedChecker extends JavaCCGlobals implements TreeWalkerOp {
+  class ProductionDefinedChecker implements TreeWalkerOp {
 
     public boolean goDeeper(Expansion e) {
       if (e instanceof RegularExpression) {
@@ -755,7 +755,7 @@ public class Semanticize {
     public void action(Expansion e) {
       if (e instanceof NonTerminal) {
         NonTerminal nt = (NonTerminal)e;
-        if ((nt.setProd((NormalProduction)production_table.get(nt.getName()))) == null) {
+        if ((nt.setProd((NormalProduction) JavaCCGlobals.production_table.get(nt.getName()))) == null) {
           JavaCCErrors.semantic_error(e, "Non-terminal " + nt.getName() + " has not been defined.");
         } else {
           nt.getProd().getParents().add(nt);
@@ -765,7 +765,7 @@ public class Semanticize {
 
   }
 
-  class EmptyChecker extends JavaCCGlobals implements TreeWalkerOp {
+  class EmptyChecker implements TreeWalkerOp {
 
     public boolean goDeeper(Expansion e) {
       if (e instanceof RegularExpression) {
@@ -793,7 +793,7 @@ public class Semanticize {
 
   }
 
-  class LookaheadChecker extends JavaCCGlobals implements TreeWalkerOp {
+  class LookaheadChecker implements TreeWalkerOp {
 
     public boolean goDeeper(Expansion e) {
       if (e instanceof RegularExpression) {
