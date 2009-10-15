@@ -83,6 +83,7 @@ public class LexGen implements JavaCCParserConstants {
   boolean hasMore = false;
   public RegularExpression curRE;
   public boolean keepLineCol;
+  final NfaStates nfaStates = new NfaStates();
 
   void PrintClassHead() {
     int i, j;
@@ -363,7 +364,7 @@ public class LexGen implements JavaCCParserConstants {
     boolean ignoring = false;
 
     while (e.hasMoreElements()) {
-      NfaState.ReInit();
+      nfaStates.ReInit();
       RStringLiteral.ReInit();
 
       String key = (String) e.nextElement();
@@ -485,13 +486,13 @@ public class LexGen implements JavaCCParserConstants {
       }
 
       // Generate a static block for initializing the nfa transitions
-      NfaState.ComputeClosures();
+      nfaStates.ComputeClosures();
 
       for (i = 0; i < initialState.epsilonMoves.size(); i++) {
         ((NfaState) initialState.epsilonMoves.elementAt(i)).GenerateCode();
       }
 
-      if (hasNfa[lexStateIndex] = (NfaState.generatedStates != 0)) {
+      if (hasNfa[lexStateIndex] = (nfaStates.generatedStates != 0)) {
         initialState.GenerateCode();
         initialState.GenerateInitMoves(ostr);
       }
@@ -527,11 +528,11 @@ public class LexGen implements JavaCCParserConstants {
       RStringLiteral.DumpDfaCode(this, ostr);
 
       if (hasNfa[lexStateIndex]) {
-        NfaState.DumpMoveNfa(this, ostr);
+        nfaStates.DumpMoveNfa(this, ostr);
       }
 
-      if (stateSetSize < NfaState.generatedStates) {
-        stateSetSize = NfaState.generatedStates;
+      if (stateSetSize < nfaStates.generatedStates) {
+        stateSetSize = nfaStates.generatedStates;
       }
     }
 
@@ -539,16 +540,16 @@ public class LexGen implements JavaCCParserConstants {
       ((RChoice) choices.get(i)).CheckUnmatchability(this);
     }
 
-    NfaState.DumpStateSets(ostr);
+    nfaStates.DumpStateSets(ostr);
     CheckEmptyStringMatch();
-    NfaState.DumpNonAsciiMoveMethods(ostr);
+    nfaStates.DumpNonAsciiMoveMethods(ostr);
     RStringLiteral.DumpStrLiteralImages(this, ostr);
     DumpStaticVarDeclarations();
     DumpFillToken();
     DumpGetNextToken();
 
     if (Options.getDebugTokenManager()) {
-      NfaState.DumpStatesForKind(ostr);
+      nfaStates.DumpStatesForKind(ostr);
       DumpDebugMethods();
     }
 
@@ -568,7 +569,7 @@ public class LexGen implements JavaCCParserConstants {
       DumpTokenActions();
     }
 
-    NfaState.PrintBoilerPlate(ostr);
+    nfaStates.PrintBoilerPlate(ostr);
     ostr.unindent();
     ostr.println(/*{*/ "}");
     ostr.close();

@@ -160,18 +160,16 @@ public final class Main {
       parser.javacc_input();
       JavaCCGlobals.createOutputDir(Options.getOutputDirectory());
 
-      if (Options.getUnicodeInput())
-      {
-         NfaState.unicodeWarningGiven = true;
-         System.out.println("Note: UNICODE_INPUT option is specified. " +
-              "Please make sure you create the parser/lexer using a Reader with the correct character encoding.");
-      }
-
       final Semanticize semanticize = new Semanticize();
       semanticize.start();
       final ParseGen parseGen = new ParseGen(semanticize);
       parseGen.start();
       final LexGen lexGen = new LexGen();
+      if (Options.getUnicodeInput()) {
+        lexGen.nfaStates.unicodeWarningGiven = true;
+        System.out.println("Note: UNICODE_INPUT option is specified. " +
+            "Please make sure you create the parser/lexer using a Reader with the correct character encoding.");
+      }
       lexGen.start();
       final OtherFilesGen otherFilesGen = new OtherFilesGen();
       otherFilesGen.start(lexGen);
@@ -207,7 +205,6 @@ public final class Main {
       org.javacc.parser.JavaCCGlobals.reInit();
       Options.init();
       org.javacc.parser.RStringLiteral.reInit();
-      org.javacc.parser.NfaState.reInit();
       org.javacc.parser.MatchInfo.reInit();
    }
 

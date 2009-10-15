@@ -358,7 +358,7 @@ static final char[] diffUpperCaseRanges = {
         }
 
         if (negated_list)
-           RemoveNegation();  // This also sorts the list
+           RemoveNegation(lexGen);  // This also sorts the list
         else
            SortDescriptors();
      }
@@ -501,7 +501,7 @@ static final char[] diffUpperCaseRanges = {
      descriptors = newDesc;
   }
 
-  void RemoveNegation()
+  void RemoveNegation(LexGen lexGen)
   {
      int i;
 
@@ -565,7 +565,7 @@ static final char[] diffUpperCaseRanges = {
      }
 
      //System.out.println("lastRem : " + (int)lastRemoved);
-     if (NfaState.unicodeWarningGiven || Options.getJavaUnicodeEscape())
+     if (lexGen.nfaStates.unicodeWarningGiven || Options.getJavaUnicodeEscape())
      {
         if (lastRemoved < (char)0xffff)
            newDescriptors.add(new CharacterRange((char)(lastRemoved + 1),

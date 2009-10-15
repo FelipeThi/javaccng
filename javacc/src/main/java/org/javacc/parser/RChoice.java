@@ -58,7 +58,7 @@ public class RChoice extends RegularExpression {
 
   public Nfa GenerateNfa(final LexGen lexGen, boolean ignoreCase)
   {
-     CompressCharLists();
+     CompressCharLists(lexGen);
 
      if (getChoices().size() == 1)
         return ((RegularExpression)getChoices().get(0)).GenerateNfa(lexGen, ignoreCase);
@@ -81,7 +81,7 @@ public class RChoice extends RegularExpression {
      return retVal;
   }
 
-  void CompressCharLists()
+  void CompressCharLists(LexGen lexGen)
   {
      CompressChoices(); // Unroll nested choices
      RegularExpression curRE;
@@ -102,7 +102,7 @@ public class RChoice extends RegularExpression {
         if (curRE instanceof RCharacterList)
         {
            if (((RCharacterList)curRE).negated_list)
-              ((RCharacterList)curRE).RemoveNegation();
+              ((RCharacterList)curRE).RemoveNegation(lexGen);
 
            List tmp = ((RCharacterList)curRE).descriptors;
 
