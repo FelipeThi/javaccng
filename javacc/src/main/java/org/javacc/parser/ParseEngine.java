@@ -36,7 +36,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ParseEngine  {
-
+  private Semanticize semanticize;
   private IndentingPrintWriter ostr;
   private int gensymindex = 0;
   private int indentamt;
@@ -64,6 +64,10 @@ public class ParseEngine  {
   private List phase2list = new ArrayList();
   private List phase3list = new ArrayList();
   private java.util.Hashtable phase3table = new java.util.Hashtable();
+
+  public ParseEngine(final Semanticize semanticize) {
+    this.semanticize = semanticize;
+  }
 
   /**
    * The phase 1 routines generates their output into String's and dumps
@@ -113,7 +117,7 @@ public class ParseEngine  {
         else if (javaCodeCheck((units[i]))) {
           return true;
         }
-        else if (!Semanticize.emptyExpansionExists(units[i])) {
+        else if (!semanticize.emptyExpansionExists(units[i])) {
           return false;
         }
       }
@@ -186,7 +190,7 @@ public class ParseEngine  {
         else {
           genFirstSet((Expansion) (seq.units.get(i)));
         }
-        if (!Semanticize.emptyExpansionExists((Expansion) (seq.units.get(i)))) {
+        if (!semanticize.emptyExpansionExists((Expansion) (seq.units.get(i)))) {
           break;
         }
       }
@@ -259,7 +263,7 @@ public class ParseEngine  {
       jj2LA = false;
 
       if ((la.getAmount() == 0) ||
-          Semanticize.emptyExpansionExists(la.getLaExpansion()) ||
+          semanticize.emptyExpansionExists(la.getLaExpansion()) ||
           javaCodeCheck(la.getLaExpansion())
           ) {
 

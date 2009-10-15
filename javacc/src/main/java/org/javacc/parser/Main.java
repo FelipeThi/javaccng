@@ -167,8 +167,9 @@ public final class Main {
               "Please make sure you create the parser/lexer using a Reader with the correct character encoding.");
       }
 
-      Semanticize.start();
-      final ParseGen parseGen = new ParseGen();
+      final Semanticize semanticize = new Semanticize();
+      semanticize.start();
+      final ParseGen parseGen = new ParseGen(semanticize);
       parseGen.start();
       final LexGen lexGen = new LexGen();
       lexGen.start();
@@ -211,7 +212,6 @@ public final class Main {
       org.javacc.parser.NfaState.reInit();
       org.javacc.parser.MatchInfo.reInit();
       org.javacc.parser.LookaheadWalk.reInit();
-      org.javacc.parser.Semanticize.reInit();
    }
 
 }

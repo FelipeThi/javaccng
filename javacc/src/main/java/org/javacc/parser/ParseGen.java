@@ -39,6 +39,11 @@ import java.util.List;
 
 /** Generate the parser. */
 public class ParseGen implements JavaCCParserConstants {
+  final Semanticize semanticize;
+
+  public ParseGen(final Semanticize semanticize) {
+    this.semanticize = semanticize;
+  }
 
   public void start() throws MetaParseException {
 
@@ -103,7 +108,7 @@ public class ParseGen implements JavaCCParserConstants {
       ostr.println("");
       ostr.println("");
 
-      final ParseEngine parseEngine = new ParseEngine();
+      final ParseEngine parseEngine = new ParseEngine(semanticize);
       parseEngine.build(ostr);
 
       ostr.println("  /** Either generated or user defined Token Manager. */");

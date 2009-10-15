@@ -91,7 +91,7 @@ public class LookaheadCalc extends JavaCCGlobals {
     }
   }
 
-  public static void choiceCalc(Choice ch) {
+  public static void choiceCalc(Semanticize semanticize, Choice ch) {
     int first = firstChoice(ch);
     // dbl[i] and dbr[i] are lists of size limited matches for choice i
     // of ch.  dbl ignores matches with semantic lookaheads (when force_la_check
@@ -129,7 +129,7 @@ public class LookaheadCalc extends JavaCCGlobals {
       if (la == 1) {
         for (int i = first; i < ch.getChoices().size()-1; i++) {
           Expansion exp = (Expansion)ch.getChoices().get(i);
-          if (Semanticize.emptyExpansionExists(exp)) {
+          if (semanticize.emptyExpansionExists(exp)) {
             JavaCCErrors.warning(exp, "This choice can expand to the empty token sequence " +
                     "and will therefore always be taken in favor of the choices appearing later.");
             break;

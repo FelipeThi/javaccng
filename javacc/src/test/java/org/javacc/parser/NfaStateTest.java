@@ -32,7 +32,8 @@ public class NfaStateTest extends JavaCCTestCase {
     JavaCCGlobals.fileName = JavaCCGlobals.origFileName = parserInput;
     JavaCCGlobals.jjtreeGenerated = JavaCCGlobals.isGeneratedBy("JJTree", parserInput);
     JavaCCGlobals.toolNames = JavaCCGlobals.getToolNames(parserInput);
-    Semanticize.start();
+    Semanticize semanticize = new Semanticize();
+    semanticize.start();
     lexGen = new LexGen();
     lexGen.start();
   }
@@ -364,7 +365,7 @@ public class NfaStateTest extends JavaCCTestCase {
         "}\n", output.toString().replaceAll("\r", ""));
   }
 
-  /** Test method for {@link org.javacc.parser.NfaState#DumpMoveNfa(IndentingPrintWriter)}. */
+  /** Test method for {@link org.javacc.parser.NfaState#DumpMoveNfa()}. */
   @Test
   public void testDumpMoveNfa() throws Exception {
     lexGen = new LexGen();
