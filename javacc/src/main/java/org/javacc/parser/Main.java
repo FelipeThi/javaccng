@@ -168,8 +168,9 @@ public final class Main {
       }
 
       Semanticize.start();
-      ParseGen.start();
-      LexGen lexGen = new LexGen();
+      final ParseGen parseGen = new ParseGen();
+      parseGen.start();
+      final LexGen lexGen = new LexGen();
       lexGen.start();
       OtherFilesGen.start(lexGen);
 
@@ -211,7 +212,6 @@ public final class Main {
       org.javacc.parser.MatchInfo.reInit();
       org.javacc.parser.LookaheadWalk.reInit();
       org.javacc.parser.Semanticize.reInit();
-      org.javacc.parser.ParseGen.reInit();
       org.javacc.parser.OtherFilesGen.reInit();
       org.javacc.parser.ParseEngine.reInit();
    }
