@@ -64,8 +64,9 @@ public class NfaState
 
    private static boolean jjCheckNAddStatesUnaryNeeded = false;
    private static boolean jjCheckNAddStatesDualNeeded = false;
+  private final LexGen lexGen;
 
-   public static void ReInit()
+  public static void ReInit()
    {
       generatedStates = 0;
       idCnt = 0;
@@ -112,17 +113,18 @@ public class NfaState
    private int onlyChar = 0;
    private char matchSingleChar;
 
-   NfaState()
+   NfaState(LexGen lexGen)
    {
-      id = idCnt++;
+     this.lexGen = lexGen;
+     id = idCnt++;
       allStates.add(this);
-      lexState = LexGen.lexStateIndex;
-      lookingFor = LexGen.curKind;
+      lexState = lexGen.lexStateIndex;
+      lookingFor = lexGen.curKind;
    }
 
    NfaState CreateClone()
    {
-      NfaState retVal = new NfaState();
+      NfaState retVal = new NfaState(lexGen);
 
       retVal.isFinal = isFinal;
       retVal.kind = kind;
@@ -200,7 +202,7 @@ public class NfaState
           !Options.getUserCharStream())
       {
          unicodeWarningGiven = true;
-         JavaCCErrors.warning(LexGen.curRE, "Non-ASCII characters used in regular expression.\n" +
+         JavaCCErrors.warning(lexGen.curRE, "Non-ASCII characters used in regular expression.\n" +
               "Please make sure you use the correct Reader when you create the parser, " +
               "one that can handle your character set.");
       }
@@ -244,7 +246,7 @@ public class NfaState
           !Options.getUserCharStream())
       {
          unicodeWarningGiven = true;
-         JavaCCErrors.warning(LexGen.curRE, "Non-ASCII characters used in regular expression.\n" +
+         JavaCCErrors.warning(lexGen.curRE, "Non-ASCII characters used in regular expression.\n" +
               "Please make sure you use the correct Reader when you create the parser, " +
               "one that can handle your character set.");
       }
@@ -421,7 +423,7 @@ public class NfaState
    {
       NfaState newState = ((NfaState)states.get(0)).CreateClone();
 
-      newState.next = new NfaState();
+      newState.next = new NfaState(lexGen);
 
       InsertInOrder(newState.next.epsilonMoves,
                            ((NfaState)states.get(0)).next);
@@ -712,12 +714,12 @@ public class NfaState
       return epsilonMovesString;
    }
 
-   public static boolean CanStartNfaUsingAscii(char c)
+   public static boolean CanStartNfaUsingAscii(LexGen lexGen, char c)
    {
       if (c >= 128)
          throw new Error("JavaCC Bug: Please send mail to sankar@cs.stanford.edu");
 
-      String s = LexGen.initialState.GetEpsilonMovesString();
+      String s = lexGen.initialState.GetEpsilonMovesString();
 
       if (s == null || s.equals("null;"))
          return false;
@@ -1194,11 +1196,11 @@ public class NfaState
       return ((Integer)stateNameForComposite.get(stateSetString)).intValue();
    }
 
-   static int InitStateName()
+   static int InitStateName(LexGen lexGen)
    {
-      String s = LexGen.initialState.GetEpsilonMovesString();
+      String s = lexGen.initialState.GetEpsilonMovesString();
 
-      if (LexGen.initialState.usefulEpsilonMoves != 0)
+      if (lexGen.initialState.usefulEpsilonMoves != 0)
          return StateNameForComposite(s);
       return -1;
    }
@@ -2076,7 +2078,7 @@ public class NfaState
          ostr.println("                  break;");
    }
 
-   private static void DumpAsciiMoves(IndentingPrintWriter ostr, int byteNum)
+   private static void DumpAsciiMoves(LexGen lexGen, IndentingPrintWriter ostr, int byteNum)
    {
       boolean[] dumped = new boolean[Math.max(generatedStates, dummyStateIndex + 1)];
       Enumeration e = compositeStateTable.keys();
@@ -2090,7 +2092,7 @@ public class NfaState
       {
          NfaState temp = (NfaState)allStates.get(i);
 
-         if (dumped[temp.stateName] || temp.lexState != LexGen.lexStateIndex ||
+         if (dumped[temp.stateName] || temp.lexState != lexGen.lexStateIndex ||
              !temp.HasTransitions() || temp.dummy ||
              temp.stateName == -1)
             continue;
@@ -2428,7 +2430,7 @@ public class NfaState
       ostr.println("                  break;");
    }
 
-   public static void DumpCharAndRangeMoves(IndentingPrintWriter ostr)
+   public static void DumpCharAndRangeMoves(LexGen lexGen, IndentingPrintWriter ostr)
    {
       boolean[] dumped = new boolean[Math.max(generatedStates, dummyStateIndex + 1)];
       Enumeration e = compositeStateTable.keys();
@@ -2443,7 +2445,7 @@ public class NfaState
       {
          NfaState temp = (NfaState)allStates.get(i);
 
-         if (temp.stateName == -1 || dumped[temp.stateName] || temp.lexState != LexGen.lexStateIndex ||
+         if (temp.stateName == -1 || dumped[temp.stateName] || temp.lexState != lexGen.lexStateIndex ||
              !temp.HasTransitions() || temp.dummy )
             continue;
 
@@ -2719,7 +2721,7 @@ public class NfaState
 
    static int[][] kinds;
    static int[][][] statesForState;
-   public static void DumpMoveNfa(IndentingPrintWriter ostr)
+   public static void DumpMoveNfa(LexGen lexGen, IndentingPrintWriter ostr)
    {
       //if (!boilerPlateDumped)
       //   PrintBoilerPlate(ostr);
@@ -2730,8 +2732,8 @@ public class NfaState
 
       if (kinds == null)
       {
-         kinds = new int[LexGen.maxLexStates][];
-         statesForState = new int[LexGen.maxLexStates][][];
+         kinds = new int[lexGen.maxLexStates][];
+         statesForState = new int[lexGen.maxLexStates][][];
       }
 
       ReArrange();
@@ -2740,7 +2742,7 @@ public class NfaState
       {
          NfaState temp = (NfaState)allStates.get(i);
 
-         if (temp.lexState != LexGen.lexStateIndex ||
+         if (temp.lexState != lexGen.lexStateIndex ||
              !temp.HasTransitions() || temp.dummy ||
              temp.stateName == -1)
             continue;
@@ -2748,11 +2750,11 @@ public class NfaState
          if (kindsForStates == null)
          {
             kindsForStates = new int[generatedStates];
-            statesForState[LexGen.lexStateIndex] = new int[Math.max(generatedStates, dummyStateIndex + 1)][];
+            statesForState[lexGen.lexStateIndex] = new int[Math.max(generatedStates, dummyStateIndex + 1)][];
          }
 
          kindsForStates[temp.stateName] = temp.lookingFor;
-         statesForState[LexGen.lexStateIndex][temp.stateName] = temp.compositeStates;
+         statesForState[lexGen.lexStateIndex][temp.stateName] = temp.compositeStates;
 
          temp.GenerateNonAsciiMoves(ostr);
       }
@@ -2765,16 +2767,16 @@ public class NfaState
          int state = ((Integer)stateNameForComposite.get(s)).intValue();
 
          if (state >= generatedStates)
-            statesForState[LexGen.lexStateIndex][state] = (int[])allNextStates.get(s);
+            statesForState[lexGen.lexStateIndex][state] = (int[])allNextStates.get(s);
       }
 
       if (stateSetsToFix.size() != 0)
          FixStateSets();
 
-      kinds[LexGen.lexStateIndex] = kindsForStates;
+      kinds[lexGen.lexStateIndex] = kindsForStates;
 
       ostr.println("private int " +
-                    "jjMoveNfa" + LexGen.lexStateSuffix + "(int startState, int curPos) throws java.io.IOException");
+                    "jjMoveNfa" + lexGen.lexStateSuffix + "(int startState, int curPos) throws java.io.IOException");
       ostr.println("{");
 
       if (generatedStates == 0)
@@ -2784,7 +2786,7 @@ public class NfaState
          return;
       }
 
-      if (LexGen.mixed[LexGen.lexStateIndex])
+      if (lexGen.mixed[lexGen.lexStateIndex])
       {
          ostr.println("   int strKind = jjMatchedKind;");
          ostr.println("   int strPos = jjMatchedPos;");
@@ -2805,7 +2807,7 @@ public class NfaState
                  "jjKindsForStateVector(jjLexState, jjStateSet, 0, 1));");
 
       if (Options.getDebugTokenManager())
-         ostr.println("      debugPrinter.println(" + (LexGen.maxLexStates > 1 ?
+         ostr.println("      debugPrinter.println(" + (lexGen.maxLexStates > 1 ?
                  "\"<\" + jjLexStateNames[jjLexState] + \">\" + " :
                  "") + "\"Current character : \" + " +
                  "TokenManagerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
@@ -2819,7 +2821,7 @@ public class NfaState
       ostr.println("      if (jjChar < 64)");
       ostr.println("      {");
 
-      DumpAsciiMoves(ostr, 0);
+      DumpAsciiMoves(lexGen, ostr, 0);
 
       ostr.println("      }");
 
@@ -2827,14 +2829,14 @@ public class NfaState
 
       ostr.println("      {");
 
-      DumpAsciiMoves(ostr, 1);
+      DumpAsciiMoves(lexGen, ostr, 1);
 
       ostr.println("      }");
 
       ostr.println("      else");
       ostr.println("      {");
 
-      DumpCharAndRangeMoves(ostr);
+      DumpCharAndRangeMoves(lexGen, ostr);
 
       ostr.println("      }");
 
@@ -2857,7 +2859,7 @@ public class NfaState
 
       ostr.println("      if ((i = jjNewStateCount) == (startsAt = " +
                    generatedStates + " - (jjNewStateCount = startsAt)))");
-      if (LexGen.mixed[LexGen.lexStateIndex])
+      if (lexGen.mixed[lexGen.lexStateIndex])
          ostr.println("         break;");
       else
          ostr.println("         return curPos;");
@@ -2868,13 +2870,13 @@ public class NfaState
 
       ostr.println("      jjChar = charStream.readChar();");
 
-      if (LexGen.mixed[LexGen.lexStateIndex])
+      if (lexGen.mixed[lexGen.lexStateIndex])
          ostr.println("      if (jjChar == -1) { break; }");
       else
          ostr.println("      if (jjChar == -1) { return curPos; }");
 
       if (Options.getDebugTokenManager())
-         ostr.println("      debugPrinter.println(" + (LexGen.maxLexStates > 1 ?
+         ostr.println("      debugPrinter.println(" + (lexGen.maxLexStates > 1 ?
                  "\"<\" + jjLexStateNames[jjLexState] + \">\" + " :
                  "") + "\"Current character : \" + " +
                  "TokenManagerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
@@ -2882,7 +2884,7 @@ public class NfaState
 
       ostr.println("   }");
 
-      if (LexGen.mixed[LexGen.lexStateIndex])
+      if (lexGen.mixed[lexGen.lexStateIndex])
       {
          ostr.println("   if (jjMatchedPos > strPos)");
          ostr.println("      return curPos;");

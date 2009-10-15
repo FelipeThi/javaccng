@@ -169,8 +169,9 @@ public final class Main {
 
       Semanticize.start();
       ParseGen.start();
-      LexGen.start();
-      OtherFilesGen.start();
+      LexGen lexGen = new LexGen();
+      lexGen.start();
+      OtherFilesGen.start(lexGen);
 
       if ((JavaCCErrors.get_error_count() == 0) && (Options.getBuildParser() || Options.getBuildTokenManager())) {
         if (JavaCCErrors.get_warning_count() == 0) {
@@ -206,7 +207,6 @@ public final class Main {
       org.javacc.parser.JavaCCParserInternals.reInit();
       org.javacc.parser.RStringLiteral.reInit();
       org.javacc.parser.JavaFiles.reInit();
-      org.javacc.parser.LexGen.reInit();
       org.javacc.parser.NfaState.reInit();
       org.javacc.parser.MatchInfo.reInit();
       org.javacc.parser.LookaheadWalk.reInit();

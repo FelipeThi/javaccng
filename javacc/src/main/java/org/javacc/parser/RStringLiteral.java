@@ -117,7 +117,7 @@ public class RStringLiteral extends RegularExpression {
     statesForPos = null;
   }
 
-  public static void DumpStrLiteralImages(IndentingPrintWriter ostr)
+  public static void DumpStrLiteralImages(LexGen lexGen, IndentingPrintWriter ostr)
   {
     String image;
     int i;
@@ -137,13 +137,13 @@ public class RStringLiteral extends RegularExpression {
     for (i = 0; i < allImages.length; i++)
     {
       if ((image = allImages[i]) == null ||
-          ((LexGen.toSkip[i / 64] & (1L << (i % 64))) == 0L &&
-           (LexGen.toMore[i / 64] & (1L << (i % 64))) == 0L &&
-           (LexGen.toToken[i / 64] & (1L << (i % 64))) == 0L) ||
-          (LexGen.toSkip[i / 64] & (1L << (i % 64))) != 0L ||
-          (LexGen.toMore[i / 64] & (1L << (i % 64))) != 0L ||
-          LexGen.canReachOnMore[LexGen.lexStates[i]] ||
-          ((Options.getIgnoreCase() || LexGen.ignoreCase[i]) &&
+          ((lexGen.toSkip[i / 64] & (1L << (i % 64))) == 0L &&
+           (lexGen.toMore[i / 64] & (1L << (i % 64))) == 0L &&
+           (lexGen.toToken[i / 64] & (1L << (i % 64))) == 0L) ||
+          (lexGen.toSkip[i / 64] & (1L << (i % 64))) != 0L ||
+          (lexGen.toMore[i / 64] & (1L << (i % 64))) != 0L ||
+          lexGen.canReachOnMore[lexGen.lexStates[i]] ||
+          ((Options.getIgnoreCase() || lexGen.ignoreCase[i]) &&
            (!image.equals(image.toLowerCase()) ||
             !image.equals(image.toUpperCase()))))
       {
@@ -193,7 +193,7 @@ public class RStringLiteral extends RegularExpression {
       ostr.print(toPrint);
     }
 
-    while (++i < LexGen.maxOrdinal)
+    while (++i < lexGen.maxOrdinal)
     {
       if ((charCnt += 6) > 80)
       {
@@ -211,7 +211,7 @@ public class RStringLiteral extends RegularExpression {
   /**
    * Used for top level string literals.
    */
-  public void GenerateDfa(IndentingPrintWriter ostr, int kind)
+  public void GenerateDfa(LexGen lexGen, IndentingPrintWriter ostr, int kind)
   {
      String s;
      Hashtable temp;
@@ -237,7 +237,7 @@ public class RStringLiteral extends RegularExpression {
             !Options.getUserCharStream())
         {
            NfaState.unicodeWarningGiven = true;
-           JavaCCErrors.warning(LexGen.curRE, "Non-ASCII characters used in regular expression." +
+           JavaCCErrors.warning(lexGen.curRE, "Non-ASCII characters used in regular expression." +
               "Please make sure you use the correct Reader when you create the parser, " +
               "one that can handle your character set.");
         }
@@ -248,14 +248,14 @@ public class RStringLiteral extends RegularExpression {
            temp = (Hashtable)charPosKind.get(i);
 
         if ((info = (KindInfo)temp.get(s)) == null)
-           temp.put(s, info = new KindInfo(LexGen.maxOrdinal));
+           temp.put(s, info = new KindInfo(lexGen.maxOrdinal));
 
         if (i + 1 == len)
            info.InsertFinalKind(ordinal);
         else
            info.InsertValidKind(ordinal);
 
-        if (!Options.getIgnoreCase() && LexGen.ignoreCase[ordinal] &&
+        if (!Options.getIgnoreCase() && lexGen.ignoreCase[ordinal] &&
             c != Character.toLowerCase(c))
         {
            s = ("" + image.charAt(i)).toLowerCase();
@@ -266,7 +266,7 @@ public class RStringLiteral extends RegularExpression {
               temp = (Hashtable)charPosKind.get(i);
 
            if ((info = (KindInfo)temp.get(s)) == null)
-              temp.put(s, info = new KindInfo(LexGen.maxOrdinal));
+              temp.put(s, info = new KindInfo(lexGen.maxOrdinal));
 
            if (i + 1 == len)
               info.InsertFinalKind(ordinal);
@@ -274,7 +274,7 @@ public class RStringLiteral extends RegularExpression {
               info.InsertValidKind(ordinal);
         }
 
-        if (!Options.getIgnoreCase() && LexGen.ignoreCase[ordinal] &&
+        if (!Options.getIgnoreCase() && lexGen.ignoreCase[ordinal] &&
             c != Character.toUpperCase(c))
         {
            s = ("" + image.charAt(i)).toUpperCase();
@@ -285,7 +285,7 @@ public class RStringLiteral extends RegularExpression {
               temp = (Hashtable)charPosKind.get(i);
 
            if ((info = (KindInfo)temp.get(s)) == null)
-              temp.put(s, info = new KindInfo(LexGen.maxOrdinal));
+              temp.put(s, info = new KindInfo(lexGen.maxOrdinal));
 
            if (i + 1 == len)
               info.InsertFinalKind(ordinal);
@@ -299,15 +299,15 @@ public class RStringLiteral extends RegularExpression {
      allImages[ordinal] = image;
   }
 
-  public Nfa GenerateNfa(boolean ignoreCase)
+  public Nfa GenerateNfa(final LexGen lexGen, boolean ignoreCase)
   {
      if (image.length() == 1)
      {
         RCharacterList temp = new RCharacterList(image.charAt(0));
-        return temp.GenerateNfa(ignoreCase);
+        return temp.GenerateNfa(lexGen, ignoreCase);
      }
 
-     NfaState startState = new NfaState();
+     NfaState startState = new NfaState(lexGen);
      NfaState theStartState = startState;
      NfaState finalState = null;
 
@@ -318,7 +318,7 @@ public class RStringLiteral extends RegularExpression {
 
      for (i = 0; i < image.length(); i++)
      {
-        finalState = new NfaState();
+        finalState = new NfaState(lexGen);
         startState.charMoves = new char[1];
         startState.AddChar(image.charAt(i));
 
@@ -335,12 +335,12 @@ public class RStringLiteral extends RegularExpression {
      return new Nfa(theStartState, finalState);
   }
 
-  static void DumpNullStrLiterals(IndentingPrintWriter ostr)
+  static void DumpNullStrLiterals(LexGen lexGen, IndentingPrintWriter ostr)
   {
      ostr.println("{");
     ostr.indent();
      if (NfaState.generatedStates != 0)
-        ostr.println("return jjMoveNfa" + LexGen.lexStateSuffix + "(" + NfaState.InitStateName() + ", 0);");
+        ostr.println("return jjMoveNfa" + lexGen.lexStateSuffix + "(" + NfaState.InitStateName(lexGen) + ", 0);");
      else
         ostr.println("return 1;");
 
@@ -348,9 +348,9 @@ public class RStringLiteral extends RegularExpression {
      ostr.println("}");
   }
 
-  private static int GetStateSetForKind(int pos, int kind)
+  private static int GetStateSetForKind(LexGen lexGen, int pos, int kind)
   {
-     if (LexGen.mixed[LexGen.lexStateIndex] || NfaState.generatedStates == 0)
+     if (lexGen.mixed[lexGen.lexStateIndex] || NfaState.generatedStates == 0)
         return -1;
 
      Hashtable allStateSets = statesForPos[pos];
@@ -381,9 +381,9 @@ public class RStringLiteral extends RegularExpression {
      return -1;
   }
 
-  static String GetLabel(int kind)
+  static String GetLabel(LexGen lexGen, int kind)
   {
-     RegularExpression re = LexGen.rexprs[kind];
+     RegularExpression re = lexGen.rexprs[kind];
 
      if (re instanceof RStringLiteral)
        return " \"" + JavaCCGlobals.add_escapes(((RStringLiteral)re).image) + "\"";
@@ -393,14 +393,14 @@ public class RStringLiteral extends RegularExpression {
        return " <token of kind " + kind + ">";
   }
 
-  static int GetLine(int kind)
+  static int GetLine(LexGen lexGen, int kind)
   {
-     return LexGen.rexprs[kind].getLine();
+     return lexGen.rexprs[kind].getLine();
   }
 
-  static int GetColumn(int kind)
+  static int GetColumn(LexGen lexGen, int kind)
   {
-     return LexGen.rexprs[kind].getColumn();
+     return lexGen.rexprs[kind].getColumn();
   }
 
   /**
@@ -423,7 +423,7 @@ public class RStringLiteral extends RegularExpression {
      return true;
   }
 
-  static void FillSubString()
+  static void FillSubString(LexGen lexGen)
   {
      String image;
      subString = new boolean[maxStrKind + 1];
@@ -434,10 +434,10 @@ public class RStringLiteral extends RegularExpression {
         subString[i] = false;
 
         if ((image = allImages[i]) == null ||
-            LexGen.lexStates[i] != LexGen.lexStateIndex)
+            lexGen.lexStates[i] != lexGen.lexStateIndex)
            continue;
 
-        if (LexGen.mixed[LexGen.lexStateIndex])
+        if (lexGen.mixed[lexGen.lexStateIndex])
         {
            // We will not optimize for mixed case
            subString[i] = true;
@@ -447,7 +447,7 @@ public class RStringLiteral extends RegularExpression {
 
         for (int j = 0; j < maxStrKind; j++)
         {
-           if (j != i && LexGen.lexStates[j] == LexGen.lexStateIndex &&
+           if (j != i && lexGen.lexStates[j] == lexGen.lexStateIndex &&
                ((String)allImages[j]) != null)
            {
               if (((String)allImages[j]).indexOf(image) == 0)
@@ -468,10 +468,10 @@ public class RStringLiteral extends RegularExpression {
      }
   }
 
-  static void DumpStartWithStates(IndentingPrintWriter ostr)
+  static void DumpStartWithStates(LexGen lexGen, IndentingPrintWriter ostr)
   {
      ostr.println("private int " +
-                  "jjStartNfaWithStates" + LexGen.lexStateSuffix + "(int pos, int kind, int state) throws java.io.IOException");
+                  "jjStartNfaWithStates" + lexGen.lexStateSuffix + "(int pos, int kind, int state) throws java.io.IOException");
      ostr.println("{");
     ostr.indent();
      ostr.println("jjMatchedKind = kind;");
@@ -489,12 +489,12 @@ public class RStringLiteral extends RegularExpression {
 
      if (Options.getDebugTokenManager())
         ostr.println("debugPrinter.println(" +
-                (LexGen.maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
+                (lexGen.maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
                 "\"Current character : \" + " +
                 "TokenManagerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
                 "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
 
-     ostr.println("return jjMoveNfa" + LexGen.lexStateSuffix + "(state, pos + 1);");
+     ostr.println("return jjMoveNfa" + lexGen.lexStateSuffix + "(state, pos + 1);");
     ostr.unindent();
      ostr.println("}");
     ostr.println();
@@ -548,7 +548,7 @@ public class RStringLiteral extends RegularExpression {
      return ret;
   }
 
-  static void DumpDfaCode(IndentingPrintWriter ostr)
+  static void DumpDfaCode(LexGen lexGen, IndentingPrintWriter ostr)
   {
      Hashtable tab;
      String key;
@@ -556,14 +556,14 @@ public class RStringLiteral extends RegularExpression {
      int maxLongsReqd = maxStrKind / 64 + 1;
      int i, j, k;
      boolean ifGenerated;
-     LexGen.maxLongsReqd[LexGen.lexStateIndex] = maxLongsReqd;
+     lexGen.maxLongsReqd[lexGen.lexStateIndex] = maxLongsReqd;
 
      if (maxLen == 0)
      {
         ostr.println("private int " +
-                       "jjMoveStringLiteralDfa0" + LexGen.lexStateSuffix + "() throws java.io.IOException");
+                       "jjMoveStringLiteralDfa0" + lexGen.lexStateSuffix + "() throws java.io.IOException");
 
-        DumpNullStrLiterals(ostr);
+        DumpNullStrLiterals(lexGen, ostr);
        ostr.println();
         return;
      }
@@ -583,7 +583,7 @@ public class RStringLiteral extends RegularExpression {
         String[] keys = ReArrange(tab);
 
         ostr.print("private int " +
-                       "jjMoveStringLiteralDfa" + i + LexGen.lexStateSuffix + "(");
+                       "jjMoveStringLiteralDfa" + i + lexGen.lexStateSuffix + "(");
 
         if (i != 0)
         {
@@ -655,9 +655,9 @@ public class RStringLiteral extends RegularExpression {
 
               ostr.println(") == 0L)");
              ostr.indent();
-              if (!LexGen.mixed[LexGen.lexStateIndex] && NfaState.generatedStates != 0)
+              if (!lexGen.mixed[lexGen.lexStateIndex] && NfaState.generatedStates != 0)
               {
-                 ostr.print("return jjStartNfa" + LexGen.lexStateSuffix +
+                 ostr.print("return jjStartNfa" + lexGen.lexStateSuffix +
                                  "(" + (i - 2) + ", ");
                  for (j = 0; j < maxLongsReqd - 1; j++)
                     if (i <= maxLenForActive[j] + 1)
@@ -671,8 +671,8 @@ public class RStringLiteral extends RegularExpression {
 
               }
               else if (NfaState.generatedStates != 0)
-                 ostr.println("return jjMoveNfa" + LexGen.lexStateSuffix +
-                         "(" + NfaState.InitStateName() + ", " + (i - 1) + ");");
+                 ostr.println("return jjMoveNfa" + lexGen.lexStateSuffix +
+                         "(" + NfaState.InitStateName(lexGen) + ", " + (i - 1) + ");");
               else
                  ostr.println("return " + i + ";");
              ostr.unindent();
@@ -706,9 +706,9 @@ public class RStringLiteral extends RegularExpression {
            ostr.println("{");
           ostr.indent();
 
-           if (!LexGen.mixed[LexGen.lexStateIndex] && NfaState.generatedStates != 0)
+           if (!lexGen.mixed[lexGen.lexStateIndex] && NfaState.generatedStates != 0)
            {
-              ostr.print("jjStopStringLiteralDfa" + LexGen.lexStateSuffix + "(" + (i - 1) + ", ");
+              ostr.print("jjStopStringLiteralDfa" + lexGen.lexStateSuffix + "(" + (i - 1) + ", ");
               for (k = 0; k < maxLongsReqd - 1; k++)
                  if (i <= maxLenForActive[k])
                     ostr.print("active" + k + ", ");
@@ -731,7 +731,7 @@ public class RStringLiteral extends RegularExpression {
               ostr.println("return " + i + ";");
            }
            else if (NfaState.generatedStates != 0)
-              ostr.println("return jjMoveNfa" + LexGen.lexStateSuffix + "(" + NfaState.InitStateName() +
+              ostr.println("return jjMoveNfa" + lexGen.lexStateSuffix + "(" + NfaState.InitStateName(lexGen) +
                       ", " + (i - 1) + ");");
            else
               ostr.println("return " + i + ";");
@@ -742,7 +742,7 @@ public class RStringLiteral extends RegularExpression {
 
         if (i != 0 && Options.getDebugTokenManager())
            ostr.println("debugPrinter.println(" +
-                   (LexGen.maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
+                   (lexGen.maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
                    "\"Current character : \" + " +
                    "TokenManagerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
                    "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
@@ -760,7 +760,7 @@ public class RStringLiteral extends RegularExpression {
            char c = key.charAt(0);
 
            if (i == 0 && c < 128 && info.finalKindCnt != 0 &&
-               (NfaState.generatedStates == 0 || !NfaState.CanStartNfaUsingAscii(c)))
+               (NfaState.generatedStates == 0 || !NfaState.CanStartNfaUsingAscii(lexGen, c)))
            {
               int kind;
               for (j = 0; j < maxLongsReqd; j++)
@@ -776,23 +776,23 @@ public class RStringLiteral extends RegularExpression {
                         intermediateKinds[(j * 64 + k)][i] < (j * 64 + k) &&
                         intermediateMatchedPos != null &&
                         intermediateMatchedPos[(j * 64 + k)][i] == i) ||
-                       (LexGen.canMatchAnyChar[LexGen.lexStateIndex] >= 0 &&
-                        LexGen.canMatchAnyChar[LexGen.lexStateIndex] < (j * 64 + k)))
+                       (lexGen.canMatchAnyChar[lexGen.lexStateIndex] >= 0 &&
+                        lexGen.canMatchAnyChar[lexGen.lexStateIndex] < (j * 64 + k)))
                       break;
-                    else if ((LexGen.toSkip[kind / 64] & (1L << (kind % 64))) != 0L  &&
-                             (LexGen.toSpecial[kind / 64] & (1L << (kind % 64))) == 0L  &&
-                             LexGen.actions[kind] == null &&
-                             LexGen.newLexState[kind] == null)
+                    else if ((lexGen.toSkip[kind / 64] & (1L << (kind % 64))) != 0L  &&
+                             (lexGen.toSpecial[kind / 64] & (1L << (kind % 64))) == 0L  &&
+                             lexGen.actions[kind] == null &&
+                             lexGen.newLexState[kind] == null)
                     {
-                       LexGen.AddCharToSkip(c, kind);
+                       lexGen.AddCharToSkip(c, kind);
 
                        if (Options.getIgnoreCase())
                        {
                           if (c != Character.toUpperCase(c))
-                             LexGen.AddCharToSkip(Character.toUpperCase(c), kind);
+                             lexGen.AddCharToSkip(Character.toUpperCase(c), kind);
 
                           if (c != Character.toLowerCase(c))
-                             LexGen.AddCharToSkip(Character.toLowerCase(c), kind);
+                             lexGen.AddCharToSkip(Character.toLowerCase(c), kind);
                        }
                        continue CaseLoop;
                     }
@@ -851,36 +851,36 @@ public class RStringLiteral extends RegularExpression {
                        JavaCCErrors.warning(" \"" +
                            JavaCCGlobals.add_escapes(allImages[j * 64 + k]) +
                            "\" cannot be matched as a string literal token " +
-                           "at line " + GetLine(j * 64 + k) + ", column " + GetColumn(j * 64 + k) +
+                           "at line " + GetLine(lexGen, j * 64 + k) + ", column " + GetColumn(lexGen, j * 64 + k) +
                            ". It will be matched as " +
-                           GetLabel(intermediateKinds[(j * 64 + k)][i]) + ".");
+                           GetLabel(lexGen, intermediateKinds[(j * 64 + k)][i]) + ".");
                        kindToPrint = intermediateKinds[(j * 64 + k)][i];
                     }
                     else if (i == 0 &&
-                         LexGen.canMatchAnyChar[LexGen.lexStateIndex] >= 0 &&
-                         LexGen.canMatchAnyChar[LexGen.lexStateIndex] < (j * 64 + k))
+                         lexGen.canMatchAnyChar[lexGen.lexStateIndex] >= 0 &&
+                         lexGen.canMatchAnyChar[lexGen.lexStateIndex] < (j * 64 + k))
                     {
                        JavaCCErrors.warning(" \"" +
                            JavaCCGlobals.add_escapes(allImages[j * 64 + k]) +
                            "\" cannot be matched as a string literal token " +
-                           "at line " + GetLine(j * 64 + k) + ", column " + GetColumn(j * 64 + k) +
+                           "at line " + GetLine(lexGen, j * 64 + k) + ", column " + GetColumn(lexGen, j * 64 + k) +
                            ". It will be matched as " +
-                           GetLabel(LexGen.canMatchAnyChar[LexGen.lexStateIndex]) + ".");
-                       kindToPrint = LexGen.canMatchAnyChar[LexGen.lexStateIndex];
+                           GetLabel(lexGen, lexGen.canMatchAnyChar[lexGen.lexStateIndex]) + ".");
+                       kindToPrint = lexGen.canMatchAnyChar[lexGen.lexStateIndex];
                     }
                     else
                        kindToPrint = j * 64 + k;
 
                     if (!subString[(j * 64 + k)])
                     {
-                       int stateSetName = GetStateSetForKind(i, j * 64 + k);
+                       int stateSetName = GetStateSetForKind(lexGen, i, j * 64 + k);
 
                        if (stateSetName != -1)
                        {
                           createStartNfa = true;
                          ostr.indent();
                           ostr.println("return jjStartNfaWithStates" +
-                              LexGen.lexStateSuffix + "(" + i +
+                              lexGen.lexStateSuffix + "(" + i +
                               ", " + kindToPrint + ", " + stateSetName + ");");
                          ostr.unindent();
                        }
@@ -892,8 +892,8 @@ public class RStringLiteral extends RegularExpression {
                     }
                     else
                     {
-                       if ((LexGen.initMatch[LexGen.lexStateIndex] != 0 &&
-                            LexGen.initMatch[LexGen.lexStateIndex] != Integer.MAX_VALUE) ||
+                       if ((lexGen.initMatch[lexGen.lexStateIndex] != 0 &&
+                            lexGen.initMatch[lexGen.lexStateIndex] != Integer.MAX_VALUE) ||
                             i != 0)
                        {
                           ostr.println("{");
@@ -920,7 +920,7 @@ public class RStringLiteral extends RegularExpression {
               {
 
                  ostr.print("return jjMoveStringLiteralDfa" + (i + 1) +
-                                LexGen.lexStateSuffix + "(");
+                                lexGen.lexStateSuffix + "(");
                  for (j = 0; j < maxLongsReqd - 1; j++)
                     if ((i + 1) <= maxLenForActive[j])
                     {
@@ -945,7 +945,7 @@ public class RStringLiteral extends RegularExpression {
               else
               {
                  ostr.print("return jjMoveStringLiteralDfa" + (i + 1) +
-                                LexGen.lexStateSuffix + "(");
+                                lexGen.lexStateSuffix + "(");
 
                  for (j = 0; j < maxLongsReqd - 1; j++)
                     if ((i + 1) <= maxLenForActive[j] + 1)
@@ -980,12 +980,12 @@ public class RStringLiteral extends RegularExpression {
            else
            {
               // A very special case.
-              if (i == 0 && LexGen.mixed[LexGen.lexStateIndex])
+              if (i == 0 && lexGen.mixed[lexGen.lexStateIndex])
               {
 
                  if (NfaState.generatedStates != 0)
-                    ostr.println("return jjMoveNfa" + LexGen.lexStateSuffix +
-                            "(" + NfaState.InitStateName() + ", 0);");
+                    ostr.println("return jjMoveNfa" + lexGen.lexStateSuffix +
+                            "(" + NfaState.InitStateName(lexGen) + ", 0);");
                  else
                     ostr.println("return 1;");
               }
@@ -1013,8 +1013,8 @@ public class RStringLiteral extends RegularExpression {
            {
               /* This means no string literal is possible. Just move nfa with
                  this guy and return. */
-              ostr.println("return jjMoveNfa" + LexGen.lexStateSuffix +
-                      "(" + NfaState.InitStateName() + ", 0);");
+              ostr.println("return jjMoveNfa" + lexGen.lexStateSuffix +
+                      "(" + NfaState.InitStateName(lexGen) + ", 0);");
            }
            else
            {
@@ -1035,13 +1035,13 @@ public class RStringLiteral extends RegularExpression {
         {
           if (startNfaNeeded)
           {
-           if (!LexGen.mixed[LexGen.lexStateIndex] && NfaState.generatedStates != 0)
+           if (!lexGen.mixed[lexGen.lexStateIndex] && NfaState.generatedStates != 0)
            {
               /* Here, a string literal is successfully matched and no more
                  string literals are possible. So set the kind and state set
                  upto and including this position for the matched string. */
 
-              ostr.print("return jjStartNfa" + LexGen.lexStateSuffix + "(" + (i - 1) + ", ");
+              ostr.print("return jjStartNfa" + lexGen.lexStateSuffix + "(" + (i - 1) + ", ");
               for (k = 0; k < maxLongsReqd - 1; k++)
                  if (i <= maxLenForActive[k])
                     ostr.print("active" + k + ", ");
@@ -1053,8 +1053,8 @@ public class RStringLiteral extends RegularExpression {
                  ostr.println("0L);");
            }
            else if (NfaState.generatedStates != 0)
-              ostr.println("return jjMoveNfa" + LexGen.lexStateSuffix +
-                      "(" + NfaState.InitStateName() + ", " + i + ");");
+              ostr.println("return jjMoveNfa" + lexGen.lexStateSuffix +
+                      "(" + NfaState.InitStateName(lexGen) + ", " + i + ");");
            else
               ostr.println("return " + (i + 1) + ";");
           }
@@ -1065,15 +1065,15 @@ public class RStringLiteral extends RegularExpression {
        ostr.println();
      }
 
-     if (!LexGen.mixed[LexGen.lexStateIndex] && NfaState.generatedStates != 0 && createStartNfa)
-        DumpStartWithStates(ostr);
+     if (!lexGen.mixed[lexGen.lexStateIndex] && NfaState.generatedStates != 0 && createStartNfa)
+        DumpStartWithStates(lexGen, ostr);
   }
 
-  static final int GetStrKind(String str)
+  static final int GetStrKind(LexGen lexGen, String str)
   {
      for (int i = 0; i < maxStrKind; i++)
      {
-        if (LexGen.lexStates[i] != LexGen.lexStateIndex)
+        if (lexGen.lexStates[i] != lexGen.lexStateIndex)
            continue;
 
         String image = allImages[i];
@@ -1084,7 +1084,7 @@ public class RStringLiteral extends RegularExpression {
      return Integer.MAX_VALUE;
   }
 
-  static void GenerateNfaStartStates(IndentingPrintWriter ostr,
+  static void GenerateNfaStartStates(LexGen lexGen, IndentingPrintWriter ostr,
                                                 NfaState initialState)
   {
      boolean[] seen = new boolean[NfaState.generatedStates];
@@ -1102,7 +1102,7 @@ public class RStringLiteral extends RegularExpression {
 
      for (i = 0; i < maxStrKind; i++)
      {
-        if (LexGen.lexStates[i] != LexGen.lexStateIndex)
+        if (lexGen.lexStates[i] != lexGen.lexStateIndex)
            continue;
 
         String image = allImages[i];
@@ -1115,7 +1115,7 @@ public class RStringLiteral extends RegularExpression {
            if ((oldStates = (List)initialState.epsilonMoves.clone()) == null ||
                oldStates.size() == 0)
            {
-              DumpNfaStartStatesCode(statesForPos, ostr);
+              DumpNfaStartStatesCode(lexGen, statesForPos, ostr);
               return;
            }
         }
@@ -1143,11 +1143,11 @@ public class RStringLiteral extends RegularExpression {
               oldStates.clear();
 
               if (j == 0 && kind != Integer.MAX_VALUE &&
-                  LexGen.canMatchAnyChar[LexGen.lexStateIndex] != -1 &&
-                  kind > LexGen.canMatchAnyChar[LexGen.lexStateIndex])
-                 kind = LexGen.canMatchAnyChar[LexGen.lexStateIndex];
+                  lexGen.canMatchAnyChar[lexGen.lexStateIndex] != -1 &&
+                  kind > lexGen.canMatchAnyChar[lexGen.lexStateIndex])
+                 kind = lexGen.canMatchAnyChar[lexGen.lexStateIndex];
 
-              if (GetStrKind(image.substring(0, j + 1)) < kind)
+              if (GetStrKind(lexGen, image.substring(0, j + 1)) < kind)
               {
                  intermediateKinds[i][j] = kind = Integer.MAX_VALUE;
                  jjMatchedPos = 0;
@@ -1210,10 +1210,10 @@ public class RStringLiteral extends RegularExpression {
         }
      }
 
-     DumpNfaStartStatesCode(statesForPos, ostr);
+     DumpNfaStartStatesCode(lexGen, statesForPos, ostr);
   }
 
-  static void DumpNfaStartStatesCode(Hashtable[] statesForPos,
+  static void DumpNfaStartStatesCode(LexGen lexGen, Hashtable[] statesForPos,
                                               IndentingPrintWriter ostr)
   {
       if (maxStrKind == 0) { // No need to generate this function
@@ -1225,7 +1225,7 @@ public class RStringLiteral extends RegularExpression {
      int ind = 0;
 
      ostr.print("private int jjStopStringLiteralDfa" +
-                  LexGen.lexStateSuffix + "(int pos, ");
+                  lexGen.lexStateSuffix + "(int pos, ");
      for (i = 0; i < maxKindsReqd - 1; i++)
         ostr.print("long active" + i + ", ");
      ostr.println("long active" + i + ")\n{");
@@ -1283,8 +1283,8 @@ public class RStringLiteral extends RegularExpression {
                  {
                     ostr.println("            jjMatchedKind = " + kindStr + ";");
 
-                    if ((LexGen.initMatch[LexGen.lexStateIndex] != 0 &&
-                        LexGen.initMatch[LexGen.lexStateIndex] != Integer.MAX_VALUE))
+                    if ((lexGen.initMatch[lexGen.lexStateIndex] != 0 &&
+                        lexGen.initMatch[lexGen.lexStateIndex] != Integer.MAX_VALUE))
                        ostr.println("            jjMatchedPos = 0;");
                  }
                  else if (i == jjMatchedPos)
@@ -1344,16 +1344,16 @@ public class RStringLiteral extends RegularExpression {
 
     ostr.println();
      ostr.print("private int jjStartNfa" +
-                  LexGen.lexStateSuffix + "(int pos, ");
+                  lexGen.lexStateSuffix + "(int pos, ");
      for (i = 0; i < maxKindsReqd - 1; i++)
         ostr.print("long active" + i + ", ");
      ostr.println("long active" + i + ") throws java.io.IOException \n{");
 
-     if (LexGen.mixed[LexGen.lexStateIndex])
+     if (lexGen.mixed[lexGen.lexStateIndex])
      {
          if (NfaState.generatedStates != 0)
-            ostr.println("   return jjMoveNfa" + LexGen.lexStateSuffix +
-                    "(" + NfaState.InitStateName() + ", pos + 1);");
+            ostr.println("   return jjMoveNfa" + lexGen.lexStateSuffix +
+                    "(" + NfaState.InitStateName(lexGen) + ", pos + 1);");
          else
             ostr.println("   return pos + 1;");
 
@@ -1361,8 +1361,8 @@ public class RStringLiteral extends RegularExpression {
          return;
      }
 
-     ostr.print("   return jjMoveNfa" + LexGen.lexStateSuffix + "(" +
-               "jjStopStringLiteralDfa" + LexGen.lexStateSuffix + "(pos, ");
+     ostr.print("   return jjMoveNfa" + lexGen.lexStateSuffix + "(" +
+               "jjStopStringLiteralDfa" + lexGen.lexStateSuffix + "(pos, ");
      for (i = 0; i < maxKindsReqd - 1; i++)
         ostr.print("active" + i + ", ");
      ostr.print("active" + i + ")");

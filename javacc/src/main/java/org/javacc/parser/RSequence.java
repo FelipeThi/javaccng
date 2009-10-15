@@ -43,12 +43,12 @@ public class RSequence extends RegularExpression {
    */
   public List units = new ArrayList();
 
-  public Nfa GenerateNfa(boolean ignoreCase)
+  public Nfa GenerateNfa(final LexGen lexGen, boolean ignoreCase)
   {
      if (units.size() == 1)
-        return ((RegularExpression)units.get(0)).GenerateNfa(ignoreCase);
+        return ((RegularExpression)units.get(0)).GenerateNfa(lexGen, ignoreCase);
 
-     Nfa retVal = new Nfa();
+     Nfa retVal = new Nfa(lexGen);
      NfaState startState = retVal.start;
      NfaState finalState = retVal.end;
      Nfa temp1;
@@ -57,14 +57,14 @@ public class RSequence extends RegularExpression {
      RegularExpression curRE;
 
      curRE = (RegularExpression)units.get(0);
-     temp1 = curRE.GenerateNfa(ignoreCase);
+     temp1 = curRE.GenerateNfa(lexGen, ignoreCase);
      startState.AddMove(temp1.start);
 
      for (int i = 1; i < units.size(); i++)
      {
         curRE = (RegularExpression)units.get(i);
 
-        temp2 = curRE.GenerateNfa(ignoreCase);
+        temp2 = curRE.GenerateNfa(lexGen, ignoreCase);
         temp1.end.AddMove(temp2.start);
         temp1 = temp2;
      }

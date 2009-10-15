@@ -38,7 +38,7 @@ import java.util.List;
 public class OtherFilesGen extends JavaCCGlobals implements JavaCCParserConstants {
 
   public static boolean keepLineCol;
-  static public void start() throws MetaParseException {
+  static public void start(LexGen lexGen) throws MetaParseException {
 
     Token t = null;
     keepLineCol = Options.getKeepLineColumn();
@@ -112,9 +112,9 @@ public class OtherFilesGen extends JavaCCGlobals implements JavaCCParserConstant
     }
     ostr.println("");
     if (!Options.getUserTokenManager() && Options.getBuildTokenManager()) {
-      for (int i = 0; i < LexGen.lexStateName.length; i++) {
+      for (int i = 0; i < lexGen.lexStateName.length; i++) {
         ostr.println("  /** Lexical state. */");
-        ostr.println("  int " + LexGen.lexStateName[i] + " = " + i + ";");
+        ostr.println("  int " + lexGen.lexStateName[i] + " = " + i + ";");
       }
       ostr.println("");
     }

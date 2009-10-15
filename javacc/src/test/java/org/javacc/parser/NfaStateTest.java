@@ -17,6 +17,7 @@ import java.io.StringWriter;
  */
 public class NfaStateTest extends JavaCCTestCase {
   String parserInput = getJJInputDirectory() + "JavaCC.jj";
+  private LexGen lexGen;
 
   @Before
   public void setUp() throws Exception {
@@ -32,7 +33,8 @@ public class NfaStateTest extends JavaCCTestCase {
     JavaCCGlobals.jjtreeGenerated = JavaCCGlobals.isGeneratedBy("JJTree", parserInput);
     JavaCCGlobals.toolNames = JavaCCGlobals.getToolNames(parserInput);
     Semanticize.start();
-    LexGen.start();
+    lexGen = new LexGen();
+    lexGen.start();
   }
 
   /** Test method for {@link org.javacc.parser.NfaState#ReInit()}. */
@@ -118,7 +120,7 @@ public class NfaStateTest extends JavaCCTestCase {
   public void testDumpCharAndRangeMoves() throws Exception {
     StringWriter output = new StringWriter();
     IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
-    NfaState.DumpCharAndRangeMoves(contentWriter);
+    NfaState.DumpCharAndRangeMoves(lexGen, contentWriter);
     assertEquals(
         "         int i2 = (jjChar & 0xff) >> 6;\n" +
             "         long l2 = 1L << (jjChar & 077);\n" +
@@ -141,7 +143,7 @@ public class NfaStateTest extends JavaCCTestCase {
     StringWriter output = new StringWriter();
     IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     setupState();
-    NfaState.DumpCharAndRangeMoves(contentWriter);
+    NfaState.DumpCharAndRangeMoves(lexGen, contentWriter);
     assertEquals(
         "         int hiByte = (int)(jjChar >> 8);\n" +
             "         int i1 = hiByte >> 6;\n" +
@@ -364,11 +366,12 @@ public class NfaStateTest extends JavaCCTestCase {
 
   /** Test method for {@link org.javacc.parser.NfaState#DumpMoveNfa(IndentingPrintWriter)}. */
   @Test
-  public void testDumpMoveNfa() {
+  public void testDumpMoveNfa() throws Exception {
+    lexGen = new LexGen();
     StringWriter output = new StringWriter();
     IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     try {
-      NfaState.DumpMoveNfa(contentWriter);
+      NfaState.DumpMoveNfa(lexGen, contentWriter);
       fail("Should have bombed");
     }
     catch (ArrayIndexOutOfBoundsException e) {
@@ -416,7 +419,7 @@ public class NfaStateTest extends JavaCCTestCase {
     StringWriter output = new StringWriter();
     IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     setupState();
-    NfaState.DumpMoveNfa(contentWriter);
+    NfaState.DumpMoveNfa(lexGen, contentWriter);
     assertEquals("private int jjMoveNfa_3(int startState, int curPos) throws java.io.IOException\n" +
         "{\n" +
         "   return curPos;\n" +

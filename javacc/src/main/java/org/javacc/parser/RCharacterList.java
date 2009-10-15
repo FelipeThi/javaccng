@@ -302,7 +302,7 @@ static final char[] diffUpperCaseRanges = {
   }
 
   boolean transformed = false;
-  public Nfa GenerateNfa(boolean ignoreCase)
+  public Nfa GenerateNfa(final LexGen lexGen, boolean ignoreCase)
   {
      if (!transformed)
      {
@@ -366,11 +366,11 @@ static final char[] diffUpperCaseRanges = {
      if (descriptors.size() == 0 && !negated_list)
      {
         JavaCCErrors.semantic_error(this, "Empty character set is not allowed as it will not match any character.");
-        return new Nfa();
+        return new Nfa(lexGen);
      }
 
      transformed = true;
-     Nfa retVal = new Nfa();
+     Nfa retVal = new Nfa(lexGen);
      NfaState startState = retVal.start;
      NfaState finalState = retVal.end;
      int i;

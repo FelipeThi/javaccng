@@ -39,13 +39,13 @@ public class RZeroOrMore extends RegularExpression {
    */
   public RegularExpression regexpr;
 
-  public Nfa GenerateNfa(boolean ignoreCase)
+  public Nfa GenerateNfa(final LexGen lexGen, boolean ignoreCase)
   {
-     Nfa retVal = new Nfa();
+     Nfa retVal = new Nfa(lexGen);
      NfaState startState = retVal.start;
      NfaState finalState = retVal.end;
 
-     Nfa temp = regexpr.GenerateNfa(ignoreCase);
+     Nfa temp = regexpr.GenerateNfa(lexGen, ignoreCase);
 
      startState.AddMove(temp.start);
      startState.AddMove(finalState);
