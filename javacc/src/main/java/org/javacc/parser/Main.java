@@ -210,7 +210,6 @@ public final class Main {
       org.javacc.parser.RStringLiteral.reInit();
       org.javacc.parser.NfaState.reInit();
       org.javacc.parser.MatchInfo.reInit();
-      org.javacc.parser.LookaheadWalk.reInit();
    }
 
 }

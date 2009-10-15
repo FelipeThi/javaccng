@@ -32,19 +32,17 @@ import java.util.List;
 
 public final class LookaheadWalk {
 
-  public static boolean considerSemanticLA;
+  public boolean considerSemanticLA;
 
-  public static ArrayList sizeLimitedMatches;
+  public ArrayList sizeLimitedMatches;
 
-  private LookaheadWalk() {}
-
-  private static void listAppend(List vToAppendTo, List vToAppend) {
+  private void listAppend(List vToAppendTo, List vToAppend) {
     for (int i = 0; i < vToAppend.size(); i++) {
       vToAppendTo.add(vToAppend.get(i));
     }
   }
 
-  public static List genFirstSet(List partialMatches, Expansion exp) {
+  public List genFirstSet(List partialMatches, Expansion exp) {
     if (exp instanceof RegularExpression) {
       List retval = new ArrayList();
       for (int i = 0; i < partialMatches.size(); i++) {
@@ -125,7 +123,7 @@ public final class LookaheadWalk {
     }
   }
 
-  private static void listSplit(List toSplit, List mask, List partInMask, List rest) {
+  private void listSplit(List toSplit, List mask, List partInMask, List rest) {
     OuterLoop:
     for (int i = 0; i < toSplit.size(); i++) {
       for (int j = 0; j < mask.size(); j++) {
@@ -138,7 +136,7 @@ public final class LookaheadWalk {
     }
   }
 
-  public static List genFollowSet(List partialMatches, Expansion exp, long generation) {
+  public List genFollowSet(List partialMatches, Expansion exp, long generation) {
     if (exp.myGeneration == generation) {
       return new ArrayList();
     }
@@ -204,11 +202,4 @@ public final class LookaheadWalk {
       return genFollowSet(partialMatches, (Expansion)exp.parent, generation);
     }
   }
-
-   public static void reInit()
-   {
-      considerSemanticLA = false;
-      sizeLimitedMatches = null;
-   }
-
 }

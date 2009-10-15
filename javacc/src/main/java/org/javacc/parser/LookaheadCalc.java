@@ -30,9 +30,10 @@ package org.javacc.parser;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LookaheadCalc extends JavaCCGlobals {
+public class LookaheadCalc {
+  LookaheadWalk lookaheadWalk = new LookaheadWalk();
 
-  static MatchInfo overlap(List v1, List v2) {
+  MatchInfo overlap(List v1, List v2) {
     MatchInfo m1, m2, m3;
     int size;
     boolean diff;
@@ -74,9 +75,9 @@ public class LookaheadCalc extends JavaCCGlobals {
       if (m.match[i] == 0) {
         ret += " <EOF>";
       } else {
-        RegularExpression re = (RegularExpression)rexps_of_tokens.get(new Integer(m.match[i]));
+        RegularExpression re = (RegularExpression) JavaCCGlobals.rexps_of_tokens.get(new Integer(m.match[i]));
         if (re instanceof RStringLiteral) {
-          ret += " \"" + add_escapes(((RStringLiteral)re).image) + "\"";
+          ret += " \"" + JavaCCGlobals.add_escapes(((RStringLiteral)re).image) + "\"";
         } else if (re.label != null && !re.label.equals("")) {
           ret += " <" + re.label + ">";
         } else {
@@ -91,7 +92,7 @@ public class LookaheadCalc extends JavaCCGlobals {
     }
   }
 
-  public static void choiceCalc(Semanticize semanticize, Choice ch) {
+  public void choiceCalc(Semanticize semanticize, Choice ch) {
     int first = firstChoice(ch);
     // dbl[i] and dbr[i] are lists of size limited matches for choice i
     // of ch.  dbl ignores matches with semantic lookaheads (when force_la_check
@@ -106,25 +107,25 @@ public class LookaheadCalc extends JavaCCGlobals {
     boolean overlapDetected;
     for (int la = 1; la <= Options.getChoiceAmbiguityCheck(); la++) {
       MatchInfo.laLimit = la;
-      LookaheadWalk.considerSemanticLA = !Options.getForceLaCheck();
+      lookaheadWalk.considerSemanticLA = !Options.getForceLaCheck();
       for (int i = first; i < ch.getChoices().size()-1; i++) {
-        LookaheadWalk.sizeLimitedMatches = new ArrayList();
+        lookaheadWalk.sizeLimitedMatches = new ArrayList();
         m = new MatchInfo();
         m.firstFreeLoc = 0;
         v = new ArrayList();
         v.add(m);
-        LookaheadWalk.genFirstSet(v, (Expansion)ch.getChoices().get(i));
-        dbl[i] = LookaheadWalk.sizeLimitedMatches;
+        lookaheadWalk.genFirstSet(v, (Expansion)ch.getChoices().get(i));
+        dbl[i] = lookaheadWalk.sizeLimitedMatches;
       }
-      LookaheadWalk.considerSemanticLA = false;
+      lookaheadWalk.considerSemanticLA = false;
       for (int i = first+1; i < ch.getChoices().size(); i++) {
-        LookaheadWalk.sizeLimitedMatches = new ArrayList();
+        lookaheadWalk.sizeLimitedMatches = new ArrayList();
         m = new MatchInfo();
         m.firstFreeLoc = 0;
         v = new ArrayList();
         v.add(m);
-        LookaheadWalk.genFirstSet(v, (Expansion)ch.getChoices().get(i));
-        dbr[i] = LookaheadWalk.sizeLimitedMatches;
+        lookaheadWalk.genFirstSet(v, (Expansion)ch.getChoices().get(i));
+        dbr[i] = lookaheadWalk.sizeLimitedMatches;
       }
       if (la == 1) {
         for (int i = first; i < ch.getChoices().size()-1; i++) {
@@ -217,25 +218,25 @@ public class LookaheadCalc extends JavaCCGlobals {
     }
   }
 
-  public static void ebnfCalc(Expansion exp, Expansion nested) {
+  public void ebnfCalc(Expansion exp, Expansion nested) {
     // exp is one of OneOrMore, ZeroOrMore, ZeroOrOne
     MatchInfo m, m1 = null;
     List v, first, follow;
     int la;
     for (la = 1; la <= Options.getOtherAmbiguityCheck(); la++) {
       MatchInfo.laLimit = la;
-      LookaheadWalk.sizeLimitedMatches = new ArrayList();
+      lookaheadWalk.sizeLimitedMatches = new ArrayList();
       m = new MatchInfo();
       m.firstFreeLoc = 0;
       v = new ArrayList();
       v.add(m);
-      LookaheadWalk.considerSemanticLA = !Options.getForceLaCheck();
-      LookaheadWalk.genFirstSet(v, nested);
-      first = LookaheadWalk.sizeLimitedMatches;
-      LookaheadWalk.sizeLimitedMatches = new ArrayList();
-      LookaheadWalk.considerSemanticLA = false;
-      LookaheadWalk.genFollowSet(v, exp, Expansion.nextGenerationIndex++);
-      follow = LookaheadWalk.sizeLimitedMatches;
+      lookaheadWalk.considerSemanticLA = !Options.getForceLaCheck();
+      lookaheadWalk.genFirstSet(v, nested);
+      first = lookaheadWalk.sizeLimitedMatches;
+      lookaheadWalk.sizeLimitedMatches = new ArrayList();
+      lookaheadWalk.considerSemanticLA = false;
+      lookaheadWalk.genFollowSet(v, exp, Expansion.nextGenerationIndex++);
+      follow = lookaheadWalk.sizeLimitedMatches;
       if (la == 1) {
         if (javaCodeCheck(first)) {
           JavaCCErrors.warning(nested, "JAVACODE non-terminal within " + image(exp) +

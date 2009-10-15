@@ -34,7 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Semanticize {
-
+  LookaheadCalc lookaheadCalc = new LookaheadCalc();
   List removeList = new ArrayList();
   List itemList = new ArrayList();
 
@@ -808,22 +808,22 @@ public class Semanticize {
     public void action(Expansion e) {
       if (e instanceof Choice) {
         if (Options.getLookahead() == 1 || Options.getForceLaCheck()) {
-          LookaheadCalc.choiceCalc(Semanticize.this, (Choice)e);
+          lookaheadCalc.choiceCalc(Semanticize.this, (Choice)e);
         }
       } else if (e instanceof OneOrMore) {
         OneOrMore exp = (OneOrMore)e;
         if (Options.getForceLaCheck() || (implicitLA(exp.expansion) && Options.getLookahead() == 1)) {
-          LookaheadCalc.ebnfCalc(exp, exp.expansion);
+          lookaheadCalc.ebnfCalc(exp, exp.expansion);
         }
       } else if (e instanceof ZeroOrMore) {
         ZeroOrMore exp = (ZeroOrMore)e;
         if (Options.getForceLaCheck() || (implicitLA(exp.expansion) && Options.getLookahead() == 1)) {
-          LookaheadCalc.ebnfCalc(exp, exp.expansion);
+          lookaheadCalc.ebnfCalc(exp, exp.expansion);
         }
       } else if (e instanceof ZeroOrOne) {
         ZeroOrOne exp = (ZeroOrOne)e;
         if (Options.getForceLaCheck() || (implicitLA(exp.expansion) && Options.getLookahead() == 1)) {
-          LookaheadCalc.ebnfCalc(exp, exp.expansion);
+          lookaheadCalc.ebnfCalc(exp, exp.expansion);
         }
       }
     }
