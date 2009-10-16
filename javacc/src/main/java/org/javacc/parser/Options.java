@@ -142,8 +142,8 @@ public class Options {
    * Used when, for example, generating Token.java to record the JavaCC options
    * that were used to generate the file. All of the options must be
    * boolean values.
-   * @param interestingOptions the options of interest, eg {"STATIC", "CACHE_TOKENS"}
-   * @return the string representation of the options, eg "STATIC=true,CACHE_TOKENS=false"
+   * @param interestingOptions the options of interest, eg {"ERROR_REPORTING", "CACHE_TOKENS"}
+   * @return the string representation of the options, eg "ERROR_REPORTING=true,CACHE_TOKENS=false"
    */
   public static String getOptionsString(String[] interestingOptions) {
     StringBuffer sb = new StringBuffer();

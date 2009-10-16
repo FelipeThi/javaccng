@@ -47,7 +47,7 @@ public class JavaFileGenerator {
    * @param templateName the name of the template. E.g.
    *        "/templates/Token.template".
    * @param options the processing options in force, such
-   *        as "STATIC=yes"
+   *        as "ERROR_REPORTING=yes"
    */
   public JavaFileGenerator(String templateName, Map options) {
     this.templateName = templateName;

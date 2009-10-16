@@ -50,19 +50,18 @@ public class JJTree {
     p("\"option-settings\" is a sequence of settings separated by spaces.");
     p("Each option setting must be of one of the following forms:");
     p("");
-    p("    -optionname=value (e.g., -STATIC=false)");
-    p("    -optionname:value (e.g., -STATIC:false)");
-    p("    -optionname       (equivalent to -optionname=true.  e.g., -STATIC)");
-    p("    -NOoptionname     (equivalent to -optionname=false. e.g., -NOSTATIC)");
+    p("    -optionname=value (e.g., -VISITOR=false)");
+    p("    -optionname:value (e.g., -VISITOR:false)");
+    p("    -optionname       (equivalent to -optionname=true.  e.g., -VISITOR)");
+    p("    -NOoptionname     (equivalent to -optionname=false. e.g., -NOVISITOR)");
     p("");
-    p("Option settings are not case-sensitive, so one can say \"-nOsTaTiC\" instead");
-    p("of \"-NOSTATIC\".  Option values must be appropriate for the corresponding");
+    p("Option settings are not case-sensitive, so one can say \"-nOvIsItOr\" instead");
+    p("of \"-NOVISITOR\".  Option values must be appropriate for the corresponding");
     p("option, and must be either an integer or a string value.");
     p("");
 
     p("The boolean valued options are:");
     p("");
-    p("    STATIC                   (default true)");
     p("    MULTI                    (default false)");
     p("    NODE_DEFAULT_VOID        (default false)");
     p("    NODE_SCOPE_HOOK          (default false)");
@@ -90,7 +89,7 @@ public class JJTree {
     p("");
 
     p("EXAMPLES:");
-    p("    jjtree -STATIC=false mygrammar.jjt");
+    p("    jjtree -VISITOR=true mygrammar.jjt");
     p("");
     p("ABOUT JJTree:");
     p("    JJTree is a preprocessor for JavaCC that inserts actions into a");
