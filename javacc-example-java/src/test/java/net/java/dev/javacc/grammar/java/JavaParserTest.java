@@ -1,5 +1,6 @@
 package net.java.dev.javacc.grammar.java;
 
+import static org.junit.Assert.*;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -66,6 +67,23 @@ public class JavaParserTest {
 
     System.out.println("Parsed " + sources.size() + " java files"
         + " (" + chars + " chars) in " + ((now - started) / 1000.0) + " seconds");
+  }
+
+  @Test
+  public void errorReporting() throws IOException {
+    final Reader reader = new StringReader("final class MyClass {\nvoid ();\n}");
+    final CharStream charStream = new JavaCharStream(reader);
+    final TokenManager tokenManager = new JavaParserTokenManager(charStream);
+    ParseException exception = null;
+    try {
+      final JavaParser parser = new JavaParser(tokenManager);
+      parser.CompilationUnit();
+    }
+    catch (ParseException ex) {
+      exception = ex;
+    }
+    assertNotNull(exception);
+    assertEquals("Encountered: \"(\" at line 2, column 6.\nWas expecting:\n   <IDENTIFIER>...", exception.getMessage());
   }
 
   void load(final File file) throws IOException, ParseException {
