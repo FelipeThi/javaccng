@@ -39,23 +39,29 @@ in Java.
 
 CONTENTS
 
-This distribution contains the javacc, jjtree and jjdoc sources, 
+This distribution contains the javacc, jjtree and jjdoc sources,
 launcher scripts, example grammars and documentation. It also contains
 a bootstrap version of JavaCC needed to build JavaCC.
 
 BUILDING
 
-You need ant-1.5.3 or above to build JavaCC.  You can get ant from:
+You need Maven 2.1 or above to build JavaCC.
 
-    http://ant.apache.org
+After you have checked out the sources, you will need to install
+the provided javacc jar to the local maven repository to bootstrap
+build process. Just run the following command in the project root dir:
 
-Once you install ant, make sure ant is in your path. Then you can simply
-come to this directory (JavaCC source install directory) and type:
+  mvn install:install-file \
+    -DgroupId=net.java.dev.javacc \
+    -DartifactId=javacc \
+    -Dversion=5.1 \
+    -Dpackaging=jar \
+    -Dfile=javacc-5.1.jar
 
-    $ ant
+This has to be done only once, to make it possible to build javacc
+for the very first time.
 
-it will build the javacc.jar file in the bin/lib directory.
-
-On unix-based systems, you need to make sure the files in the bin
-directory of this distribution are in your path.
-
+The build is two-phase process. The first time you run maven, it builds
+new javacc binary and installs it to the local repository. The second
+time you run maven, it uses javacc binary that has just been built
+to rebuild itself.
