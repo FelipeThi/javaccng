@@ -90,7 +90,7 @@ public class OutputFile {
    *      the minimum compatible JavaCC version.
    * @param options
    *      if the file already exists, and cannot be overwritten, this is
-   *      a list of options (such s STATIC=false) to check for changes.
+   *      a list of options (such s ERROR_REPORTING=false) to check for changes.
    * @throws IOException
    */
   public OutputFile(File file, String compatibleVersion, String[] options)

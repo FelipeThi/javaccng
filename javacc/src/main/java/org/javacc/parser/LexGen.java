@@ -140,6 +140,7 @@ public class LexGen implements JavaCCParserConstants {
 
       ostr.println();
       ostr.println("/** Token Manager. */");
+      ostr.println("@SuppressWarnings(\"unused\")");
       if (Options.getSupportClassVisibilityPublic()) {
         ostr.print("public ");
       }
@@ -670,19 +671,21 @@ public class LexGen implements JavaCCParserConstants {
     ostr.println();
     ostr.println("/** Lexer state names. */");
     ostr.println("public static final String[] jjLexStateNames = {");
+    ostr.indent();
     for (i = 0; i < maxLexStates; i++) {
-      ostr.println("   \"" + lexStateName[i] + "\",");
+      ostr.println("\"" + lexStateName[i] + "\",");
     }
+    ostr.unindent();
     ostr.println("};");
 
     if (maxLexStates > 1) {
       ostr.println();
       ostr.println("/** Lex State array. */");
       ostr.print("public static final int[] jjNewLexState = {");
-
+      ostr.indent();
       for (i = 0; i < maxOrdinal; i++) {
         if (i % 25 == 0) {
-          ostr.print("\n   ");
+          ostr.print("\n");
         }
 
         if (newLexState[i] == null) {
@@ -692,6 +695,7 @@ public class LexGen implements JavaCCParserConstants {
           ostr.print(GetIndex(newLexState[i]) + ", ");
         }
       }
+      ostr.unindent();
       ostr.println("\n};");
     }
 

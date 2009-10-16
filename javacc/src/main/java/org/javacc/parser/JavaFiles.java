@@ -165,7 +165,7 @@ public class JavaFiles implements JavaCCParserConstants
   public void gen_JavaCharStream() {
     try {
       final File file = new File(Options.getOutputDirectory(), "JavaCharStream.java");
-      final OutputFile outputFile = new OutputFile(file, charStreamVersion, new String[] {"STATIC", "SUPPORT_CLASS_VISIBILITY_PUBLIC"});
+      final OutputFile outputFile = new OutputFile(file, charStreamVersion, new String[] {"SUPPORT_CLASS_VISIBILITY_PUBLIC"});
 
       if (!outputFile.needToWrite)
       {
@@ -208,7 +208,7 @@ public class JavaFiles implements JavaCCParserConstants
   public void gen_SimpleCharStream() {
     try {
       final File file = new File(Options.getOutputDirectory(), "SimpleCharStream.java");
-      final OutputFile outputFile = new OutputFile(file, charStreamVersion, new String[] {"STATIC", "SUPPORT_CLASS_VISIBILITY_PUBLIC"});
+      final OutputFile outputFile = new OutputFile(file, charStreamVersion, new String[] {"SUPPORT_CLASS_VISIBILITY_PUBLIC"});
 
       if (!outputFile.needToWrite)
       {
@@ -251,7 +251,7 @@ public class JavaFiles implements JavaCCParserConstants
   public void gen_CharStream() {
     try {
       final File file = new File(Options.getOutputDirectory(), "CharStream.java");
-      final OutputFile outputFile = new OutputFile(file, charStreamVersion, new String[] {"STATIC", "SUPPORT_CLASS_VISIBILITY_PUBLIC"});
+      final OutputFile outputFile = new OutputFile(file, charStreamVersion, new String[] {"SUPPORT_CLASS_VISIBILITY_PUBLIC"});
 
       if (!outputFile.needToWrite)
       {

@@ -134,7 +134,7 @@ public final class OptionsTest extends TestCase {
 
     assertEquals(0, JavaCCErrors.get_warning_count());
     assertEquals(0, JavaCCErrors.get_error_count());
-    Options.setInputFileOption(null, null, "STATIC", new Integer(8));
+    Options.setInputFileOption(null, null, "ERROR_REPORTING", new Integer(8));
     assertEquals(1, JavaCCErrors.get_warning_count());
 
     assertEquals(0, JavaCCErrors.get_error_count());

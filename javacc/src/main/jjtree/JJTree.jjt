@@ -867,7 +867,7 @@ void node_descriptor_expression() #NodeDescriptorExpression
   while (true) {
     tok = getToken(1);
     if (tok.getKind() == 0) {
-      throw new ParseException();
+      throw new ParseException("Premature end of file");
     }
     if (tok.getKind() == LPAREN) nesting++;
     if (tok.getKind() == RPAREN) {
