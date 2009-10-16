@@ -133,6 +133,8 @@ public class RStringLiteral extends RegularExpression {
       return;
     }
 
+    ostr.indent();
+
     allImages[0] = "";
     for (i = 0; i < allImages.length; i++)
     {
@@ -204,6 +206,8 @@ public class RStringLiteral extends RegularExpression {
       ostr.print("null, ");
       continue;
     }
+
+    ostr.unindent();
 
     ostr.println("};");
   }
