@@ -220,10 +220,10 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}final class JavaCharStream implements
     endOffset++;
     if (offset == buffer.length) {
       final int newLength = buffer.length * 3 / 2 + 1;
-      buffer = java.util.Arrays.copyOf(buffer, newLength);
+      buffer = copyOf(buffer, newLength);
 #if KEEP_LINE_COLUMN
-      bufLine = java.util.Arrays.copyOf(bufLine, newLength);
-      bufColumn = java.util.Arrays.copyOf(bufColumn, newLength);
+      bufLine = copyOf(bufLine, newLength);
+      bufColumn = copyOf(bufColumn, newLength);
 #fi
     }
 #if KEEP_LINE_COLUMN
@@ -347,6 +347,20 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}final class JavaCharStream implements
     bufLine = null;
     bufColumn = null;
 #fi
+  }
+
+  /** Backported from JDK6 Arrays.copyOf(...). */
+  private static char[] copyOf(char[] original, int newLength) {
+    final char[] copy = new char[newLength];
+    System.arraycopy(original, 0, copy, 0, Math.min(original.length, newLength));
+    return copy;
+  }
+
+  /** Backported from JDK6 Arrays.copyOf(...). */
+  private static int[] copyOf(int[] original, int newLength) {
+    final int[] copy = new int[newLength];
+    System.arraycopy(original, 0, copy, 0, Math.min(original.length, newLength));
+    return copy;
   }
 
   private int hexValue(int c) throws java.io.IOException {
