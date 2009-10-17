@@ -31,7 +31,8 @@ options {
   JAVA_UNICODE_ESCAPE = true;
   ERROR_REPORTING = true;
   TOKEN_FACTORY = "MyToken";
-  KEEP_LINE_COLUMN = true;
+  KEEP_LINE_COLUMN = false;
+  KEEP_IMAGE = false;
 }
 
 PARSER_BEGIN(JavaParser)
@@ -1013,7 +1014,7 @@ TOKEN :
      matchedToken.setKind(GT);
      ((MyToken)matchedToken).realKind = RUNSIGNEDSHIFT;
      charStream.backup(2);
-     matchedToken.setImage(">");
+     //matchedToken.setImage(">");
      matchedToken.setOffset(matchedToken.getBeginOffset(), matchedToken.getEndOffset() - 2);
   }
 | < RSIGNEDSHIFT: ">>" >
@@ -1021,7 +1022,7 @@ TOKEN :
      matchedToken.setKind(GT);
      ((MyToken)matchedToken).realKind = RSIGNEDSHIFT;
      charStream.backup(1);
-     matchedToken.setImage(">");
+     //matchedToken.setImage(">");
      matchedToken.setOffset(matchedToken.getBeginOffset(), matchedToken.getEndOffset() - 1);
   }
 | < GT: ">" >

@@ -16,7 +16,7 @@ public final class OptionsTest extends TestCase {
     Options.init();
     JavaCCErrors.reInit();
 
-    assertEquals(30, Options.optionValues.size());
+    assertEquals(31, Options.optionValues.size());
 
     assertEquals(true, Options.getBuildParser());
     assertEquals(true, Options.getBuildTokenManager());
@@ -30,6 +30,7 @@ public final class OptionsTest extends TestCase {
     assertEquals(false, Options.getIgnoreCase());
     assertEquals(false, Options.getJavaUnicodeEscape());
     assertEquals(true, Options.getKeepLineColumn());
+    assertEquals(true, Options.getKeepImage());
     assertEquals(true, Options.getSanityCheck());
     assertEquals(false, Options.getUnicodeInput());
     assertEquals(false, Options.getUserCharStream());

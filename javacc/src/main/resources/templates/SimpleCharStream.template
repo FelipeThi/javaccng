@@ -176,6 +176,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}final class SimpleCharStream implemen
     endOffset -= amount;
     offset -= amount;
   }
+#if KEEP_IMAGE
 
   public String getImage() {
     return new String(buffer, 0, offset);
@@ -186,6 +187,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}final class SimpleCharStream implemen
     System.arraycopy(buffer, length - l, ret, 0, l);
     return ret;
   }
+#fi
 #if KEEP_LINE_COLUMN
 
   private void updateLineColumn(int c) {

@@ -83,7 +83,7 @@ public class JavaParserTest {
       exception = ex;
     }
     assertNotNull(exception);
-    assertEquals("Encountered: \"(\" at line 2, column 6.\nWas expecting:\n   <IDENTIFIER>...", exception.getMessage());
+    assertEquals("Encountered: \"(\".\nWas expecting:\n   <IDENTIFIER>...", exception.getMessage());
   }
 
   void load(final File file) throws IOException, ParseException {

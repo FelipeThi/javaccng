@@ -15,7 +15,9 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class Token implements java.io.Serial
   private int endLine;
   private int endColumn;
 #fi
+#if KEEP_IMAGE
   private String image;
+#fi
 
   /**
    * A reference to the next regular (non-special) token from the input
@@ -41,19 +43,25 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class Token implements java.io.Serial
    */
   public Token specialToken;
 
-  /** No-argument contructor */
+  /** No-argument constructor */
   public Token() {}
 
   /** Constructs a new token for the specified Image. */
   public Token(int kind) {
+#if KEEP_IMAGE
     this(kind, null);
+#else
+    this.kind = kind;
+#fi
   }
+#if KEEP_IMAGE
 
   /** Constructs a new token for the specified Image and Kind. */
   public Token(int kind, String image) {
     this.kind = kind;
     this.image = image;
   }
+#fi
 
   /**
    * Gets an integer that describes the kind of this token.
@@ -75,6 +83,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class Token implements java.io.Serial
   public void setKind(final int kind) {
     this.kind = kind;
   }
+#if KEEP_IMAGE
 
   /**
    * Gets text matched by this token.
@@ -93,6 +102,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class Token implements java.io.Serial
   public void setImage(final String image) {
     this.image = image;
   }
+#fi
 
   /** @return Index of the first character of the token, inclusive. */
   public int getBeginOffset() {
@@ -154,8 +164,13 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class Token implements java.io.Serial
 
   /** Returns the image. */
   public String toString() {
+#if KEEP_IMAGE
     return image;
+#else
+    return String.valueOf(kind);
+#fi
   }
+#if KEEP_IMAGE
 
   /**
    * Returns a new Token object, by default. However, if you want, you
@@ -178,8 +193,13 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class Token implements java.io.Serial
       default: return new Token(ofKind, image);
     }
   }
+#fi
 
   public static Token newToken(int ofKind) {
+#if KEEP_IMAGE
     return newToken(ofKind, null);
+#else
+    return new Token(ofKind);
+#fi
   }
 }

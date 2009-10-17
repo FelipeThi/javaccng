@@ -83,6 +83,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
   static boolean hasMore = false;
   public static RegularExpression curRE;
   public static boolean keepLineCol;
+  public static boolean keepImage;
 
   static void PrintClassHead() {
     int i, j;
@@ -349,6 +350,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
     }
 
     keepLineCol = Options.getKeepLineColumn();
+    keepImage = Options.getKeepImage();
     List choices = new ArrayList();
     Enumeration e;
     TokenProduction tp;
@@ -753,9 +755,11 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
         "new int[" + (2 * stateSetSize) + "];");
 
     if (hasMoreActions || hasSkipActions || hasTokenActions) {
-      ostr.println("private final " + Options.stringBufOrBuild() + " jjImage = new " + Options.stringBufOrBuild() + "();");
-      ostr.println("private " + Options.stringBufOrBuild() + " image = jjImage;");
-      ostr.println("private int jjImageLength;");
+      if (keepImage) {
+        ostr.println("private final " + Options.stringBufOrBuild() + " jjImage = new " + Options.stringBufOrBuild() + "();");
+        ostr.println("private " + Options.stringBufOrBuild() + " image = jjImage;");
+        ostr.println("private int jjImageLength;");
+      }
       ostr.println("private int lengthOfMatch;");
     }
 
@@ -829,15 +833,19 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
     ostr.println("protected Token jjFillToken()");
     ostr.println("{");
     ostr.indent();
-    ostr.println("final String curTokenImage;");
+    if (keepImage) {
+      ostr.println("final String curTokenImage;");
+    }
 
     if (hasEmptyMatch) {
       ostr.println("if (jjMatchedPos < 0)");
       ostr.println("{");
-      ostr.println("   if (image == null)");
-      ostr.println("      curTokenImage = \"\";");
-      ostr.println("   else");
-      ostr.println("      curTokenImage = image.toString();");
+      if (keepImage) {
+        ostr.println("   if (image == null)");
+        ostr.println("      curTokenImage = \"\";");
+        ostr.println("   else");
+        ostr.println("      curTokenImage = image.toString();");
+      }
 
       if (keepLineCol) {
         ostr.println("final int beginLine = charStream.getBeginLine();");
@@ -849,8 +857,10 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
       ostr.println("}");
       ostr.println("else");
       ostr.println("{");
-      ostr.println("   final String literalImage = jjLiteralImages[jjMatchedKind];");
-      ostr.println("   curTokenImage = literalImage == null ? charStream.getImage() : literalImage;");
+      if (keepImage) {
+        ostr.println("   final String literalImage = jjLiteralImages[jjMatchedKind];");
+        ostr.println("   curTokenImage = literalImage == null ? charStream.getImage() : literalImage;");
+      }
 
       if (keepLineCol) {
         ostr.println("   final int beginLine = charStream.getBeginLine();");
@@ -862,8 +872,10 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
       ostr.println("}");
     }
     else {
-      ostr.println("final String literalImage = jjLiteralImages[jjMatchedKind];");
-      ostr.println("curTokenImage = literalImage == null ? charStream.getImage() : literalImage;");
+      if (keepImage) {
+        ostr.println("final String literalImage = jjLiteralImages[jjMatchedKind];");
+        ostr.println("curTokenImage = literalImage == null ? charStream.getImage() : literalImage;");
+      }
       if (keepLineCol) {
         ostr.println("final int beginLine = charStream.getBeginLine();");
         ostr.println("final int beginColumn = charStream.getBeginColumn();");
@@ -872,11 +884,21 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
       }
     }
 
-    if (Options.getTokenFactory().length() > 0) {
-      ostr.println("final Token t = " + Options.getTokenFactory() + ".newToken(jjMatchedKind, curTokenImage);");
+    if (keepImage) {
+      if (Options.getTokenFactory().length() > 0) {
+        ostr.println("final Token t = " + Options.getTokenFactory() + ".newToken(jjMatchedKind, curTokenImage);");
+      }
+      else {
+        ostr.println("final Token t = Token.newToken(jjMatchedKind, curTokenImage);");
+      }
     }
     else {
-      ostr.println("final Token t = Token.newToken(jjMatchedKind, curTokenImage);");
+      if (Options.getTokenFactory().length() > 0) {
+        ostr.println("final Token t = " + Options.getTokenFactory() + ".newToken(jjMatchedKind);");
+      }
+      else {
+        ostr.println("final Token t = Token.newToken(jjMatchedKind);");
+      }
     }
 
     ostr.println("t.setOffset(charStream.getBeginOffset(), charStream.getEndOffset());");
@@ -967,9 +989,11 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
     ostr.println("}"); // if (jjChar == -1)
 
     if (hasMoreActions || hasSkipActions || hasTokenActions) {
-      ostr.println("image = jjImage;");
-      ostr.println("image.setLength(0);");
-      ostr.println("jjImageLength = 0;");
+      if (keepImage) {
+        ostr.println("image = jjImage;");
+        ostr.println("image.setLength(0);");
+        ostr.println("jjImageLength = 0;");
+      }
     }
 
     ostr.println();
@@ -1220,7 +1244,9 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
             ostr.println("moreLexicalActions();");
           }
           else if (hasSkipActions || hasTokenActions) {
-            ostr.println("jjImageLength += jjMatchedPos + 1;");
+            if (keepImage) {
+              ostr.println("jjImageLength += jjMatchedPos + 1;");
+            }
           }
 
           if (maxLexStates > 1) {
@@ -1321,7 +1347,9 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
       ostr.println("      charStream.backup(1);");
       ostr.println("   } else {");
       ostr.println("      eof = true;");
-      ostr.println("      prefix = curPos <= 1 ? \"\" : charStream.getImage();");
+      if (keepImage) {
+        ostr.println("      prefix = curPos <= 1 ? \"\" : charStream.getImage();");
+      }
       ostr.println("      errorLine = charStream.getEndLine();");
       ostr.println("      errorColumn = charStream.getEndColumn();");
       ostr.println("   }");
@@ -1334,7 +1362,9 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
       ostr.println("      charStream.backup(1);");
       ostr.println("   } else {");
       ostr.println("      eof = true;");
-      ostr.println("      prefix = curPos <= 1 ? \"\" : charStream.getImage();");
+      if (keepImage) {
+        ostr.println("      prefix = curPos <= 1 ? \"\" : charStream.getImage();");
+      }
       ostr.println("   }");
       ostr.println("   throw new TokenManagerError(" +
           "eof, jjLexState, -1, -1, prefix, jjChar, TokenManagerError.LEXICAL_ERROR);");
@@ -1387,13 +1417,15 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
           break;
         }
 
-        ostr.print("         image.append");
-        if (RStringLiteral.allImages[i] != null) {
-          ostr.println("(jjLiteralImages[" + i + "]);");
-          ostr.println("        lengthOfMatch = jjLiteralImages[" + i + "].length();");
-        }
-        else {
-          ostr.println("(charStream.getSuffix(jjImageLength + (lengthOfMatch = jjMatchedPos + 1)));");
+        if (keepImage) {
+          ostr.print("         image.append");
+          if (RStringLiteral.allImages[i] != null) {
+            ostr.println("(jjLiteralImages[" + i + "]);");
+            ostr.println("        lengthOfMatch = jjLiteralImages[" + i + "].length();");
+          }
+          else {
+            ostr.println("(charStream.getSuffix(jjImageLength + (lengthOfMatch = jjMatchedPos + 1)));");
+          }
         }
 
         printTokenSetup((Token) act.getActionTokens().get(0));
@@ -1421,7 +1453,9 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
 
     ostr.println("void moreLexicalActions()");
     ostr.println("{");
-    ostr.println("   jjImageLength += (lengthOfMatch = jjMatchedPos + 1);");
+    if (keepImage) {
+      ostr.println("   jjImageLength += (lengthOfMatch = jjMatchedPos + 1);");
+    }
     ostr.println("   switch(jjMatchedKind)");
     ostr.println("   {");
 
@@ -1461,16 +1495,18 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
           break;
         }
 
-        ostr.print("         image.append");
+        if (keepImage) {
+          ostr.print("         image.append");
+          if (RStringLiteral.allImages[i] != null) {
+            ostr.println("(jjLiteralImages[" + i + "]);");
+          }
+          else {
+            ostr.println("(charStream.getSuffix(jjImageLength));");
+          }
 
-        if (RStringLiteral.allImages[i] != null) {
-          ostr.println("(jjLiteralImages[" + i + "]);");
-        }
-        else {
-          ostr.println("(charStream.getSuffix(jjImageLength));");
+          ostr.println("         jjImageLength = 0;");
         }
 
-        ostr.println("         jjImageLength = 0;");
         printTokenSetup((Token) act.getActionTokens().get(0));
         ccol = 1;
 
@@ -1537,18 +1573,20 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
           break;
         }
 
-        if (i == 0) {
-          ostr.println("      image.setLength(0);"); // For EOF no image is there
-        }
-        else {
-          ostr.print("        image.append");
-
-          if (RStringLiteral.allImages[i] != null) {
-            ostr.println("(jjLiteralImages[" + i + "]);");
-            ostr.println("        lengthOfMatch = jjLiteralImages[" + i + "].length();");
+        if (keepImage) {
+          if (i == 0) {
+              ostr.println("      image.setLength(0);"); // For EOF no image is there
           }
           else {
-            ostr.println("(charStream.getSuffix(jjImageLength + (lengthOfMatch = jjMatchedPos + 1)));");
+            ostr.print("        image.append");
+
+            if (RStringLiteral.allImages[i] != null) {
+              ostr.println("(jjLiteralImages[" + i + "]);");
+              ostr.println("        lengthOfMatch = jjLiteralImages[" + i + "].length();");
+            }
+            else {
+              ostr.println("(charStream.getSuffix(jjImageLength + (lengthOfMatch = jjMatchedPos + 1)));");
+            }
           }
         }
 
