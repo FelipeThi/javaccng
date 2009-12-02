@@ -19,7 +19,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}final class JavaCharStream implements
   /** Line number of the first character of the current token. */
   private int line = 1;
   /** Column number of the first character of the current token. */
-  private int column = 0;
+  private int column = 1;
   /** Contains line numbers for read characters. */
   private int[] bufLine;
   /** Contains column numbers for read characters. */

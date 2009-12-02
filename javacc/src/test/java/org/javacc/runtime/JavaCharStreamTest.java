@@ -1,6 +1,5 @@
 package org.javacc.runtime;
 
-import static org.junit.Assert.*;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -9,10 +8,18 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 
+import static org.junit.Assert.*;
+
 public class JavaCharStreamTest extends CharStreamBaseTestCase {
   @Override
   CharStream makeCharStream(final CharSequence content) {
     return new JavaCharStream(new StringReader(content.toString()));
+  }
+
+  @Test
+  public void canReadEmptyStreamEx() throws IOException {
+    final CharStream s = makeCharStream("");
+    assertCharLineColumn(s, -1, 0, 0, 0, 0);
   }
 
   @Test

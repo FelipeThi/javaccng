@@ -5,10 +5,10 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-class Test {
+class Parse {
   public static void main(String[] args) throws Exception {
     if (args.length == 0 || args.length > 2) {
-      System.out.println("usage: Test FILE [ENCODING]");
+      System.out.println("usage: Parse FILE [ENCODING]");
       return;
     }
     final Reader reader;

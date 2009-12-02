@@ -1,14 +1,24 @@
 package net.java.dev.javacc.grammar.java;
 
 public class MyToken extends Token {
+  int realKind = JavaParserConstants.GT;
+
   public MyToken(final int kind) {
     super(kind);
   }
 
-  int realKind = JavaParserConstants.GT;
+  public MyToken(int kind, String image) {
+    super(kind, image);
+  }
 
-  /** Returns a new Token object. */
+  public static Token newToken(int ofKind, String image) {
+    switch (ofKind) {
+      default:
+        return new MyToken(ofKind, image);
+    }
+  }
+
   public static Token newToken(int ofKind) {
-    return new MyToken(ofKind);
+    return newToken(ofKind, null);
   }
 }

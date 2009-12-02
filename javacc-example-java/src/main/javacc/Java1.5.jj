@@ -31,8 +31,8 @@ options {
   JAVA_UNICODE_ESCAPE = true;
   ERROR_REPORTING = true;
   TOKEN_FACTORY = "MyToken";
-  KEEP_LINE_COLUMN = false;
-  KEEP_IMAGE = false;
+  KEEP_LINE_COLUMN = true;
+  KEEP_IMAGE = true;
 }
 
 PARSER_BEGIN(JavaParser)

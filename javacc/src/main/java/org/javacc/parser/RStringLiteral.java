@@ -495,7 +495,7 @@ public class RStringLiteral extends RegularExpression {
         ostr.println("debugPrinter.println(" +
                 (LexGen.maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
                 "\"Current character : \" + " +
-                "TokenManagerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
+                "TokenManagerException.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
                 "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
 
      ostr.println("return jjMoveNfa" + LexGen.lexStateSuffix + "(state, pos + 1);");
@@ -748,7 +748,7 @@ public class RStringLiteral extends RegularExpression {
            ostr.println("debugPrinter.println(" +
                    (LexGen.maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
                    "\"Current character : \" + " +
-                   "TokenManagerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
+                   "TokenManagerException.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
                    "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
 
         ostr.println("switch(jjChar)");

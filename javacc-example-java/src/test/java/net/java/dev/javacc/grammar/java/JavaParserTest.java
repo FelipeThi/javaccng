@@ -1,6 +1,5 @@
 package net.java.dev.javacc.grammar.java;
 
-import static org.junit.Assert.*;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -14,6 +13,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 /** Parses all java files in the current project. */
 public class JavaParserTest {
@@ -70,7 +71,23 @@ public class JavaParserTest {
   }
 
   @Test
-  public void errorReporting() throws IOException {
+  public void lexicalErrorReporting() throws IOException {
+    final Reader reader = new StringReader("/* comment");
+    final CharStream charStream = new JavaCharStream(reader);
+    final TokenManager tokenManager = new JavaParserTokenManager(charStream);
+    TokenManagerException exception = null;
+    try {
+      tokenManager.getNextToken();
+    }
+    catch (TokenManagerException ex) {
+      exception = ex;
+    }
+    assertNotNull(exception);
+    assertEquals("Lexical error at line 1, column 10. Encountered: <EOF> after: \"/* comment\"", exception.getMessage());
+  }
+
+  @Test
+  public void parsingErrorReporting() throws IOException {
     final Reader reader = new StringReader("final class MyClass {\nvoid ();\n}");
     final CharStream charStream = new JavaCharStream(reader);
     final TokenManager tokenManager = new JavaParserTokenManager(charStream);

@@ -1,13 +1,21 @@
 package org.javacc.runtime;
 
-import static org.junit.Assert.*;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.text.ParseException;
+
+import static org.junit.Assert.*;
 
 public abstract class CharStreamBaseTestCase {
   abstract CharStream makeCharStream(CharSequence content);
+
+  @Test
+  public void canReadEmptyStream() throws IOException {
+    final CharStream s = makeCharStream("");
+    assertEquals(-1, s.readChar());
+  }
 
   @Test
   public void providesValidOffset() throws ParseException, IOException {
@@ -50,6 +58,13 @@ public abstract class CharStreamBaseTestCase {
   }
 
   @Test
+  public void reportsEofEx() throws IOException {
+    final CharStream s = new JavaCharStream(new StringReader("x"));
+    assertCharLineColumn(s, 'x', 1, 1, 1, 1);
+    assertCharLineColumn(s, -1, 1, 1, 1, 1);
+  }
+
+  @Test
   public void providesLineAndColumnNumbers() throws IOException {
     final CharStream cs = makeCharStream("a1\r\nb2\nc3\rd");
     cs.beginToken();
@@ -78,10 +93,10 @@ public abstract class CharStreamBaseTestCase {
     assertCharLineColumn(cs, -1, 3, 2, 4, 1);
   }
 
-  private static void assertCharLineColumn(final CharStream cs,
-                                           final int c,
-                                           final int beginLne, final int beginColumn,
-                                           final int endLine, final int endColumn) throws IOException {
+  static void assertCharLineColumn(final CharStream cs,
+                                   final int c,
+                                   final int beginLne, final int beginColumn,
+                                   final int endLine, final int endColumn) throws IOException {
     assertEquals(c, cs.readChar());
     assertEquals(beginLne, cs.getBeginLine());
     assertEquals(beginColumn, cs.getBeginColumn());

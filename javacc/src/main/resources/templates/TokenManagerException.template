@@ -1,0 +1,201 @@
+/**
+ * If you have designed your tokens well, the token manager
+ * is never expected to throw this exception.
+ * Therefore it extends Error rather than Exception.
+ */
+${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class TokenManagerException extends RuntimeException {
+  /** Lexical error occurred. */
+  public static final int LEXICAL_ERROR = 0;
+
+  /** Detected (and bailed out of) an infinite loop in the token manager. */
+  public static final int LOOP_DETECTED = 1;
+
+  private final int errorCode;
+  private final int lexState;
+#if KEEP_LINE_COLUMN
+  private final int line;
+  private final int column;
+#fi
+  private final int character;
+
+  /**
+   * Constructor with message and reason.
+   *
+   * @param message   Descriptive error message.
+   * @param errorCode Reason for lexical error.
+   */
+  public TokenManagerException(String message, int errorCode) {
+    super(message);
+    this.errorCode = errorCode;
+    this.lexState = -1;
+#if KEEP_LINE_COLUMN
+    this.line = -1;
+    this.column = -1;
+#fi
+    this.character = 0;
+  }
+
+  /**
+   * Create new lexical error instance.
+   *
+   * @param errorCode Reason for lexical error.
+   * @param lexState  Lexical state in which this error occurred.
+#if KEEP_LINE_COLUMN
+   * @param line      Line number when the error occurred.
+   * @param column    Column number when the error occurred.
+#fi
+#if KEEP_IMAGE
+   * @param prefix    Prefix that was seen before this error occurred.
+#fi
+   * @param character The offending character, or -1 if EOF causes the error.
+   */
+  public TokenManagerException(int errorCode,
+                               int lexState,
+#if KEEP_LINE_COLUMN
+                               int line,
+                               int column,
+#fi
+#if KEEP_IMAGE
+                               String prefix,
+#fi
+                               int character) {
+    super(genMessage(lexState,
+#if KEEP_LINE_COLUMN
+            line, column,
+#fi
+#if KEEP_IMAGE
+            prefix,
+#fi
+            character));
+    this.errorCode = errorCode;
+    this.lexState = lexState;
+#if KEEP_LINE_COLUMN
+    this.line = line;
+    this.column = column;
+#fi
+    this.character = character;
+  }
+
+  /** @return the reason why the exception is thrown. */
+  public int getErrorCode() {
+    return errorCode;
+  }
+
+  /** @return Lexical state in which this error occurred. */
+  public int getLexState() {
+    return lexState;
+  }
+#if KEEP_LINE_COLUMN
+
+  /** @return Line number when the error occurred. */
+  public int getLine() {
+    return line;
+  }
+
+  /** @return Column number when the error occurred. */
+  public int getColumn() {
+    return column;
+  }
+#fi
+
+  /** @return The offending character, or -1 if EOF causes the error. */
+  public int getCharacter() {
+    return character;
+  }
+
+  /**
+   * Returns a detailed message for the Error when it is thrown by the
+   * token manager to indicate a lexical error.
+   *
+   * @param lexState Lexical state in which this error occurred.
+#if KEEP_LINE_COLUMN
+   * @param line     Line number when the error occurred.
+   * @param column   Column number when the error occurred.
+#fi
+#if KEEP_IMAGE
+   * @param prefix   Prefix that was seen before this error occurred.
+#fi
+   * @param curChar  The offending character, or -1 if EOF causes the error.
+   * @return Descriptive error message.
+   */
+  static String genMessage(int lexState,
+#if KEEP_LINE_COLUMN
+                           int line,
+                           int column,
+#fi
+#if KEEP_IMAGE
+                           String prefix,
+#fi
+                           int curChar) {
+    final StringBuilder s = new StringBuilder();
+#if KEEP_LINE_COLUMN
+    s.append("Lexical error at line ").append(line).append(", column ").append(column).append(". Encountered: ");
+#else
+    s.append("Lexical error").append(". Encountered: ");
+#fi
+    if (curChar == -1) {
+      s.append("<EOF>");
+    }
+    else {
+      s.append("'").append(escape(String.valueOf((char) curChar))).append("' (").append(curChar).append(")");
+    }
+#if KEEP_IMAGE
+    s.append(" after: \"").append(escape(prefix)).append("\"");
+#fi
+    return s.toString();
+  }
+
+  /**
+   * Replaces unprintable characters by their escaped (or unicode escaped)
+   * equivalents in the given string
+   *
+   * @param string String to escape.
+   * @return Escaped string.
+   */
+  static String escape(final String string) {
+    final StringBuffer b = new StringBuffer(string.length());
+    for (int i = 0; i < string.length(); i++) {
+      final char ch = string.charAt(i);
+      switch (ch) {
+        case '\b':
+          b.append("\\b");
+          continue;
+        case '\t':
+          b.append("\\t");
+          continue;
+        case '\n':
+          b.append("\\n");
+          continue;
+        case '\f':
+          b.append("\\f");
+          continue;
+        case '\r':
+          b.append("\\r");
+          continue;
+        case '\"':
+          b.append("\\\"");
+          continue;
+        case '\'':
+          b.append("\\\'");
+          continue;
+        case '\\':
+          b.append("\\\\");
+          continue;
+        default:
+          if (ch < 0x20 || ch > 0x7e) {
+            b.append("\\u");
+            final String s = Integer.toString(ch, 16);
+            for (int n = 0; n < 4 - s.length(); n++) {
+              b.append("0");
+            }
+            b.append(s);
+          }
+          else {
+            b.append(ch);
+          }
+          continue;
+      }
+    }
+    return b.toString();
+  }
+}

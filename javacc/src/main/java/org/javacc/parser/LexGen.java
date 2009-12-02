@@ -808,11 +808,9 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
     ostr.println("/** Switch to specified lex state. */");
     ostr.println("public void switchTo(int lexState)");
     ostr.println("{");
-    ostr.println("   if (lexState >= " + lexStateName.length + " || lexState < 0)");
-    ostr.println("      throw new TokenManagerError(\"Error: Ignoring invalid lexical state : \"" +
-        " + lexState + \". State unchanged.\", TokenManagerError.INVALID_LEXICAL_STATE);");
-    ostr.println("   else");
-    ostr.println("      jjLexState = lexState;");
+    ostr.println("   if (lexState < 0 || lexState >= " + lexStateName.length + ")");
+    ostr.println("      throw new IllegalArgumentException(\"Invalid lexical state: \" + lexState + \"\");");
+    ostr.println("   jjLexState = lexState;");
     ostr.println("}");
 
     ostr.println();
@@ -1052,7 +1050,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
               (maxLexStates > 1 ?
                   "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
               "\"Skipping character : \" + " +
-              "TokenManagerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \")\");");
+              "TokenManagerException.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \")\");");
         }
         ostr.println("charStream.beginToken();");
         ostr.println("jjChar = charStream.readChar();");
@@ -1080,7 +1078,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
         ostr.println("debugPrinter.println(" +
             (maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
             "\"Current character : \" + " +
-            "TokenManagerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
+            "TokenManagerException.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
             "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
       }
 
@@ -1153,7 +1151,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
       if (Options.getDebugTokenManager()) {
         ostr.println("debugPrinter.println(" +
             "\"****** FOUND A \" + tokenImage[jjMatchedKind] + \" MATCH " +
-            "(\" + TokenManagerError.escape(new String(charStream.getSuffix(jjMatchedPos + 1))) + " +
+            "(\" + TokenManagerException.escape(new String(charStream.getSuffix(jjMatchedPos + 1))) + " +
             "\") ******\\n\");");
       }
 
@@ -1265,7 +1263,7 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
             ostr.println("debugPrinter.println(" +
                 (maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
                 "\"Current character : \" + " +
-                "TokenManagerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
+                "TokenManagerException.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
                 "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
           }
           ostr.println("continue;");
@@ -1337,38 +1335,17 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
 
     ostr.println();
     ostr.println("void reportLexicalError(final int curPos) throws java.io.IOException {");
-    ostr.println("   String prefix = null;");
-    ostr.println("   boolean eof = false;");
+    ostr.println("   throw new TokenManagerException(jjLexState,");
+    ostr.println("        TokenManagerException.LEXICAL_ERROR,");
     if (keepLineCol) {
-      ostr.println("   int errorLine = charStream.getEndLine();");
-      ostr.println("   int errorColumn = charStream.getEndColumn();");
-      ostr.println("   int c = charStream.readChar();");
-      ostr.println("   if (c != -1) {");
-      ostr.println("      charStream.backup(1);");
-      ostr.println("   } else {");
-      ostr.println("      eof = true;");
-      if (keepImage) {
-        ostr.println("      prefix = curPos <= 1 ? \"\" : charStream.getImage();");
-      }
-      ostr.println("      errorLine = charStream.getEndLine();");
-      ostr.println("      errorColumn = charStream.getEndColumn();");
-      ostr.println("   }");
-      ostr.println("   throw new TokenManagerError(" +
-          "eof, jjLexState, errorLine, errorColumn, prefix, jjChar, TokenManagerError.LEXICAL_ERROR);");
+      ostr.println("        charStream.getEndLine(),");
+      ostr.println("        charStream.getEndColumn(),");
     }
-    else {
-      ostr.println("   int c = charStream.readChar();");
-      ostr.println("   if (c != -1) {");
-      ostr.println("      charStream.backup(1);");
-      ostr.println("   } else {");
-      ostr.println("      eof = true;");
-      if (keepImage) {
-        ostr.println("      prefix = curPos <= 1 ? \"\" : charStream.getImage();");
-      }
-      ostr.println("   }");
-      ostr.println("   throw new TokenManagerError(" +
-          "eof, jjLexState, -1, -1, prefix, jjChar, TokenManagerError.LEXICAL_ERROR);");
+    if (keepImage) {
+      ostr.println("        charStream.getImage(),");
     }
+    ostr.println("        jjChar);");
+
     ostr.println("}");
     ostr.println();
   }
@@ -1402,10 +1379,10 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
           ostr.println("            if (jjBeenHere[" + lexStates[i] + "] &&");
           ostr.println("                jjEmptyLineNo[" + lexStates[i] + "] == charStream.getBeginLine() &&");
           ostr.println("                jjEmptyColumnNo[" + lexStates[i] + "] == charStream.getBeginColumn())");
-          ostr.println("               throw new TokenManagerError(" +
-              "(\"Error: Bailing out of infinite loop caused by repeated empty string matches " +
+          ostr.println("               throw new TokenManagerException(" +
+              "(\"Bailing out of infinite loop caused by repeated empty string matches " +
               "at line \" + charStream.getBeginLine() + \", " +
-              "column \" + charStream.getBeginColumn() + \".\"), TokenManagerError.LOOP_DETECTED);");
+              "column \" + charStream.getBeginColumn() + \".\"), TokenManagerException.LOOP_DETECTED);");
           ostr.println("            jjEmptyLineNo[" + lexStates[i] + "] = charStream.getBeginLine();");
           ostr.println("            jjEmptyColumnNo[" + lexStates[i] + "] = charStream.getBeginColumn();");
           ostr.println("            jjBeenHere[" + lexStates[i] + "] = true;");
@@ -1480,10 +1457,10 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
           ostr.println("            if (jjBeenHere[" + lexStates[i] + "] &&");
           ostr.println("                jjEmptyLineNo[" + lexStates[i] + "] == charStream.getBeginLine() &&");
           ostr.println("                jjEmptyColumnNo[" + lexStates[i] + "] == charStream.getBeginColumn())");
-          ostr.println("               throw new TokenManagerError(" +
-              "(\"Error: Bailing out of infinite loop caused by repeated empty string matches " +
+          ostr.println("               throw new TokenManagerException(" +
+              "(\"Bailing out of infinite loop caused by repeated empty string matches " +
               "at line \" + charStream.getBeginLine() + \", " +
-              "column \" + charStream.getBeginColumn() + \".\"), TokenManagerError.LOOP_DETECTED);");
+              "column \" + charStream.getBeginColumn() + \".\"), TokenManagerException.LOOP_DETECTED);");
           ostr.println("            jjEmptyLineNo[" + lexStates[i] + "] = charStream.getBeginLine();");
           ostr.println("            jjEmptyColumnNo[" + lexStates[i] + "] = charStream.getBeginColumn();");
           ostr.println("            jjBeenHere[" + lexStates[i] + "] = true;");
@@ -1558,10 +1535,10 @@ public class LexGen extends JavaCCGlobals implements JavaCCParserConstants {
           ostr.println("            if (jjBeenHere[" + lexStates[i] + "] &&");
           ostr.println("                jjEmptyLineNo[" + lexStates[i] + "] == charStream.getBeginLine() &&");
           ostr.println("                jjEmptyColumnNo[" + lexStates[i] + "] == charStream.getBeginColumn())");
-          ostr.println("               throw new TokenManagerError(" +
-              "(\"Error: Bailing out of infinite loop caused by repeated empty string matches " +
+          ostr.println("               throw new TokenManagerException(" +
+              "(\"Bailing out of infinite loop caused by repeated empty string matches " +
               "at line \" + charStream.getBeginLine() + \", " +
-              "column \" + charStream.getBeginColumn() + \".\"), TokenManagerError.LOOP_DETECTED);");
+              "column \" + charStream.getBeginColumn() + \".\"), TokenManagerException.LOOP_DETECTED);");
           ostr.println("            jjEmptyLineNo[" + lexStates[i] + "] = charStream.getBeginLine();");
           ostr.println("            jjEmptyColumnNo[" + lexStates[i] + "] = charStream.getBeginColumn();");
           ostr.println("            jjBeenHere[" + lexStates[i] + "] = true;");
