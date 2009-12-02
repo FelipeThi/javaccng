@@ -123,6 +123,7 @@ public class Options {
     optionValues.put("COMMON_TOKEN_ACTION", Boolean.FALSE);
     optionValues.put("CACHE_TOKENS", Boolean.FALSE);
     optionValues.put("KEEP_LINE_COLUMN", Boolean.TRUE);
+    optionValues.put("KEEP_IMAGE", Boolean.TRUE);
 
     optionValues.put("GENERATE_CHAINED_EXCEPTION", Boolean.FALSE);
     optionValues.put("GENERATE_GENERICS", Boolean.FALSE);
@@ -532,6 +533,15 @@ public class Options {
    */
   public static boolean getKeepLineColumn() {
     return booleanValue("KEEP_LINE_COLUMN");
+  }
+
+  /**
+   * Find the keep token image value.
+   *
+   * @return The requested keep token image value.
+   */
+  public static boolean getKeepImage() {
+    return booleanValue("KEEP_IMAGE");
   }
 
   /**

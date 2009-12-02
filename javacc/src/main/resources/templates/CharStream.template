@@ -39,6 +39,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}interface CharStream extends java.io.
    * token and it is the implemetation's responsibility to do this right.
    */
   void backup(int amount);
+#if KEEP_IMAGE
 
   /**
    * Returns a string made up of characters from the marked token beginning
@@ -57,6 +58,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}interface CharStream extends java.io.
    * </pre>
    */
   char[] getSuffix(int length);
+#fi
 
   /**
    * Returns index of the first character for current token (being
