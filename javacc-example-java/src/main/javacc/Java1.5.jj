@@ -1014,7 +1014,7 @@ TOKEN :
      matchedToken.setKind(GT);
      ((MyToken)matchedToken).realKind = RUNSIGNEDSHIFT;
      charStream.backup(2);
-     //matchedToken.setImage(">");
+     matchedToken.setImage(">");
      matchedToken.setOffset(matchedToken.getBeginOffset(), matchedToken.getEndOffset() - 2);
   }
 | < RSIGNEDSHIFT: ">>" >
@@ -1022,7 +1022,7 @@ TOKEN :
      matchedToken.setKind(GT);
      ((MyToken)matchedToken).realKind = RSIGNEDSHIFT;
      charStream.backup(1);
-     //matchedToken.setImage(">");
+     matchedToken.setImage(">");
      matchedToken.setOffset(matchedToken.getBeginOffset(), matchedToken.getEndOffset() - 1);
   }
 | < GT: ">" >
