@@ -41,9 +41,9 @@ public class RJustName extends RegularExpression {
    */
   public RegularExpression regexpr;
 
-  public Nfa GenerateNfa(boolean ignoreCase)
+  public Nfa GenerateNfa(final LexGen lexGen, boolean ignoreCase)
   {
-     return regexpr.GenerateNfa(ignoreCase);
+     return regexpr.GenerateNfa(lexGen, ignoreCase);
   }
 
     public RJustName() {}

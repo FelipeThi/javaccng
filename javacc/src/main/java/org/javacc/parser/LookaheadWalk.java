@@ -32,30 +32,33 @@ import java.util.List;
 
 public final class LookaheadWalk {
 
-  public static boolean considerSemanticLA;
+  public boolean considerSemanticLA;
 
-  public static ArrayList sizeLimitedMatches;
+  public ArrayList sizeLimitedMatches;
 
-  private LookaheadWalk() {}
+  /**
+   * To avoid right-recursive loops when calculating follow sets, we use
+   * a generation number which indicates if this expansion was visited
+   * by LookaheadWalk.genFollowSet in the same generation.  New generations
+   * are obtained by incrementing the static counter below, and the current
+   * generation is stored in the non-static variable below.
+   */
+  public long nextGenerationIndex = 1;
 
-  private static void listAppend(List vToAppendTo, List vToAppend) {
-    for (int i = 0; i < vToAppend.size(); i++) {
-      vToAppendTo.add(vToAppend.get(i));
-    }
-  }
+  public int laLimit;
 
-  public static List genFirstSet(List partialMatches, Expansion exp) {
+  public List genFirstSet(List partialMatches, Expansion exp) {
     if (exp instanceof RegularExpression) {
       List retval = new ArrayList();
       for (int i = 0; i < partialMatches.size(); i++) {
         MatchInfo m = (MatchInfo)partialMatches.get(i);
-        MatchInfo mnew = new MatchInfo();
+        MatchInfo mnew = new MatchInfo(laLimit);
         for (int j = 0; j < m.firstFreeLoc; j++) {
           mnew.match[j] = m.match[j];
         }
         mnew.firstFreeLoc = m.firstFreeLoc;
         mnew.match[mnew.firstFreeLoc++] = ((RegularExpression)exp).ordinal;
-        if (mnew.firstFreeLoc == MatchInfo.laLimit) {
+        if (mnew.firstFreeLoc == laLimit) {
           sizeLimitedMatches.add(mnew);
         } else {
           retval.add(mnew);
@@ -74,7 +77,7 @@ public final class LookaheadWalk {
       Choice ch = (Choice)exp;
       for (int i = 0; i < ch.getChoices().size(); i++) {
         List v = genFirstSet(partialMatches, (Expansion)ch.getChoices().get(i));
-        listAppend(retval, v);
+        retval.addAll(v);
       }
       return retval;
     } else if (exp instanceof Sequence) {
@@ -92,24 +95,24 @@ public final class LookaheadWalk {
       while (true) {
         v = genFirstSet(v, om.expansion);
         if (v.size() == 0) break;
-        listAppend(retval, v);
+        retval.addAll(v);
       }
       return retval;
     } else if (exp instanceof ZeroOrMore) {
       List retval = new ArrayList();
-      listAppend(retval, partialMatches);
+      retval.addAll(partialMatches);
       List v = partialMatches;
       ZeroOrMore zm = (ZeroOrMore)exp;
       while (true) {
         v = genFirstSet(v, zm.expansion);
         if (v.size() == 0) break;
-        listAppend(retval, v);
+        retval.addAll(v);
       }
       return retval;
     } else if (exp instanceof ZeroOrOne) {
       List retval = new ArrayList();
-      listAppend(retval, partialMatches);
-      listAppend(retval, genFirstSet(partialMatches, ((ZeroOrOne)exp).expansion));
+      retval.addAll(partialMatches);
+      retval.addAll(genFirstSet(partialMatches, ((ZeroOrOne)exp).expansion));
       return retval;
     } else if (exp instanceof TryBlock) {
       return genFirstSet(partialMatches, ((TryBlock)exp).exp);
@@ -120,12 +123,12 @@ public final class LookaheadWalk {
       return new ArrayList();
     } else {
       List retval = new ArrayList();
-      listAppend(retval, partialMatches);
+      retval.addAll(partialMatches);
       return retval;
     }
   }
 
-  private static void listSplit(List toSplit, List mask, List partInMask, List rest) {
+  private void listSplit(List toSplit, List mask, List partInMask, List rest) {
     OuterLoop:
     for (int i = 0; i < toSplit.size(); i++) {
       for (int j = 0; j < mask.size(); j++) {
@@ -138,7 +141,7 @@ public final class LookaheadWalk {
     }
   }
 
-  public static List genFollowSet(List partialMatches, Expansion exp, long generation) {
+  public List genFollowSet(List partialMatches, Expansion exp, long generation) {
     if (exp.myGeneration == generation) {
       return new ArrayList();
     }
@@ -146,7 +149,7 @@ public final class LookaheadWalk {
     exp.myGeneration = generation;
     if (exp.parent == null) {
       List retval = new ArrayList();
-      listAppend(retval, partialMatches);
+      retval.addAll(partialMatches);
       return retval;
     } else if (exp.parent instanceof NormalProduction) {
       List parents = ((NormalProduction)exp.parent).getParents();
@@ -154,7 +157,7 @@ public final class LookaheadWalk {
 //System.out.println("1; gen: " + generation + "; exp: " + exp);
       for (int i = 0; i < parents.size(); i++) {
         List v = genFollowSet(partialMatches, (Expansion)parents.get(i), generation);
-        listAppend(retval, v);
+        retval.addAll(v);
       }
       return retval;
     } else if (exp.parent instanceof Sequence) {
@@ -173,18 +176,18 @@ public final class LookaheadWalk {
       }
       if (v2.size() != 0) {
 //System.out.println("3; gen: " + generation + "; exp: " + exp);
-        v2 = genFollowSet(v2, seq, Expansion.nextGenerationIndex++);
+        v2 = genFollowSet(v2, seq, nextGenerationIndex++);
       }
-      listAppend(v2, v1);
+      v2.addAll(v1);
       return v2;
     } else if (exp.parent instanceof OneOrMore || exp.parent instanceof ZeroOrMore) {
       List moreMatches = new ArrayList();
-      listAppend(moreMatches, partialMatches);
+      moreMatches.addAll(partialMatches);
       List v = partialMatches;
       while (true) {
         v = genFirstSet(v, exp);
         if (v.size() == 0) break;
-        listAppend(moreMatches, v);
+        moreMatches.addAll(v);
       }
       List v1 = new ArrayList();
       List v2 = new ArrayList();
@@ -195,20 +198,13 @@ public final class LookaheadWalk {
       }
       if (v2.size() != 0) {
 //System.out.println("5; gen: " + generation + "; exp: " + exp);
-        v2 = genFollowSet(v2, (Expansion)exp.parent, Expansion.nextGenerationIndex++);
+        v2 = genFollowSet(v2, (Expansion)exp.parent, nextGenerationIndex++);
       }
-      listAppend(v2, v1);
+      v2.addAll(v1);
       return v2;
     } else {
 //System.out.println("6; gen: " + generation + "; exp: " + exp);
       return genFollowSet(partialMatches, (Expansion)exp.parent, generation);
     }
   }
-
-   public static void reInit()
-   {
-      considerSemanticLA = false;
-      sizeLimitedMatches = null;
-   }
-
 }

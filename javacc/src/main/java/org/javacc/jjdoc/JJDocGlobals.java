@@ -28,13 +28,11 @@
 
 package org.javacc.jjdoc;
 
-import org.javacc.parser.JavaCCGlobals;
-
 /**
  * Global variables for JJDoc.
  *
  */
-public class JJDocGlobals extends JavaCCGlobals {
+public final class JJDocGlobals  {
   /**
    * The name of the input file.
    */
@@ -83,7 +81,7 @@ public class JJDocGlobals extends JavaCCGlobals {
         if(generator instanceof TextGenerator) {
           generator = new HTMLGenerator();
         }
-      } 
+      }
     }
     return generator;
   }

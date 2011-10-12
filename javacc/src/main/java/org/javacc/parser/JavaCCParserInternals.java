@@ -33,17 +33,17 @@ import java.util.List;
 /**
  * Utilities.
  */
-public abstract class JavaCCParserInternals extends JavaCCGlobals {
+public abstract class JavaCCParserInternals {
 
   static protected void initialize() {
     Integer i = new Integer(0);
-    lexstate_S2I.put("DEFAULT", i);
-    lexstate_I2S.put(i, "DEFAULT");
-    simple_tokens_table.put("DEFAULT", new java.util.Hashtable());
+    JavaCCGlobals.lexstate_S2I.put("DEFAULT", i);
+    JavaCCGlobals.lexstate_I2S.put(i, "DEFAULT");
+    JavaCCGlobals.simple_tokens_table.put("DEFAULT", new java.util.Hashtable());
   }
 
   static protected void addcuname(String id) {
-    cu_name = id;
+    JavaCCGlobals.cu_name = id;
   }
 
   static protected void compare(Token t, String id1, String id2) {
@@ -52,12 +52,12 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
     }
   }
 
-  static private List add_cu_token_here = cu_to_insertion_point_1;
-  static private Token first_cu_token;
-  static private boolean insertionpoint1set = false;
-  static private boolean insertionpoint2set = false;
+  private List add_cu_token_here = JavaCCGlobals.cu_to_insertion_point_1;
+  private Token first_cu_token;
+  private boolean insertionpoint1set = false;
+  private boolean insertionpoint2set = false;
 
-  static protected void setinsertionpoint(Token t, int no) {
+  protected void setinsertionpoint(Token t, int no) {
     do {
       add_cu_token_here.add(first_cu_token);
       first_cu_token = first_cu_token.next;
@@ -67,16 +67,16 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
         JavaCCErrors.parse_error(t, "Multiple declaration of parser class.");
       } else {
         insertionpoint1set = true;
-        add_cu_token_here = cu_to_insertion_point_2;
+        add_cu_token_here = JavaCCGlobals.cu_to_insertion_point_2;
       }
     } else {
-      add_cu_token_here = cu_from_insertion_point_2;
+      add_cu_token_here = JavaCCGlobals.cu_from_insertion_point_2;
       insertionpoint2set = true;
     }
     first_cu_token = t;
   }
 
-  static protected void insertionpointerrors(Token t) {
+  protected void insertionpointerrors(Token t) {
     while (first_cu_token != t) {
       add_cu_token_here.add(first_cu_token);
       first_cu_token = first_cu_token.next;
@@ -86,12 +86,12 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
     }
   }
 
-  static protected void set_initial_cu_token(Token t) {
+  protected void set_initial_cu_token(Token t) {
     first_cu_token = t;
   }
 
-  static protected void addproduction(NormalProduction p) {
-    bnfproductions.add(p);
+  protected void addproduction(NormalProduction p) {
+    JavaCCGlobals.bnfproductions.add(p);
   }
 
   static protected void production_addexpansion(BNFProduction p, Expansion e) {
@@ -99,11 +99,11 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
     p.setExpansion(e);
   }
 
-  static private int nextFreeLexState = 1;
+  private int nextFreeLexState = 1;
 
-  static protected void addregexpr(TokenProduction p) {
+  protected void addregexpr(TokenProduction p) {
     Integer ii;
-    rexprlist.add(p);
+    JavaCCGlobals.rexprlist.add(p);
     if (Options.getUserTokenManager()) {
       if (p.lexStates == null || p.lexStates.length != 1 || !p.lexStates[0].equals("DEFAULT")) {
         JavaCCErrors.warning(p, "Ignoring lexical state specifications since option " +
@@ -119,20 +119,20 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
           JavaCCErrors.parse_error(p, "Multiple occurrence of \"" + p.lexStates[i] + "\" in lexical state list.");
         }
       }
-      if (lexstate_S2I.get(p.lexStates[i]) == null) {
+      if (JavaCCGlobals.lexstate_S2I.get(p.lexStates[i]) == null) {
         ii = new Integer(nextFreeLexState++);
-        lexstate_S2I.put(p.lexStates[i], ii);
-        lexstate_I2S.put(ii, p.lexStates[i]);
-        simple_tokens_table.put(p.lexStates[i], new java.util.Hashtable());
+        JavaCCGlobals.lexstate_S2I.put(p.lexStates[i], ii);
+        JavaCCGlobals.lexstate_I2S.put(ii, p.lexStates[i]);
+        JavaCCGlobals.simple_tokens_table.put(p.lexStates[i], new java.util.Hashtable());
       }
     }
   }
 
   static protected void add_token_manager_decls(Token t, java.util.List decls) {
-    if (token_mgr_decls != null) {
+    if (JavaCCGlobals.token_mgr_decls != null) {
       JavaCCErrors.parse_error(t, "Multiple occurrence of \"TOKEN_MGR_DECLS\".");
     } else {
-      token_mgr_decls = decls;
+      JavaCCGlobals.token_mgr_decls = decls;
       if (Options.getUserTokenManager()) {
         JavaCCErrors.warning(t, "Ignoring declarations in \"TOKEN_MGR_DECLS\" since option " +
                                 "USER_TOKEN_MANAGER has been set to true.");
@@ -153,7 +153,7 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
       res.nextState = null;
       res.nsTok = null;
       p.respecs.add(res);
-      rexprlist.add(p);
+      JavaCCGlobals.rexprlist.add(p);
     }
   }
 
@@ -306,14 +306,4 @@ public abstract class JavaCCParserInternals extends JavaCCGlobals {
     tblk.finallyblk = finallyblk;
     result.member = tblk;
   }
-
-   public static void reInit()
-   {
-      add_cu_token_here = cu_to_insertion_point_1;
-      first_cu_token = null;
-      insertionpoint1set = false;
-      insertionpoint2set = false;
-      nextFreeLexState = 1;
-   }
-
 }

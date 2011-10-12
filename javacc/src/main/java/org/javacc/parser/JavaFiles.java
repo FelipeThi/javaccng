@@ -42,7 +42,7 @@ import java.util.Map;
 /**
  * Generate CharStream, TokenManager and Exceptions.
  */
-public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
+public class JavaFiles implements JavaCCParserConstants
 {
   /**
    * ID of the latest version (of JavaCC) in which one of the CharStream classes
@@ -107,7 +107,7 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
    */
   static double getVersion(String fileName)
   {
-    final String commentHeader = "/* " + getIdString(toolName, fileName) + " Version ";
+    final String commentHeader = "/* " + JavaCCGlobals.getIdString(JavaCCGlobals.toolName, fileName) + " Version ";
     File file = new File(Options.getOutputDirectory(), replaceBackslash(fileName));
 
     if (!file.exists()) {
@@ -162,7 +162,7 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
 
 
 
-  public static void gen_JavaCharStream() {
+  public void gen_JavaCharStream() {
     try {
       final File file = new File(Options.getOutputDirectory(), "JavaCharStream.java");
       final OutputFile outputFile = new OutputFile(file, charStreamVersion, new String[] {"SUPPORT_CLASS_VISIBILITY_PUBLIC"});
@@ -174,15 +174,15 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
 
       final IndentingPrintWriter ostr = outputFile.getPrintWriter();
 
-      if (cu_to_insertion_point_1.size() != 0 &&
-          ((Token)cu_to_insertion_point_1.get(0)).getKind() == PACKAGE
+      if (JavaCCGlobals.cu_to_insertion_point_1.size() != 0 &&
+          ((Token)JavaCCGlobals.cu_to_insertion_point_1.get(0)).getKind() == PACKAGE
       ) {
-        for (int i = 1; i < cu_to_insertion_point_1.size(); i++) {
-          if (((Token)cu_to_insertion_point_1.get(i)).getKind() == SEMICOLON) {
-            cline = ((Token)(cu_to_insertion_point_1.get(0))).getBeginLine();
-            ccol = ((Token)(cu_to_insertion_point_1.get(0))).getBeginColumn();
+        for (int i = 1; i < JavaCCGlobals.cu_to_insertion_point_1.size(); i++) {
+          if (((Token)JavaCCGlobals.cu_to_insertion_point_1.get(i)).getKind() == SEMICOLON) {
+            JavaCCGlobals.cline = ((Token)(JavaCCGlobals.cu_to_insertion_point_1.get(0))).getBeginLine();
+            JavaCCGlobals.ccol = ((Token)(JavaCCGlobals.cu_to_insertion_point_1.get(0))).getBeginColumn();
             for (int j = 0; j <= i; j++) {
-              printToken((Token)(cu_to_insertion_point_1.get(j)), ostr);
+              JavaCCGlobals.printToken((Token)(JavaCCGlobals.cu_to_insertion_point_1.get(j)), ostr);
             }
             ostr.println("");
             ostr.println("");
@@ -205,7 +205,7 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
     }
   }
 
-  public static void gen_SimpleCharStream() {
+  public void gen_SimpleCharStream() {
     try {
       final File file = new File(Options.getOutputDirectory(), "SimpleCharStream.java");
       final OutputFile outputFile = new OutputFile(file, charStreamVersion, new String[] {"SUPPORT_CLASS_VISIBILITY_PUBLIC"});
@@ -217,15 +217,15 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
 
       final IndentingPrintWriter ostr = outputFile.getPrintWriter();
 
-      if (cu_to_insertion_point_1.size() != 0 &&
-          ((Token)cu_to_insertion_point_1.get(0)).getKind() == PACKAGE
+      if (JavaCCGlobals.cu_to_insertion_point_1.size() != 0 &&
+          ((Token)JavaCCGlobals.cu_to_insertion_point_1.get(0)).getKind() == PACKAGE
       ) {
-        for (int i = 1; i < cu_to_insertion_point_1.size(); i++) {
-          if (((Token)cu_to_insertion_point_1.get(i)).getKind() == SEMICOLON) {
-            cline = ((Token)(cu_to_insertion_point_1.get(0))).getBeginLine();
-            ccol = ((Token)(cu_to_insertion_point_1.get(0))).getBeginColumn();
+        for (int i = 1; i < JavaCCGlobals.cu_to_insertion_point_1.size(); i++) {
+          if (((Token)JavaCCGlobals.cu_to_insertion_point_1.get(i)).getKind() == SEMICOLON) {
+            JavaCCGlobals.cline = ((Token)(JavaCCGlobals.cu_to_insertion_point_1.get(0))).getBeginLine();
+            JavaCCGlobals.ccol = ((Token)(JavaCCGlobals.cu_to_insertion_point_1.get(0))).getBeginColumn();
             for (int j = 0; j <= i; j++) {
-              printToken((Token)(cu_to_insertion_point_1.get(j)), ostr);
+              JavaCCGlobals.printToken((Token)(JavaCCGlobals.cu_to_insertion_point_1.get(j)), ostr);
             }
             ostr.println("");
             ostr.println("");
@@ -248,7 +248,7 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
     }
   }
 
-  public static void gen_CharStream() {
+  public void gen_CharStream() {
     try {
       final File file = new File(Options.getOutputDirectory(), "CharStream.java");
       final OutputFile outputFile = new OutputFile(file, charStreamVersion, new String[] {"SUPPORT_CLASS_VISIBILITY_PUBLIC"});
@@ -260,15 +260,15 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
 
       final IndentingPrintWriter ostr = outputFile.getPrintWriter();
 
-      if (cu_to_insertion_point_1.size() != 0 &&
-          ((Token)cu_to_insertion_point_1.get(0)).getKind() == PACKAGE
+      if (JavaCCGlobals.cu_to_insertion_point_1.size() != 0 &&
+          ((Token)JavaCCGlobals.cu_to_insertion_point_1.get(0)).getKind() == PACKAGE
       ) {
-        for (int i = 1; i < cu_to_insertion_point_1.size(); i++) {
-          if (((Token)cu_to_insertion_point_1.get(i)).getKind() == SEMICOLON) {
-            cline = ((Token)(cu_to_insertion_point_1.get(0))).getBeginLine();
-            ccol = ((Token)(cu_to_insertion_point_1.get(0))).getBeginColumn();
+        for (int i = 1; i < JavaCCGlobals.cu_to_insertion_point_1.size(); i++) {
+          if (((Token)JavaCCGlobals.cu_to_insertion_point_1.get(i)).getKind() == SEMICOLON) {
+            JavaCCGlobals.cline = ((Token)(JavaCCGlobals.cu_to_insertion_point_1.get(0))).getBeginLine();
+            JavaCCGlobals.ccol = ((Token)(JavaCCGlobals.cu_to_insertion_point_1.get(0))).getBeginColumn();
             for (int j = 0; j <= i; j++) {
-              printToken((Token)(cu_to_insertion_point_1.get(j)), ostr);
+              JavaCCGlobals.printToken((Token)(JavaCCGlobals.cu_to_insertion_point_1.get(j)), ostr);
             }
             ostr.println("");
             ostr.println("");
@@ -290,7 +290,7 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
     }
   }
 
-  public static void gen_ParseException() {
+  public void gen_ParseException() {
     try {
       final File file = new File(Options.getOutputDirectory(), "ParseException.java");
       final OutputFile outputFile = new OutputFile(file, parseExceptionVersion, new String[] {"KEEP_LINE_COL"});
@@ -302,15 +302,15 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
 
       final IndentingPrintWriter ostr = outputFile.getPrintWriter();
 
-      if (cu_to_insertion_point_1.size() != 0 &&
-          ((Token)cu_to_insertion_point_1.get(0)).getKind() == PACKAGE
+      if (JavaCCGlobals.cu_to_insertion_point_1.size() != 0 &&
+          ((Token)JavaCCGlobals.cu_to_insertion_point_1.get(0)).getKind() == PACKAGE
       ) {
-        for (int i = 1; i < cu_to_insertion_point_1.size(); i++) {
-          if (((Token)cu_to_insertion_point_1.get(i)).getKind() == SEMICOLON) {
-            cline = ((Token)(cu_to_insertion_point_1.get(0))).getBeginLine();
-            ccol = ((Token)(cu_to_insertion_point_1.get(0))).getBeginColumn();
+        for (int i = 1; i < JavaCCGlobals.cu_to_insertion_point_1.size(); i++) {
+          if (((Token)JavaCCGlobals.cu_to_insertion_point_1.get(i)).getKind() == SEMICOLON) {
+            JavaCCGlobals.cline = ((Token)(JavaCCGlobals.cu_to_insertion_point_1.get(0))).getBeginLine();
+            JavaCCGlobals.ccol = ((Token)(JavaCCGlobals.cu_to_insertion_point_1.get(0))).getBeginColumn();
             for (int j = 0; j <= i; j++) {
-              printToken((Token)(cu_to_insertion_point_1.get(j)), ostr);
+              JavaCCGlobals.printToken((Token)(JavaCCGlobals.cu_to_insertion_point_1.get(j)), ostr);
             }
             ostr.println("");
             ostr.println("");
@@ -332,7 +332,7 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
     }
   }
 
-  public static void gen_TokenMgrError() {
+  public void gen_TokenMgrError() {
     try {
       final File file = new File(Options.getOutputDirectory(), "TokenManagerException.java");
       final OutputFile outputFile = new OutputFile(file, tokenMgrErrorVersion, new String[0]);
@@ -344,15 +344,15 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
 
       final IndentingPrintWriter ostr = outputFile.getPrintWriter();
 
-      if (cu_to_insertion_point_1.size() != 0 &&
-          ((Token)cu_to_insertion_point_1.get(0)).getKind() == PACKAGE
+      if (JavaCCGlobals.cu_to_insertion_point_1.size() != 0 &&
+          ((Token)JavaCCGlobals.cu_to_insertion_point_1.get(0)).getKind() == PACKAGE
       ) {
-        for (int i = 1; i < cu_to_insertion_point_1.size(); i++) {
-          if (((Token)cu_to_insertion_point_1.get(i)).getKind() == SEMICOLON) {
-            cline = ((Token)(cu_to_insertion_point_1.get(0))).getBeginLine();
-            ccol = ((Token)(cu_to_insertion_point_1.get(0))).getBeginColumn();
+        for (int i = 1; i < JavaCCGlobals.cu_to_insertion_point_1.size(); i++) {
+          if (((Token)JavaCCGlobals.cu_to_insertion_point_1.get(i)).getKind() == SEMICOLON) {
+            JavaCCGlobals.cline = ((Token)(JavaCCGlobals.cu_to_insertion_point_1.get(0))).getBeginLine();
+            JavaCCGlobals.ccol = ((Token)(JavaCCGlobals.cu_to_insertion_point_1.get(0))).getBeginColumn();
             for (int j = 0; j <= i; j++) {
-              printToken((Token)(cu_to_insertion_point_1.get(j)), ostr);
+              JavaCCGlobals.printToken((Token)(JavaCCGlobals.cu_to_insertion_point_1.get(j)), ostr);
             }
             ostr.println("");
             ostr.println("");
@@ -374,7 +374,7 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
     }
   }
 
-  public static void gen_Token() {
+  public void gen_Token() {
     try {
       final File file = new File(Options.getOutputDirectory(), "Token.java");
       final OutputFile outputFile = new OutputFile(file, tokenVersion, new String[] {"TOKEN_EXTENDS", "KEEP_LINE_COL", "SUPPORT_CLASS_VISIBILITY_PUBLIC"});
@@ -386,15 +386,15 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
 
       final IndentingPrintWriter ostr = outputFile.getPrintWriter();
 
-      if (cu_to_insertion_point_1.size() != 0 &&
-          ((Token)cu_to_insertion_point_1.get(0)).getKind() == PACKAGE
+      if (JavaCCGlobals.cu_to_insertion_point_1.size() != 0 &&
+          ((Token)JavaCCGlobals.cu_to_insertion_point_1.get(0)).getKind() == PACKAGE
       ) {
-        for (int i = 1; i < cu_to_insertion_point_1.size(); i++) {
-          if (((Token)cu_to_insertion_point_1.get(i)).getKind() == SEMICOLON) {
-            cline = ((Token)(cu_to_insertion_point_1.get(0))).getBeginLine();
-            ccol = ((Token)(cu_to_insertion_point_1.get(0))).getBeginColumn();
+        for (int i = 1; i < JavaCCGlobals.cu_to_insertion_point_1.size(); i++) {
+          if (((Token)JavaCCGlobals.cu_to_insertion_point_1.get(i)).getKind() == SEMICOLON) {
+            JavaCCGlobals.cline = ((Token)(JavaCCGlobals.cu_to_insertion_point_1.get(0))).getBeginLine();
+            JavaCCGlobals.ccol = ((Token)(JavaCCGlobals.cu_to_insertion_point_1.get(0))).getBeginColumn();
             for (int j = 0; j <= i; j++) {
-              printToken((Token)(cu_to_insertion_point_1.get(j)), ostr);
+              JavaCCGlobals.printToken((Token)(JavaCCGlobals.cu_to_insertion_point_1.get(j)), ostr);
             }
             ostr.println("");
             ostr.println("");
@@ -416,7 +416,7 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
     }
   }
 
-  public static void gen_TokenManager() {
+  public void gen_TokenManager() {
     try {
       final File file = new File(Options.getOutputDirectory(), "TokenManager.java");
       final OutputFile outputFile = new OutputFile(file, tokenManagerVersion, new String[] {"SUPPORT_CLASS_VISIBILITY_PUBLIC"});
@@ -428,15 +428,15 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
 
       final IndentingPrintWriter ostr = outputFile.getPrintWriter();
 
-      if (cu_to_insertion_point_1.size() != 0 &&
-          ((Token)cu_to_insertion_point_1.get(0)).getKind() == PACKAGE
+      if (JavaCCGlobals.cu_to_insertion_point_1.size() != 0 &&
+          ((Token)JavaCCGlobals.cu_to_insertion_point_1.get(0)).getKind() == PACKAGE
       ) {
-        for (int i = 1; i < cu_to_insertion_point_1.size(); i++) {
-          if (((Token)cu_to_insertion_point_1.get(i)).getKind() == SEMICOLON) {
-            cline = ((Token)(cu_to_insertion_point_1.get(0))).getBeginLine();
-            ccol = ((Token)(cu_to_insertion_point_1.get(0))).getBeginColumn();
+        for (int i = 1; i < JavaCCGlobals.cu_to_insertion_point_1.size(); i++) {
+          if (((Token)JavaCCGlobals.cu_to_insertion_point_1.get(i)).getKind() == SEMICOLON) {
+            JavaCCGlobals.cline = ((Token)(JavaCCGlobals.cu_to_insertion_point_1.get(0))).getBeginLine();
+            JavaCCGlobals.ccol = ((Token)(JavaCCGlobals.cu_to_insertion_point_1.get(0))).getBeginColumn();
             for (int j = 0; j <= i; j++) {
-              printToken((Token)(cu_to_insertion_point_1.get(j)), ostr);
+              JavaCCGlobals.printToken((Token)(JavaCCGlobals.cu_to_insertion_point_1.get(j)), ostr);
             }
             ostr.println("");
             ostr.println("");
@@ -457,9 +457,4 @@ public class JavaFiles extends JavaCCGlobals implements JavaCCParserConstants
       throw new Error();
     }
   }
-
-  public static void reInit()
-  {
-  }
-
 }

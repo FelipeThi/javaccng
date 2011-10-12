@@ -35,10 +35,10 @@ public class Nfa
    NfaState start;
    NfaState end;
 
-   public Nfa()
+   public Nfa(LexGen lexGen)
    {
-      start = new NfaState();
-      end = new NfaState();
+      start = new NfaState(lexGen);
+      end = new NfaState(lexGen);
    }
 
    public Nfa(NfaState startGiven, NfaState finalGiven)

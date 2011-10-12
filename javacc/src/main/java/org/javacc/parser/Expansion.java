@@ -83,14 +83,6 @@ public class Expansion {
    */
   int ordinal;
 
-  /**
-   * To avoid right-recursive loops when calculating follow sets, we use
-   * a generation number which indicates if this expansion was visited
-   * by LookaheadWalk.genFollowSet in the same generation.  New generations
-   * are obtained by incrementing the static counter below, and the current
-   * generation is stored in the non-static variable below.
-   */
-  public static long nextGenerationIndex = 1;
   public long myGeneration = 0;
 
   /**
@@ -98,11 +90,6 @@ public class Expansion {
    * ParseEngine.
    */
   public boolean inMinimumSize = false;
-
-   public static void reInit()
-   {
-      nextGenerationIndex = 1;
-   }
 
   private String getSimpleName() {
     String name = getClass().getName();

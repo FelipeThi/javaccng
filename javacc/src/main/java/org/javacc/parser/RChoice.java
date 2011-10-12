@@ -56,14 +56,14 @@ public class RChoice extends RegularExpression {
     return choices;
   }
 
-  public Nfa GenerateNfa(boolean ignoreCase)
+  public Nfa GenerateNfa(final LexGen lexGen, boolean ignoreCase)
   {
-     CompressCharLists();
+     CompressCharLists(lexGen);
 
      if (getChoices().size() == 1)
-        return ((RegularExpression)getChoices().get(0)).GenerateNfa(ignoreCase);
+        return ((RegularExpression)getChoices().get(0)).GenerateNfa(lexGen, ignoreCase);
 
-     Nfa retVal = new Nfa();
+     Nfa retVal = new Nfa(lexGen);
      NfaState startState = retVal.start;
      NfaState finalState = retVal.end;
 
@@ -72,7 +72,7 @@ public class RChoice extends RegularExpression {
         Nfa temp;
         RegularExpression curRE = (RegularExpression)getChoices().get(i);
 
-        temp = curRE.GenerateNfa(ignoreCase);
+        temp = curRE.GenerateNfa(lexGen, ignoreCase);
 
         startState.AddMove(temp.start);
         temp.end.AddMove(finalState);
@@ -81,7 +81,7 @@ public class RChoice extends RegularExpression {
      return retVal;
   }
 
-  void CompressCharLists()
+  void CompressCharLists(LexGen lexGen)
   {
      CompressChoices(); // Unroll nested choices
      RegularExpression curRE;
@@ -102,7 +102,7 @@ public class RChoice extends RegularExpression {
         if (curRE instanceof RCharacterList)
         {
            if (((RCharacterList)curRE).negated_list)
-              ((RCharacterList)curRE).RemoveNegation();
+              ((RCharacterList)curRE).RemoveNegation(lexGen);
 
            List tmp = ((RCharacterList)curRE).descriptors;
 
@@ -138,7 +138,7 @@ public class RChoice extends RegularExpression {
      }
   }
 
-  public void CheckUnmatchability()
+  public void CheckUnmatchability(LexGen lexGen)
   {
      RegularExpression curRE;
      int numStrings = 0;
@@ -148,7 +148,7 @@ public class RChoice extends RegularExpression {
         if (!(curRE = (RegularExpression)getChoices().get(i)).private_rexp &&
             //curRE instanceof RJustName &&
             curRE.ordinal > 0 && curRE.ordinal < ordinal &&
-            LexGen.lexStates[curRE.ordinal] == LexGen.lexStates[ordinal])
+            lexGen.lexStates[curRE.ordinal] == lexGen.lexStates[ordinal])
         {
            if (label != null)
               JavaCCErrors.warning(this, "Regular Expression choice : " +

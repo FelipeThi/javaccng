@@ -35,23 +35,23 @@ import java.util.List;
 /**
  * The main entry point for JJDoc.
  */
-public class JJDoc extends JJDocGlobals {
+public class JJDoc {
 
-  static void start() {
-    generator = getGenerator();
+  void start() {
+    Generator generator = JJDocGlobals.getGenerator();
     generator.documentStart();
-    emitTokenProductions(generator, rexprlist);
-    emitNormalProductions(generator, bnfproductions);
+    emitTokenProductions(generator, JavaCCGlobals.rexprlist);
+    emitNormalProductions(generator, JavaCCGlobals.bnfproductions);
     generator.documentEnd();
   }
-  private static Token getPrecedingSpecialToken(Token tok) {
+  private Token getPrecedingSpecialToken(Token tok) {
     Token t = tok;
     while (t.specialToken != null) {
       t = t.specialToken;
     }
     return (t != tok) ? t : null;
   }
-  private static void emitTopLevelSpecialTokens(Token token, Generator gen) {
+  private void emitTopLevelSpecialTokens(Token token, Generator gen) {
     if (token == null) {
       // Strange ...
       return;
@@ -59,10 +59,10 @@ public class JJDoc extends JJDocGlobals {
     token = getPrecedingSpecialToken(token);
     String s = "";
     if (token != null) {
-      cline = token.getBeginLine();
-      ccol = token.getBeginColumn();
+      JavaCCGlobals.cline = token.getBeginLine();
+      JavaCCGlobals.ccol = token.getBeginColumn();
       while (token != null) {
-        s += printTokenOnly(token);
+        s += JavaCCGlobals.printTokenOnly(token);
         token = token.next;
       }
     }
@@ -71,7 +71,7 @@ public class JJDoc extends JJDocGlobals {
   }
 
   /*
-  private static boolean toplevelExpansion(Expansion exp) {
+  private boolean toplevelExpansion(Expansion exp) {
     return exp.parent != null
       && ( (exp.parent instanceof NormalProduction)
          ||
@@ -80,7 +80,7 @@ public class JJDoc extends JJDocGlobals {
   }
   */
 
-  private static void emitTokenProductions(Generator gen, List prods) {
+  private void emitTokenProductions(Generator gen, List prods) {
     gen.tokensStart();
     // FIXME there are many empty productions here
     for (Iterator it = prods.iterator(); it.hasNext();) {
@@ -131,7 +131,7 @@ public class JJDoc extends JJDocGlobals {
     gen.tokensEnd();
   }
 
-  private static void emitNormalProductions(Generator gen, List prods) {
+  private void emitNormalProductions(Generator gen, List prods) {
     gen.nonterminalsStart();
     for (Iterator it = prods.iterator(); it.hasNext();) {
       NormalProduction np = (NormalProduction)it.next();
@@ -160,7 +160,7 @@ public class JJDoc extends JJDocGlobals {
     }
     gen.nonterminalsEnd();
   }
-  private static void emitExpansionTree(Expansion exp, Generator gen) {
+  private void emitExpansionTree(Expansion exp, Generator gen) {
 //     gen.text("[->" + exp.getClass().getName() + "]");
     if (exp instanceof Action) {
       emitExpansionAction((Action)exp, gen);
@@ -183,13 +183,13 @@ public class JJDoc extends JJDocGlobals {
     } else if (exp instanceof ZeroOrOne) {
       emitExpansionZeroOrOne((ZeroOrOne)exp, gen);
     } else {
-      error("Oops: Unknown expansion type.");
+      JJDocGlobals.error("Oops: Unknown expansion type.");
     }
 //     gen.text("[<-" + exp.getClass().getName() + "]");
   }
-  private static void emitExpansionAction(Action a, Generator gen) {
+  private void emitExpansionAction(Action a, Generator gen) {
   }
-  private static void emitExpansionChoice(Choice c, Generator gen) {
+  private void emitExpansionChoice(Choice c, Generator gen) {
     for (Iterator it = c.getChoices().iterator(); it.hasNext();) {
       Expansion e = (Expansion)(it.next());
       emitExpansionTree(e, gen);
@@ -198,19 +198,19 @@ public class JJDoc extends JJDocGlobals {
       }
     }
   }
-  private static void emitExpansionLookahead(Lookahead l, Generator gen) {
+  private void emitExpansionLookahead(Lookahead l, Generator gen) {
   }
-  private static void emitExpansionNonTerminal(NonTerminal nt, Generator gen) {
+  private void emitExpansionNonTerminal(NonTerminal nt, Generator gen) {
     gen.nonTerminalStart(nt);
     gen.text(nt.getName());
     gen.nonTerminalEnd(nt);
   }
-  private static void emitExpansionOneOrMore(OneOrMore o, Generator gen) {
+  private void emitExpansionOneOrMore(OneOrMore o, Generator gen) {
     gen.text("( ");
     emitExpansionTree(o.expansion, gen);
     gen.text(" )+");
   }
-  private static void emitExpansionRegularExpression(RegularExpression r,
+  private void emitExpansionRegularExpression(RegularExpression r,
       Generator gen) {
     String reRendered = emitRE(r);
     if (!reRendered.equals("")) {
@@ -219,7 +219,7 @@ public class JJDoc extends JJDocGlobals {
       gen.reEnd(r);
     }
   }
-  private static void emitExpansionSequence(Sequence s, Generator gen) {
+  private void emitExpansionSequence(Sequence s, Generator gen) {
     boolean firstUnit = true;
     for (Iterator it = s.units.iterator(); it.hasNext();) {
       Expansion e = (Expansion)it.next();
@@ -240,7 +240,7 @@ public class JJDoc extends JJDocGlobals {
       firstUnit = false;
     }
   }
-  private static void emitExpansionTryBlock(TryBlock t, Generator gen) {
+  private void emitExpansionTryBlock(TryBlock t, Generator gen) {
     boolean needParens = t.exp instanceof Choice;
     if (needParens) {
       gen.text("( ");
@@ -250,17 +250,17 @@ public class JJDoc extends JJDocGlobals {
       gen.text(" )");
     }
   }
-  private static void emitExpansionZeroOrMore(ZeroOrMore z, Generator gen) {
+  private void emitExpansionZeroOrMore(ZeroOrMore z, Generator gen) {
     gen.text("( ");
     emitExpansionTree(z.expansion, gen);
     gen.text(" )*");
   }
-  private static void emitExpansionZeroOrOne(ZeroOrOne z, Generator gen) {
+  private void emitExpansionZeroOrOne(ZeroOrOne z, Generator gen) {
     gen.text("( ");
     emitExpansionTree(z.expansion, gen);
     gen.text(" )?");
   }
-  private static String emitRE(RegularExpression re) {
+  private String emitRE(RegularExpression re) {
     String returnString = "";
     boolean hasLabel = !re.label.equals("");
     boolean justName = re instanceof RJustName;
@@ -292,18 +292,18 @@ public class JJDoc extends JJDocGlobals {
         if (o instanceof SingleCharacter) {
           returnString += "\"";
           char s[] = { ((SingleCharacter)o).ch };
-          returnString += add_escapes(new String(s));
+          returnString += JavaCCGlobals.add_escapes(new String(s));
           returnString += "\"";
         } else if (o instanceof CharacterRange) {
           returnString += "\"";
           char s[] = { ((CharacterRange)o).getLeft() };
-          returnString += add_escapes(new String(s));
+          returnString += JavaCCGlobals.add_escapes(new String(s));
           returnString += "\"-\"";
           s[0] = ((CharacterRange)o).getRight();
-          returnString += add_escapes(new String(s));
+          returnString += JavaCCGlobals.add_escapes(new String(s));
           returnString += "\"";
         } else {
-          error("Oops: unknown character list element type.");
+          JJDocGlobals.error("Oops: unknown character list element type.");
         }
         if (it.hasNext()) {
           returnString += ",";
@@ -350,7 +350,7 @@ public class JJDoc extends JJDocGlobals {
       }
     } else if (re instanceof RStringLiteral) {
       RStringLiteral sl = (RStringLiteral)re;
-      returnString += ("\"" + JavaCCParserInternals.add_escapes(sl.image) + "\"");
+      returnString += ("\"" + JavaCCGlobals.add_escapes(sl.image) + "\"");
     } else if (re instanceof RZeroOrMore) {
       RZeroOrMore zm = (RZeroOrMore)re;
       returnString += "(";
@@ -376,7 +376,7 @@ public class JJDoc extends JJDocGlobals {
 	  }
 	  returnString += "}";
     } else {
-      error("Oops: Unknown regular expression type.");
+      JJDocGlobals.error("Oops: Unknown regular expression type.");
     }
     if (needBrackets) {
       returnString += ">";
@@ -385,7 +385,7 @@ public class JJDoc extends JJDocGlobals {
   }
 
   /*
-  private static String v2s(Vector v, boolean newLine) {
+  private String v2s(Vector v, boolean newLine) {
     String s = "";
     boolean firstToken = true;
     for (Enumeration enumeration = v.elements(); enumeration.hasMoreElements();) {

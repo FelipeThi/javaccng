@@ -302,7 +302,7 @@ static final char[] diffUpperCaseRanges = {
   }
 
   boolean transformed = false;
-  public Nfa GenerateNfa(boolean ignoreCase)
+  public Nfa GenerateNfa(final LexGen lexGen, boolean ignoreCase)
   {
      if (!transformed)
      {
@@ -358,7 +358,7 @@ static final char[] diffUpperCaseRanges = {
         }
 
         if (negated_list)
-           RemoveNegation();  // This also sorts the list
+           RemoveNegation(lexGen);  // This also sorts the list
         else
            SortDescriptors();
      }
@@ -366,11 +366,11 @@ static final char[] diffUpperCaseRanges = {
      if (descriptors.size() == 0 && !negated_list)
      {
         JavaCCErrors.semantic_error(this, "Empty character set is not allowed as it will not match any character.");
-        return new Nfa();
+        return new Nfa(lexGen);
      }
 
      transformed = true;
-     Nfa retVal = new Nfa();
+     Nfa retVal = new Nfa(lexGen);
      NfaState startState = retVal.start;
      NfaState finalState = retVal.end;
      int i;
@@ -501,7 +501,7 @@ static final char[] diffUpperCaseRanges = {
      descriptors = newDesc;
   }
 
-  void RemoveNegation()
+  void RemoveNegation(LexGen lexGen)
   {
      int i;
 
@@ -565,7 +565,7 @@ static final char[] diffUpperCaseRanges = {
      }
 
      //System.out.println("lastRem : " + (int)lastRemoved);
-     if (NfaState.unicodeWarningGiven || Options.getJavaUnicodeEscape())
+     if (lexGen.nfaStates.unicodeWarningGiven || Options.getJavaUnicodeEscape())
      {
         if (lastRemoved < (char)0xffff)
            newDescriptors.add(new CharacterRange((char)(lastRemoved + 1),

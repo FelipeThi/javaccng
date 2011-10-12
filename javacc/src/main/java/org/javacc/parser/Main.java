@@ -160,17 +160,19 @@ public final class Main {
       parser.javacc_input();
       JavaCCGlobals.createOutputDir(Options.getOutputDirectory());
 
-      if (Options.getUnicodeInput())
-      {
-         NfaState.unicodeWarningGiven = true;
-         System.out.println("Note: UNICODE_INPUT option is specified. " +
-              "Please make sure you create the parser/lexer using a Reader with the correct character encoding.");
+      final Semanticize semanticize = new Semanticize();
+      semanticize.start();
+      final ParseGen parseGen = new ParseGen(semanticize);
+      parseGen.start();
+      final LexGen lexGen = new LexGen();
+      if (Options.getUnicodeInput()) {
+        lexGen.nfaStates.unicodeWarningGiven = true;
+        System.out.println("Note: UNICODE_INPUT option is specified. " +
+            "Please make sure you create the parser/lexer using a Reader with the correct character encoding.");
       }
-
-      Semanticize.start();
-      ParseGen.start();
-      LexGen.start();
-      OtherFilesGen.start();
+      lexGen.start();
+      final OtherFilesGen otherFilesGen = new OtherFilesGen();
+      otherFilesGen.start(lexGen);
 
       if ((JavaCCErrors.get_error_count() == 0) && (Options.getBuildParser() || Options.getBuildTokenManager())) {
         if (JavaCCErrors.get_warning_count() == 0) {
@@ -199,21 +201,9 @@ public final class Main {
 
    public static void reInitAll()
    {
-      org.javacc.parser.Expansion.reInit();
       org.javacc.parser.JavaCCErrors.reInit();
       org.javacc.parser.JavaCCGlobals.reInit();
       Options.init();
-      org.javacc.parser.JavaCCParserInternals.reInit();
-      org.javacc.parser.RStringLiteral.reInit();
-      org.javacc.parser.JavaFiles.reInit();
-      org.javacc.parser.LexGen.reInit();
-      org.javacc.parser.NfaState.reInit();
-      org.javacc.parser.MatchInfo.reInit();
-      org.javacc.parser.LookaheadWalk.reInit();
-      org.javacc.parser.Semanticize.reInit();
-      org.javacc.parser.ParseGen.reInit();
-      org.javacc.parser.OtherFilesGen.reInit();
-      org.javacc.parser.ParseEngine.reInit();
    }
 
 }

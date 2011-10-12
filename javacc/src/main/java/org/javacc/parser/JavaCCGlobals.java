@@ -39,7 +39,7 @@ import java.util.List;
  * a JavaCC input file.  This data is what is used by the back-ends of JavaCC as
  * well as any other back-end of JavaCC related tools such as JJTree.
  */
-public class JavaCCGlobals {
+public final class JavaCCGlobals {
 
   /**
    * String that identifies the JavaCC generated files.
@@ -390,7 +390,7 @@ public class JavaCCGlobals {
     return retval;
   }
 
-  static protected int cline, ccol;
+  public static int cline, ccol;
 
   static protected void printTokenSetup(Token t) {
     Token tt = t;
@@ -461,7 +461,7 @@ public class JavaCCGlobals {
     printLeadingComments(t.next);
   }
 
-  static protected String printTokenOnly(Token t) {
+  static public String printTokenOnly(Token t) {
     String retval = "";
     for (; cline < t.getBeginLine(); cline++) {
       retval += "\n"; ccol = 1;

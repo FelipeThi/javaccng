@@ -25,14 +25,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.javacc.parser;
 
-/**
- * An object container.  Used to pass references to objects as parameter.
- */
-
-public class Container {
-
-  public Object member;
-
+/** An object container.  Used to pass references to objects as parameter. */
+public class Container<T> {
+  public T member;
 }
