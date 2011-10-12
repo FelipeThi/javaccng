@@ -26,7 +26,6 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 package org.javacc.jjdoc;
 
 import org.javacc.parser.Expansion;
@@ -37,178 +36,96 @@ import org.javacc.parser.RegularExpression;
 import org.javacc.parser.TokenProduction;
 import org.javacc.utils.io.IndentingPrintWriter;
 
-/**
- * Output BNF in text format.
- */
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.lang.String;
+
+/** Output BNF in text format. */
 public class TextGenerator implements Generator {
-  protected IndentingPrintWriter ostr;
+  protected IndentingPrintWriter out;
 
-  public TextGenerator() {
-  }
-
-  /**
-   * {@inheritDoc}
-   * @see org.javacc.jjdoc.Generator#text(java.lang.String)
-   */
   public void text(String s) {
     print(s);
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.javacc.jjdoc.Generator#print(java.lang.String)
-   */
   public void print(String s) {
-    ostr.print(s);
+    out.print(s);
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.javacc.jjdoc.Generator#documentStart()
-   */
   public void documentStart() {
-    ostr = create_output_stream();
-    ostr.print("\nDOCUMENT START\n");
+    out = createOutputStream();
+    out.print("\nDOCUMENT START\n");
   }
-  /**
-   * {@inheritDoc}
-   * @see org.javacc.jjdoc.Generator#documentEnd()
-   */
+
   public void documentEnd() {
-    ostr.print("\nDOCUMENT END\n");
-    ostr.close();
+    out.print("\nDOCUMENT END\n");
+    out.close();
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.javacc.jjdoc.Generator#specialTokens(java.lang.String)
-   */
   public void specialTokens(String s) {
-    ostr.print(s);
+    out.print(s);
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.javacc.jjdoc.Generator#tokenStart(org.javacc.parser.TokenProduction)
-   */
-  public void tokenStart(TokenProduction tp) {
-  }
+  public void tokenStart(TokenProduction tp) {}
 
-  /**
-   * {@inheritDoc}
-   * @see org.javacc.jjdoc.Generator#tokenEnd(org.javacc.parser.TokenProduction)
-   */
-  public void tokenEnd(TokenProduction tp) {
-  }
+  public void tokenEnd(TokenProduction tp) {}
 
-  /**
-   * {@inheritDoc}
-   * @see org.javacc.jjdoc.Generator#nonterminalsStart()
-   */
   public void nonterminalsStart() {
     text("NON-TERMINALS\n");
   }
-  /**
-   * {@inheritDoc}
-   * @see org.javacc.jjdoc.Generator#nonterminalsEnd()
-   */
-  public void nonterminalsEnd() {
-  }
 
-  /**
-   * {@inheritDoc}
-   * @see org.javacc.jjdoc.Generator#tokensStart()
-   */
+  public void nonterminalsEnd() {}
+
   public void tokensStart() {
     text("TOKENS\n");
   }
-  /**
-   * {@inheritDoc}
-   * @see org.javacc.jjdoc.Generator#tokensEnd()
-   */
-  public void tokensEnd() {
-  }
 
-  /**
-   * {@inheritDoc}
-   * @see org.javacc.jjdoc.Generator#javacode(org.javacc.parser.JavaCodeProduction)
-   */
+  public void tokensEnd() {}
+
   public void javacode(JavaCodeProduction jp) {
     productionStart(jp);
     text("java code");
     productionEnd(jp);
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.javacc.jjdoc.Generator#productionStart(org.javacc.parser.NormalProduction)
-   */
   public void productionStart(NormalProduction np) {
-    ostr.print("\t" + np.getLhs() + "\t:=\t");
-  }
-  /**
-   * {@inheritDoc}
-   * @see org.javacc.jjdoc.Generator#productionEnd(org.javacc.parser.NormalProduction)
-   */
-  public void productionEnd(NormalProduction np) {
-    ostr.print("\n");
+    out.print("\t" + np.getLhs() + "\t:=\t");
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.javacc.jjdoc.Generator#expansionStart(org.javacc.parser.Expansion, boolean)
-   */
+  public void productionEnd(NormalProduction np) {
+    out.print("\n");
+  }
+
   public void expansionStart(Expansion e, boolean first) {
     if (!first) {
-      ostr.print("\n\t\t|\t");
+      out.print("\n\t\t|\t");
     }
   }
-  /**
-   * {@inheritDoc}
-   * @see org.javacc.jjdoc.Generator#expansionEnd(org.javacc.parser.Expansion, boolean)
-   */
-  public void expansionEnd(Expansion e, boolean first) {
-  }
 
-  /**
-   * {@inheritDoc}
-   * @see org.javacc.jjdoc.Generator#nonTerminalStart(org.javacc.parser.NonTerminal)
-   */
-  public void nonTerminalStart(NonTerminal nt) {
-  }
-  /**
-   * {@inheritDoc}
-   * @see org.javacc.jjdoc.Generator#nonTerminalEnd(org.javacc.parser.NonTerminal)
-   */
-  public void nonTerminalEnd(NonTerminal nt) {
-  }
+  public void expansionEnd(Expansion e, boolean first) {}
 
-  /**
-   * {@inheritDoc}
-   * @see org.javacc.jjdoc.Generator#reStart(org.javacc.parser.RegularExpression)
-   */
-  public void reStart(RegularExpression r) {
-  }
-  /**
-   * {@inheritDoc}
-   * @see org.javacc.jjdoc.Generator#reEnd(org.javacc.parser.RegularExpression)
-   */
-  public void reEnd(RegularExpression r) {
-  }
+  public void nonTerminalStart(NonTerminal nt) {}
+
+  public void nonTerminalEnd(NonTerminal nt) {}
+
+  public void reStart(RegularExpression r) {}
+
+  public void reEnd(RegularExpression r) {}
 
   /**
    * Create an output stream for the generated Jack code. Try to open a file
    * based on the name of the parser, but if that fails use the standard output
    * stream.
    */
-  protected IndentingPrintWriter create_output_stream() {
-
+  protected final IndentingPrintWriter createOutputStream() {
     if (JJDocOptions.getOutputFile().equals("")) {
       if (JJDocGlobals.input_file.equals("standard input")) {
         return new IndentingPrintWriter(
-                                       new java.io.OutputStreamWriter(
-                                                                      System.out));
-      } else {
+            new OutputStreamWriter(
+                System.out));
+      }
+      else {
         String ext = ".html";
         if (JJDocOptions.getText()) {
           ext = ".txt";
@@ -216,64 +133,49 @@ public class TextGenerator implements Generator {
         int i = JJDocGlobals.input_file.lastIndexOf('.');
         if (i == -1) {
           JJDocGlobals.output_file = JJDocGlobals.input_file + ext;
-        } else {
+        }
+        else {
           String suffix = JJDocGlobals.input_file.substring(i);
           if (suffix.equals(ext)) {
             JJDocGlobals.output_file = JJDocGlobals.input_file + ext;
-          } else {
-            JJDocGlobals.output_file = JJDocGlobals.input_file.substring(0, i)
-                + ext;
+          }
+          else {
+            JJDocGlobals.output_file = JJDocGlobals.input_file.substring(0, i) + ext;
           }
         }
       }
-    } else {
+    }
+    else {
       JJDocGlobals.output_file = JJDocOptions.getOutputFile();
     }
 
     try {
-      ostr = new IndentingPrintWriter(
-                                     new java.io.FileWriter(
-                                                            JJDocGlobals.output_file));
-    } catch (java.io.IOException e) {
+      out = new IndentingPrintWriter(
+          new FileWriter(
+              JJDocGlobals.output_file));
+    }
+    catch (IOException e) {
       error("JJDoc: can't open output stream on file "
           + JJDocGlobals.output_file + ".  Using standard output.");
-      ostr = new IndentingPrintWriter(new java.io.OutputStreamWriter(System.out));
+      out = new IndentingPrintWriter(new OutputStreamWriter(System.out));
     }
 
-    return ostr;
+    return out;
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.javacc.jjdoc.Generator#debug(java.lang.String)
-   */
   public void debug(String message) {
     System.err.println(message);
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.javacc.jjdoc.Generator#info(java.lang.String)
-   */
   public void info(String message) {
     System.err.println(message);
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.javacc.jjdoc.Generator#warn(java.lang.String)
-   */
   public void warn(String message) {
     System.err.println(message);
   }
 
-  /**
-   * {@inheritDoc}
-   * @see org.javacc.jjdoc.Generator#error(java.lang.String)
-   */
   public void error(String message) {
     System.err.println(message);
   }
-
-
 }

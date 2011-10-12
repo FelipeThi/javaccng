@@ -37,19 +37,13 @@ import org.javacc.parser.TokenProduction;
 
 import java.util.Hashtable;
 
-/**
- * Output BNF in HTML 3.2 format.
- */
+/** Output BNF in HTML 3.2 format. */
 public class HTMLGenerator extends TextGenerator implements Generator {
   private Hashtable id_map = new Hashtable();
   private int id = 1;
 
-  public HTMLGenerator() {
-    super();
-  }
-
   protected String get_id(String nt) {
-    String i = (String)id_map.get(nt);
+    String i = (String) id_map.get(nt);
     if (i == null) {
       i = "prod" + id++;
       id_map.put(nt, i);
@@ -61,28 +55,34 @@ public class HTMLGenerator extends TextGenerator implements Generator {
     print(s + "\n");
   }
 
+  @Override
   public void text(String s) {
     String ss = "";
     for (int i = 0; i < s.length(); ++i) {
       if (s.charAt(i) == '<') {
-  ss += "&lt;";
-      } else if (s.charAt(i) == '>') {
-  ss += "&gt;";
-      } else if (s.charAt(i) == '&') {
-  ss += "&amp;";
-      } else {
-  ss += s.charAt(i);
+        ss += "&lt;";
+      }
+      else if (s.charAt(i) == '>') {
+        ss += "&gt;";
+      }
+      else if (s.charAt(i) == '&') {
+        ss += "&amp;";
+      }
+      else {
+        ss += s.charAt(i);
       }
     }
     print(ss);
   }
 
+  @Override
   public void print(String s) {
-    ostr.print(s);
+    out.print(s);
   }
 
+  @Override
   public void documentStart() {
-    ostr = create_output_stream();
+    out = createOutputStream();
     println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2//EN\">");
     println("<HTML>");
     println("<HEAD>");
@@ -91,7 +91,8 @@ public class HTMLGenerator extends TextGenerator implements Generator {
     }
     if (JJDocGlobals.input_file != null) {
       println("<TITLE>BNF for " + JJDocGlobals.input_file + "</TITLE>");
-    } else {
+    }
+    else {
       println("<TITLE>A BNF grammar by JJDoc</TITLE>");
     }
     println("</HEAD>");
@@ -99,17 +100,20 @@ public class HTMLGenerator extends TextGenerator implements Generator {
     println("<H1 ALIGN=CENTER>BNF for " + JJDocGlobals.input_file + "</H1>");
   }
 
+  @Override
   public void documentEnd() {
     println("</BODY>");
     println("</HTML>");
-    ostr.close();
+    out.close();
   }
 
   /**
    * Prints out comments, used for tokens and non-terminals.
    * {@inheritDoc}
+   *
    * @see org.javacc.jjdoc.TextGenerator#specialTokens(java.lang.String)
    */
+  @Override
   public void specialTokens(String s) {
     println(" <!-- Special token -->");
     println(" <TR>");
@@ -121,6 +125,7 @@ public class HTMLGenerator extends TextGenerator implements Generator {
     println(" </TR>");
   }
 
+  @Override
   public void tokenStart(TokenProduction tp) {
     println(" <!-- Token -->");
     println(" <TR>");
@@ -128,38 +133,47 @@ public class HTMLGenerator extends TextGenerator implements Generator {
     println("   <PRE>");
   }
 
+  @Override
   public void tokenEnd(TokenProduction tp) {
     println("   </PRE>");
     println("  </TD>");
     println(" </TR>");
   }
 
+  @Override
   public void nonterminalsStart() {
     println("<H2 ALIGN=CENTER>NON-TERMINALS</H2>");
     if (JJDocOptions.getOneTable()) {
       println("<TABLE>");
     }
   }
+
+  @Override
   public void nonterminalsEnd() {
     if (JJDocOptions.getOneTable()) {
       println("</TABLE>");
     }
   }
 
+  @Override
   public void tokensStart() {
     println("<H2 ALIGN=CENTER>TOKENS</H2>");
     println("<TABLE>");
   }
+
+  @Override
   public void tokensEnd() {
     println("</TABLE>");
   }
 
+  @Override
   public void javacode(JavaCodeProduction jp) {
     productionStart(jp);
     println("<I>java code</I></TD></TR>");
     productionEnd(jp);
   }
 
+  @Override
   public void productionStart(NormalProduction np) {
     if (!JJDocOptions.getOneTable()) {
       println("");
@@ -171,6 +185,8 @@ public class HTMLGenerator extends TextGenerator implements Generator {
     println("<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>");
     print("<TD ALIGN=LEFT VALIGN=BASELINE>");
   }
+
+  @Override
   public void productionEnd(NormalProduction np) {
     if (!JJDocOptions.getOneTable()) {
       println("</TABLE>");
@@ -178,6 +194,7 @@ public class HTMLGenerator extends TextGenerator implements Generator {
     }
   }
 
+  @Override
   public void expansionStart(Expansion e, boolean first) {
     if (!first) {
       println("<TR>");
@@ -186,20 +203,28 @@ public class HTMLGenerator extends TextGenerator implements Generator {
       print("<TD ALIGN=LEFT VALIGN=BASELINE>");
     }
   }
+
+  @Override
   public void expansionEnd(Expansion e, boolean first) {
     println("</TD>");
     println("</TR>");
   }
 
+  @Override
   public void nonTerminalStart(NonTerminal nt) {
     print("<A HREF=\"#" + get_id(nt.getName()) + "\">");
   }
+
+  @Override
   public void nonTerminalEnd(NonTerminal nt) {
     print("</A>");
   }
 
+  @Override
   public void reStart(RegularExpression r) {
   }
+
+  @Override
   public void reEnd(RegularExpression r) {
   }
 }

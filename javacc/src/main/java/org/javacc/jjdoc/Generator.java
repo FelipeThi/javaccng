@@ -26,7 +26,6 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 package org.javacc.jjdoc;
 
 import org.javacc.parser.Expansion;
@@ -36,151 +35,119 @@ import org.javacc.parser.NormalProduction;
 import org.javacc.parser.RegularExpression;
 import org.javacc.parser.TokenProduction;
 
-/**
- * A report generator for a grammar.
- * @author timp
- * @since 11-Dec-2006
- *
- */
+/** A report generator for a grammar. */
 public interface Generator {
-
-  /**
-   * Output string with entity substitution for brackets and ampersands.
-   * @param s the String to output
-   */
+  /** Output string with entity substitution for brackets and ampersands. */
   void text(String s);
 
-  /**
-   * Output String.
-   * @param s String to output
-   */
+  /** Output String. */
   void print(String s);
 
-  /**
-   * Output document header.
-   */
+  /** Output document header. */
   void documentStart();
 
-  /**
-   * Output document footer.
-   */
+  /** Output document footer. */
   void documentEnd();
 
-  /**
-   * Output Special Tokens.
-   * @param s tokens to output
-   */
+  /** Output Special Tokens. */
   void specialTokens(String s);
 
-  /**
-   * Output start of a TokenProduction.
-   * @param tp the TokenProduction being output
-   */
+  /** Output start of a TokenProduction. */
   void tokenStart(TokenProduction tp);
 
-  /**
-   * Output end of a TokenProduction.
-   * @param tp the TokenProduction being output
-   */
+  /** Output end of a TokenProduction. */
   void tokenEnd(TokenProduction tp);
 
-  /**
-   * Output start of non-terminal.
-   */
+  /** Output start of non-terminal. */
   void nonterminalsStart();
 
-  /**
-   * Output end of non-terminal.
-   */
+  /** Output end of non-terminal. */
   void nonterminalsEnd();
 
-  /**
-   * Output start of tokens.
-   */
+  /** Output start of tokens. */
   void tokensStart();
 
-  /**
-   * Output end of tokens.
-   */
+  /** Output end of tokens. */
   void tokensEnd();
 
-  /**
-   * Output comment from a production.
-   * @param jp the JavaCodeProduction to output
-   */
+  /** Output comment from a production. */
   void javacode(JavaCodeProduction jp);
 
-  /**
-   * Output start of a normal production.
-   * @param np the NormalProduction being output
-   */
+  /** Output start of a normal production. */
   void productionStart(NormalProduction np);
 
-  /**
-   * Output end of a normal production.
-   * @param np the NormalProduction being output
-   */
+  /** Output end of a normal production. */
   void productionEnd(NormalProduction np);
 
   /**
    * Output start of an Expansion.
-   * @param e Expansion being output
-   * @param first whether this is the first expansion
+   *
+   * @param e     Expansion being output
+   * @param first Whether this is the first expansion
    */
   void expansionStart(Expansion e, boolean first);
 
   /**
    * Output end of Expansion.
-   * @param e Expansion being output
-   * @param first whether this is the first expansion
+   *
+   * @param e     Expansion being output
+   * @param first Whether this is the first expansion
    */
   void expansionEnd(Expansion e, boolean first);
 
   /**
    * Output start of non-terminal.
+   *
    * @param nt the NonTerminal being output
    */
   void nonTerminalStart(NonTerminal nt);
 
   /**
    * Output end of non-terminal.
+   *
    * @param nt the NonTerminal being output
    */
   void nonTerminalEnd(NonTerminal nt);
 
   /**
    * Output start of regular expression.
+   *
    * @param re the RegularExpression being output
    */
   void reStart(RegularExpression re);
 
   /**
    * Output end of regular expression.
+   *
    * @param re the RegularExpression being output
    */
   void reEnd(RegularExpression re);
 
   /**
    * Log debug messages.
-   * @param message the string to log
+   *
+   * @param message The string to log
    */
   void debug(String message);
 
   /**
    * Log informational messages.
-   * @param message the string to log
+   *
+   * @param message The string to log
    */
   void info(String message);
 
   /**
    * Log warning messages.
-   * @param message the string to log
+   *
+   * @param message The string to log
    */
   void warn(String message);
 
   /**
    * Log error messages.
-   * @param message the string to log
+   *
+   * @param message The string to log
    */
   void error(String message);
 }

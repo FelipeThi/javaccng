@@ -28,29 +28,16 @@
 
 package org.javacc.jjdoc;
 
-/**
- * Global variables for JJDoc.
- *
- */
-public final class JJDocGlobals  {
-  /**
-   * The name of the input file.
-   */
+/** Global variables for JJDoc. */
+public final class JJDocGlobals {
+  /** The name of the input file. */
   public static String input_file;
-  /**
-   * The name of the output file.
-   */
+  /** The name of the output file. */
   public static String output_file;
-
-  /**
-   * The Generator to create output with.
-   */
+  /** The Generator to create output with. */
   public static Generator generator;
 
-  /**
-   * @param generator
-   *        The generator to set.
-   */
+  /** @param generator The generator to set. */
   public static void setGenerator(Generator generator) {
     JJDocGlobals.generator = generator;
   }
@@ -65,20 +52,25 @@ public final class JJDocGlobals  {
     if (generator == null) {
       if (JJDocOptions.getText()) {
         generator = new TextGenerator();
-      } else if (JJDocOptions.getBNF()) {
-	    generator = new BNFGenerator();
-	  } else {
+      }
+      else if (JJDocOptions.getBNF()) {
+        generator = new BNFGenerator();
+      }
+      else {
         generator = new HTMLGenerator();
       }
-    } else {
+    }
+    else {
       if (JJDocOptions.getText()) {
-        if(generator instanceof HTMLGenerator) {
+        if (generator instanceof HTMLGenerator) {
           generator = new TextGenerator();
         }
-      } else if (JJDocOptions.getBNF()) {
-		generator = new BNFGenerator();
-	  } else {
-        if(generator instanceof TextGenerator) {
+      }
+      else if (JJDocOptions.getBNF()) {
+        generator = new BNFGenerator();
+      }
+      else {
+        if (generator instanceof TextGenerator) {
           generator = new HTMLGenerator();
         }
       }
@@ -88,6 +80,7 @@ public final class JJDocGlobals  {
 
   /**
    * Log informational messages.
+   *
    * @param message the message to log
    */
   public static void debug(String message) {
@@ -96,6 +89,7 @@ public final class JJDocGlobals  {
 
   /**
    * Log informational messages.
+   *
    * @param message the message to log
    */
   public static void info(String message) {
@@ -104,11 +98,10 @@ public final class JJDocGlobals  {
 
   /**
    * Log error messages.
+   *
    * @param message the message to log
    */
   public static void error(String message) {
     getGenerator().error(message);
   }
-
-
 }

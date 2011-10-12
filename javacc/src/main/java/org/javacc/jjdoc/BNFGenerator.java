@@ -25,6 +25,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.javacc.jjdoc;
 
 import org.javacc.parser.Expansion;
@@ -37,56 +38,53 @@ import org.javacc.parser.RegularExpression;
 import org.javacc.parser.TokenProduction;
 import org.javacc.utils.io.IndentingPrintWriter;
 
-import java.util.Hashtable;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BNFGenerator implements Generator {
-  private Hashtable id_map = new Hashtable();
+  private Map id_map = new HashMap();
   private int id = 1;
   protected IndentingPrintWriter ostr;
   private boolean printing = true;
 
-  protected String get_id(String nt) {
-    String i = (String)id_map.get(nt);
-    if (i == null) {
-      i = "prod" + id++;
-      id_map.put(nt, i);
-    }
-    return i;
-  }
-
-  protected IndentingPrintWriter create_output_stream() {
-
+  protected IndentingPrintWriter createOutputStream() {
     if (JJDocOptions.getOutputFile().equals("")) {
       if (JJDocGlobals.input_file.equals("standard input")) {
         return new IndentingPrintWriter(
-                                       new java.io.OutputStreamWriter(
-                                                                      System.out));
-      } else {
+            new OutputStreamWriter(System.out));
+      }
+      else {
         String ext = ".bnf";
         int i = JJDocGlobals.input_file.lastIndexOf('.');
         if (i == -1) {
           JJDocGlobals.output_file = JJDocGlobals.input_file + ext;
-        } else {
+        }
+        else {
           String suffix = JJDocGlobals.input_file.substring(i);
           if (suffix.equals(ext)) {
             JJDocGlobals.output_file = JJDocGlobals.input_file + ext;
-          } else {
-            JJDocGlobals.output_file = JJDocGlobals.input_file.substring(0, i)
-                + ext;
+          }
+          else {
+            JJDocGlobals.output_file = JJDocGlobals.input_file.substring(0, i) + ext;
           }
         }
       }
-    } else {
+    }
+    else {
       JJDocGlobals.output_file = JJDocOptions.getOutputFile();
     }
     try {
       ostr = new IndentingPrintWriter(
-                                     new java.io.FileWriter(
-                                                            JJDocGlobals.output_file));
-    } catch (java.io.IOException e) {
+          new FileWriter(
+              JJDocGlobals.output_file));
+    }
+    catch (IOException e) {
       error("JJDoc: can't open output stream on file "
           + JJDocGlobals.output_file + ".  Using standard output.");
-      ostr = new IndentingPrintWriter(new java.io.OutputStreamWriter(System.out));
+      ostr = new IndentingPrintWriter(new OutputStreamWriter(System.out));
     }
 
     return ostr;
@@ -101,56 +99,76 @@ public class BNFGenerator implements Generator {
       print(s);
     }
   }
+
   public void print(String s) {
     ostr.print(s);
   }
 
   public void documentStart() {
-    ostr = create_output_stream();
+    ostr = createOutputStream();
   }
+
   public void documentEnd() {
     ostr.close();
   }
+
   public void specialTokens(String s) {
   }
+
   public void tokenStart(TokenProduction tp) {
     printing = false;
   }
+
   public void tokenEnd(TokenProduction tp) {
     printing = true;
   }
+
   public void nonterminalsStart() { }
+
   public void nonterminalsEnd() { }
+
   public void tokensStart() { }
+
   public void tokensEnd() { }
+
   public void javacode(JavaCodeProduction jp) { }
+
   public void expansionEnd(Expansion e, boolean first) { }
+
   public void nonTerminalStart(NonTerminal nt) { }
+
   public void nonTerminalEnd(NonTerminal nt) { }
+
   public void productionStart(NormalProduction np) {
-	  println("");
+    println("");
     print(np.getLhs() + " ::= ");
   }
+
   public void productionEnd(NormalProduction np) {
-	  println("");
+    println("");
   }
+
   public void expansionStart(Expansion e, boolean first) {
     if (!first) {
       print(" | ");
     }
   }
+
   public void reStart(RegularExpression r) {
     if (r.getClass().equals(RJustName.class) || r.getClass().equals(RCharacterList.class)) {
       printing = false;
     }
   }
+
   public void reEnd(RegularExpression r) {
     printing = true;
   }
 
   public void debug(String message) { System.err.println(message); }
-  public void info(String message) { System.err.println(message); }
-  public void warn(String message) { System.err.println(message); }
-  public void error(String message) { System.err.println(message); }
 
+  public void info(String message) { System.err.println(message); }
+
+  public void warn(String message) { System.err.println(message); }
+
+  public void error(String message) { System.err.println(message); }
 }
