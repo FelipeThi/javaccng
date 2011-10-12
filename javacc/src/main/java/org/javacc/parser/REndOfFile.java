@@ -25,16 +25,13 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.javacc.parser;
 
-/**
- * Describes the EOF regular expression
- */
-
-public class REndOfFile extends RegularExpression {
-
-  public Nfa GenerateNfa(final LexGen lexGen, boolean ignoreCase)
-  {
-     return null;
+/** Describes the EOF regular expression */
+public final class REndOfFile extends RegularExpression {
+  @Override
+  public Nfa generateNfa(LexGen lexGen, boolean ignoreCase) {
+    return null;
   }
 }

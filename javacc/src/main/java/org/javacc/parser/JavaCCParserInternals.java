@@ -28,73 +28,74 @@
 
 package org.javacc.parser;
 
+import java.util.Hashtable;
 import java.util.List;
 
-/**
- * Utilities.
- */
+/** Utilities. */
 public abstract class JavaCCParserInternals {
-
-  static protected void initialize() {
+  protected static void initialize() {
     Integer i = new Integer(0);
-    JavaCCGlobals.lexstate_S2I.put("DEFAULT", i);
-    JavaCCGlobals.lexstate_I2S.put(i, "DEFAULT");
-    JavaCCGlobals.simple_tokens_table.put("DEFAULT", new java.util.Hashtable());
+    JavaCCGlobals.lexStateS2I.put("DEFAULT", i);
+    JavaCCGlobals.lexStateI2S.put(i, "DEFAULT");
+    JavaCCGlobals.simpleTokensTable.put("DEFAULT", new Hashtable());
   }
 
-  static protected void addcuname(String id) {
-    JavaCCGlobals.cu_name = id;
+  protected static void addCuName(String id) {
+    JavaCCGlobals.cuName = id;
   }
 
-  static protected void compare(Token t, String id1, String id2) {
+  protected static void compare(Token t, String id1, String id2) {
     if (!id2.equals(id1)) {
-      JavaCCErrors.parse_error(t, "Name " + id2 + " must be the same as that used at PARSER_BEGIN (" + id1 + ")");
+      JavaCCErrors.parseError(t, "Name " + id2 + " must be the same as that used at PARSER_BEGIN (" + id1 + ")");
     }
   }
 
-  private List add_cu_token_here = JavaCCGlobals.cu_to_insertion_point_1;
-  private Token first_cu_token;
-  private boolean insertionpoint1set = false;
-  private boolean insertionpoint2set = false;
+  private List addCuTokenHere = JavaCCGlobals.cuToInsertionPoint1;
+  private Token firstCuToken;
+  private boolean insertionPoint1Set = false;
+  private boolean insertionPoint2Set = false;
 
-  protected void setinsertionpoint(Token t, int no) {
+  protected void setInsertionPoint(Token t, int no) {
     do {
-      add_cu_token_here.add(first_cu_token);
-      first_cu_token = first_cu_token.next;
-    } while (first_cu_token != t);
-    if (no == 1) {
-      if (insertionpoint1set) {
-        JavaCCErrors.parse_error(t, "Multiple declaration of parser class.");
-      } else {
-        insertionpoint1set = true;
-        add_cu_token_here = JavaCCGlobals.cu_to_insertion_point_2;
-      }
-    } else {
-      add_cu_token_here = JavaCCGlobals.cu_from_insertion_point_2;
-      insertionpoint2set = true;
+      addCuTokenHere.add(firstCuToken);
+      firstCuToken = firstCuToken.next;
     }
-    first_cu_token = t;
+    while (firstCuToken != t);
+    if (no == 1) {
+      if (insertionPoint1Set) {
+        JavaCCErrors.parseError(t, "Multiple declaration of parser class.");
+      }
+      else {
+        insertionPoint1Set = true;
+        addCuTokenHere = JavaCCGlobals.cuToInsertionPoint2;
+      }
+    }
+    else {
+      addCuTokenHere = JavaCCGlobals.cuFromInsertionPoint2;
+      insertionPoint2Set = true;
+    }
+    firstCuToken = t;
   }
 
   protected void insertionpointerrors(Token t) {
-    while (first_cu_token != t) {
-      add_cu_token_here.add(first_cu_token);
-      first_cu_token = first_cu_token.next;
+    while (firstCuToken != t) {
+      addCuTokenHere.add(firstCuToken);
+      firstCuToken = firstCuToken.next;
     }
-    if (!insertionpoint1set || !insertionpoint2set) {
-      JavaCCErrors.parse_error(t, "Parser class has not been defined between PARSER_BEGIN and PARSER_END.");
+    if (!insertionPoint1Set || !insertionPoint2Set) {
+      JavaCCErrors.parseError(t, "Parser class has not been defined between PARSER_BEGIN and PARSER_END.");
     }
   }
 
   protected void set_initial_cu_token(Token t) {
-    first_cu_token = t;
+    firstCuToken = t;
   }
 
   protected void addproduction(NormalProduction p) {
-    JavaCCGlobals.bnfproductions.add(p);
+    JavaCCGlobals.bnfProductions.add(p);
   }
 
-  static protected void production_addexpansion(BNFProduction p, Expansion e) {
+  protected static void production_addexpansion(BNFProduction p, Expansion e) {
     e.parent = p;
     p.setExpansion(e);
   }
@@ -103,11 +104,11 @@ public abstract class JavaCCParserInternals {
 
   protected void addregexpr(TokenProduction p) {
     Integer ii;
-    JavaCCGlobals.rexprlist.add(p);
+    JavaCCGlobals.regExpList.add(p);
     if (Options.getUserTokenManager()) {
       if (p.lexStates == null || p.lexStates.length != 1 || !p.lexStates[0].equals("DEFAULT")) {
         JavaCCErrors.warning(p, "Ignoring lexical state specifications since option " +
-                                "USER_TOKEN_MANAGER has been set to true.");
+            "USER_TOKEN_MANAGER has been set to true.");
       }
     }
     if (p.lexStates == null) {
@@ -116,194 +117,213 @@ public abstract class JavaCCParserInternals {
     for (int i = 0; i < p.lexStates.length; i++) {
       for (int j = 0; j < i; j++) {
         if (p.lexStates[i].equals(p.lexStates[j])) {
-          JavaCCErrors.parse_error(p, "Multiple occurrence of \"" + p.lexStates[i] + "\" in lexical state list.");
+          JavaCCErrors.parseError(p, "Multiple occurrence of \"" + p.lexStates[i] + "\" in lexical state list.");
         }
       }
-      if (JavaCCGlobals.lexstate_S2I.get(p.lexStates[i]) == null) {
+      if (JavaCCGlobals.lexStateS2I.get(p.lexStates[i]) == null) {
         ii = new Integer(nextFreeLexState++);
-        JavaCCGlobals.lexstate_S2I.put(p.lexStates[i], ii);
-        JavaCCGlobals.lexstate_I2S.put(ii, p.lexStates[i]);
-        JavaCCGlobals.simple_tokens_table.put(p.lexStates[i], new java.util.Hashtable());
+        JavaCCGlobals.lexStateS2I.put(p.lexStates[i], ii);
+        JavaCCGlobals.lexStateI2S.put(ii, p.lexStates[i]);
+        JavaCCGlobals.simpleTokensTable.put(p.lexStates[i], new Hashtable());
       }
     }
   }
 
-  static protected void add_token_manager_decls(Token t, java.util.List decls) {
-    if (JavaCCGlobals.token_mgr_decls != null) {
-      JavaCCErrors.parse_error(t, "Multiple occurrence of \"TOKEN_MGR_DECLS\".");
-    } else {
-      JavaCCGlobals.token_mgr_decls = decls;
+  protected static void add_token_manager_decls(Token t, java.util.List decls) {
+    if (JavaCCGlobals.tokenManagerDeclarations != null) {
+      JavaCCErrors.parseError(t, "Multiple occurrence of \"TOKEN_MGR_DECLS\".");
+    }
+    else {
+      JavaCCGlobals.tokenManagerDeclarations = decls;
       if (Options.getUserTokenManager()) {
         JavaCCErrors.warning(t, "Ignoring declarations in \"TOKEN_MGR_DECLS\" since option " +
-                                "USER_TOKEN_MANAGER has been set to true.");
+            "USER_TOKEN_MANAGER has been set to true.");
       }
     }
   }
 
-  static protected void add_inline_regexpr(RegularExpression r) {
+  protected static void add_inline_regexpr(RegularExpression r) {
     if (!(r instanceof REndOfFile)) {
       TokenProduction p = new TokenProduction();
-      p.isExplicit = false;
-      p.lexStates = new String[] {"DEFAULT"};
+      p.explicit = false;
+      p.lexStates = new String[]{"DEFAULT"};
       p.kind = TokenProduction.TOKEN;
-      RegExprSpec res = new RegExprSpec();
-      res.rexp = r;
-      res.rexp.tpContext = p;
-      res.act = new Action();
+      RegExpSpec res = new RegExpSpec();
+      res.regExp = r;
+      res.regExp.tpContext = p;
+      res.action = new Action();
       res.nextState = null;
-      res.nsTok = null;
-      p.respecs.add(res);
-      JavaCCGlobals.rexprlist.add(p);
+      res.nsToken = null;
+      p.reSpecs.add(res);
+      JavaCCGlobals.regExpList.add(p);
     }
   }
 
-  static protected boolean hexchar(char ch) {
-    if (ch >= '0' && ch <= '9') return true;
-    if (ch >= 'A' && ch <= 'F') return true;
-    if (ch >= 'a' && ch <= 'f') return true;
+  protected static boolean hexchar(char ch) {
+    if (ch >= '0' && ch <= '9') { return true; }
+    if (ch >= 'A' && ch <= 'F') { return true; }
+    if (ch >= 'a' && ch <= 'f') { return true; }
     return false;
   }
 
-  static protected int hexval(char ch) {
-    if (ch >= '0' && ch <= '9') return ((int)ch) - ((int)'0');
-    if (ch >= 'A' && ch <= 'F') return ((int)ch) - ((int)'A') + 10;
-    return ((int)ch) - ((int)'a') + 10;
+  protected static int hexval(char ch) {
+    if (ch >= '0' && ch <= '9') { return ((int) ch) - ((int) '0'); }
+    if (ch >= 'A' && ch <= 'F') { return ((int) ch) - ((int) 'A') + 10; }
+    return ((int) ch) - ((int) 'a') + 10;
   }
 
-  static protected String remove_escapes_and_quotes(Token t, String str) {
+  protected static String remove_escapes_and_quotes(Token t, String str) {
     String retval = "";
     int index = 1;
     char ch, ch1;
     int ordinal;
-    while (index < str.length()-1) {
+    while (index < str.length() - 1) {
       if (str.charAt(index) != '\\') {
-        retval += str.charAt(index); index++;
+        retval += str.charAt(index);
+        index++;
         continue;
       }
       index++;
       ch = str.charAt(index);
       if (ch == 'b') {
-        retval += '\b'; index++;
+        retval += '\b';
+        index++;
         continue;
       }
       if (ch == 't') {
-        retval += '\t'; index++;
+        retval += '\t';
+        index++;
         continue;
       }
       if (ch == 'n') {
-        retval += '\n'; index++;
+        retval += '\n';
+        index++;
         continue;
       }
       if (ch == 'f') {
-        retval += '\f'; index++;
+        retval += '\f';
+        index++;
         continue;
       }
       if (ch == 'r') {
-        retval += '\r'; index++;
+        retval += '\r';
+        index++;
         continue;
       }
       if (ch == '"') {
-        retval += '\"'; index++;
+        retval += '\"';
+        index++;
         continue;
       }
       if (ch == '\'') {
-        retval += '\''; index++;
+        retval += '\'';
+        index++;
         continue;
       }
       if (ch == '\\') {
-        retval += '\\'; index++;
+        retval += '\\';
+        index++;
         continue;
       }
       if (ch >= '0' && ch <= '7') {
-        ordinal = ((int)ch) - ((int)'0'); index++;
+        ordinal = ((int) ch) - ((int) '0');
+        index++;
         ch1 = str.charAt(index);
         if (ch1 >= '0' && ch1 <= '7') {
-          ordinal = ordinal*8 + ((int)ch1) - ((int)'0'); index++;
+          ordinal = ordinal * 8 + ((int) ch1) - ((int) '0');
+          index++;
           ch1 = str.charAt(index);
           if (ch <= '3' && ch1 >= '0' && ch1 <= '7') {
-            ordinal = ordinal*8 + ((int)ch1) - ((int)'0'); index++;
+            ordinal = ordinal * 8 + ((int) ch1) - ((int) '0');
+            index++;
           }
         }
-        retval += (char)ordinal;
+        retval += (char) ordinal;
         continue;
       }
       if (ch == 'u') {
-        index++; ch = str.charAt(index);
+        index++;
+        ch = str.charAt(index);
         if (hexchar(ch)) {
           ordinal = hexval(ch);
-          index++; ch = str.charAt(index);
+          index++;
+          ch = str.charAt(index);
           if (hexchar(ch)) {
-            ordinal = ordinal*16 + hexval(ch);
-            index++; ch = str.charAt(index);
+            ordinal = ordinal * 16 + hexval(ch);
+            index++;
+            ch = str.charAt(index);
             if (hexchar(ch)) {
-              ordinal = ordinal*16 + hexval(ch);
-              index++; ch = str.charAt(index);
+              ordinal = ordinal * 16 + hexval(ch);
+              index++;
+              ch = str.charAt(index);
               if (hexchar(ch)) {
-                ordinal = ordinal*16 + hexval(ch);
+                ordinal = ordinal * 16 + hexval(ch);
                 index++;
                 continue;
               }
             }
           }
         }
-        JavaCCErrors.parse_error(t, "Encountered non-hex character '" + ch +
-                "' at position " + index + " of string " +
-                "- Unicode escape must have 4 hex digits after it.");
+        JavaCCErrors.parseError(t, "Encountered non-hex character '" + ch +
+            "' at position " + index + " of string " +
+            "- Unicode escape must have 4 hex digits after it.");
         return retval;
       }
-      JavaCCErrors.parse_error(t, "Illegal escape sequence '\\" + ch +
-              "' at position " + index + " of string.");
+      JavaCCErrors.parseError(t, "Illegal escape sequence '\\" + ch +
+          "' at position " + index + " of string.");
       return retval;
     }
     return retval;
   }
 
-  static protected char character_descriptor_assign(Token t, String s) {
+  protected static char character_descriptor_assign(Token t, String s) {
     if (s.length() != 1) {
-      JavaCCErrors.parse_error(t, "String in character list may contain only one character.");
+      JavaCCErrors.parseError(t, "String in character list may contain only one character.");
       return ' ';
-    } else {
+    }
+    else {
       return s.charAt(0);
     }
   }
 
-  static protected char character_descriptor_assign(Token t, String s, String left) {
+  protected static char character_descriptor_assign(Token t, String s, String left) {
     if (s.length() != 1) {
-      JavaCCErrors.parse_error(t, "String in character list may contain only one character.");
+      JavaCCErrors.parseError(t, "String in character list may contain only one character.");
       return ' ';
-    } else if ((int)(left.charAt(0)) > (int)(s.charAt(0))) {
-      JavaCCErrors.parse_error(t, "Right end of character range \'" + s +
-              "\' has a lower ordinal value than the left end of character range \'" + left + "\'.");
+    }
+    else if ((int) (left.charAt(0)) > (int) (s.charAt(0))) {
+      JavaCCErrors.parseError(t, "Right end of character range \'" + s +
+          "\' has a lower ordinal value than the left end of character range \'" + left + "\'.");
       return left.charAt(0);
-    } else {
+    }
+    else {
       return s.charAt(0);
     }
   }
 
-  static protected void makeTryBlock(
-    Token tryLoc,
-    Container result,
-    Container nestedExp,
-    List types,
-    List ids,
-    List catchblks,
-    List finallyblk
-  )
-  {
-    if (catchblks.size() == 0 && finallyblk == null) {
-      JavaCCErrors.parse_error(tryLoc, "Try block must contain at least one catch or finally block.");
+  protected static void makeTryBlock(
+      Token tryLoc,
+      Container<Expansion> result,
+      Container<Expansion> nestedExp,
+      List types,
+      List ids,
+      List catchBlocks,
+      List finallyBlocks
+  ) {
+    if (catchBlocks.size() == 0 && finallyBlocks == null) {
+      JavaCCErrors.parseError(tryLoc, "Try block must contain at least one catch or finally block.");
       return;
     }
-    TryBlock tblk = new TryBlock();
-    tblk.setLine(tryLoc.getBeginLine());
-    tblk.setColumn(tryLoc.getBeginColumn());
-    tblk.exp = (Expansion)(nestedExp.member);
-    tblk.exp.parent = tblk;
-    tblk.exp.ordinal = 0;
-    tblk.types = types;
-    tblk.ids = ids;
-    tblk.catchblks = catchblks;
-    tblk.finallyblk = finallyblk;
-    result.member = tblk;
+    TryBlock block = new TryBlock();
+    block.setLine(tryLoc.getBeginLine());
+    block.setColumn(tryLoc.getBeginColumn());
+    block.expansion = nestedExp.member;
+    block.expansion.parent = block;
+    block.expansion.ordinal = 0;
+    block.types = types;
+    block.ids = ids;
+    block.catchBlocks = catchBlocks;
+    block.finallyBlocks = finallyBlocks;
+    result.member = block;
   }
 }

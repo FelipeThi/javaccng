@@ -25,98 +25,101 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.javacc.parser;
 
-/**
- * Output error messages and keep track of totals.
- */
+/** Output error messages and keep track of totals. */
 public final class JavaCCErrors {
+  private static int parseErrorCount = 0, semanticErrorCount = 0, warningCount = 0;
 
-  private static int parse_error_count = 0, semantic_error_count = 0, warning_count = 0;
   private JavaCCErrors() {}
 
   private static void printLocationInfo(Object node) {
     if (node instanceof NormalProduction) {
-      NormalProduction n = (NormalProduction)node;
+      NormalProduction n = (NormalProduction) node;
       System.err.print("Line " + n.getLine() + ", Column " + n.getColumn() + ": ");
-    } else if (node instanceof TokenProduction) {
-      TokenProduction n = (TokenProduction)node;
+    }
+    else if (node instanceof TokenProduction) {
+      TokenProduction n = (TokenProduction) node;
       System.err.print("Line " + n.getLine() + ", Column " + n.getColumn() + ": ");
-    } else if (node instanceof Expansion) {
-      Expansion n = (Expansion)node;
+    }
+    else if (node instanceof Expansion) {
+      Expansion n = (Expansion) node;
       System.err.print("Line " + n.getLine() + ", Column " + n.getColumn() + ": ");
-    } else if (node instanceof CharacterRange) {
-      CharacterRange n = (CharacterRange)node;
+    }
+    else if (node instanceof CharacterRange) {
+      CharacterRange n = (CharacterRange) node;
       System.err.print("Line " + n.getLine() + ", Column " + n.getColumn() + ": ");
-    } else if (node instanceof SingleCharacter) {
-      SingleCharacter n = (SingleCharacter)node;
+    }
+    else if (node instanceof SingleCharacter) {
+      SingleCharacter n = (SingleCharacter) node;
       System.err.print("Line " + n.getLine() + ", Column " + n.getColumn() + ": ");
-    } else if (node instanceof Token) {
-      Token t = (Token)node;
+    }
+    else if (node instanceof Token) {
+      Token t = (Token) node;
       System.err.print("Line " + t.getBeginLine() + ", Column " + t.getBeginColumn() + ": ");
     }
   }
 
-  public static void parse_error(Object node, String mess) {
+  public static void parseError(Object node, String msg) {
     System.err.print("Error: ");
     printLocationInfo(node);
-    System.err.println(mess);
-    parse_error_count++;
+    System.err.println(msg);
+    parseErrorCount++;
   }
 
-  public static void parse_error(String mess) {
+  public static void parseError(String msg) {
     System.err.print("Error: ");
-    System.err.println(mess);
-    parse_error_count++;
+    System.err.println(msg);
+    parseErrorCount++;
   }
 
-  public static int get_parse_error_count() {
-    return parse_error_count;
+  public static int getParseErrorCount() {
+    return parseErrorCount;
   }
 
-  public static void semantic_error(Object node, String mess) {
+  public static void semanticError(Object node, String msg) {
     System.err.print("Error: ");
     printLocationInfo(node);
-    System.err.println(mess);
-    semantic_error_count++;
+    System.err.println(msg);
+    semanticErrorCount++;
   }
 
-  public static void semantic_error(String mess) {
+  public static void semanticError(String msg) {
     System.err.print("Error: ");
-    System.err.println(mess);
-    semantic_error_count++;
+    System.err.println(msg);
+    semanticErrorCount++;
   }
 
-  public static int get_semantic_error_count() {
-    return semantic_error_count;
+  public static int getSemanticErrorCount() {
+    return semanticErrorCount;
   }
 
-  public static void warning(Object node, String mess) {
+  public static void warning(Object node, String msg) {
     System.err.print("Warning: ");
     printLocationInfo(node);
-    System.err.println(mess);
-    warning_count++;
+    System.err.println(msg);
+    warningCount++;
   }
 
-  public static void warning(String mess) {
+  public static void warning(String msg) {
     System.err.print("Warning: ");
-    System.err.println(mess);
-    warning_count++;
+    System.err.println(msg);
+    warningCount++;
   }
 
-  public static int get_warning_count() {
-    return warning_count;
+  public static int getWarningCount() {
+    return warningCount;
   }
 
-  public static int get_error_count() {
-    return parse_error_count + semantic_error_count;
+  public static int getErrorCount() {
+    return parseErrorCount + semanticErrorCount;
   }
 
-   public static void reInit()
-   {
-      parse_error_count = 0;
-      semantic_error_count = 0;
-      warning_count = 0;
-   }
-
+  @Deprecated
+  public static void reInit() {
+    parseErrorCount = 0;
+    semanticErrorCount = 0;
+    warningCount = 0;
+  }
 }

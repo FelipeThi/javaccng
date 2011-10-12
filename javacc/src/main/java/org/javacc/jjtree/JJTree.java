@@ -28,22 +28,20 @@
 
 package org.javacc.jjtree;
 
+import org.javacc.parser.Main;
 import org.javacc.parser.JavaCCGlobals;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-public class JJTree {
-
+public final class JJTree {
   private IO io;
 
-  private void p(String s)
-  {
+  private void p(String s) {
     io.getMsg().println(s);
   }
 
-  private void help_message()
-  {
+  private void usage() {
     p("Usage:");
     p("    jjtree option-settings inputfile");
     p("");
@@ -100,16 +98,12 @@ public class JJTree {
     p("");
   }
 
-  /**
-   * A main program that exercises the parser.
-   */
   public int main(String args[]) {
-
     // initialize static state for allowing repeat runs without exiting
     ASTNodeDescriptor.nodeIds = new ArrayList();
     ASTNodeDescriptor.nodeNames = new ArrayList();
     ASTNodeDescriptor.nodeSeen = new Hashtable();
-    org.javacc.parser.Main.reInitAll();
+    Main.reInitAll();
 
     JavaCCGlobals.bannerLine("Tree Builder", "");
 
@@ -120,9 +114,10 @@ public class JJTree {
       initializeOptions();
       if (args.length == 0) {
         p("");
-        help_message();
+        usage();
         return 1;
-      } else {
+      }
+      else {
         p("(type \"jjtree\" with no arguments for help)");
       }
 
@@ -144,7 +139,8 @@ public class JJTree {
 
       try {
         io.setInput(fn);
-      } catch (JJTreeIOException ioe) {
+      }
+      catch (JJTreeIOException ioe) {
         p("Error setting input: " + ioe.getMessage());
         return 1;
       }
@@ -157,13 +153,14 @@ public class JJTree {
         JJTreeParser parser = new JJTreeParser(new JJTreeParserTokenManager(new JavaCharStream(io.getIn())));
         parser.javacc_input();
 
-        ASTGrammar root = (ASTGrammar)parser.jjtree.rootNode();
+        ASTGrammar root = (ASTGrammar) parser.jjtree.rootNode();
         if (Boolean.getBoolean("jjtree-dump")) {
           root.dump(" ");
         }
         try {
           io.setOutput();
-        } catch (JJTreeIOException ioe) {
+        }
+        catch (JJTreeIOException ioe) {
           p("Error setting output: " + ioe.getMessage());
           return 1;
         }
@@ -175,34 +172,28 @@ public class JJTree {
         JJTreeState.generateTreeState_java();
 
         p("Annotated grammar generated successfully in " +
-              io.getOutputFileName());
-
-      } catch (ParseException pe) {
+            io.getOutputFileName());
+      }
+      catch (ParseException pe) {
         p("Error parsing input: " + pe.toString());
         return 1;
-      } catch (Exception e) {
+      }
+      catch (Exception e) {
         p("Error parsing input: " + e.toString());
         e.printStackTrace(io.getMsg());
         return 1;
       }
 
       return 0;
-
-    } finally {
+    }
+    finally {
       io.closeAll();
     }
   }
 
-
-  /**
-   * Initialize for JJTree
-   */
+  /** Initialize for JJTree */
   private void initializeOptions() {
     JJTreeOptions.init();
     JJTreeGlobals.initialize();
   }
-
-
 }
-
-/*end*/

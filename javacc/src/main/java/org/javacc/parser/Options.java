@@ -25,6 +25,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.javacc.parser;
 
 import java.io.File;
@@ -33,18 +34,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static java.lang.Boolean.*;
 
-/**
- * A class with static state that stores all option information.
- */
+/** A class with static state that stores all option information. */
 public class Options {
-
-
-  /**
-   * Limit subclassing to derived classes.
-   */
-  protected Options() {
-  }
+  /** Limit subclassing to derived classes. */
+  protected Options() {}
 
   /**
    * A mapping of option names (Strings) to values (Integer, Boolean, String).
@@ -54,29 +49,22 @@ public class Options {
    */
   protected static Map optionValues = null;
 
-  /**
-   * Convenience method to retrieve integer options.
-   */
-  protected static int intValue(final String option) {
-    return ((Integer) optionValues.get(option)).intValue();
+  /** Convenience method to retrieve integer options. */
+  protected static int intValue(String option) {
+    return (Integer) optionValues.get(option);
   }
 
-  /**
-   * Convenience method to retrieve boolean options.
-   */
-  protected static boolean booleanValue(final String option) {
-    return ((Boolean) optionValues.get(option)).booleanValue();
+  /** Convenience method to retrieve boolean options. */
+  protected static boolean booleanValue(String option) {
+    return (Boolean) optionValues.get(option);
   }
 
-  /**
-   * Convenience method to retrieve string options.
-   */
-  protected static String stringValue(final String option) {
+  /** Convenience method to retrieve string options. */
+  protected static String stringValue(String option) {
     return (String) optionValues.get(option);
   }
 
-  public static Map getOptions()
-  {
+  public static Map getOptions() {
     return new HashMap(optionValues);
   }
 
@@ -86,7 +74,6 @@ public class Options {
    * the input files clash in any way.
    */
   private static Set cmdLineSetting = null;
-
   /**
    * Keep track of what options were set from the grammar file. We use this to
    * see if the options set from the command line and the ones set in the
@@ -94,42 +81,40 @@ public class Options {
    */
   private static Set inputFileSetting = null;
 
-  /**
-   * Initialize for JavaCC
-   */
+  /** Initialize for JavaCC */
   public static void init() {
     optionValues = new HashMap();
     cmdLineSetting = new HashSet();
     inputFileSetting = new HashSet();
 
-    optionValues.put("LOOKAHEAD", new Integer(1));
-    optionValues.put("CHOICE_AMBIGUITY_CHECK", new Integer(2));
-    optionValues.put("OTHER_AMBIGUITY_CHECK", new Integer(1));
+    optionValues.put("LOOKAHEAD", 1);
+    optionValues.put("CHOICE_AMBIGUITY_CHECK", 2);
+    optionValues.put("OTHER_AMBIGUITY_CHECK", 1);
 
-    optionValues.put("DEBUG_PARSER", Boolean.FALSE);
-    optionValues.put("DEBUG_LOOKAHEAD", Boolean.FALSE);
-    optionValues.put("DEBUG_TOKEN_MANAGER", Boolean.FALSE);
-    optionValues.put("ERROR_REPORTING", Boolean.TRUE);
-    optionValues.put("JAVA_UNICODE_ESCAPE", Boolean.FALSE);
-    optionValues.put("UNICODE_INPUT", Boolean.FALSE);
-    optionValues.put("IGNORE_CASE", Boolean.FALSE);
-    optionValues.put("USER_TOKEN_MANAGER", Boolean.FALSE);
-    optionValues.put("USER_CHAR_STREAM", Boolean.FALSE);
-    optionValues.put("BUILD_PARSER", Boolean.TRUE);
-    optionValues.put("BUILD_TOKEN_MANAGER", Boolean.TRUE);
-    optionValues.put("TOKEN_MANAGER_USES_PARSER", Boolean.FALSE);
-    optionValues.put("SANITY_CHECK", Boolean.TRUE);
-    optionValues.put("FORCE_LA_CHECK", Boolean.FALSE);
-    optionValues.put("COMMON_TOKEN_ACTION", Boolean.FALSE);
-    optionValues.put("CACHE_TOKENS", Boolean.FALSE);
-    optionValues.put("KEEP_LINE_COLUMN", Boolean.TRUE);
-    optionValues.put("KEEP_IMAGE", Boolean.TRUE);
+    optionValues.put("DEBUG_PARSER", FALSE);
+    optionValues.put("DEBUG_LOOKAHEAD", FALSE);
+    optionValues.put("DEBUG_TOKEN_MANAGER", FALSE);
+    optionValues.put("ERROR_REPORTING", TRUE);
+    optionValues.put("JAVA_UNICODE_ESCAPE", FALSE);
+    optionValues.put("UNICODE_INPUT", FALSE);
+    optionValues.put("IGNORE_CASE", FALSE);
+    optionValues.put("USER_TOKEN_MANAGER", FALSE);
+    optionValues.put("USER_CHAR_STREAM", FALSE);
+    optionValues.put("BUILD_PARSER", TRUE);
+    optionValues.put("BUILD_TOKEN_MANAGER", TRUE);
+    optionValues.put("TOKEN_MANAGER_USES_PARSER", FALSE);
+    optionValues.put("SANITY_CHECK", TRUE);
+    optionValues.put("FORCE_LA_CHECK", FALSE);
+    optionValues.put("COMMON_TOKEN_ACTION", FALSE);
+    optionValues.put("CACHE_TOKENS", FALSE);
+    optionValues.put("KEEP_LINE_COLUMN", TRUE);
+    optionValues.put("KEEP_IMAGE", TRUE);
 
-    optionValues.put("GENERATE_CHAINED_EXCEPTION", Boolean.FALSE);
-    optionValues.put("GENERATE_GENERICS", Boolean.FALSE);
-    optionValues.put("GENERATE_STRING_BUILDER", Boolean.FALSE);
-    optionValues.put("GENERATE_ANNOTATIONS", Boolean.FALSE);
-    optionValues.put("SUPPORT_CLASS_VISIBILITY_PUBLIC", Boolean.TRUE);
+    optionValues.put("GENERATE_CHAINED_EXCEPTION", FALSE);
+    optionValues.put("GENERATE_GENERICS", FALSE);
+    optionValues.put("GENERATE_STRING_BUILDER", FALSE);
+    optionValues.put("GENERATE_ANNOTATIONS", FALSE);
+    optionValues.put("SUPPORT_CLASS_VISIBILITY_PUBLIC", TRUE);
 
     optionValues.put("OUTPUT_DIRECTORY", ".");
     optionValues.put("JDK_VERSION", "1.5");
@@ -143,35 +128,32 @@ public class Options {
    * Used when, for example, generating Token.java to record the JavaCC options
    * that were used to generate the file. All of the options must be
    * boolean values.
+   *
    * @param interestingOptions the options of interest, eg {"ERROR_REPORTING", "CACHE_TOKENS"}
    * @return the string representation of the options, eg "ERROR_REPORTING=true,CACHE_TOKENS=false"
    */
   public static String getOptionsString(String[] interestingOptions) {
-    StringBuffer sb = new StringBuffer();
-
+    StringBuilder b = new StringBuilder();
     for (int i = 0; i < interestingOptions.length; i++) {
       String key = interestingOptions[i];
-      sb.append(key);
-      sb.append('=');
-      sb.append(optionValues.get(key));
-      if (i != interestingOptions.length -1) {
-        sb.append(',');
+      b.append(key);
+      b.append('=');
+      b.append(optionValues.get(key));
+      if (i != interestingOptions.length - 1) {
+        b.append(',');
       }
     }
-
-    return sb.toString();
+    return b.toString();
   }
-
 
   /**
    * Determine if a given command line argument might be an option flag.
    * Command line options start with a dash&nbsp;(-).
    *
-   * @param opt
-   *            The command line argument to examine.
+   * @param opt The command line argument to examine.
    * @return True when the argument looks like an option flag.
    */
-  public static boolean isOption(final String opt) {
+  public static boolean isOption(String opt) {
     return opt != null && opt.length() > 1 && opt.charAt(0) == '-';
   }
 
@@ -180,37 +162,37 @@ public class Options {
    * over time. If the user has supplied an option in the old format, it will
    * be converted to the new format.
    *
-   * @param name The name of the option being checked.
+   * @param name  The name of the option being checked.
    * @param value The option's value.
    * @return The upgraded value.
    */
-  public static Object upgradeValue(final String name, Object value) {
+  public static Object upgradeValue(String name, Object value) {
     if (name.equalsIgnoreCase("NODE_FACTORY") && value.getClass() == Boolean.class) {
-      if (((Boolean)value).booleanValue()) {
+      if ((Boolean) value) {
         value = "*";
-      } else {
+      }
+      else {
         value = "";
       }
     }
-
     return value;
   }
 
   public static void setInputFileOption(Object nameloc, Object valueloc,
-      String name, Object value) {
+                                        String name, Object value) {
     String s = name.toUpperCase();
     if (!optionValues.containsKey(s)) {
       JavaCCErrors.warning(nameloc, "Bad option name \"" + name
           + "\".  Option setting will be ignored.");
       return;
     }
-    final Object existingValue = optionValues.get(s);
+    Object existingValue = optionValues.get(s);
 
     value = upgradeValue(name, value);
 
     if (existingValue != null) {
-      if ((existingValue.getClass() != value.getClass()) ||
-          (value instanceof Integer && ((Integer)value).intValue() <= 0)) {
+      if (existingValue.getClass() != value.getClass()
+          || value instanceof Integer && (Integer) value <= 0) {
         JavaCCErrors.warning(valueloc, "Bad option value \"" + value
             + "\" for \"" + name
             + "\".  Option setting will be ignored.");
@@ -236,19 +218,17 @@ public class Options {
     inputFileSetting.add(s);
   }
 
-
-
   /**
    * Process a single command-line option.
    * The option is parsed and stored in the optionValues map.
-   * @param arg
    */
   public static void setCmdLineOption(String arg) {
-    final String s;
+    String s;
 
     if (arg.charAt(0) == '-') {
       s = arg.substring(1);
-    } else {
+    }
+    else {
       s = arg;
     }
 
@@ -257,39 +237,39 @@ public class Options {
 
     // Look for the first ":" or "=", which will separate the option name
     // from its value (if any).
-    final int index1 = s.indexOf('=');
-    final int index2 = s.indexOf(':');
-    final int index;
+    int index1 = s.indexOf('=');
+    int index2 = s.indexOf(':');
+    int index;
 
-    if (index1 < 0)
-      index = index2;
-    else if (index2 < 0)
-      index = index1;
-    else if (index1 < index2)
-      index = index1;
-    else
-      index = index2;
+    if (index1 < 0) { index = index2; }
+    else if (index2 < 0) { index = index1; }
+    else if (index1 < index2) { index = index1; }
+    else { index = index2; }
 
     if (index < 0) {
       name = s.toUpperCase();
-      if (optionValues.containsKey(name))
-      {
-        Val = Boolean.TRUE;
-      } else if (name.length() > 2 && name.charAt(0) == 'N' && name.charAt(1) == 'O') {
-        Val = Boolean.FALSE;
+      if (optionValues.containsKey(name)) {
+        Val = TRUE;
+      }
+      else if (name.length() > 2 && name.charAt(0) == 'N' && name.charAt(1) == 'O') {
+        Val = FALSE;
         name = name.substring(2);
-      } else {
+      }
+      else {
         System.out.println("Warning: Bad option \"" + arg
             + "\" will be ignored.");
         return;
       }
-    } else {
+    }
+    else {
       name = s.substring(0, index).toUpperCase();
       if (s.substring(index + 1).equalsIgnoreCase("TRUE")) {
-        Val = Boolean.TRUE;
-      } else if (s.substring(index + 1).equalsIgnoreCase("FALSE")) {
-        Val = Boolean.FALSE;
-      } else {
+        Val = TRUE;
+      }
+      else if (s.substring(index + 1).equalsIgnoreCase("FALSE")) {
+        Val = FALSE;
+      }
+      else {
         try {
           int i = Integer.parseInt(s.substring(index + 1));
           if (i <= 0) {
@@ -297,13 +277,14 @@ public class Options {
                 + arg + "\" will be ignored.");
             return;
           }
-          Val = new Integer(i);
-        } catch (NumberFormatException e) {
+          Val = i;
+        }
+        catch (NumberFormatException e) {
           Val = s.substring(index + 1);
           if (s.length() > index + 2) {
             // i.e., there is space for two '"'s in value
             if (s.charAt(index + 1) == '"'
-              && s.charAt(s.length() - 1) == '"') {
+                && s.charAt(s.length() - 1) == '"') {
               // remove the two '"'s.
               Val = s.substring(index + 2, s.length() - 1);
             }
@@ -340,18 +321,18 @@ public class Options {
       if (cmdLineSetting.contains("DEBUG_PARSER")
           || inputFileSetting.contains("DEBUG_PARSER")) {
         JavaCCErrors
-        .warning("True setting of option DEBUG_LOOKAHEAD overrides " +
-        "false setting of option DEBUG_PARSER.");
+            .warning("True setting of option DEBUG_LOOKAHEAD overrides " +
+                "false setting of option DEBUG_PARSER.");
       }
-      optionValues.put("DEBUG_PARSER", Boolean.TRUE);
+      optionValues.put("DEBUG_PARSER", TRUE);
     }
 
     // Now set the "GENERATE" options from the supplied (or default) JDK version.
 
-    optionValues.put("GENERATE_CHAINED_EXCEPTION", Boolean.valueOf(jdkVersionAtLeast(1.4)));
-    optionValues.put("GENERATE_GENERICS", Boolean.valueOf(jdkVersionAtLeast(1.5)));
-    optionValues.put("GENERATE_STRING_BUILDER", Boolean.valueOf(jdkVersionAtLeast(1.5)));
-    optionValues.put("GENERATE_ANNOTATIONS", Boolean.valueOf(jdkVersionAtLeast(1.5)));
+    optionValues.put("GENERATE_CHAINED_EXCEPTION", jdkVersionAtLeast(1.4));
+    optionValues.put("GENERATE_GENERICS", jdkVersionAtLeast(1.5));
+    optionValues.put("GENERATE_STRING_BUILDER", jdkVersionAtLeast(1.5));
+    optionValues.put("GENERATE_ANNOTATIONS", jdkVersionAtLeast(1.5));
   }
 
   /**
@@ -485,7 +466,7 @@ public class Options {
    *
    * @return The requested token manager uses parser value;
    */
-  public static boolean getTokenManagerUsesParser(){
+  public static boolean getTokenManagerUsesParser() {
     return booleanValue("TOKEN_MANAGER_USES_PARSER");
   }
 
@@ -512,7 +493,6 @@ public class Options {
    *
    * @return The requested common token action value.
    */
-
   public static boolean getCommonTokenAction() {
     return booleanValue("COMMON_TOKEN_ACTION");
   }
@@ -555,6 +535,7 @@ public class Options {
 
   /**
    * Should the generated code create Exceptions using a constructor taking a nested exception?
+   *
    * @return
    */
   public static boolean getGenerateChainedException() {
@@ -563,6 +544,7 @@ public class Options {
 
   /**
    * Should the generated code contain Generics?
+   *
    * @return
    */
   public static boolean getGenerateGenerics() {
@@ -571,6 +553,7 @@ public class Options {
 
   /**
    * Should the generated code use StringBuilder rather than StringBuffer?
+   *
    * @return
    */
   public static boolean getGenerateStringBuilder() {
@@ -579,6 +562,7 @@ public class Options {
 
   /**
    * Should the generated code contain Annotations?
+   *
    * @return
    */
   public static boolean getGenerateAnnotations() {
@@ -587,6 +571,7 @@ public class Options {
 
   /**
    * Should the generated code class visibility public?
+   *
    * @return
    */
   public static boolean getSupportClassVisibilityPublic() {
@@ -596,6 +581,7 @@ public class Options {
   /**
    * Determine if the output language is at least the specified
    * version.
+   *
    * @param version the version to check against. E.g. <code>1.5</code>
    * @return true if the output version is at least the specified version.
    */
@@ -611,8 +597,7 @@ public class Options {
    *
    * @return The required base class for Token.
    */
-  public static String getTokenExtends()
-  {
+  public static String getTokenExtends() {
     return stringValue("TOKEN_EXTENDS");
   }
 
@@ -621,8 +606,7 @@ public class Options {
    *
    * @return The required factory class for Token.
    */
-  public static String getTokenFactory()
-  {
+  public static String getTokenFactory() {
     return stringValue("TOKEN_FACTORY");
   }
 
@@ -631,13 +615,13 @@ public class Options {
    *
    * @return The file encoding (e.g., UTF-8, ISO_8859-1, MacRoman)
    */
-  public static String getGrammarEncoding()
-  {
-	if (stringValue("GRAMMAR_ENCODING").equals("")) {
-	    return System.getProperties().getProperty("file.encoding");
-	} else {
-	    return stringValue("GRAMMAR_ENCODING");
-	}
+  public static String getGrammarEncoding() {
+    if (stringValue("GRAMMAR_ENCODING").equals("")) {
+      return System.getProperties().getProperty("file.encoding");
+    }
+    else {
+      return stringValue("GRAMMAR_ENCODING");
+    }
   }
 
   /**
@@ -652,9 +636,9 @@ public class Options {
   public static String stringBufOrBuild() {
     if (getGenerateStringBuilder()) {
       return "StringBuilder";
-    } else {
+    }
+    else {
       return "StringBuffer";
     }
   }
-
 }

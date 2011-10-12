@@ -12,7 +12,6 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.lang.String;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * A sea anchor, to ensure that code is not inadvertently broken.
@@ -46,7 +45,7 @@ public class NfaStateTest extends JavaCCTestCase {
   public void testReInit() {
   }
 
-  /** Test method for {@link NfaState#HasTransitions()}. */
+  /** Test method for {@link NfaState#hasTransitions()}. */
   public void testHasTransitions() {
   }
 

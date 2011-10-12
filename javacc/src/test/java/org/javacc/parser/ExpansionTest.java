@@ -28,9 +28,10 @@
 
 package org.javacc.parser;
 
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 public final class ExpansionTest {
   private Token t;
@@ -40,7 +41,9 @@ public final class ExpansionTest {
   public void setUp() {
     t = new Token();
     t.setLineColumn(3, 2, 0, 0);
-    e = new Expansion();
+    e = new Expansion() {
+      //
+    };
     e.setColumn(5);
     e.setLine(6);
   }
@@ -69,7 +72,7 @@ public final class ExpansionTest {
     RZeroOrMore rzom = new RZeroOrMore(t, r);
     assertEquals(t.getBeginColumn(), rzom.getColumn());
     assertEquals(t.getBeginLine(), rzom.getLine());
-    assertEquals(r, rzom.regexpr);
+    assertEquals(r, rzom.regExp);
   }
 
   @Test
@@ -78,7 +81,7 @@ public final class ExpansionTest {
     ROneOrMore room = new ROneOrMore(t, r);
     assertEquals(t.getBeginColumn(), room.getColumn());
     assertEquals(t.getBeginLine(), room.getLine());
-    assertEquals(r, room.regexpr);
+    assertEquals(r, room.regExp);
   }
 
   @Test

@@ -921,7 +921,7 @@ final class StringLiterals {
         }
         catch(Exception e)
         {
-           JavaCCErrors.semantic_error("Error cloning state vector");
+           JavaCCErrors.semanticError("Error cloning state vector");
         }
 
         intermediateKinds[i] = new int[image.length()];

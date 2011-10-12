@@ -25,53 +25,45 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.javacc.parser;
 
 import java.util.List;
 import java.util.Set;
 
-/**
- * Describes expansions of the form "try {...} ...".
- */
-
+/** Describes expansions of the form "try {...} ...". */
 public class TryBlock extends Expansion {
-
-  /**
-   * The expansion contained within the try block.
-   */
-  public Expansion exp;
-
+  /** The expansion contained within the try block. */
+  public Expansion expansion;
   /**
    * The types of each catch block.  Each list entry is itself a
    * list which in turn contains tokens as entries.
    */
   public List types;
-
   /**
    * The exception identifiers of each catch block.  Each list entry
    * is a token.
    */
   public List ids;
-
   /**
    * The block part of each catch block.  Each list entry is itself a
    * list which in turn contains tokens as entries.
    */
-  public List catchblks;
-
+  public List catchBlocks;
   /**
    * The block part of the finally block.  Each list entry is a token.
    * If there is no finally block, this is null.
    */
-  public List finallyblk;
+  public List finallyBlocks;
 
+  @Override
   public StringBuffer dump(int indent, Set alreadyDumped) {
     StringBuffer sb = super.dump(indent, alreadyDumped);
-    if (alreadyDumped.contains(this))
+    if (alreadyDumped.contains(this)) {
       return sb;
+    }
     alreadyDumped.add(this);
-    sb.append(eol).append(exp.dump(indent + 1, alreadyDumped));
+    sb.append("\n").append(expansion.dump(indent + 1, alreadyDumped));
     return sb;
   }
-
 }

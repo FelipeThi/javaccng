@@ -37,23 +37,23 @@ import org.junit.Test;
  * @author timp
  * @since 7 Mar 2007
  */
-public class JJDocMainTest extends JavaCCTestCase {
-  /** Test method for {@link org.javacc.jjdoc.JJDocMain#main(java.lang.String[])}. */
+public class MainTest extends JavaCCTestCase {
+  /** Test method for {@link Main#main(java.lang.String[])}. */
   public void testMain() {
   }
 
-  /** Test method for {@link org.javacc.jjdoc.JJDocMain#mainProgram(java.lang.String[])}. */
+  /** Test method for {@link Main#mainProgram(java.lang.String[])}. */
   @Test
   @Ignore
   public void testMainProgramHTML() throws Exception {
-    assertEquals(0, JJDocMain.mainProgram(new String[]{"-OUTPUT_FILE:" + getJJDocOutputDirectory() + "JavaCC.html", getJJInputDirectory() + "JavaCC.jj"}));
+    assertEquals(0, Main.mainProgram(new String[]{"-OUTPUT_FILE:" + getJJDocOutputDirectory() + "JavaCC.html", getJJInputDirectory() + "JavaCC.jj"}));
   }
 
-  /** Test method for {@link org.javacc.jjdoc.JJDocMain#mainProgram(java.lang.String[])}. */
+  /** Test method for {@link Main#mainProgram(java.lang.String[])}. */
   @Test
   @Ignore
   public void testMainProgramText() throws Exception {
-    assertEquals(0, JJDocMain.mainProgram(new String[]{"-OUTPUT_FILE:" + getJJDocOutputDirectory() + "JavaCC.txt",
+    assertEquals(0, Main.mainProgram(new String[]{"-OUTPUT_FILE:" + getJJDocOutputDirectory() + "JavaCC.txt",
         "-TEXT:true", getJJInputDirectory() + "JavaCC.jj"}));
   }
 }

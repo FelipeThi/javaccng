@@ -190,7 +190,7 @@ public class OutputFile {
       // If no version line is found, do not output the warning.
     } catch (FileNotFoundException e1) {
       // This should never happen
-      JavaCCErrors.semantic_error("Could not open file " + file.getName()
+      JavaCCErrors.semanticError("Could not open file " + file.getName()
           + " for writing.");
       throw new Error();
     } catch (IOException e2) {
@@ -223,7 +223,7 @@ public class OutputFile {
       }
     } catch (FileNotFoundException e1) {
       // This should never happen
-      JavaCCErrors.semantic_error("Could not open file " + file.getName()
+      JavaCCErrors.semanticError("Could not open file " + file.getName()
           + " for writing.");
       throw new Error();
     } catch (IOException e2) {
@@ -287,7 +287,7 @@ public class OutputFile {
     return toHexString(digest);
   }
 
-  private final static char[] HEX_DIGITS = new char[] { '0', '1', '2', '3',
+  private static final char[] HEX_DIGITS = new char[] { '0', '1', '2', '3',
     '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
   private static final String toHexString(byte[] bytes) {

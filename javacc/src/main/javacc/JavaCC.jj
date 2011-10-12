@@ -39,7 +39,6 @@ options {
 }
 
 PARSER_BEGIN(JavaCCParser)
-
 /**
  * This file contains the code for JavaCCParser generated
  * by JavaCCParser itself.
@@ -50,23 +49,18 @@ package org.javacc.parser;
 import java.util.List;
 import java.util.ArrayList;
 
-public class JavaCCParser extends JavaCCParserInternals {
-
-  /**
-   * The name of the parser class.
-   */
-  String parser_class_name;
+public final class JavaCCParser extends JavaCCParserInternals {
+  /** * The name of the parser class. */
+  String parserClassName;
 
   /**
    * This flag is set to true when the part between PARSER_BEGIN and
    * PARSER_END is being parsed.
    */
-  boolean processing_cu = false;
+  boolean processingCu = false;
 
-  /**
-   * The level of class nesting.
-   */
-  int class_nesting = 0;
+  /** * The level of class nesting. */
+  int classNesting = 0;
 
   /**
    * This int variable is incremented while parsing local lookaheads.
@@ -95,16 +89,21 @@ public class JavaCCParser extends JavaCCParserInternals {
    * It is used to decide when the end of an "expansion" has been reached.
    */
   private boolean notTailOfExpansionUnit() throws java.io.IOException {
-    final Token t = getToken(1);
-    if (t.getKind() == BIT_OR || t.getKind() == COMMA || t.getKind() == RPAREN || t.getKind() == RBRACE || t.getKind() == RBRACKET) return false;
+    Token t = getToken(1);
+    if (t.getKind() == BIT_OR
+        || t.getKind() == COMMA
+        || t.getKind() == RPAREN
+        || t.getKind() == RBRACE
+        || t.getKind() == RBRACKET) {
+        return false;
+    }
     return true;
   }
 
    /**
     * Class to hold modifiers.
     */
-   static public final class ModifierSet
-   {
+   public static final class ModifierSet {
      /* Definitions of the bits in the modifiers field.  */
      public static final int PUBLIC = 0x0001;
      public static final int PROTECTED = 0x0002;
@@ -121,73 +120,55 @@ public class JavaCCParser extends JavaCCParserInternals {
      /** A set of accessors that indicate whether the specified modifier
          is in the set. */
 
-     public boolean isPublic(int modifiers)
-     {
+     public boolean isPublic(int modifiers) {
        return (modifiers & PUBLIC) != 0;
      }
 
-     public boolean isProtected(int modifiers)
-     {
+     public boolean isProtected(int modifiers) {
        return (modifiers & PROTECTED) != 0;
      }
 
-     public boolean isPrivate(int modifiers)
-     {
+     public boolean isPrivate(int modifiers) {
        return (modifiers & PRIVATE) != 0;
      }
 
-     public boolean isStatic(int modifiers)
-     {
+     public boolean isStatic(int modifiers) {
        return (modifiers & STATIC) != 0;
      }
 
-     public boolean isAbstract(int modifiers)
-     {
+     public boolean isAbstract(int modifiers) {
        return (modifiers & ABSTRACT) != 0;
      }
 
-     public boolean isFinal(int modifiers)
-     {
+     public boolean isFinal(int modifiers) {
        return (modifiers & FINAL) != 0;
      }
 
-     public boolean isNative(int modifiers)
-     {
+     public boolean isNative(int modifiers) {
        return (modifiers & NATIVE) != 0;
      }
 
-     public boolean isStrictfp(int modifiers)
-     {
+     public boolean isStrictfp(int modifiers) {
        return (modifiers & STRICTFP) != 0;
      }
 
-     public boolean isSynchronized(int modifiers)
-     {
+     public boolean isSynchronized(int modifiers) {
        return (modifiers & SYNCHRONIZED) != 0;
      }
 
-     public boolean isTransient(int modifiers)
-      {
+     public boolean isTransient(int modifiers) {
        return (modifiers & TRANSIENT) != 0;
      }
 
-     public boolean isVolatile(int modifiers)
-     {
+     public boolean isVolatile(int modifiers) {
        return (modifiers & VOLATILE) != 0;
      }
 
-     /**
-      * Removes the given modifier.
-      */
-     static int removeModifier(int modifiers, int mod)
-     {
+     static int removeModifier(int modifiers, int mod) {
         return modifiers & ~mod;
      }
    }
-
-
 }
-
 PARSER_END(JavaCCParser)
 
 TOKEN_MGR_DECLS :
@@ -197,10 +178,8 @@ TOKEN_MGR_DECLS :
    int depth = 0;
    int size = 10;
 
-   void saveBeginLineCol(int l, int c)
-   {
-      if (depth == size)
-      {
+   void saveBeginLineCol(int l, int c) {
+      if (depth == size) {
          size += 5;
          int tmpbeginLine[] = new int[size];
          int tmpbeginCol[] = new int[size];
@@ -214,8 +193,7 @@ TOKEN_MGR_DECLS :
       depth++;
    }
 
-   void restoreBeginLineCol()
-   {
+   void restoreBeginLineCol() {
       depth--;
       // TODO uncomment this line later: ((JavaCharStream)charStream).adjustBeginLineColumn(beginLine[depth], beginCol[depth]);
    }
@@ -525,22 +503,22 @@ void javacc_input() :
   javacc_options()
   "PARSER_BEGIN" "(" id1=identifier()
 	{
-	  addcuname(id1);
+	  addCuName(id1);
 	}
-                 ")"
+  ")"
 	{
-	  processing_cu = true;
-	  parser_class_name = id1;
+	  processingCu = true;
+	  parserClassName = id1;
 	}
   CompilationUnit()
 	{
-	  processing_cu = false;
+	  processingCu = false;
 	}
   "PARSER_END" "(" id2=identifier()
 	{
 	  compare(getToken(0), id1, id2);
 	}
-               ")"
+  ")"
   ( production() )+
   <EOF>
 }
@@ -623,8 +601,8 @@ void javacode_production() :
 	  String lhs;
 	  Token t = getToken(1);
 	  p.setFirstToken(t);
-	  java.util.List excName;
-	  p.setThrowsList(new java.util.ArrayList());
+	  List excName;
+	  p.setThrowsList(new ArrayList());
 	  p.setLine(t.getBeginLine());
 	  p.setColumn(t.getBeginColumn());
 	}
@@ -662,12 +640,12 @@ void javacode_production() :
 void bnf_production() :
 	{
 	  BNFProduction p = new BNFProduction();
-	  Container c = new Container();
+	  Container<Expansion> c = new Container<Expansion>();
 	  Token t = getToken(1);
 	  p.setFirstToken(t);
-	  java.util.List excName;
+	  List excName;
 	  String lhs;
-	  p.setThrowsList(new java.util.ArrayList());
+	  p.setThrowsList(new ArrayList());
 	  p.setLine(t.getBeginLine());
 	  p.setColumn(t.getBeginColumn());
 	  jumpPatched = false;
@@ -696,7 +674,7 @@ void bnf_production() :
     )*
   ]
   ":"
-  Block(p.getDeclarationTokens())
+  Block(p.getTokens())
   "{" expansion_choices(c) t="}"
 	{
 	  p.setLastToken(t);
@@ -714,7 +692,7 @@ void AccessModifier(NormalProduction p) :
 	( t = "public" | t = "protected" | t = "private" )?
 	{
 	  if(t != null){
-	    p.setAccessMod(t.getImage());
+	    p.setAccessModifier(t.getImage());
 	  }
 	}
 }
@@ -722,7 +700,7 @@ void AccessModifier(NormalProduction p) :
 void regular_expr_production() :
 	{
 	  TokenProduction p = new TokenProduction();
-	  java.util.List states;
+	  List states;
 	  Token t = p.firstToken = getToken(1);
 	  p.setLine(t.getBeginLine());
 	  p.setColumn(t.getBeginColumn());
@@ -741,7 +719,7 @@ void regular_expr_production() :
   |
     "<"
 	{
-	  states = new java.util.ArrayList();
+	  states = new ArrayList();
 	}
       t=<IDENTIFIER>
 	{
@@ -785,7 +763,7 @@ void regular_expr_production() :
 
 void token_manager_decls() :
 	{
-	  java.util.List decls = new java.util.ArrayList();
+	  List decls = new ArrayList();
 	  Token t;
 	}
 {
@@ -822,16 +800,16 @@ void regexpr_kind(TokenProduction p) :
 
 void regexpr_spec(TokenProduction p) :
 	{
-	  Container c = new Container();
+	  Container<Expansion> c = new Container<Expansion>();
 	  Action act = new Action();
 	  Token t = null;
-	  RegExprSpec res = new RegExprSpec();
+	  RegExpSpec res = new RegExpSpec();
 	}
 {
   regular_expression(c)
 	{
-	  res.rexp = (RegularExpression)c.member;
-	  res.rexp.tpContext = p;
+	  res.regExp = (RegularExpression) c.member;
+	  res.regExp.tpContext = p;
 	}
   [
 	{
@@ -842,41 +820,42 @@ void regexpr_spec(TokenProduction p) :
 	  if (Options.getUserTokenManager()) {
 	    JavaCCErrors.warning(t, "Ignoring action in regular expression specification since option USER_TOKEN_MANAGER has been set to true.");
 	  }
-	  if (res.rexp.private_rexp) {
-	    JavaCCErrors.parse_error(t, "Actions are not permitted on private (#) regular expressions.");
+	  if (res.regExp.isPrivate) {
+	    JavaCCErrors.parseError(t, "Actions are not permitted on private (#) regular expressions.");
 	  }
 	}
   ]
   [ ":" t=<IDENTIFIER>
 	{
 	  res.nextState = t.getImage();
-	  if (res.rexp.private_rexp) {
-	    JavaCCErrors.parse_error(t, "Lexical state changes are not permitted after private (#) regular expressions.");
+	  if (res.regExp.isPrivate) {
+	    JavaCCErrors.parseError(t, "Lexical state changes are not permitted after private (#) regular expressions.");
 	  }
 	}
   ]
 	{
-	  res.act = act;
-	  res.nsTok = t;
-	  p.respecs.add(res);
+	  res.action = act;
+	  res.nsToken = t;
+	  p.reSpecs.add(res);
 	}
 }
 
-void expansion_choices(Container c1) :
+void expansion_choices(Container<Expansion> c1) :
 	{
-	  boolean morethanone = false;
+	  boolean moreThanOne = false;
 	  Choice ch = null; // unnecessary initialization to make Java compiler happy!
-	  Container c2 = new Container();
+	  Container<Expansion> c2 = new Container<Expansion>();
 	}
 {
   expansion(c1)
   ( "|" expansion(c2)
 	{
-	  if (morethanone) {
+	  if (moreThanOne) {
 	    ch.getChoices().add(c2.member);
-	    ((Expansion)c2.member).parent = ch;
-	  } else {
-	    morethanone = true;
+	    c2.member.parent = ch;
+	  }
+	  else {
+	    moreThanOne = true;
 	    ch = new Choice((Expansion)c1.member);
 	    ((Expansion)c1.member).parent = ch;
 	    ch.getChoices().add(c2.member);
@@ -885,16 +864,16 @@ void expansion_choices(Container c1) :
 	}
   )*
 	{
-	  if (morethanone) {
+	  if (moreThanOne) {
 	    c1.member = ch;
 	  }
 	}
 }
 
-void expansion(Container c1) :
+void expansion(Container<Expansion> c1) :
 	{
 	  Sequence seq = new Sequence();
-	  Container c2 = new Container();
+	  Container<Expansion> c2 = new Container<Expansion>();
 	  Lookahead la = new Lookahead();
 	  Token t = getToken(1);
 	  seq.setLine(t.getBeginLine());
@@ -943,7 +922,7 @@ Lookahead local_lookahead() :
 	  la.setLine(t.getBeginLine());
 	  la.setColumn(t.getBeginColumn());
 	  la.setLaExpansion(null);
-	  Container c = new Container();
+	  Container<Expansion> c = new Container<Expansion>();
 	  boolean commaAtEnd = false, emptyLA = true;
 	  int laAmount;
 	  inLocalLA++;
@@ -996,10 +975,10 @@ Lookahead local_lookahead() :
 	}
 }
 
-void expansion_unit(Container c) :
+void expansion_unit(Container<Expansion> c) :
 	{
 	  String name;
-	  java.util.List lhsTokens = new java.util.ArrayList();
+	  List lhsTokens = new ArrayList();
 	  NonTerminal nt;
 	  Action act;
 	  Token t;
@@ -1030,7 +1009,8 @@ void expansion_unit(Container c) :
 	  if (la.getAmount() != 0) {
 	    if (la.getActionTokens().size() != 0) {
 	      JavaCCErrors.warning(t, "Encountered LOOKAHEAD(...) at a non-choice location.  Only semantic lookahead will be considered here.");
-	    } else {
+	    }
+	    else {
 	      JavaCCErrors.warning(t, "Encountered LOOKAHEAD(...) at a non-choice location.  This will be ignored.");
 	    }
 	  }
@@ -1059,12 +1039,12 @@ void expansion_unit(Container c) :
 	}
 |
 	{
-	  Container expch = new Container();
-	  java.util.List types = new java.util.ArrayList();
-	  java.util.List ids = new java.util.ArrayList();
-	  java.util.List catchblks = new java.util.ArrayList();
-	  java.util.List finallyblk = null;
-	  java.util.List vec = new java.util.ArrayList();
+	  Container<Expansion> expch = new Container<Expansion>();
+	  List types = new ArrayList();
+	  List ids = new ArrayList();
+	  List catchblks = new ArrayList();
+	  List finallyblk = null;
+	  List vec = new ArrayList();
 	  Token t0;
 	}
   t0="try" "{" expansion_choices(expch) "}"
@@ -1072,14 +1052,14 @@ void expansion_unit(Container c) :
 	{
 	  types.add(vec);
 	  ids.add(t);
-	  vec = new java.util.ArrayList();
+	  vec = new ArrayList();
 	  inAction = true;
 	}
     Block(vec)
 	{
 	  inAction = false;
 	  catchblks.add(vec);
-	  vec = new java.util.ArrayList();
+	  vec = new ArrayList();
 	}
   )*
   [
@@ -1154,11 +1134,11 @@ void expansion_unit(Container c) :
   )?
 }
 
-void regular_expression(Container c) :
+void regular_expression(Container<Expansion> c) :
 	{
 	  REndOfFile ef;
 	  String image;
-	  boolean private_rexp = false;
+	  boolean isPrivate = false;
 	  Token t = getToken(1);
 	}
 {
@@ -1175,7 +1155,7 @@ void regular_expression(Container c) :
   [
     [ "#"
 	{
-	  private_rexp = true;
+	  isPrivate = true;
 	}
     ]
     image=identifier() ":"
@@ -1187,11 +1167,12 @@ void regular_expression(Container c) :
 	    RSequence seq = new RSequence();
 	    seq.units.add(c.member);
 	    re = seq;
-	  } else {
+	  }
+	  else {
 	    re = (RegularExpression)c.member;
 	  }
 	  re.label = image;
-	  re.private_rexp = private_rexp;
+	  re.isPrivate = isPrivate;
 	  re.setLine(t.getBeginLine());
 	  re.setColumn(t.getBeginColumn());
 	  c.member = re;
@@ -1213,40 +1194,41 @@ void regular_expression(Container c) :
 	}
 }
 
-void complex_regular_expression_choices(Container c1) :
+void complex_regular_expression_choices(Container<Expansion> c1) :
 	{
-	  boolean morethanone = false;
-	  RChoice ch = null; // unnecessary initialization to make Java compiler happy!
-	  Container c2 = new Container();
+	  boolean moreThanOne = false;
+	  RChoice ch = null;
+	  Container<Expansion> c2 = new Container<Expansion>();
 	}
 {
   complex_regular_expression(c1)
   ( "|" complex_regular_expression(c2)
 	{
-	  if (morethanone) {
-	    ch.getChoices().add(c2.member);
-	  } else {
-	    morethanone = true;
+	  if (moreThanOne) {
+	    ch.getChoices().add((RegularExpression) c2.member);
+	  }
+	  else {
+	    moreThanOne = true;
 	    ch = new RChoice();
-	    ch.setLine(((RegularExpression)c1.member).getLine());
-	    ch.setColumn(((RegularExpression)c1.member).getColumn());
-	    ch.getChoices().add(c1.member);
-	    ch.getChoices().add(c2.member);
+	    ch.setLine((c1.member).getLine());
+	    ch.setColumn((c1.member).getColumn());
+	    ch.getChoices().add((RegularExpression) c1.member);
+	    ch.getChoices().add((RegularExpression) c2.member);
 	  }
 	}
   )*
 	{
-	  if (morethanone) {
+	  if (moreThanOne) {
 	    c1.member = ch;
 	  }
 	}
 }
 
-void complex_regular_expression(Container c1) :
+void complex_regular_expression(Container<Expansion> c1) :
 	{
 	  int count = 0;
 	  RSequence seq = null; // unnecessary initialization to make Java compiler happy!
-	  Container c2 = new Container();
+	  Container<Expansion> c2 = new Container<Expansion>();
 	}
 {
   ( complex_regular_expression_unit(c2)
@@ -1254,13 +1236,15 @@ void complex_regular_expression(Container c1) :
 	  count++;
 	  if (count == 1) {
 	    c1.member = c2.member; // if count does not go beyond 1, we are done.
-	  } else if (count == 2) { // more than 1, so create a sequence.
+	  }
+	  else if (count == 2) { // more than 1, so create a sequence.
 	    seq = new RSequence();
 	    seq.setLine(((RegularExpression)c1.member).getLine());
 	    seq.setColumn(((RegularExpression)c1.member).getColumn());
 	    seq.units.add(c1.member);
 	    seq.units.add(c2.member);
-	  } else {
+	  }
+	  else {
 	    seq.units.add(c2.member);
 	  }
 	}
@@ -1272,7 +1256,7 @@ void complex_regular_expression(Container c1) :
 	}
 }
 
-void complex_regular_expression_unit(Container c) :
+void complex_regular_expression_unit(Container<Expansion> c) :
 	{
 	  String image;
 	  Token t = getToken(1);
@@ -1306,7 +1290,7 @@ void complex_regular_expression_unit(Container c) :
 	  RZeroOrOne zorexp = new RZeroOrOne();
 	  zorexp.setLine(t.getBeginLine());
 	  zorexp.setColumn(t.getBeginColumn());
-	  zorexp.regexpr = (RegularExpression)c.member;
+	  zorexp.regExp = (RegularExpression)c.member;
 	  c.member = zorexp;
 	}
    | "{" r1 = IntegerLiteral()
@@ -1318,25 +1302,25 @@ void complex_regular_expression_unit(Container c) :
 	  rrrexp.setColumn(t.getBeginColumn());
 	  rrrexp.min = r1;
 	  rrrexp.max = r2;
-        rrrexp.hasMax = hasMax;
-	  rrrexp.regexpr = (RegularExpression)c.member;
+      rrrexp.hasMax = hasMax;
+	  rrrexp.regExp = (RegularExpression)c.member;
 	  c.member = rrrexp;
 	}
   )?
 }
 
-void character_list(Container c1) :
+void character_list(Container<Expansion> c1) :
 	{
 	  RCharacterList chlist = new RCharacterList();
 	  Token t = getToken(1);
 	  chlist.setLine(t.getBeginLine());
 	  chlist.setColumn(t.getBeginColumn());
-	  Container c2 = new Container();
+	  Container<CharacterDescriptor> c2 = new Container<CharacterDescriptor>();
 	}
 {
   ["~"
 	{
-	  chlist.negated_list = true;
+	  chlist.negatedList = true;
 	}
   ]
   "[" [ character_descriptor(c2)
@@ -1355,7 +1339,7 @@ void character_list(Container c1) :
 	}
 }
 
-void character_descriptor(Container c) :
+void character_descriptor(Container<CharacterDescriptor> c) :
 	{
 	  char c1, c2 = ' '; // unnecessary initialization to make Java compiler happy!
 	  boolean isrange = false;
@@ -1381,7 +1365,8 @@ void character_descriptor(Container c) :
         cr.setLeft(c1);
         cr.setRight(c2);
 	    c.member = cr;
-	  } else {
+	  }
+	  else {
 	    SingleCharacter sc = new SingleCharacter();
 	    sc.setLine(t.getBeginLine());
 	    sc.setColumn(t.getBeginColumn());
@@ -1542,7 +1527,7 @@ void TypeDeclaration():
 void ClassOrInterfaceDeclaration(int modifiers, List tokens):
 {
    boolean isInterface = false;
-	  class_nesting++;
+	  classNesting++;
 	  Token t;
 	  boolean is_parser_class = false;
   if (tokens == null)
@@ -1555,29 +1540,29 @@ void ClassOrInterfaceDeclaration(int modifiers, List tokens):
   [ ExtendsList(isInterface) ]
   [ ImplementsList(isInterface) ]
 	{
-	  if (t.getImage().equals(parser_class_name) && class_nesting == 1 && processing_cu) {
+	  if (t.getImage().equals(parserClassName) && classNesting == 1 && processingCu) {
 	    is_parser_class = true;
-	    setinsertionpoint(getToken(1), 1);
+	    setInsertionPoint(getToken(1), 1);
 	  }
 	}
   ClassOrInterfaceBody(isInterface, null)
 	{
 	  if (is_parser_class) {
-	    setinsertionpoint(getToken(0), 2);
+	    setInsertionPoint(getToken(0), 2);
 	  }
-	  class_nesting--;
+	  classNesting--;
 	}
 }
 
 void ExtendsList(boolean isInterface):
 {
-   boolean extendsMoreThanOne = false;
+   boolean extendsmoreThanOne = false;
 }
 {
    "extends" ClassOrInterfaceType()
-   ( "," ClassOrInterfaceType() { extendsMoreThanOne = true; } )*
+   ( "," ClassOrInterfaceType() { extendsmoreThanOne = true; } )*
    {
-      if (extendsMoreThanOne && !isInterface)
+      if (extendsmoreThanOne && !isInterface)
          throw new ParseException("A class cannot extend more than one other class");
    }
 }
@@ -2230,7 +2215,7 @@ void NullLiteral() :
   "null"
 }
 
-void Arguments(java.util.List tokens) :
+void Arguments(List tokens) :
 /*
  * Parsing this fills "tokens" with all tokens of the arguments
  * excluding the parentheses at each end.

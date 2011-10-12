@@ -28,193 +28,187 @@
 
 package org.javacc.parser;
 
-import org.javacc.utils.io.IndentingPrintWriter;
-
-import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Set;
 
-final class KindInfo
-{
-   long[] validKinds;
-   long[] finalKinds;
-   int    validKindCnt = 0;
-   int    finalKindCnt = 0;
-
-   KindInfo(int maxKind)
-   {
-      validKinds = new long[maxKind / 64 + 1];
-      finalKinds = new long[maxKind / 64 + 1];
-   }
-
-   public void InsertValidKind(int kind)
-   {
-      validKinds[kind / 64] |= (1L << (kind % 64));
-      validKindCnt++;
-   }
-
-   public void InsertFinalKind(int kind)
-   {
-      finalKinds[kind / 64] |= (1L << (kind % 64));
-      finalKindCnt++;
-   }
-};
-
-/**
- * Describes string literals.
- */
-
-public class RStringLiteral extends RegularExpression {
-
-  /**
-   * The string image of the literal.
-   */
+/** Describes string literals. */
+public final class RStringLiteral extends RegularExpression {
+  /** The string image of the literal. */
   public String image;
 
-  public RStringLiteral() {
-  }
-
   public RStringLiteral(Token t, String image) {
-    this.setLine(t.getBeginLine());
-    this.setColumn(t.getBeginColumn());
+    setLine(t.getBeginLine());
+    setColumn(t.getBeginColumn());
     this.image = image;
   }
 
-  /**
-   * Used for top level string literals.
-   */
-  public void GenerateDfa(LexGen lexGen, IndentingPrintWriter ostr, int kind)
-  {
-     String s;
-     Hashtable temp;
-     KindInfo info;
-     int len;
+  @Override
+  public Nfa generateNfa(LexGen lexGen, boolean ignoreCase) {
+    if (image.length() == 1) {
+      RCharacterList temp = new RCharacterList(image.charAt(0));
+      return temp.generateNfa(lexGen, ignoreCase);
+    }
 
-     if (lexGen.stringLiterals.maxStrKind <= ordinal)
-        lexGen.stringLiterals.maxStrKind = ordinal + 1;
+    NfaState state = new NfaState(lexGen);
 
-     if ((len = image.length()) > lexGen.stringLiterals.maxLen)
-        lexGen.stringLiterals.maxLen = len;
+    if (image.length() == 0) {
+      return new Nfa(state, state);
+    }
 
-     char c;
-     for (int i = 0; i < len; i++)
-     {
-        if (Options.getIgnoreCase())
-           s = ("" + (c = image.charAt(i))).toLowerCase();
-        else
-           s = "" + (c = image.charAt(i));
+    NfaState startState = state;
+    NfaState finalState = null;
 
-        if (!lexGen.nfaStates.unicodeWarningGiven && c > 0xff &&
-            !Options.getJavaUnicodeEscape() &&
-            !Options.getUserCharStream())
-        {
-           lexGen.nfaStates.unicodeWarningGiven = true;
-           JavaCCErrors.warning(lexGen.curRE, "Non-ASCII characters used in regular expression." +
-              "Please make sure you use the correct Reader when you create the parser, " +
-              "one that can handle your character set.");
-        }
+    for (int i = 0; i < image.length(); i++) {
+      finalState = new NfaState(lexGen);
+      state.charMoves = new char[1];
+      state.addChar(image.charAt(i));
 
-        if (i >= lexGen.stringLiterals.charPosKind.size()) // Kludge, but OK
-           lexGen.stringLiterals.charPosKind.add(temp = new Hashtable());
-        else
-           temp = (Hashtable) lexGen.stringLiterals.charPosKind.get(i);
+      if (Options.getIgnoreCase() || ignoreCase) {
+        state.addChar(Character.toLowerCase(image.charAt(i)));
+        state.addChar(Character.toUpperCase(image.charAt(i)));
+      }
 
-        if ((info = (KindInfo)temp.get(s)) == null)
-           temp.put(s, info = new KindInfo(lexGen.maxOrdinal));
+      state.next = finalState;
+      state = finalState;
+    }
 
-        if (i + 1 == len)
-           info.InsertFinalKind(ordinal);
-        else
-           info.InsertValidKind(ordinal);
-
-        if (!Options.getIgnoreCase() && lexGen.ignoreCase[ordinal] &&
-            c != Character.toLowerCase(c))
-        {
-           s = ("" + image.charAt(i)).toLowerCase();
-
-           if (i >= lexGen.stringLiterals.charPosKind.size()) // Kludge, but OK
-              lexGen.stringLiterals.charPosKind.add(temp = new Hashtable());
-           else
-              temp = (Hashtable) lexGen.stringLiterals.charPosKind.get(i);
-
-           if ((info = (KindInfo)temp.get(s)) == null)
-              temp.put(s, info = new KindInfo(lexGen.maxOrdinal));
-
-           if (i + 1 == len)
-              info.InsertFinalKind(ordinal);
-           else
-              info.InsertValidKind(ordinal);
-        }
-
-        if (!Options.getIgnoreCase() && lexGen.ignoreCase[ordinal] &&
-            c != Character.toUpperCase(c))
-        {
-           s = ("" + image.charAt(i)).toUpperCase();
-
-           if (i >= lexGen.stringLiterals.charPosKind.size()) // Kludge, but OK
-              lexGen.stringLiterals.charPosKind.add(temp = new Hashtable());
-           else
-              temp = (Hashtable) lexGen.stringLiterals.charPosKind.get(i);
-
-           if ((info = (KindInfo)temp.get(s)) == null)
-              temp.put(s, info = new KindInfo(lexGen.maxOrdinal));
-
-           if (i + 1 == len)
-              info.InsertFinalKind(ordinal);
-           else
-              info.InsertValidKind(ordinal);
-        }
-     }
-
-     lexGen.stringLiterals.maxLenForActive[ordinal / 64] = Math.max(lexGen.stringLiterals.maxLenForActive[ordinal / 64],
-                                                                        len -1);
-     lexGen.stringLiterals.allImages[ordinal] = image;
+    return new Nfa(startState, finalState);
   }
 
-  public Nfa GenerateNfa(final LexGen lexGen, boolean ignoreCase)
-  {
-     if (image.length() == 1)
-     {
-        RCharacterList temp = new RCharacterList(image.charAt(0));
-        return temp.GenerateNfa(lexGen, ignoreCase);
-     }
+  /** Used for top level string literals. */
+  public void generateDfa(LexGen lexGen) {
+    if (lexGen.stringLiterals.maxStrKind <= ordinal) {
+      lexGen.stringLiterals.maxStrKind = ordinal + 1;
+    }
 
-     NfaState startState = new NfaState(lexGen);
-     NfaState theStartState = startState;
-     NfaState finalState = null;
+    int len;
+    if ((len = image.length()) > lexGen.stringLiterals.maxLen) {
+      lexGen.stringLiterals.maxLen = len;
+    }
 
-     if (image.length() == 0)
-        return new Nfa(theStartState, theStartState);
+    for (int i = 0; i < len; i++) {
+      char c;
+      String s;
+      if (Options.getIgnoreCase()) {
+        s = ("" + (c = image.charAt(i))).toLowerCase();
+      }
+      else {
+        s = "" + (c = image.charAt(i));
+      }
 
-     int i;
+      if (!lexGen.nfaStates.unicodeWarningGiven && c > 0xff
+          && !Options.getJavaUnicodeEscape()
+          && !Options.getUserCharStream()) {
+        lexGen.nfaStates.unicodeWarningGiven = true;
+        JavaCCErrors.warning(lexGen.curRE, "Non-ASCII characters used in regular expression." +
+            "Please make sure you use the correct Reader when you create the parser, " +
+            "one that can handle your character set.");
+      }
 
-     for (i = 0; i < image.length(); i++)
-     {
-        finalState = new NfaState(lexGen);
-        startState.charMoves = new char[1];
-        startState.AddChar(image.charAt(i));
+      Hashtable temp;
+      if (i >= lexGen.stringLiterals.charPosKind.size()) {
+        // Kludge, but OK
+        lexGen.stringLiterals.charPosKind.add(temp = new Hashtable());
+      }
+      else {
+        temp = (Hashtable) lexGen.stringLiterals.charPosKind.get(i);
+      }
 
-        if (Options.getIgnoreCase() || ignoreCase)
-        {
-           startState.AddChar(Character.toLowerCase(image.charAt(i)));
-           startState.AddChar(Character.toUpperCase(image.charAt(i)));
+      KindInfo info;
+      if ((info = (KindInfo) temp.get(s)) == null) {
+        temp.put(s, info = new KindInfo(lexGen.maxOrdinal));
+      }
+
+      if (i + 1 == len) {
+        info.InsertFinalKind(ordinal);
+      }
+      else {
+        info.InsertValidKind(ordinal);
+      }
+
+      if (!Options.getIgnoreCase() && lexGen.ignoreCase[ordinal]
+          && c != Character.toLowerCase(c)) {
+        s = ("" + image.charAt(i)).toLowerCase();
+
+        if (i >= lexGen.stringLiterals.charPosKind.size()) {
+          // Kludge, but OK
+          lexGen.stringLiterals.charPosKind.add(temp = new Hashtable());
+        }
+        else {
+          temp = (Hashtable) lexGen.stringLiterals.charPosKind.get(i);
         }
 
-        startState.next = finalState;
-        startState = finalState;
-     }
+        if ((info = (KindInfo) temp.get(s)) == null) {
+          temp.put(s, info = new KindInfo(lexGen.maxOrdinal));
+        }
 
-     return new Nfa(theStartState, finalState);
+        if (i + 1 == len) {
+          info.InsertFinalKind(ordinal);
+        }
+        else {
+          info.InsertValidKind(ordinal);
+        }
+      }
+
+      if (!Options.getIgnoreCase()
+          && lexGen.ignoreCase[ordinal]
+          && c != Character.toUpperCase(c)) {
+        s = ("" + image.charAt(i)).toUpperCase();
+
+        if (i >= lexGen.stringLiterals.charPosKind.size()) {
+          // Kludge, but OK
+          lexGen.stringLiterals.charPosKind.add(temp = new Hashtable());
+        }
+        else {
+          temp = (Hashtable) lexGen.stringLiterals.charPosKind.get(i);
+        }
+
+        if ((info = (KindInfo) temp.get(s)) == null) {
+          temp.put(s, info = new KindInfo(lexGen.maxOrdinal));
+        }
+
+        if (i + 1 == len) {
+          info.InsertFinalKind(ordinal);
+        }
+        else {
+          info.InsertValidKind(ordinal);
+        }
+      }
+    }
+
+    lexGen.stringLiterals.maxLenForActive[ordinal / 64]
+        = Math.max(lexGen.stringLiterals.maxLenForActive[ordinal / 64], len - 1);
+    lexGen.stringLiterals.allImages[ordinal] = image;
   }
 
+  @Override
   public StringBuffer dump(int indent, Set alreadyDumped) {
-    StringBuffer sb = super.dump(indent, alreadyDumped).append(' ').append(image);
-    return sb;
+    return super.dump(indent, alreadyDumped).append(' ').append(image);
   }
 
   public String toString() {
     return super.toString() + " - " + image;
+  }
+}
+
+final class KindInfo {
+  long[] validKinds;
+  long[] finalKinds;
+  int validKindCnt = 0;
+  int finalKindCnt = 0;
+
+  KindInfo(int maxKind) {
+    validKinds = new long[maxKind / 64 + 1];
+    finalKinds = new long[maxKind / 64 + 1];
+  }
+
+  public void InsertValidKind(int kind) {
+    validKinds[kind / 64] |= (1L << (kind % 64));
+    validKindCnt++;
+  }
+
+  public void InsertFinalKind(int kind) {
+    finalKinds[kind / 64] |= (1L << (kind % 64));
+    finalKindCnt++;
   }
 }

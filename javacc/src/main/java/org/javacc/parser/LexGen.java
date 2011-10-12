@@ -106,27 +106,27 @@ public class LexGen implements JavaCCParserConstants {
       int l = 0, kind;
       i = 1;
       for (; ;) {
-        if (JavaCCGlobals.cu_to_insertion_point_1.size() <= l) {
+        if (JavaCCGlobals.cuToInsertionPoint1.size() <= l) {
           break;
         }
 
-        kind = ((Token) JavaCCGlobals.cu_to_insertion_point_1.get(l)).getKind();
+        kind = ((Token) JavaCCGlobals.cuToInsertionPoint1.get(l)).getKind();
         if (kind == PACKAGE || kind == IMPORT) {
-          for (; i < JavaCCGlobals.cu_to_insertion_point_1.size(); i++) {
-            kind = ((Token) JavaCCGlobals.cu_to_insertion_point_1.get(i)).getKind();
+          for (; i < JavaCCGlobals.cuToInsertionPoint1.size(); i++) {
+            kind = ((Token) JavaCCGlobals.cuToInsertionPoint1.get(i)).getKind();
             if (kind == SEMICOLON ||
                 kind == ABSTRACT ||
                 kind == FINAL ||
                 kind == PUBLIC ||
                 kind == CLASS ||
                 kind == INTERFACE) {
-              JavaCCGlobals.cline = ((Token) (JavaCCGlobals.cu_to_insertion_point_1.get(l))).getBeginLine();
-              JavaCCGlobals.ccol = ((Token) (JavaCCGlobals.cu_to_insertion_point_1.get(l))).getBeginColumn();
+              JavaCCGlobals.cline = ((Token) (JavaCCGlobals.cuToInsertionPoint1.get(l))).getBeginLine();
+              JavaCCGlobals.ccol = ((Token) (JavaCCGlobals.cuToInsertionPoint1.get(l))).getBeginColumn();
               for (j = l; j < i; j++) {
-                JavaCCGlobals.printToken((Token) (JavaCCGlobals.cu_to_insertion_point_1.get(j)), ostr);
+                JavaCCGlobals.printToken((Token) (JavaCCGlobals.cuToInsertionPoint1.get(j)), ostr);
               }
               if (kind == SEMICOLON) {
-                JavaCCGlobals.printToken((Token) (JavaCCGlobals.cu_to_insertion_point_1.get(j)), ostr);
+                JavaCCGlobals.printToken((Token) (JavaCCGlobals.cuToInsertionPoint1.get(j)), ostr);
               }
               ostr.println();
               break;
@@ -146,23 +146,23 @@ public class LexGen implements JavaCCParserConstants {
         ostr.print("public ");
       }
       ostr.println("class " + tokMgrClassName + " implements TokenManager, " +
-          JavaCCGlobals.cu_name + "Constants");
+          JavaCCGlobals.cuName + "Constants");
       ostr.println("{"); // }
     }
     catch (java.io.IOException err) {
-      JavaCCErrors.semantic_error("Could not create file : " + tokMgrClassName + ".java\n");
+      JavaCCErrors.semanticError("Could not create file : " + tokMgrClassName + ".java\n");
       throw new Error();
     }
 
-    if (JavaCCGlobals.token_mgr_decls != null && JavaCCGlobals.token_mgr_decls.size() > 0) {
+    if (JavaCCGlobals.tokenManagerDeclarations != null && JavaCCGlobals.tokenManagerDeclarations.size() > 0) {
       boolean commonTokenActionSeen = false;
       boolean commonTokenActionNeeded = Options.getCommonTokenAction();
 
-      JavaCCGlobals.printTokenSetup((Token) JavaCCGlobals.token_mgr_decls.get(0));
+      JavaCCGlobals.printTokenSetup((Token) JavaCCGlobals.tokenManagerDeclarations.get(0));
       JavaCCGlobals.ccol = 1;
 
-      for (j = 0; j < JavaCCGlobals.token_mgr_decls.size(); j++) {
-        Token t = (Token) JavaCCGlobals.token_mgr_decls.get(j);
+      for (j = 0; j < JavaCCGlobals.tokenManagerDeclarations.size(); j++) {
+        Token t = (Token) JavaCCGlobals.tokenManagerDeclarations.get(j);
         if (t.getKind() == IDENTIFIER &&
             commonTokenActionNeeded &&
             !commonTokenActionSeen) {
@@ -202,7 +202,7 @@ public class LexGen implements JavaCCParserConstants {
     if (Options.getTokenManagerUsesParser()) {
       ostr.println();
       ostr.println("/** The parser. */");
-      ostr.println("public " + JavaCCGlobals.cu_name + " parser = null;");
+      ostr.println("public " + JavaCCGlobals.cuName + " parser = null;");
     }
   }
 
@@ -263,14 +263,14 @@ public class LexGen implements JavaCCParserConstants {
   }
 
   void BuildLexStatesTable() {
-    Iterator it = JavaCCGlobals.rexprlist.iterator();
+    Iterator it = JavaCCGlobals.regExpList.iterator();
     TokenProduction tp;
     int i;
 
-    String[] tmpLexStateName = new String[JavaCCGlobals.lexstate_I2S.size()];
+    String[] tmpLexStateName = new String[JavaCCGlobals.lexStateI2S.size()];
     while (it.hasNext()) {
       tp = (TokenProduction) it.next();
-      List respecs = tp.respecs;
+      List respecs = tp.reSpecs;
       List tps;
 
       for (i = 0; i < tp.lexStates.length; i++) {
@@ -288,7 +288,7 @@ public class LexGen implements JavaCCParserConstants {
 
       RegularExpression re;
       for (i = 0; i < respecs.size(); i++) {
-        if (maxOrdinal <= (re = ((RegExprSpec) respecs.get(i)).rexp).ordinal) {
+        if (maxOrdinal <= (re = ((RegExpSpec) respecs.get(i)).regExp).ordinal) {
           maxOrdinal = re.ordinal + 1;
         }
       }
@@ -301,8 +301,8 @@ public class LexGen implements JavaCCParserConstants {
     toToken = new long[maxOrdinal / 64 + 1];
     toToken[0] = 1L;
     actions = new Action[maxOrdinal];
-    actions[0] = JavaCCGlobals.actForEof;
-    hasTokenActions = JavaCCGlobals.actForEof != null;
+    actions[0] = JavaCCGlobals.eofAction;
+    hasTokenActions = JavaCCGlobals.eofAction != null;
     initStates = new Hashtable();
     canMatchAnyChar = new int[maxLexStates];
     canLoop = new boolean[maxLexStates];
@@ -320,7 +320,7 @@ public class LexGen implements JavaCCParserConstants {
     maxLongsReqd = new int[maxLexStates];
     initMatch = new int[maxLexStates];
     newLexState = new String[maxOrdinal];
-    newLexState[0] = JavaCCGlobals.nextStateForEof;
+    newLexState[0] = JavaCCGlobals.eofNextState;
     hasEmptyMatch = false;
     lexStates = new int[maxOrdinal];
     ignoreCase = new boolean[maxOrdinal];
@@ -340,14 +340,14 @@ public class LexGen implements JavaCCParserConstants {
   }
 
   public void AddCharToSkip(char c, int kind) {
-    singlesToSkip[lexStateIndex].AddChar(c);
+    singlesToSkip[lexStateIndex].addChar(c);
     singlesToSkip[lexStateIndex].kind = kind;
   }
 
   public void start() {
     if (!Options.getBuildTokenManager() ||
         Options.getUserTokenManager() ||
-        JavaCCErrors.get_error_count() > 0) {
+        JavaCCErrors.getErrorCount() > 0) {
       return;
     }
 
@@ -358,7 +358,7 @@ public class LexGen implements JavaCCParserConstants {
     TokenProduction tp;
     int i, j;
 
-    tokMgrClassName = JavaCCGlobals.cu_name + "TokenManager";
+    tokMgrClassName = JavaCCGlobals.cuName + "TokenManager";
 
     PrintClassHead();
     BuildLexStatesTable();
@@ -390,33 +390,33 @@ public class LexGen implements JavaCCParserConstants {
         tp = (TokenProduction) allTps.get(i);
         int kind = tp.kind;
         boolean ignore = tp.ignoreCase;
-        List rexps = tp.respecs;
+        List rexps = tp.reSpecs;
 
         if (i == 0) {
           ignoring = ignore;
         }
 
         for (j = 0; j < rexps.size(); j++) {
-          RegExprSpec respec = (RegExprSpec) rexps.get(j);
-          curRE = respec.rexp;
+          RegExpSpec respec = (RegExpSpec) rexps.get(j);
+          curRE = respec.regExp;
 
           rexprs[curKind = curRE.ordinal] = curRE;
           lexStates[curRE.ordinal] = lexStateIndex;
           ignoreCase[curRE.ordinal] = ignore;
 
-          if (curRE.private_rexp) {
+          if (curRE.isPrivate) {
             kinds[curRE.ordinal] = -1;
             continue;
           }
 
           if (curRE instanceof RStringLiteral &&
               !((RStringLiteral) curRE).image.equals("")) {
-            ((RStringLiteral) curRE).GenerateDfa(this, ostr, curRE.ordinal);
+            ((RStringLiteral) curRE).generateDfa(this);
             if (i != 0 && !mixed[lexStateIndex] && ignoring != ignore) {
               mixed[lexStateIndex] = true;
             }
           }
-          else if (curRE.CanMatchAnyChar()) {
+          else if (curRE.canMatchAnyChar()) {
             if (canMatchAnyChar[lexStateIndex] == -1 ||
                 canMatchAnyChar[lexStateIndex] > curRE.ordinal) {
               canMatchAnyChar[lexStateIndex] = curRE.ordinal;
@@ -429,10 +429,10 @@ public class LexGen implements JavaCCParserConstants {
               choices.add(curRE);
             }
 
-            temp = curRE.GenerateNfa(this, ignore);
+            temp = curRE.generateNfa(this, ignore);
             temp.end.isFinal = true;
             temp.end.kind = curRE.ordinal;
-            initialState.AddMove(temp.start);
+            initialState.addMove(temp.start);
           }
 
           if (kinds.length < curRE.ordinal) {
@@ -450,9 +450,9 @@ public class LexGen implements JavaCCParserConstants {
             newLexState[curRE.ordinal] = respec.nextState;
           }
 
-          if (respec.act != null && respec.act.getActionTokens() != null &&
-              respec.act.getActionTokens().size() > 0) {
-            actions[curRE.ordinal] = respec.act;
+          if (respec.action != null && respec.action.getActionTokens() != null &&
+              respec.action.getActionTokens().size() > 0) {
+            actions[curRE.ordinal] = respec.action;
           }
 
           switch (kind) {
@@ -493,12 +493,12 @@ public class LexGen implements JavaCCParserConstants {
       nfaStates.ComputeClosures();
 
       for (i = 0; i < initialState.epsilonMoves.size(); i++) {
-        ((NfaState) initialState.epsilonMoves.elementAt(i)).GenerateCode();
+        ((NfaState) initialState.epsilonMoves.elementAt(i)).generateCode();
       }
 
       if (hasNfa[lexStateIndex] = (nfaStates.generatedStates != 0)) {
-        initialState.GenerateCode();
-        initialState.GenerateInitMoves(ostr);
+        initialState.generateCode();
+        initialState.generateInitMoves(ostr);
       }
 
       if (initialState.kind != Integer.MAX_VALUE && initialState.kind != 0) {
@@ -541,7 +541,7 @@ public class LexGen implements JavaCCParserConstants {
     }
 
     for (i = 0; i < choices.size(); i++) {
-      ((RChoice) choices.get(i)).CheckUnmatchability(this);
+      ((RChoice) choices.get(i)).checkUnmatchability(this);
     }
 
     nfaStates.DumpStateSets(ostr);
@@ -770,7 +770,7 @@ public class LexGen implements JavaCCParserConstants {
     if (Options.getTokenManagerUsesParser()) {
       ostr.println();
       ostr.println("/** Constructor with parser. */");
-      ostr.println("public " + tokMgrClassName + "(" + JavaCCGlobals.cu_name + " parserArg, CharStream stream){");
+      ostr.println("public " + tokMgrClassName + "(" + JavaCCGlobals.cuName + " parserArg, CharStream stream){");
       ostr.println("   parser = parserArg;");
     }
     else {
@@ -785,7 +785,7 @@ public class LexGen implements JavaCCParserConstants {
     if (Options.getTokenManagerUsesParser()) {
       ostr.println();
       ostr.println("/** Constructor with parser. */");
-      ostr.println("public " + tokMgrClassName + "(" + JavaCCGlobals.cu_name + " parserArg, CharStream stream, int lexState){");
+      ostr.println("public " + tokMgrClassName + "(" + JavaCCGlobals.cuName + " parserArg, CharStream stream, int lexState){");
       ostr.println("   this(parserArg, stream);");
     }
     else {
@@ -976,7 +976,7 @@ public class LexGen implements JavaCCParserConstants {
     ostr.println("jjMatchedKind = 0;");
     ostr.println("token = jjFillToken();");
 
-    if (JavaCCGlobals.nextStateForEof != null || JavaCCGlobals.actForEof != null) {
+    if (JavaCCGlobals.eofNextState != null || JavaCCGlobals.eofAction != null) {
       ostr.println("tokenLexicalActions(token);");
     }
 
@@ -1017,7 +1017,7 @@ public class LexGen implements JavaCCParserConstants {
         ostr.indent();
       }
 
-      if (singlesToSkip[i].HasTransitions()) {
+      if (singlesToSkip[i].hasTransitions()) {
         // added the backup(0) to make JIT happy
         ostr.println("// added the backup(0) to make JIT happy");
         ostr.println("charStream.backup(0);");

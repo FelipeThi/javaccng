@@ -28,39 +28,33 @@
 
 package org.javacc.parser;
 
-/**
- * Describes zero-or-more regular expressions (<foo*>).
- */
+/** Describes zero-or-more regular expressions (<foo*>). */
+public final class RZeroOrMore extends RegularExpression {
+  /** The regular expression which is repeated zero or more times. */
+  public RegularExpression regExp;
 
-public class RZeroOrMore extends RegularExpression {
+  public RZeroOrMore() {}
 
-  /**
-   * The regular expression which is repeated zero or more times.
-   */
-  public RegularExpression regexpr;
-
-  public Nfa GenerateNfa(final LexGen lexGen, boolean ignoreCase)
-  {
-     Nfa retVal = new Nfa(lexGen);
-     NfaState startState = retVal.start;
-     NfaState finalState = retVal.end;
-
-     Nfa temp = regexpr.GenerateNfa(lexGen, ignoreCase);
-
-     startState.AddMove(temp.start);
-     startState.AddMove(finalState);
-     temp.end.AddMove(finalState);
-     temp.end.AddMove(temp.start);
-
-     return retVal;
+  public RZeroOrMore(Token t, RegularExpression re) {
+    setLine(t.getBeginLine());
+    setColumn(t.getBeginColumn());
+    regExp = re;
   }
 
-    public RZeroOrMore() {}
+  @Override
+  public Nfa generateNfa(LexGen lexGen, boolean ignoreCase) {
+    Nfa nfa = new Nfa(lexGen);
 
-    public RZeroOrMore(Token t, RegularExpression r) {
-        this.setLine(t.getBeginLine());
-        this.setColumn(t.getBeginColumn());
-        this.regexpr = r;
-    }
+    NfaState startState = nfa.start;
+    NfaState finalState = nfa.end;
 
+    Nfa temp = regExp.generateNfa(lexGen, ignoreCase);
+
+    startState.addMove(temp.start);
+    startState.addMove(finalState);
+    temp.end.addMove(finalState);
+    temp.end.addMove(temp.start);
+
+    return nfa;
+  }
 }

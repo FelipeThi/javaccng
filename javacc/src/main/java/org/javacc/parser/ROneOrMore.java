@@ -28,37 +28,29 @@
 
 package org.javacc.parser;
 
-/**
- * Describes one-or-more regular expressions (<foo+>).
- */
+/** Describes one-or-more regular expressions (&lt;foo+&gt;). */
+public final class ROneOrMore extends RegularExpression {
+  /** The regular expression which is repeated one or more times. */
+  public RegularExpression regExp;
 
-public class ROneOrMore extends RegularExpression {
-
-  /**
-   * The regular expression which is repeated one or more times.
-   */
-  public RegularExpression regexpr;
-
-  public Nfa GenerateNfa(final LexGen lexGen, boolean ignoreCase)
-  {
-     Nfa retVal = new Nfa(lexGen);
-     NfaState startState = retVal.start;
-     NfaState finalState = retVal.end;
-
-     Nfa temp = regexpr.GenerateNfa(lexGen, ignoreCase);
-
-     startState.AddMove(temp.start);
-     temp.end.AddMove(temp.start);
-     temp.end.AddMove(finalState);
-
-     return retVal;
+  public ROneOrMore(Token t, RegularExpression re) {
+    setLine(t.getBeginLine());
+    setColumn(t.getBeginColumn());
+    regExp = re;
   }
 
-    public ROneOrMore() {}
+  @Override
+  public Nfa generateNfa(LexGen lexGen, boolean ignoreCase) {
+    Nfa retVal = new Nfa(lexGen);
+    NfaState startState = retVal.start;
+    NfaState finalState = retVal.end;
 
-    public ROneOrMore(Token t, RegularExpression re) {
-        this.setLine(t.getBeginLine());
-        this.setColumn(t.getBeginColumn());
-        this.regexpr = re;
-    }
+    Nfa temp = regExp.generateNfa(lexGen, ignoreCase);
+
+    startState.addMove(temp.start);
+    temp.end.addMove(temp.start);
+    temp.end.addMove(finalState);
+
+    return retVal;
+  }
 }

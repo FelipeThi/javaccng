@@ -75,7 +75,7 @@ public class LookaheadCalc {
       if (m.match[i] == 0) {
         ret += " <EOF>";
       } else {
-        RegularExpression re = (RegularExpression) JavaCCGlobals.rexps_of_tokens.get(new Integer(m.match[i]));
+        RegularExpression re = (RegularExpression) JavaCCGlobals.regExpsOfTokens.get(new Integer(m.match[i]));
         if (re instanceof RStringLiteral) {
           ret += " \"" + JavaCCGlobals.add_escapes(((RStringLiteral)re).image) + "\"";
         } else if (re.label != null && !re.label.equals("")) {

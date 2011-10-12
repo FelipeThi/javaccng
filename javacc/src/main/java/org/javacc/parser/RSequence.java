@@ -25,6 +25,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.javacc.parser;
 
 import java.util.ArrayList;
@@ -34,53 +35,49 @@ import java.util.List;
  * Describes regular expressions which are sequences of
  * other regular expressions.
  */
-
-public class RSequence extends RegularExpression {
-
+public final class RSequence extends RegularExpression {
   /**
    * The list of units in this regular expression sequence.  Each
    * list component will narrow to RegularExpression.
    */
   public List units = new ArrayList();
 
-  public Nfa GenerateNfa(final LexGen lexGen, boolean ignoreCase)
-  {
-     if (units.size() == 1)
-        return ((RegularExpression)units.get(0)).GenerateNfa(lexGen, ignoreCase);
+  RSequence() {}
 
-     Nfa retVal = new Nfa(lexGen);
-     NfaState startState = retVal.start;
-     NfaState finalState = retVal.end;
-     Nfa temp1;
-     Nfa temp2 = null;
-
-     RegularExpression curRE;
-
-     curRE = (RegularExpression)units.get(0);
-     temp1 = curRE.GenerateNfa(lexGen, ignoreCase);
-     startState.AddMove(temp1.start);
-
-     for (int i = 1; i < units.size(); i++)
-     {
-        curRE = (RegularExpression)units.get(i);
-
-        temp2 = curRE.GenerateNfa(lexGen, ignoreCase);
-        temp1.end.AddMove(temp2.start);
-        temp1 = temp2;
-     }
-
-     temp2.end.AddMove(finalState);
-
-     return retVal;
+  RSequence(List seq) {
+    ordinal = Integer.MAX_VALUE;
+    units = seq;
   }
 
-  RSequence()
-  {
-  }
+  @Override
+  public Nfa generateNfa(LexGen lexGen, boolean ignoreCase) {
+    if (units.size() == 1) {
+      return ((RegularExpression) units.get(0)).generateNfa(lexGen, ignoreCase);
+    }
 
-  RSequence(List seq)
-  {
-     ordinal = Integer.MAX_VALUE;
-     units = seq;
+    Nfa nfa = new Nfa(lexGen);
+
+    NfaState startState = nfa.start;
+    NfaState finalState = nfa.end;
+    Nfa temp1;
+    Nfa temp2 = null;
+
+    RegularExpression curRE;
+
+    curRE = (RegularExpression) units.get(0);
+    temp1 = curRE.generateNfa(lexGen, ignoreCase);
+    startState.addMove(temp1.start);
+
+    for (int i = 1; i < units.size(); i++) {
+      curRE = (RegularExpression) units.get(i);
+
+      temp2 = curRE.generateNfa(lexGen, ignoreCase);
+      temp1.end.addMove(temp2.start);
+      temp1 = temp2;
+    }
+
+    temp2.end.addMove(finalState);
+
+    return nfa;
   }
 }

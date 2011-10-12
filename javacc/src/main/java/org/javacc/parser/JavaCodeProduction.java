@@ -25,24 +25,18 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.javacc.parser;
 
-/**
- * Describes JAVACODE productions.
- */
+import java.util.ArrayList;
+import java.util.List;
 
-public class JavaCodeProduction extends NormalProduction {
+/** Describes JAVACODE productions. */
+public final class JavaCodeProduction extends NormalProduction {
+  /** The tokens that implement this JAVACODE production. */
+  private final List<Token> tokens = new ArrayList<Token>();
 
-  /**
-   * The tokens that implement this JAVACODE production.
-   */
-  private java.util.List code_tokens = new java.util.ArrayList();
-
-  /**
-   * @return the code_tokens
-   */
-  public java.util.List getCodeTokens() {
-    return code_tokens;
+  public List<Token> getCodeTokens() {
+    return tokens;
   }
-
 }

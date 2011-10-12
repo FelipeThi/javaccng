@@ -25,98 +25,62 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.javacc.parser;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Describes non terminals.
- */
-
-public class NonTerminal extends Expansion {
-
+/** Describes non terminals. */
+public final class NonTerminal extends Expansion {
   /**
    * The LHS to which the return value of the non-terminal
    * is assigned.  In case there is no LHS, then the vector
    * remains empty.
    */
-  private List lhsTokens = new ArrayList();
-
-  /**
-   * The name of the non-terminal.
-   */
+  private List<Token> lhsTokens = new ArrayList<Token>();
+  /** The name of the non-terminal. */
   private String name;
-
-  /**
-   * The list of all tokens in the argument list.
-   */
-  private List argument_tokens = new ArrayList();
-
-  /**
-   * The production this non-terminal corresponds to.
-   */
+  /** The list of all tokens in the argument list. */
+  private List<Token> argumentTokens = new ArrayList<Token>();
+  /** The production this non-terminal corresponds to. */
   private NormalProduction prod;
 
-  public StringBuffer dump(int indent, Set alreadyDumped) {
-    StringBuffer value = super.dump(indent, alreadyDumped).append(' ').append(name);
-    return value;
+  public void setLhsTokens(List<Token> lhsTokens) {
+    this.lhsTokens = lhsTokens;
   }
 
-/**
- * @param lhsTokens the lhsTokens to set
- */
-public void setLhsTokens(List lhsTokens) {
-	this.lhsTokens = lhsTokens;
-}
+  public List<Token> getLhsTokens() {
+    return lhsTokens;
+  }
 
-/**
- * @return the lhsTokens
- */
-public List getLhsTokens() {
-	return lhsTokens;
-}
+  public void setName(String name) {
+    this.name = name;
+  }
 
-/**
- * @param name the name to set
- */
-public void setName(String name) {
-	this.name = name;
-}
+  public String getName() {
+    return name;
+  }
 
-/**
- * @return the name
- */
-public String getName() {
-	return name;
-}
+  public void setArgumentTokens(List<Token> argumentTokens) {
+    this.argumentTokens = argumentTokens;
+  }
 
-/**
- * @param argument_tokens the argument_tokens to set
- */
-public void setArgumentTokens(List argument_tokens) {
-	this.argument_tokens = argument_tokens;
-}
+  public List<Token> getArgumentTokens() {
+    return argumentTokens;
+  }
 
-/**
- * @return the argument_tokens
- */
-public List getArgumentTokens() {
-	return argument_tokens;
-}
+  public NormalProduction setProd(NormalProduction prod) {
+    return this.prod = prod;
+  }
 
-/**
- * @param prod the prod to set
- */
-public NormalProduction setProd(NormalProduction prod) {
-	return this.prod = prod;
-}
+  public NormalProduction getProd() {
+    return prod;
+  }
 
-/**
- * @return the prod
- */
-public NormalProduction getProd() {
-	return prod;
-}
+  @Override
+  public StringBuffer dump(int indent, Set alreadyDumped) {
+    return super.dump(indent, alreadyDumped).append(' ').append(name);
+  }
 }

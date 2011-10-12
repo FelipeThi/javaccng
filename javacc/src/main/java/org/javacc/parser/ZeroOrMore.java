@@ -30,32 +30,26 @@ package org.javacc.parser;
 
 import java.util.Set;
 
-/**
- * Describes zero-or-more expansions (e.g., foo*).
- */
-
-public class ZeroOrMore extends Expansion {
-
-  /**
-   * The expansion which is repeated zero or more times.
-   */
+/** Describes zero-or-more expansions (e.g., foo*). */
+public final class ZeroOrMore extends Expansion {
+  /** The expansion which is repeated zero or more times. */
   public Expansion expansion;
 
-    public ZeroOrMore() {}
+  public ZeroOrMore(Token t, Expansion e) {
+    setLine(t.getBeginLine());
+    setColumn(t.getBeginColumn());
+    expansion = e;
+    expansion.parent = this;
+  }
 
-    public ZeroOrMore(Token token, Expansion expansion) {
-        this.setLine(token.getBeginLine());
-        this.setColumn(token.getBeginColumn());
-        this.expansion = expansion;
-        this.expansion.parent = this;
-    }
-
-    public StringBuffer dump(int indent, Set alreadyDumped) {
-      StringBuffer sb = super.dump(indent, alreadyDumped);
-      if (alreadyDumped.contains(this))
-        return sb;
-      alreadyDumped.add(this);
-      sb.append(eol).append(expansion.dump(indent + 1, alreadyDumped));
+  @Override
+  public StringBuffer dump(int indent, Set alreadyDumped) {
+    StringBuffer sb = super.dump(indent, alreadyDumped);
+    if (alreadyDumped.contains(this)) {
       return sb;
     }
+    alreadyDumped.add(this);
+    sb.append("\n").append(expansion.dump(indent + 1, alreadyDumped));
+    return sb;
+  }
 }

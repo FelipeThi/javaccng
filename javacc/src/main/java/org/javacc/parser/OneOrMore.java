@@ -30,32 +30,26 @@ package org.javacc.parser;
 
 import java.util.Set;
 
-/**
- * Describes one-or-more expansions (e.g., foo+).
- */
-
-public class OneOrMore extends Expansion {
-
-  /**
-   * The expansion which is repeated one or more times.
-   */
+/** Describes one-or-more expansions (e.g., foo+). */
+public final class OneOrMore extends Expansion {
+  /** The expansion which is repeated one or more times. */
   public Expansion expansion;
 
-    public OneOrMore() {}
+  public OneOrMore(Token t, Expansion e) {
+    setLine(t.getBeginLine());
+    setColumn(t.getBeginColumn());
+    expansion = e;
+    expansion.parent = this;
+  }
 
-    public OneOrMore(Token t, Expansion e) {
-        this.setLine(t.getBeginLine());
-        this.setColumn(t.getBeginColumn());
-        this.expansion = e;
-        expansion.parent = this;
-    }
-
-    public StringBuffer dump(int indent, Set alreadyDumped) {
-      StringBuffer sb = super.dump(indent, alreadyDumped);
-      if (alreadyDumped.contains(this))
-        return sb;
-      alreadyDumped.add(this);
-      sb.append(eol).append(expansion.dump(indent + 1, alreadyDumped));
+  @Override
+  public StringBuffer dump(int indent, Set alreadyDumped) {
+    StringBuffer sb = super.dump(indent, alreadyDumped);
+    if (alreadyDumped.contains(this)) {
       return sb;
     }
+    alreadyDumped.add(this);
+    sb.append("\n").append(expansion.dump(indent + 1, alreadyDumped));
+    return sb;
+  }
 }

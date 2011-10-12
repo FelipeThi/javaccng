@@ -25,32 +25,27 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.javacc.parser;
 
-/**
- * Describes zero-or-one regular expressions (<foo?>).
- */
+/** Describes zero-or-one regular expressions (&lt;foo?&gt;). */
+public final class RZeroOrOne extends RegularExpression {
+  /** The regular expression which is repeated zero or one times. */
+  public RegularExpression regExp;
 
-public class RZeroOrOne extends RegularExpression {
+  @Override
+  public Nfa generateNfa(LexGen lexGen, boolean ignoreCase) {
+    Nfa nfa = new Nfa(lexGen);
 
-  /**
-   * The regular expression which is repeated zero or one times.
-   */
-  public RegularExpression regexpr;
+    NfaState startState = nfa.start;
+    NfaState finalState = nfa.end;
 
-  public Nfa GenerateNfa(final LexGen lexGen, boolean ignoreCase)
-  {
-     Nfa retVal = new Nfa(lexGen);
-     NfaState startState = retVal.start;
-     NfaState finalState = retVal.end;
+    Nfa temp = regExp.generateNfa(lexGen, ignoreCase);
 
-     Nfa temp = regexpr.GenerateNfa(lexGen, ignoreCase);
+    startState.addMove(temp.start);
+    startState.addMove(finalState);
+    temp.end.addMove(finalState);
 
-     startState.AddMove(temp.start);
-     startState.AddMove(finalState);
-     temp.end.AddMove(finalState);
-
-     return retVal;
+    return nfa;
   }
-
 }

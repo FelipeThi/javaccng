@@ -25,50 +25,42 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.javacc.parser;
 
 import java.util.ArrayList;
-import java.util.List;
 
-/**
- * Describes one-or-more regular expressions (<foo+>).
- */
-
-public class RRepetitionRange extends RegularExpression {
-
-  /**
-   * The regular expression which is repeated one or more times.
-   */
-  public RegularExpression regexpr;
+/** Describes one-or-more regular expressions (&lt;foo+&gt;). */
+public final class RRepetitionRange extends RegularExpression {
+  /** The regular expression which is repeated one or more times. */
+  public RegularExpression regExp;
   public int min = 0;
   public int max = -1;
   public boolean hasMax;
 
-  public Nfa GenerateNfa(final LexGen lexGen, boolean ignoreCase)
-  {
-     List units = new ArrayList();
-     RSequence seq;
-     int i;
+  @Override
+  public Nfa generateNfa(LexGen lexGen, boolean ignoreCase) {
+    ArrayList<RegularExpression> units = new ArrayList<RegularExpression>();
 
-     for (i = 0; i < min; i++)
-     {
-        units.add(regexpr);
-     }
+    int i;
 
-     if (hasMax && max == -1) // Unlimited
-     {
-        RZeroOrMore zoo = new RZeroOrMore();
-        zoo.regexpr = regexpr;
-        units.add(zoo);
-     }
+    for (i = 0; i < min; i++) {
+      units.add(regExp);
+    }
 
-     while (i++ < max)
-     {
-        RZeroOrOne zoo = new RZeroOrOne();
-        zoo.regexpr = regexpr;
-        units.add(zoo);
-     }
-     seq = new RSequence(units);
-     return seq.GenerateNfa(lexGen, ignoreCase);
+    if (hasMax && max == -1) {
+      RZeroOrMore zoo = new RZeroOrMore();
+      zoo.regExp = regExp;
+      units.add(zoo);
+    }
+
+    while (i++ < max) {
+      RZeroOrOne zoo = new RZeroOrOne();
+      zoo.regExp = regExp;
+      units.add(zoo);
+    }
+
+    RSequence seq = new RSequence(units);
+    return seq.generateNfa(lexGen, ignoreCase);
   }
 }

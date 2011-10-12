@@ -115,7 +115,7 @@ public final class LookaheadWalk {
       retval.addAll(genFirstSet(partialMatches, ((ZeroOrOne)exp).expansion));
       return retval;
     } else if (exp instanceof TryBlock) {
-      return genFirstSet(partialMatches, ((TryBlock)exp).exp);
+      return genFirstSet(partialMatches, ((TryBlock)exp).expansion);
     } else if (considerSemanticLA &&
                exp instanceof Lookahead &&
                ((Lookahead)exp).getActionTokens().size() != 0

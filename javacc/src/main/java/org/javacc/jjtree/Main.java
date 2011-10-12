@@ -25,21 +25,13 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.javacc.jjtree;
 
-/**
- * Entry point.
- */
 public final class Main {
-
   private Main() {}
 
-  public static void main(String args[])
-  {
-    JJTree jjtree = new JJTree();
-    int result = jjtree.main(args);
-    System.exit(result);
+  public static void main(String args[]) throws Exception {
+    System.exit(new JJTree().main(args));
   }
 }
-
-/*end*/

@@ -68,7 +68,7 @@ final class NfaStates {
         NfaState tmp = (NfaState) allStates.get(i);
 
         if (!tmp.closureDone)
-           tmp.OptimizeEpsilonMoves(true);
+           tmp.optimizeEpsilonMoves(true);
      }
 
      for (int i = 0; i < allStates.size(); i++)
@@ -76,7 +76,7 @@ final class NfaStates {
         NfaState tmp = (NfaState) allStates.get(i);
 
         if (!tmp.closureDone)
-           tmp.OptimizeEpsilonMoves(false);
+           tmp.optimizeEpsilonMoves(false);
      }
 
      for (int i = 0; i < allStates.size(); i++)
@@ -117,7 +117,7 @@ final class NfaStates {
 
      for (int i = states.size(); i-- > 0;)
         if (retVal >
-            (tmp = ((NfaState)states.get(i)).MoveFrom(c, newStates)))
+            (tmp = ((NfaState)states.get(i)).moveFrom(c, newStates)))
            retVal = tmp;
 
      return retVal;
@@ -135,7 +135,7 @@ final class NfaStates {
          if ((tmp1 = states[i]) == null)
             break;
 
-         if (tmp1.CanMoveUsingChar(c))
+         if (tmp1.canMoveUsingChar(c))
          {
             if (tmp1.kindToPrint != Integer.MAX_VALUE)
             {
@@ -540,7 +540,7 @@ final class NfaStates {
      }
 
      if (stateForCase != null)
-        toPrint = stateForCase.PrintNoBreak(ostr, byteNum, dumped);
+        toPrint = stateForCase.printNoBreak(ostr, byteNum, dumped);
 
      if (neededStates == 0)
      {
@@ -564,7 +564,7 @@ final class NfaStates {
            ostr.println("               case " + toBePrinted.stateName + ":");
 
         dumped[toBePrinted.stateName] = true;
-        toBePrinted.DumpAsciiMove(ostr, byteNum, dumped);
+        toBePrinted.dumpAsciiMove(ostr, byteNum, dumped);
         return;
      }
 
@@ -588,7 +588,7 @@ final class NfaStates {
 
            if (stateBlock)
               dumped[tmp.stateName] = true;
-           tmp.DumpAsciiMoveForCompositeState(ostr, byteNum, j != 0);
+           tmp.dumpAsciiMoveForCompositeState(ostr, byteNum, j != 0);
         }
      }
 
@@ -613,7 +613,7 @@ final class NfaStates {
         NfaState temp = (NfaState) allStates.get(i);
 
         if (dumped[temp.stateName] || temp.lexState != lexGen.lexStateIndex ||
-            !temp.HasTransitions() || temp.dummy ||
+            !temp.hasTransitions() || temp.dummy ||
             temp.stateName == -1)
            continue;
 
@@ -627,7 +627,7 @@ final class NfaStates {
            if (dumped[temp.stateForCase.stateName])
               continue;
 
-           toPrint = (temp.stateForCase.PrintNoBreak(ostr, byteNum, dumped));
+           toPrint = (temp.stateForCase.printNoBreak(ostr, byteNum, dumped));
 
            if (temp.asciiMoves[byteNum] == 0L)
            {
@@ -646,7 +646,7 @@ final class NfaStates {
 
         dumped[temp.stateName] = true;
         ostr.println("               case " + temp.stateName + ":");
-        temp.DumpAsciiMove(ostr, byteNum, dumped);
+        temp.dumpAsciiMove(ostr, byteNum, dumped);
      }
 
      ostr.println("               default: break;");
@@ -694,7 +694,7 @@ final class NfaStates {
      }
 
      if (stateForCase != null)
-        toPrint = stateForCase.PrintNoBreak(ostr, -1, dumped);
+        toPrint = stateForCase.printNoBreak(ostr, -1, dumped);
 
      if (neededStates == 0)
      {
@@ -715,7 +715,7 @@ final class NfaStates {
            ostr.println("               case " + toBePrinted.stateName + ":");
 
         dumped[toBePrinted.stateName] = true;
-        toBePrinted.DumpNonAsciiMove(ostr, dumped);
+        toBePrinted.dumpNonAsciiMove(ostr, dumped);
         return;
      }
 
@@ -735,7 +735,7 @@ final class NfaStates {
         {
            if (stateBlock)
               dumped[tmp.stateName] = true;
-           tmp.DumpNonAsciiMoveForCompositeState(ostr);
+           tmp.dumpNonAsciiMoveForCompositeState(ostr);
         }
      }
 
@@ -761,7 +761,7 @@ final class NfaStates {
         NfaState temp = (NfaState) allStates.get(i);
 
         if (temp.stateName == -1 || dumped[temp.stateName] || temp.lexState != lexGen.lexStateIndex ||
-            !temp.HasTransitions() || temp.dummy )
+            !temp.hasTransitions() || temp.dummy )
            continue;
 
         String toPrint = "";
@@ -774,7 +774,7 @@ final class NfaStates {
            if (dumped[temp.stateForCase.stateName])
               continue;
 
-           toPrint = (temp.stateForCase.PrintNoBreak(ostr, -1, dumped));
+           toPrint = (temp.stateForCase.printNoBreak(ostr, -1, dumped));
 
            if (temp.nonAsciiMethod == -1)
            {
@@ -794,7 +794,7 @@ final class NfaStates {
         dumped[temp.stateName] = true;
         //System.out.println("case : " + temp.stateName);
         ostr.println("               case " + temp.stateName + ":");
-        temp.DumpNonAsciiMove(ostr, dumped);
+        temp.dumpNonAsciiMove(ostr, dumped);
      }
 
      ostr.println("               default: break;");
@@ -813,7 +813,7 @@ final class NfaStates {
      for (int i = 0; i < nonAsciiTableForMethod.size(); i++)
      {
         NfaState tmp = (NfaState) nonAsciiTableForMethod.get(i);
-        tmp.DumpNonAsciiMoveMethod(ostr);
+        tmp.dumpNonAsciiMoveMethod(ostr);
      }
   }
 
@@ -898,7 +898,7 @@ final class NfaStates {
         NfaState stateForCase = null;
         NfaState tmpState = (NfaState) allStates.get(j);
 
-        if (tmpState.stateName == -1 || tmpState.dummy || !tmpState.UsefulState() ||
+        if (tmpState.stateName == -1 || tmpState.dummy || !tmpState.usefulState() ||
             tmpState.next == null || tmpState.next.usefulEpsilonMoves < 1)
            continue;
 
@@ -1003,7 +1003,7 @@ final class NfaStates {
         NfaState temp = (NfaState) allStates.get(i);
 
         if (temp.lexState != lexGen.lexStateIndex ||
-            !temp.HasTransitions() || temp.dummy ||
+            !temp.hasTransitions() || temp.dummy ||
             temp.stateName == -1)
            continue;
 
@@ -1016,7 +1016,7 @@ final class NfaStates {
         kindsForStates[temp.stateName] = temp.lookingFor;
         statesForState[lexGen.lexStateIndex][temp.stateName] = temp.compositeStates;
 
-        temp.GenerateNonAsciiMoves(ostr);
+        temp.generateNonAsciiMoves(ostr);
      }
 
      Enumeration e = stateNameForComposite.keys();
@@ -1360,7 +1360,7 @@ final class NfaStates {
          /*if (compositeStateTable.get(tmpState.next.epsilonMovesString) != null)
             tmpState.next.usefulEpsilonMoves = 1;
          else*/ if ((newSet = (int[])fixedSets.get(tmpState.next.epsilonMovesString)) != null)
-            tmpState.FixNextStates(newSet);
+            tmpState.fixNextStates(newSet);
       }
    }
 }

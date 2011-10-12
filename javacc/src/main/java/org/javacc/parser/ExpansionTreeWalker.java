@@ -64,7 +64,7 @@ public final class ExpansionTreeWalker {
           preOrderWalk(nested_e, opObj);
         }
       } else if (node instanceof TryBlock) {
-        preOrderWalk(((TryBlock)node).exp, opObj);
+        preOrderWalk(((TryBlock)node).expansion, opObj);
       } else if (node instanceof RChoice) {
         for (Iterator it = ((RChoice)node).getChoices().iterator(); it.hasNext();) {
           preOrderWalk((Expansion)it.next(), opObj);
@@ -74,13 +74,13 @@ public final class ExpansionTreeWalker {
           preOrderWalk((Expansion)it.next(), opObj);
         }
       } else if (node instanceof ROneOrMore) {
-        preOrderWalk(((ROneOrMore)node).regexpr, opObj);
+        preOrderWalk(((ROneOrMore)node).regExp, opObj);
       } else if (node instanceof RZeroOrMore) {
-        preOrderWalk(((RZeroOrMore)node).regexpr, opObj);
+        preOrderWalk(((RZeroOrMore)node).regExp, opObj);
       } else if (node instanceof RZeroOrOne) {
-        preOrderWalk(((RZeroOrOne)node).regexpr, opObj);
+        preOrderWalk(((RZeroOrOne)node).regExp, opObj);
       } else if (node instanceof RRepetitionRange) {
-        preOrderWalk(((RRepetitionRange)node).regexpr, opObj);
+        preOrderWalk(((RRepetitionRange)node).regExp, opObj);
       }
     }
   }
@@ -112,7 +112,7 @@ public final class ExpansionTreeWalker {
           postOrderWalk(nested_e, opObj);
         }
       } else if (node instanceof TryBlock) {
-        postOrderWalk(((TryBlock)node).exp, opObj);
+        postOrderWalk(((TryBlock)node).expansion, opObj);
       } else if (node instanceof RChoice) {
         for (Iterator it = ((RChoice)node).getChoices().iterator(); it.hasNext();) {
           postOrderWalk((Expansion)it.next(), opObj);
@@ -122,13 +122,13 @@ public final class ExpansionTreeWalker {
           postOrderWalk((Expansion)it.next(), opObj);
         }
       } else if (node instanceof ROneOrMore) {
-        postOrderWalk(((ROneOrMore)node).regexpr, opObj);
+        postOrderWalk(((ROneOrMore)node).regExp, opObj);
       } else if (node instanceof RZeroOrMore) {
-        postOrderWalk(((RZeroOrMore)node).regexpr, opObj);
+        postOrderWalk(((RZeroOrMore)node).regExp, opObj);
       } else if (node instanceof RZeroOrOne) {
-        postOrderWalk(((RZeroOrOne)node).regexpr, opObj);
+        postOrderWalk(((RZeroOrOne)node).regExp, opObj);
       } else if (node instanceof RRepetitionRange) {
-        postOrderWalk(((RRepetitionRange)node).regexpr, opObj);
+        postOrderWalk(((RRepetitionRange)node).regExp, opObj);
       }
     }
     opObj.action(node);

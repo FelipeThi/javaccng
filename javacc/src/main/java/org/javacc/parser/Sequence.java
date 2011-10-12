@@ -37,36 +37,31 @@ import java.util.Set;
  * Describes expansions that are sequences of expansion
  * units.  (c1 c2 ...)
  */
-
-public class Sequence extends Expansion {
-
+public final class Sequence extends Expansion {
   /**
    * The list of units in this expansion sequence.  Each
    * List component will narrow to Expansion.
    */
-  public List units = new ArrayList();
+  public final List<Expansion> units = new ArrayList<Expansion>();
 
-    public Sequence() {}
+  public Sequence() {}
 
-    public Sequence(Token token, Lookahead lookahead) {
-        this.setLine(token.getBeginLine());
-        this.setColumn(token.getBeginColumn());
-        this.units.add(lookahead);
+  public Sequence(Token t, Lookahead la) {
+    setLine(t.getBeginLine());
+    setColumn(t.getBeginColumn());
+    units.add(la);
+  }
+
+  public StringBuffer dump(int indent, Set alreadyDumped) {
+    if (alreadyDumped.contains(this)) {
+      return super.dump(0, alreadyDumped).insert(0, '[').append(']').insert(0, dumpPrefix(indent));
     }
-
-
-    public StringBuffer dump(int indent, Set alreadyDumped) {
-      if (alreadyDumped.contains(this))
-      {
-        return super.dump(0, alreadyDumped).insert(0, '[').append(']').insert(0, dumpPrefix(indent));
-      }
-
-      alreadyDumped.add(this);
-      final StringBuffer sb = super.dump(indent, alreadyDumped);
-      for (Iterator it = units.iterator(); it.hasNext(); ) {
-        Expansion next = (Expansion)it.next();
-        sb.append(eol).append(next.dump(indent + 1, alreadyDumped));
-      }
-      return sb;
+    alreadyDumped.add(this);
+    final StringBuffer sb = super.dump(indent, alreadyDumped);
+    for (Iterator it = units.iterator(); it.hasNext(); ) {
+      Expansion next = (Expansion) it.next();
+      sb.append("\n").append(next.dump(indent + 1, alreadyDumped));
     }
+    return sb;
+  }
 }

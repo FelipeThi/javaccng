@@ -25,6 +25,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.javacc.jjtree;
 
 import org.javacc.parser.JavaCCGlobals;
@@ -39,8 +40,8 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.Reader;
-final class IO
-{
+
+final class IO {
   private String ifn;
   private String ofn;
   private Reader in;
@@ -48,71 +49,55 @@ final class IO
   private PrintStream msg;
   private PrintStream err;
 
-  IO()
-  {
+  IO() {
     ifn = "<uninitialized input>";
     msg = System.out;
     err = System.err;
   }
 
-  String getInputFileName()
-  {
+  String getInputFileName() {
     return ifn;
   }
 
-  Reader getIn()
-  {
+  Reader getIn() {
     return in;
   }
 
-  String getOutputFileName()
-  {
+  String getOutputFileName() {
     return ofn;
   }
 
-  PrintWriter getOut()
-  {
+  PrintWriter getOut() {
     return out;
   }
 
-  PrintStream getMsg()
-  {
+  PrintStream getMsg() {
     return msg;
   }
 
-  PrintStream getErr()
-  {
+  PrintStream getErr() {
     return err;
   }
 
-
-  void print(String s)
-  {
+  void print(String s) {
     out.print(s);
   }
 
-  void println(String s)
-  {
+  void println(String s) {
     out.println(s);
   }
 
-  void println()
-  {
+  void println() {
     out.println();
   }
 
-
-  void closeAll()
-  {
-    if (out != null) out.close();
-    if (msg != null) msg.flush();
-    if (err != null) err.flush();
+  void closeAll() {
+    if (out != null) { out.close(); }
+    if (msg != null) { msg.flush(); }
+    if (err != null) { err.flush(); }
   }
 
-
-
-
-  private String create_output_file_name(String i) {
+  private String createOutputFileName(String i) {
     String o = JJTreeOptions.getOutputFile();
 
     if (o.equals("")) {
@@ -124,11 +109,13 @@ final class IO
       int di = i.lastIndexOf('.');
       if (di == -1) {
         o = i + ".jj";
-      } else {
+      }
+      else {
         String suffix = i.substring(di);
         if (suffix.equals(".jj")) {
-          o  = i + ".jj";
-        } else {
+          o = i + ".jj";
+        }
+        else {
           o = i.substring(0, di) + ".jj";
         }
       }
@@ -137,9 +124,7 @@ final class IO
     return o;
   }
 
-
-  void setInput(String fn) throws JJTreeIOException
-  {
+  void setInput(String fn) throws JJTreeIOException {
     try {
       File fp = new File(fn);
       if (!fp.exists()) {
@@ -154,29 +139,30 @@ final class IO
       ifn = fp.getPath();
 
       in = new BufferedReader(new InputStreamReader(new FileInputStream(ifn), JJTreeOptions.getGrammarEncoding()));
-
-    } catch (NullPointerException ne) { // Should never happen
+    }
+    catch (NullPointerException ne) { // Should never happen
       throw new JJTreeIOException(ne.toString());
-    } catch (SecurityException se) {
+    }
+    catch (SecurityException se) {
       throw new JJTreeIOException("Security violation while trying to open " + fn);
-    } catch (FileNotFoundException e) {
+    }
+    catch (FileNotFoundException e) {
       throw new JJTreeIOException("File " + fn + " not found.");
-    } catch (IOException ioe) {
+    }
+    catch (IOException ioe) {
       throw new JJTreeIOException(ioe.toString());
     }
   }
 
-    void setOutput() throws JJTreeIOException {
-        try {
-          JavaCCGlobals.createOutputDir(JJTreeOptions.getJJTreeOutputDirectory());
-          File ofile = new File(JJTreeOptions.getJJTreeOutputDirectory(), create_output_file_name(ifn));
-          ofn = ofile.toString();
-          out = new PrintWriter(new FileWriter(ofile));
-        } catch (IOException ioe) {
-          throw new JJTreeIOException("Can't create output file " + ofn);
-        }
+  void setOutput() throws JJTreeIOException {
+    try {
+      JavaCCGlobals.createOutputDir(JJTreeOptions.getJJTreeOutputDirectory());
+      File file = new File(JJTreeOptions.getJJTreeOutputDirectory(), createOutputFileName(ifn));
+      ofn = file.toString();
+      out = new PrintWriter(new FileWriter(file));
     }
-
+    catch (IOException ioe) {
+      throw new JJTreeIOException("Can't create output file " + ofn);
+    }
+  }
 }
-
-/*end*/

@@ -40,8 +40,8 @@ public class JJDoc {
   void start() {
     Generator generator = JJDocGlobals.getGenerator();
     generator.documentStart();
-    emitTokenProductions(generator, JavaCCGlobals.rexprlist);
-    emitNormalProductions(generator, JavaCCGlobals.bnfproductions);
+    emitTokenProductions(generator, JavaCCGlobals.regExpList);
+    emitNormalProductions(generator, JavaCCGlobals.bnfProductions);
     generator.documentEnd();
   }
   private Token getPrecedingSpecialToken(Token tok) {
@@ -88,7 +88,7 @@ public class JJDoc {
       emitTopLevelSpecialTokens(tp.firstToken, gen);
 
       String token = "";
-      if (tp.isExplicit) {
+      if (tp.explicit) {
         if (tp.lexStates == null) {
          token += "<*> ";
         } else {
@@ -106,13 +106,13 @@ public class JJDoc {
           token += " [IGNORE_CASE]";
         }
         token += " : {\n";
-        for (Iterator it2 = tp.respecs.iterator(); it2.hasNext();) {
-          RegExprSpec res = (RegExprSpec)it2.next();
+        for (Iterator it2 = tp.reSpecs.iterator(); it2.hasNext();) {
+          RegExpSpec res = (RegExpSpec)it2.next();
 
-          token += emitRE(res.rexp);
+          token += emitRE(res.regExp);
 
-          if (res.nsTok != null) {
-            token += " : " + res.nsTok.getImage();
+          if (res.nsToken != null) {
+            token += " : " + res.nsToken.getImage();
           }
 
           token += "\n";
@@ -241,11 +241,11 @@ public class JJDoc {
     }
   }
   private void emitExpansionTryBlock(TryBlock t, Generator gen) {
-    boolean needParens = t.exp instanceof Choice;
+    boolean needParens = t.expansion instanceof Choice;
     if (needParens) {
       gen.text("( ");
     }
-    emitExpansionTree(t.exp, gen);
+    emitExpansionTree(t.expansion, gen);
     if (needParens) {
       gen.text(" )");
     }
@@ -272,7 +272,7 @@ public class JJDoc {
     if (needBrackets) {
       returnString += "<";
       if (!justName) {
-        if (re.private_rexp) {
+        if (re.isPrivate) {
           returnString += "#";
         }
         if (hasLabel) {
@@ -283,7 +283,7 @@ public class JJDoc {
     }
     if (re instanceof RCharacterList) {
       RCharacterList cl = (RCharacterList)re;
-      if (cl.negated_list) {
+      if (cl.negatedList) {
         returnString += "~";
       }
       returnString += "[";
@@ -327,7 +327,7 @@ public class JJDoc {
     } else if (re instanceof ROneOrMore) {
       ROneOrMore om = (ROneOrMore)re;
       returnString += "(";
-      returnString += emitRE(om.regexpr);
+      returnString += emitRE(om.regExp);
       returnString += ")+";
     } else if (re instanceof RSequence) {
       RSequence s = (RSequence)re;
@@ -354,17 +354,17 @@ public class JJDoc {
     } else if (re instanceof RZeroOrMore) {
       RZeroOrMore zm = (RZeroOrMore)re;
       returnString += "(";
-      returnString += emitRE(zm.regexpr);
+      returnString += emitRE(zm.regExp);
       returnString += ")*";
     } else if (re instanceof RZeroOrOne) {
       RZeroOrOne zo = (RZeroOrOne)re;
       returnString += "(";
-      returnString += emitRE(zo.regexpr);
+      returnString += emitRE(zo.regExp);
       returnString += ")?";
 	} else if (re instanceof RRepetitionRange) {
 	  RRepetitionRange zo = (RRepetitionRange)re;
 	  returnString += "(";
-	  returnString += emitRE(zo.regexpr);
+	  returnString += emitRE(zo.regExp);
 	  returnString += ")";
 	  returnString += "{";
 	  if (zo.hasMax) {
