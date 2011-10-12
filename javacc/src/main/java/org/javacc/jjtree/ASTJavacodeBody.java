@@ -25,8 +25,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.javacc.jjtree;
 
+package org.javacc.jjtree;
 
 public class ASTJavacodeBody extends JJTreeNode {
   ASTJavacodeBody(int id) {
@@ -35,8 +35,8 @@ public class ASTJavacodeBody extends JJTreeNode {
 
   NodeScope node_scope;
 
-  public void print(IO io)
-  {
+  @Override
+  public void print(IO io) {
     if (node_scope.isVoid()) {
       super.print(io);
       return;
@@ -55,5 +55,3 @@ public class ASTJavacodeBody extends JJTreeNode {
     node_scope.tryTokenSequence(io, indent, first, getLastToken());
   }
 }
-
-/*end*/

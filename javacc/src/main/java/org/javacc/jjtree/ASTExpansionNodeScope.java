@@ -25,11 +25,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.javacc.jjtree;
 
-
-public class ASTExpansionNodeScope extends JJTreeNode
-{
+public class ASTExpansionNodeScope extends JJTreeNode {
   ASTExpansionNodeScope(int id) {
     super(id);
   }
@@ -37,8 +36,8 @@ public class ASTExpansionNodeScope extends JJTreeNode
   NodeScope node_scope;
   JJTreeNode expansion_unit;
 
-  public void print(IO io)
-  {
+  @Override
+  public void print(IO io) {
     String indent = getIndentation(expansion_unit);
     openJJTreeComment(io, node_scope.getNodeDescriptor().getDescriptor());
     io.println();
@@ -47,9 +46,6 @@ public class ASTExpansionNodeScope extends JJTreeNode
 
     // Print the "whiteOut" equivalent of the Node descriptor to preserve
     // line numbers in the generated file.
-    ((ASTNodeDescriptor)jjtGetChild(1)).print(io);
+    ((ASTNodeDescriptor) jjtGetChild(1)).print(io);
   }
-
 }
-
-/*end*/

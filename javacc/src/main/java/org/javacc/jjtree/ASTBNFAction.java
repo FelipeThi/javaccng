@@ -25,24 +25,23 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.javacc.jjtree;
 
-
 public class ASTBNFAction extends JJTreeNode {
-
   ASTBNFAction(int id) {
     super(id);
   }
 
-  private Node getScopingParent(NodeScope ns)
-  {
-    for (Node n = this.jjtGetParent(); n != null; n = n.jjtGetParent()) {
+  private Node getScopingParent(NodeScope ns) {
+    for (Node n = jjtGetParent(); n != null; n = n.jjtGetParent()) {
       if (n instanceof ASTBNFNodeScope) {
-        if (((ASTBNFNodeScope)n).node_scope == ns) {
+        if (((ASTBNFNodeScope) n).node_scope == ns) {
           return n;
         }
-      } else if (n instanceof ASTExpansionNodeScope) {
-        if (((ASTExpansionNodeScope)n).node_scope == ns) {
+      }
+      else if (n instanceof ASTExpansionNodeScope) {
+        if (((ASTExpansionNodeScope) n).node_scope == ns) {
           return n;
         }
       }
@@ -50,16 +49,14 @@ public class ASTBNFAction extends JJTreeNode {
     return null;
   }
 
-
-  public void print(IO io)
-  {
+  @Override
+  public void print(IO io) {
     /* Assume that this action requires an early node close, and then
        try to decide whether this assumption is false.  Do this by
        looking outwards through the enclosing expansion units.  If we
        ever find that we are enclosed in a unit which is not the final
        unit in a sequence we know that an early close is not
        required. */
-
     NodeScope ns = NodeScope.getEnclosingNodeScope(this);
     if (ns != null && !ns.isVoid()) {
       boolean needClose = true;
@@ -74,17 +71,17 @@ public class ASTBNFAction extends JJTreeNode {
             needClose = false;
             break;
           }
-        } else if (p instanceof ASTBNFZeroOrOne ||
-                 p instanceof ASTBNFZeroOrMore ||
-                 p instanceof ASTBNFOneOrMore) {
+        }
+        else if (p instanceof ASTBNFZeroOrOne
+            || p instanceof ASTBNFZeroOrMore
+            || p instanceof ASTBNFOneOrMore) {
           needClose = false;
           break;
         }
         if (p == sp) {
-          /* No more parents to look at. */
-          break;
+          break; // No more parents to look at.
         }
-        n = (JJTreeNode)p;
+        n = (JJTreeNode) p;
       }
       if (needClose) {
         openJJTreeComment(io, null);
@@ -95,8 +92,5 @@ public class ASTBNFAction extends JJTreeNode {
     }
     super.print(io);
   }
-
-
 }
 
-/*end*/

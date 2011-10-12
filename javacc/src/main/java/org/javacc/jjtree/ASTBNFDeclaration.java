@@ -25,8 +25,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.javacc.jjtree;
 
+package org.javacc.jjtree;
 
 public class ASTBNFDeclaration extends JJTreeNode {
   ASTBNFDeclaration(int id) {
@@ -35,19 +35,20 @@ public class ASTBNFDeclaration extends JJTreeNode {
 
   NodeScope node_scope;
 
-  public void print(IO io)
-  {
+  @Override
+  public void print(IO io) {
     if (!node_scope.isVoid()) {
       String indent = "";
       if (TokenUtils.hasTokens(this)) {
         for (int i = 1; i < getFirstToken().getBeginColumn(); ++i) {
           indent += " ";
         }
-      } else {
+      }
+      else {
         indent = "  ";
       }
 
-      openJJTreeComment(io,  node_scope.getNodeDescriptorText());
+      openJJTreeComment(io, node_scope.getNodeDescriptorText());
       io.println();
       node_scope.insertOpenNodeCode(io, indent);
       closeJJTreeComment(io);
@@ -55,5 +56,3 @@ public class ASTBNFDeclaration extends JJTreeNode {
     super.print(io);
   }
 }
-
-/*end*/

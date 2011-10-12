@@ -25,17 +25,14 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.javacc.jjtree;
 
-/**
- * Thrown when ther is a problem reading or writing to the file system.
- */
-class JJTreeIOException extends java.io.IOException {
+import java.io.IOException;
 
-  JJTreeIOException(String detail)
-  {
+/** Thrown when ther is a problem reading or writing to the file system. */
+class JJTreeIOException extends IOException {
+  JJTreeIOException(String detail) {
     super(detail);
   }
 }
-
-/*end*/

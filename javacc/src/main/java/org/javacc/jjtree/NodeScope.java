@@ -25,33 +25,33 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.javacc.jjtree;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
-public class NodeScope
-{
+public class NodeScope {
   private ASTProduction production;
-  private ASTNodeDescriptor node_descriptor;
-
+  private ASTNodeDescriptor nodeDescriptor;
   private String closedVar;
   private String exceptionVar;
   private String nodeVar;
   private int scopeNumber;
 
-  NodeScope(ASTProduction p, ASTNodeDescriptor n)
-  {
+  NodeScope(ASTProduction p, ASTNodeDescriptor n) {
     production = p;
 
     if (n == null) {
-      String nm = production.name;
+      String name = production.name;
       if (JJTreeOptions.getNodeDefaultVoid()) {
-        nm = "void";
+        name = "void";
       }
-      node_descriptor = ASTNodeDescriptor.indefinite(nm);
-    } else {
-      node_descriptor = n;
+      nodeDescriptor = ASTNodeDescriptor.indefinite(name);
+    }
+    else {
+      nodeDescriptor = n;
     }
 
     scopeNumber = production.getNodeScopeNumber(this);
@@ -60,82 +60,64 @@ public class NodeScope
     exceptionVar = constructVariable("e");
   }
 
-
-  boolean isVoid()
-  {
-    return node_descriptor.isVoid();
+  boolean isVoid() {
+    return nodeDescriptor.isVoid();
   }
 
-
-  ASTNodeDescriptor getNodeDescriptor()
-  {
-    return node_descriptor;
+  ASTNodeDescriptor getNodeDescriptor() {
+    return nodeDescriptor;
   }
 
-
-  String getNodeDescriptorText()
-  {
-    return node_descriptor.getDescriptor();
+  String getNodeDescriptorText() {
+    return nodeDescriptor.getDescriptor();
   }
 
-
-  String getNodeVariable()
-  {
+  String getNodeVariable() {
     return nodeVar;
   }
 
-
-  private String constructVariable(String id)
-  {
+  private String constructVariable(String id) {
     String s = "000" + scopeNumber;
     return "jjt" + id + s.substring(s.length() - 3, s.length());
   }
 
-
-  boolean usesCloseNodeVar()
-  {
+  boolean usesCloseNodeVar() {
     return true;
   }
 
-
-  void insertOpenNodeDeclaration(IO io, String indent)
-  {
-    insertOpenNodeCode(io, indent);
-  }
-
-
-  void insertOpenNodeCode(IO io, String indent)
-  {
-    String type = node_descriptor.getNodeType();
-    final String nodeClass;
+  void insertOpenNodeCode(IO io, String indent) {
+    String type = nodeDescriptor.getNodeType();
+    String nodeClass;
     if (JJTreeOptions.getNodeClass().length() > 0 && !JJTreeOptions.getMulti()) {
       nodeClass = JJTreeOptions.getNodeClass();
-    } else {
+    }
+    else {
       nodeClass = type;
     }
 
-    /* Ensure that there is a template definition file for the node
-       type. */
+    // Ensure that there is a template definition file for the node type.
     NodeFiles.ensure(io, type);
 
     io.print(indent + nodeClass + " " + nodeVar + " = ");
-    String parserArg = JJTreeOptions.getNodeUsesParser() ? ("this" + ", ") : "";
+    String parserArg = JJTreeOptions.getNodeUsesParser() ? "this, " : "";
 
     if (JJTreeOptions.getNodeFactory().equals("*")) {
       // Old-style multiple-implementations.
       io.println("(" + nodeClass + ")" + nodeClass + ".jjtCreate(" + parserArg +
-          node_descriptor.getNodeId() +");");
-    } else if (JJTreeOptions.getNodeFactory().length() > 0) {
+          nodeDescriptor.getNodeId() + ");");
+    }
+    else if (JJTreeOptions.getNodeFactory().length() > 0) {
       io.println("(" + nodeClass + ")" + JJTreeOptions.getNodeFactory() + ".jjtCreate(" + parserArg +
-       node_descriptor.getNodeId() +");");
-    } else {
-      io.println("new " + nodeClass + "(" + parserArg + node_descriptor.getNodeId() + ");");
+          nodeDescriptor.getNodeId() + ");");
+    }
+    else {
+      io.println("new " + nodeClass + "(" + parserArg + nodeDescriptor.getNodeId() + ");");
     }
 
     if (usesCloseNodeVar()) {
       io.println(indent + "boolean " + closedVar + " = true;");
     }
-    io.println(indent + node_descriptor.openNode(nodeVar));
+    io.println(indent + nodeDescriptor.openNode(nodeVar));
     if (JJTreeOptions.getNodeScopeHook()) {
       io.println(indent + "jjtreeOpenNodeScope(" + nodeVar + ");");
     }
@@ -145,10 +127,8 @@ public class NodeScope
     }
   }
 
-
-  void insertCloseNodeCode(IO io, String indent, boolean isFinal)
-  {
-    io.println(indent + node_descriptor.closeNode(nodeVar));
+  void insertCloseNodeCode(IO io, String indent, boolean isFinal) {
+    io.println(indent + nodeDescriptor.closeNode(nodeVar));
     if (usesCloseNodeVar() && !isFinal) {
       io.println(indent + closedVar + " = false;");
     }
@@ -161,29 +141,22 @@ public class NodeScope
     }
   }
 
-
-  void insertOpenNodeAction(IO io, String indent)
-  {
+  void insertOpenNodeAction(IO io, String indent) {
     io.println(indent + "{");
     insertOpenNodeCode(io, indent + "  ");
     io.println(indent + "}");
   }
 
-
-  void insertCloseNodeAction(IO io, String indent)
-  {
+  void insertCloseNodeAction(IO io, String indent) {
     io.println(indent + "{");
     insertCloseNodeCode(io, indent + "  ", false);
     io.println(indent + "}");
   }
 
-
-  private void insertCatchBlocks(IO io, Enumeration thrown_names,
-         String indent)
-  {
+  private void insertCatchBlocks(IO io, Iterator<String> thrownNames, String indent) {
     String thrown;
-    if (thrown_names.hasMoreElements()) {
-      io.println(indent + "} catch (Throwable " +  exceptionVar + ") {");
+    if (thrownNames.hasNext()) {
+      io.println(indent + "} catch (Throwable " + exceptionVar + ") {");
 
       if (usesCloseNodeVar()) {
         io.println(indent + "  if (" + closedVar + ") {");
@@ -194,10 +167,9 @@ public class NodeScope
         io.println(indent + "  }");
       }
 
-      while (thrown_names.hasMoreElements()) {
-        thrown = (String)thrown_names.nextElement();
-        io.println(indent + "  if (" + exceptionVar + " instanceof " +
-            thrown + ") {");
+      while (thrownNames.hasNext()) {
+        thrown = thrownNames.next();
+        io.println(indent + "  if (" + exceptionVar + " instanceof " + thrown + ") {");
         io.println(indent + "    throw (" + thrown + ")" + exceptionVar + ";");
         io.println(indent + "  }");
       }
@@ -206,12 +178,9 @@ public class NodeScope
          the user to declare it by crashing on the bad cast. */
       io.println(indent + "  throw (Error)" + exceptionVar + ";");
     }
-
   }
 
-
-  void tryTokenSequence(IO io, String indent, Token first, Token last)
-  {
+  void tryTokenSequence(IO io, String indent, Token first, Token last) {
     io.println(indent + "try {");
     JJTreeNode.closeJJTreeComment(io);
 
@@ -224,7 +193,7 @@ public class NodeScope
     JJTreeNode.openJJTreeComment(io, null);
     io.println();
 
-    Enumeration thrown_names = production.throws_list.elements();
+    Iterator<String> thrown_names = production.throwsList.iterator();
     insertCatchBlocks(io, thrown_names, indent);
 
     io.println(indent + "} finally {");
@@ -237,32 +206,24 @@ public class NodeScope
     JJTreeNode.closeJJTreeComment(io);
   }
 
-
-  private static void findThrown(Hashtable thrown_set,
-      JJTreeNode expansion_unit)
-  {
+  private static void findThrown(Map<String, String> thrown_set, JJTreeNode expansion_unit) {
     if (expansion_unit instanceof ASTBNFNonTerminal) {
-      /* Should really make the nonterminal explicitly maintain its
-         name. */
+      // Should really make the nonterminal explicitly maintain its name.
       String nt = expansion_unit.getFirstToken().getImage();
-      ASTProduction prod = (ASTProduction)JJTreeGlobals.productions.get(nt);
+      ASTProduction prod = (ASTProduction) JJTreeGlobals.productions.get(nt);
       if (prod != null) {
-        Enumeration e = prod.throws_list.elements();
-        while (e.hasMoreElements()) {
-          String t = (String)e.nextElement();
+        for (String t : prod.throwsList) {
           thrown_set.put(t, t);
         }
       }
     }
     for (int i = 0; i < expansion_unit.jjtGetNumChildren(); ++i) {
-      JJTreeNode n = (JJTreeNode)expansion_unit.jjtGetChild(i);
+      JJTreeNode n = (JJTreeNode) expansion_unit.jjtGetChild(i);
       findThrown(thrown_set, n);
     }
   }
 
-
-  void tryExpansionUnit(IO io, String indent, JJTreeNode expansion_unit)
-  {
+  void tryExpansionUnit(IO io, String indent, JJTreeNode expansion_unit) {
     io.println(indent + "try {");
     JJTreeNode.closeJJTreeComment(io);
 
@@ -271,9 +232,9 @@ public class NodeScope
     JJTreeNode.openJJTreeComment(io, null);
     io.println();
 
-    Hashtable thrown_set = new Hashtable();
+    Map<String, String> thrown_set = new HashMap<String, String>();
     findThrown(thrown_set, expansion_unit);
-    Enumeration thrown_names = thrown_set.elements();
+    Iterator<String> thrown_names = thrown_set.values().iterator();
     insertCatchBlocks(io, thrown_names, indent);
 
     io.println(indent + "} finally {");
@@ -286,24 +247,21 @@ public class NodeScope
     JJTreeNode.closeJJTreeComment(io);
   }
 
-
-  static NodeScope getEnclosingNodeScope(Node node)
-  {
+  static NodeScope getEnclosingNodeScope(Node node) {
     if (node instanceof ASTBNFDeclaration) {
-      return ((ASTBNFDeclaration)node).node_scope;
+      return ((ASTBNFDeclaration) node).node_scope;
     }
     for (Node n = node.jjtGetParent(); n != null; n = n.jjtGetParent()) {
       if (n instanceof ASTBNFDeclaration) {
-        return ((ASTBNFDeclaration)n).node_scope;
-      } else if (n instanceof ASTBNFNodeScope) {
-        return ((ASTBNFNodeScope)n).node_scope;
-      } else if (n instanceof ASTExpansionNodeScope) {
-        return ((ASTExpansionNodeScope)n).node_scope;
+        return ((ASTBNFDeclaration) n).node_scope;
+      }
+      else if (n instanceof ASTBNFNodeScope) {
+        return ((ASTBNFNodeScope) n).node_scope;
+      }
+      else if (n instanceof ASTExpansionNodeScope) {
+        return ((ASTExpansionNodeScope) n).node_scope;
       }
     }
     return null;
   }
-
 }
-
-/*end*/

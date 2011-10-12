@@ -301,12 +301,15 @@ public class OutputFile {
 
   private static class NullOutputStream extends OutputStream {
 
+    @Override
     public void write(byte[] arg0, int arg1, int arg2) throws IOException {
     }
 
+    @Override
     public void write(byte[] arg0) throws IOException {
     }
 
+    @Override
     public void write(int arg0) throws IOException {
     }
   }
@@ -321,6 +324,7 @@ public class OutputFile {
       super.close();
     }
 
+    @Override
     public void close() {
       try {
         OutputFile.this.close();

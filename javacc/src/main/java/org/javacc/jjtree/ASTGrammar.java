@@ -32,21 +32,17 @@ import org.javacc.parser.JavaCCGlobals;
 
 import java.io.File;
 
-
 public class ASTGrammar extends JJTreeNode {
   ASTGrammar(int id) {
     super(id);
   }
 
-  void generate(IO io)
-  {
+  void generate(IO io) {
     io.println("/*@bgen(jjtree) " +
         JavaCCGlobals.getIdString(JJTreeGlobals.toolList,
-        new File(io.getOutputFileName()).getName()) +
-         " */");
+            new File(io.getOutputFileName()).getName()) +
+        " */");
     io.print("/*@egen*/");
     print(io);
   }
 }
-
-/*end*/

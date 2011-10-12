@@ -52,6 +52,7 @@ public final class Sequence extends Expansion {
     units.add(la);
   }
 
+  @Override
   public StringBuffer dump(int indent, Set alreadyDumped) {
     if (alreadyDumped.contains(this)) {
       return super.dump(0, alreadyDumped).insert(0, '[').append(']').insert(0, dumpPrefix(indent));

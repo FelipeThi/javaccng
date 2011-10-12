@@ -25,18 +25,16 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.javacc.jjtree;
 
+package org.javacc.jjtree;
 
 public class ASTNodeDescriptorExpression extends JJTreeNode {
   ASTNodeDescriptorExpression(int id) {
     super(id);
   }
 
-  String translateImage(Token t)
-  {
+  @Override
+  String translateImage(Token t) {
     return whiteOut(t);
   }
 }
-
-/*end*/

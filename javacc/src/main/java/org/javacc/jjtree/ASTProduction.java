@@ -25,34 +25,30 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.javacc.jjtree;
 
-import java.util.Hashtable;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-
-public class ASTProduction extends JJTreeNode
-{
+public class ASTProduction extends JJTreeNode {
   ASTProduction(int id) {
     super(id);
   }
 
   String name;
-  Vector throws_list = new Vector();
-
-  private Hashtable scopes = new Hashtable();
+  List<String> throwsList = new ArrayList<String>();
+  private Map scopes = new HashMap();
   private int nextNodeScopeNumber = 0;
 
-
-  int getNodeScopeNumber(NodeScope s)
-  {
-    Integer i = (Integer)scopes.get(s);
+  int getNodeScopeNumber(NodeScope s) {
+    Integer i = (Integer) scopes.get(s);
     if (i == null) {
-      i = new Integer(nextNodeScopeNumber++);
+      i = nextNodeScopeNumber++;
       scopes.put(s, i);
     }
-    return i.intValue();
+    return i;
   }
 }
-
-/*end*/

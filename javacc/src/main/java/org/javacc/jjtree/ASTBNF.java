@@ -28,22 +28,17 @@
 
 package org.javacc.jjtree;
 
-
-public class ASTBNF extends ASTProduction
-{
+public class ASTBNF extends ASTProduction {
   ASTBNF(int id) {
     super(id);
-    throws_list.add("ParseException");
-    throws_list.add("RuntimeException");
+    throwsList.add("ParseException");
+    throwsList.add("RuntimeException");
   }
 
   Token declBeginLoc;
 
-  public String toString()
-  {
+  public String toString() {
     return super.toString() + ": " + name;
   }
-
 }
 
-/*end*/

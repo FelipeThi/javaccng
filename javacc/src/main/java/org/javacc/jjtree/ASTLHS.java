@@ -33,6 +33,7 @@ public class ASTLHS extends JJTreeNode {
     super(id);
   }
 
+  @Override
   public void print(IO io)
   {
     NodeScope ns = NodeScope.getEnclosingNodeScope(this);
@@ -47,5 +48,3 @@ public class ASTLHS extends JJTreeNode {
 
   }
 }
-
-/*end*/

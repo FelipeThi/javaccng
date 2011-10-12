@@ -266,6 +266,7 @@ public class IndentingPrintWriter extends Writer {
     return this;
   }
 
+  @Override
   public IndentingPrintWriter append(CharSequence seq) {
     if (seq == null) {
       write("null");
@@ -276,6 +277,7 @@ public class IndentingPrintWriter extends Writer {
     return this;
   }
 
+  @Override
   public IndentingPrintWriter append(CharSequence seq, int start, int end) {
     if (seq == null) {
       write("null");
@@ -286,6 +288,7 @@ public class IndentingPrintWriter extends Writer {
     return this;
   }
 
+  @Override
   public IndentingPrintWriter append(char c) {
     write(c);
     return this;

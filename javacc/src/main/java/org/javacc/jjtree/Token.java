@@ -16,7 +16,6 @@ public class Token {
   private int endLine;
   private int endColumn;
   private String image;
-
   /**
    * A reference to the next regular (non-special) token from the input
    * stream.  If this is the last token from the input stream, or if the
@@ -26,7 +25,6 @@ public class Token {
    * this field.
    */
   public Token next;
-
   /**
    * This field is used to access special tokens that occur prior to this
    * token, but after the immediately preceding regular (non-special) token.
@@ -41,7 +39,7 @@ public class Token {
    */
   public Token specialToken;
 
-  /** No-argument contructor */
+  /** No-argument constructor */
   public Token() {}
 
   /** Constructs a new token for the specified Image. */
@@ -72,7 +70,7 @@ public class Token {
    *
    * @param kind New token kind.
    */
-  public void setKind(final int kind) {
+  public void setKind(int kind) {
     this.kind = kind;
   }
 
@@ -90,7 +88,7 @@ public class Token {
    *
    * @param image New token image.
    */
-  public void setImage(final String image) {
+  public void setImage(String image) {
     this.image = image;
   }
 
