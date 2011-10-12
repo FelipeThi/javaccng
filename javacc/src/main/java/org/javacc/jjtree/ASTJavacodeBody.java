@@ -33,11 +33,11 @@ public class ASTJavacodeBody extends JJTreeNode {
     super(id);
   }
 
-  NodeScope node_scope;
+  NodeScope nodeScope;
 
   @Override
   public void print(IO io) {
-    if (node_scope.isVoid()) {
+    if (nodeScope.isVoid()) {
       super.print(io);
       return;
     }
@@ -49,9 +49,9 @@ public class ASTJavacodeBody extends JJTreeNode {
       indent += " ";
     }
 
-    JJTreeNode.openJJTreeComment(io, node_scope.getNodeDescriptorText());
+    JJTreeNode.openJJTreeComment(io, nodeScope.getNodeDescriptorText());
     io.println();
-    node_scope.insertOpenNodeCode(io, indent);
-    node_scope.tryTokenSequence(io, indent, first, getLastToken());
+    nodeScope.insertOpenNodeCode(io, indent);
+    nodeScope.tryTokenSequence(io, indent, first, getLastToken());
   }
 }

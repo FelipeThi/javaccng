@@ -29,7 +29,7 @@
 options {
   MULTI = true;
   NODE_DEFAULT_VOID = true;
-  NODE_SCOPE_HOOK=true;
+  NODE_SCOPE_HOOK = true;
   JAVA_UNICODE_ESCAPE = true;
   NODE_CLASS = "JJTreeNode";
 }
@@ -478,7 +478,7 @@ void javacode_production() #Javacode :
     (
       ( BlockStatement() )*
         {
-	  jjtThis.node_scope = new NodeScope(prod, nd);
+	  jjtThis.nodeScope = new NodeScope(prod, nd);
 	}
     ) #JavacodeBody
     "}"
@@ -525,7 +525,7 @@ void bnf_production() #BNF :
   (
     ( BlockStatement() )*
         {
-	  jjtThis.node_scope = ns;
+	  jjtThis.nodeScope = ns;
 	}
   ) #BNFDeclaration
   "}"
@@ -534,8 +534,8 @@ void bnf_production() #BNF :
   (
     eu=expansion_choices(prod)
         {
-	  jjtThis.node_scope = ns;
-	  jjtThis.expansion_unit = eu;
+	  jjtThis.nodeScope = ns;
+	  jjtThis.expansionUnit = eu;
 	}
   ) #BNFNodeScope
  "}"
@@ -616,8 +616,8 @@ void expansion(ASTProduction p) #BNFSequence(>1) :
      [ nd=node_descriptor() ]
         {
 	  if (jjtree.nodeCreated()) {
-	    jjtThis.node_scope = new NodeScope(p, nd);
-	    jjtThis.expansion_unit = eu;
+	    jjtThis.nodeScope = new NodeScope(p, nd);
+	    jjtThis.expansionUnit = eu;
 	  }
 	}
    ) #ExpansionNodeScope(>1)

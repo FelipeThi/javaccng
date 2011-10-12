@@ -36,12 +36,12 @@ public class ASTBNFAction extends JJTreeNode {
   private Node getScopingParent(NodeScope ns) {
     for (Node n = jjtGetParent(); n != null; n = n.jjtGetParent()) {
       if (n instanceof ASTBNFNodeScope) {
-        if (((ASTBNFNodeScope) n).node_scope == ns) {
+        if (((ASTBNFNodeScope) n).nodeScope == ns) {
           return n;
         }
       }
       else if (n instanceof ASTExpansionNodeScope) {
-        if (((ASTExpansionNodeScope) n).node_scope == ns) {
+        if (((ASTExpansionNodeScope) n).nodeScope == ns) {
           return n;
         }
       }

@@ -206,34 +206,34 @@ public class NodeScope {
     JJTreeNode.closeJJTreeComment(io);
   }
 
-  private static void findThrown(Map<String, String> thrown_set, JJTreeNode expansion_unit) {
-    if (expansion_unit instanceof ASTBNFNonTerminal) {
+  private static void findThrown(Map<String, String> thrownSet, JJTreeNode expansionUnit) {
+    if (expansionUnit instanceof ASTBNFNonTerminal) {
       // Should really make the nonterminal explicitly maintain its name.
-      String nt = expansion_unit.getFirstToken().getImage();
+      String nt = expansionUnit.getFirstToken().getImage();
       ASTProduction prod = (ASTProduction) JJTreeGlobals.productions.get(nt);
       if (prod != null) {
         for (String t : prod.throwsList) {
-          thrown_set.put(t, t);
+          thrownSet.put(t, t);
         }
       }
     }
-    for (int i = 0; i < expansion_unit.jjtGetNumChildren(); ++i) {
-      JJTreeNode n = (JJTreeNode) expansion_unit.jjtGetChild(i);
-      findThrown(thrown_set, n);
+    for (int i = 0; i < expansionUnit.jjtGetNumChildren(); ++i) {
+      JJTreeNode n = (JJTreeNode) expansionUnit.jjtGetChild(i);
+      findThrown(thrownSet, n);
     }
   }
 
-  void tryExpansionUnit(IO io, String indent, JJTreeNode expansion_unit) {
+  void tryExpansionUnit(IO io, String indent, JJTreeNode expansionUnit) {
     io.println(indent + "try {");
     JJTreeNode.closeJJTreeComment(io);
 
-    expansion_unit.print(io);
+    expansionUnit.print(io);
 
     JJTreeNode.openJJTreeComment(io, null);
     io.println();
 
     Map<String, String> thrown_set = new HashMap<String, String>();
-    findThrown(thrown_set, expansion_unit);
+    findThrown(thrown_set, expansionUnit);
     Iterator<String> thrown_names = thrown_set.values().iterator();
     insertCatchBlocks(io, thrown_names, indent);
 
@@ -249,17 +249,17 @@ public class NodeScope {
 
   static NodeScope getEnclosingNodeScope(Node node) {
     if (node instanceof ASTBNFDeclaration) {
-      return ((ASTBNFDeclaration) node).node_scope;
+      return ((ASTBNFDeclaration) node).nodeScope;
     }
     for (Node n = node.jjtGetParent(); n != null; n = n.jjtGetParent()) {
       if (n instanceof ASTBNFDeclaration) {
-        return ((ASTBNFDeclaration) n).node_scope;
+        return ((ASTBNFDeclaration) n).nodeScope;
       }
       else if (n instanceof ASTBNFNodeScope) {
-        return ((ASTBNFNodeScope) n).node_scope;
+        return ((ASTBNFNodeScope) n).nodeScope;
       }
       else if (n instanceof ASTExpansionNodeScope) {
-        return ((ASTExpansionNodeScope) n).node_scope;
+        return ((ASTExpansionNodeScope) n).nodeScope;
       }
     }
     return null;

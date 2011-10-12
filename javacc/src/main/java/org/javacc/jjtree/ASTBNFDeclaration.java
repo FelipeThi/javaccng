@@ -33,11 +33,11 @@ public class ASTBNFDeclaration extends JJTreeNode {
     super(id);
   }
 
-  NodeScope node_scope;
+  NodeScope nodeScope;
 
   @Override
   public void print(IO io) {
-    if (!node_scope.isVoid()) {
+    if (!nodeScope.isVoid()) {
       String indent = "";
       if (TokenUtils.hasTokens(this)) {
         for (int i = 1; i < getFirstToken().getBeginColumn(); ++i) {
@@ -48,9 +48,9 @@ public class ASTBNFDeclaration extends JJTreeNode {
         indent = "  ";
       }
 
-      openJJTreeComment(io, node_scope.getNodeDescriptorText());
+      openJJTreeComment(io, nodeScope.getNodeDescriptorText());
       io.println();
-      node_scope.insertOpenNodeCode(io, indent);
+      nodeScope.insertOpenNodeCode(io, indent);
       closeJJTreeComment(io);
     }
     super.print(io);

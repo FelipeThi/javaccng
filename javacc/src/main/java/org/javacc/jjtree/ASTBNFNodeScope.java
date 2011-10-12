@@ -33,20 +33,19 @@ public class ASTBNFNodeScope extends JJTreeNode {
     super(id);
   }
 
-  NodeScope node_scope;
-  JJTreeNode expansion_unit;
+  NodeScope nodeScope;
+  JJTreeNode expansionUnit;
 
   @Override
   public void print(IO io) {
-    if (node_scope.isVoid()) {
+    if (nodeScope.isVoid()) {
       super.print(io);
-      return;
     }
-
-    String indent = getIndentation(expansion_unit);
-
-    openJJTreeComment(io, node_scope.getNodeDescriptor().getDescriptor());
-    io.println();
-    node_scope.tryExpansionUnit(io, indent, expansion_unit);
+    else {
+      String indent = getIndentation(expansionUnit);
+      openJJTreeComment(io, nodeScope.getNodeDescriptor().getDescriptor());
+      io.println();
+      nodeScope.tryExpansionUnit(io, indent, expansionUnit);
+    }
   }
 }

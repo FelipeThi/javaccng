@@ -33,16 +33,16 @@ public class ASTExpansionNodeScope extends JJTreeNode {
     super(id);
   }
 
-  NodeScope node_scope;
-  JJTreeNode expansion_unit;
+  NodeScope nodeScope;
+  JJTreeNode expansionUnit;
 
   @Override
   public void print(IO io) {
-    String indent = getIndentation(expansion_unit);
-    openJJTreeComment(io, node_scope.getNodeDescriptor().getDescriptor());
+    String indent = getIndentation(expansionUnit);
+    openJJTreeComment(io, nodeScope.getNodeDescriptor().getDescriptor());
     io.println();
-    node_scope.insertOpenNodeAction(io, indent);
-    node_scope.tryExpansionUnit(io, indent, expansion_unit);
+    nodeScope.insertOpenNodeAction(io, indent);
+    nodeScope.tryExpansionUnit(io, indent, expansionUnit);
 
     // Print the "whiteOut" equivalent of the Node descriptor to preserve
     // line numbers in the generated file.
