@@ -47,7 +47,7 @@ public class Options {
    * set of legal options. Its initial values define the default option
    * values, and the option types can be determined from these values too.
    */
-  protected static Map optionValues = null;
+  protected static Map<String, Object> optionValues = null;
 
   /** Convenience method to retrieve integer options. */
   protected static int intValue(String option) {
@@ -64,8 +64,8 @@ public class Options {
     return (String) optionValues.get(option);
   }
 
-  public static Map getOptions() {
-    return new HashMap(optionValues);
+  public static Map<String, Object> getOptions() {
+    return new HashMap<String, Object>(optionValues);
   }
 
   /**
@@ -83,7 +83,7 @@ public class Options {
 
   /** Initialize for JavaCC */
   public static void init() {
-    optionValues = new HashMap();
+    optionValues = new HashMap<String, Object>();
     cmdLineSetting = new HashSet();
     inputFileSetting = new HashSet();
 
@@ -110,10 +110,8 @@ public class Options {
     optionValues.put("KEEP_LINE_COLUMN", TRUE);
     optionValues.put("KEEP_IMAGE", TRUE);
 
-    optionValues.put("GENERATE_CHAINED_EXCEPTION", FALSE);
-    optionValues.put("GENERATE_GENERICS", FALSE);
-    optionValues.put("GENERATE_STRING_BUILDER", FALSE);
-    optionValues.put("GENERATE_ANNOTATIONS", FALSE);
+    optionValues.put("GENERATE_GENERICS", TRUE);
+    optionValues.put("GENERATE_ANNOTATIONS", TRUE);
     optionValues.put("SUPPORT_CLASS_VISIBILITY_PUBLIC", TRUE);
 
     optionValues.put("OUTPUT_DIRECTORY", ".");
@@ -121,29 +119,6 @@ public class Options {
     optionValues.put("TOKEN_EXTENDS", "");
     optionValues.put("TOKEN_FACTORY", "");
     optionValues.put("GRAMMAR_ENCODING", "");
-  }
-
-  /**
-   * Returns a string representation of the specified options of interest.
-   * Used when, for example, generating Token.java to record the JavaCC options
-   * that were used to generate the file. All of the options must be
-   * boolean values.
-   *
-   * @param interestingOptions the options of interest, eg {"ERROR_REPORTING", "CACHE_TOKENS"}
-   * @return the string representation of the options, eg "ERROR_REPORTING=true,CACHE_TOKENS=false"
-   */
-  public static String getOptionsString(String[] interestingOptions) {
-    StringBuilder b = new StringBuilder();
-    for (int i = 0; i < interestingOptions.length; i++) {
-      String key = interestingOptions[i];
-      b.append(key);
-      b.append('=');
-      b.append(optionValues.get(key));
-      if (i != interestingOptions.length - 1) {
-        b.append(',');
-      }
-    }
-    return b.toString();
   }
 
   /**
@@ -533,47 +508,17 @@ public class Options {
     return stringValue("JDK_VERSION");
   }
 
-  /**
-   * Should the generated code create Exceptions using a constructor taking a nested exception?
-   *
-   * @return
-   */
-  public static boolean getGenerateChainedException() {
-    return booleanValue("GENERATE_CHAINED_EXCEPTION");
-  }
-
-  /**
-   * Should the generated code contain Generics?
-   *
-   * @return
-   */
+  /** Should the generated code contain Generics? */
   public static boolean getGenerateGenerics() {
     return booleanValue("GENERATE_GENERICS");
   }
 
-  /**
-   * Should the generated code use StringBuilder rather than StringBuffer?
-   *
-   * @return
-   */
-  public static boolean getGenerateStringBuilder() {
-    return booleanValue("GENERATE_STRING_BUILDER");
-  }
-
-  /**
-   * Should the generated code contain Annotations?
-   *
-   * @return
-   */
+  /** Should the generated code contain Annotations? */
   public static boolean getGenerateAnnotations() {
     return booleanValue("GENERATE_ANNOTATIONS");
   }
 
-  /**
-   * Should the generated code class visibility public?
-   *
-   * @return
-   */
+  /** Should the generated code class visibility public? */
   public static boolean getSupportClassVisibilityPublic() {
     return booleanValue("SUPPORT_CLASS_VISIBILITY_PUBLIC");
   }
@@ -631,14 +576,5 @@ public class Options {
    */
   public static File getOutputDirectory() {
     return new File(stringValue("OUTPUT_DIRECTORY"));
-  }
-
-  public static String stringBufOrBuild() {
-    if (getGenerateStringBuilder()) {
-      return "StringBuilder";
-    }
-    else {
-      return "StringBuffer";
-    }
   }
 }

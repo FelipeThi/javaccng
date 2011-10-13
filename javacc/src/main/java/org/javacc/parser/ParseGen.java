@@ -25,517 +25,504 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.javacc.parser;
 
 import org.javacc.utils.io.IndentingPrintWriter;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 /** Generate the parser. */
-public class ParseGen implements JavaCCParserConstants {
-  final Semanticize semanticize;
+final class ParseGen implements SingeFileGenerator, JavaCCParserConstants {
+  private final Semanticize semanticize;
+  private File path;
+  private String className;
 
-  public ParseGen(final Semanticize semanticize) {
+  public ParseGen(Semanticize semanticize) {
     this.semanticize = semanticize;
   }
 
-  public void start() throws MetaParseException {
-
-    Token t = null;
-
+  @Override
+  public void start() throws MetaParseException, IOException {
     if (JavaCCErrors.getErrorCount() != 0) {
       throw new MetaParseException();
     }
 
-    if (Options.getBuildParser()) {
+    if (!Options.getBuildParser()) {
+      return;
+    }
 
-      try {
-        ostr = new IndentingPrintWriter(
-            new BufferedWriter(
-                new FileWriter(
-                    new File(Options.getOutputDirectory(), JavaCCGlobals.cuName + ".java")
-                ),
-                8192
-            )
-        );
-      }
-      catch (IOException e) {
-        JavaCCErrors.semanticError("Could not open file " + JavaCCGlobals.cuName + ".java for writing.");
-        throw new Error();
-      }
-
-      List tn = new ArrayList(JavaCCGlobals.toolNames);
-      tn.add(JavaCCGlobals.toolName);
-      ostr.println("/* " + JavaCCGlobals.getIdString(tn, JavaCCGlobals.cuName + ".java") + " */");
-
-      boolean implementsExists = false;
-
-      if (JavaCCGlobals.cuToInsertionPoint1.size() != 0) {
-        JavaCCGlobals.printTokenSetup((Token) (JavaCCGlobals.cuToInsertionPoint1.get(0)));
-        JavaCCGlobals.ccol = 1;
-        for (Iterator it = JavaCCGlobals.cuToInsertionPoint1.iterator(); it.hasNext();) {
-          t = (Token) it.next();
-          if (t.getKind() == IMPLEMENTS) {
-            implementsExists = true;
-          }
-          else if (t.getKind() == CLASS) {
-            implementsExists = false;
-          }
-          JavaCCGlobals.printToken(t, ostr);
-        }
-      }
-      if (implementsExists) {
-        ostr.print(", ");
-      }
-      else {
-        ostr.print(" implements ");
-      }
-      ostr.print(JavaCCGlobals.cuName + "Constants ");
-      if (JavaCCGlobals.cuToInsertionPoint2.size() != 0) {
-        JavaCCGlobals.printTokenSetup((Token) (JavaCCGlobals.cuToInsertionPoint2.get(0)));
-        for (Iterator it = JavaCCGlobals.cuToInsertionPoint2.iterator(); it.hasNext();) {
-          t = (Token) it.next();
-          JavaCCGlobals.printToken(t, ostr);
-        }
-      }
-
-      ostr.println("");
-      ostr.println("");
-
-      final ParseEngine parseEngine = new ParseEngine(semanticize);
-      parseEngine.build(ostr);
-
-      ostr.println("  /** Either generated or user defined Token Manager. */");
-      ostr.println("  public final TokenManager tokenManager;");
-      ostr.println("  /** Current token. */");
-      ostr.println("  public Token token;");
-      ostr.println("  /** Next token. */");
-      ostr.println("  public Token jj_nt;");
-      if (!Options.getCacheTokens()) {
-        ostr.println("  private int jj_ntk;");
-      }
-      if (JavaCCGlobals.jj2index != 0) {
-        ostr.println("  private Token jj_scanpos, jj_lastpos;");
-        ostr.println("  private int jj_la;");
-        if (JavaCCGlobals.lookaheadNeeded) {
-          ostr.println("  /** Whether we are looking ahead. */");
-          ostr.println("  private boolean jj_lookingAhead = false;");
-          ostr.println("  private boolean jj_semLA;");
-        }
-      }
-      if (Options.getErrorReporting()) {
-        ostr.println("  private int jj_gen;");
-        ostr.println("  private final int[] jj_la1 = new int[" + JavaCCGlobals.maskIndex + "];");
-        int tokenMaskSize = (JavaCCGlobals.tokenCount - 1) / 32 + 1;
-        for (int i = 0; i < tokenMaskSize; i++) {
-          ostr.println("  static private int[] jj_la1_" + i + ";");
-        }
-        ostr.println("  static {");
-        for (int i = 0; i < tokenMaskSize; i++) {
-          ostr.println("      jj_la1_init_" + i + "();");
-        }
-        ostr.println("   }");
-        for (int i = 0; i < tokenMaskSize; i++) {
-          ostr.println("   private static void jj_la1_init_" + i + "() {");
-          ostr.print("      jj_la1_" + i + " = new int[] {");
-          for (Iterator it = JavaCCGlobals.maskVals.iterator(); it.hasNext();) {
-            int[] tokenMask = (int[]) (it.next());
-            ostr.print("0x" + Integer.toHexString(tokenMask[i]) + ",");
-          }
-          ostr.println("};");
-          ostr.println("   }");
-        }
-      }
-      if (JavaCCGlobals.jj2index != 0 && Options.getErrorReporting()) {
-        ostr.println("  final private JJCalls[] jj_2_rtns = new JJCalls[" + JavaCCGlobals.jj2index + "];");
-        ostr.println("  private boolean jj_rescan = false;");
-        ostr.println("  private int jj_gc = 0;");
-      }
-      ostr.println("");
-
-      ostr.println("  /** Constructor with either generated or user provided Token Manager. */");
-      ostr.println("  public " + JavaCCGlobals.cuName + "(TokenManager tm) throws java.io.IOException, ParseException {");
-      ostr.println("    tokenManager = tm;");
-      ostr.println("    token = new Token();");
-      if (Options.getCacheTokens()) {
-        ostr.println("    token.next = jj_nt = tokenManager.getNextToken();");
-      }
-      else {
-        ostr.println("    jj_ntk = -1;");
-      }
-      if (Options.getErrorReporting()) {
-        ostr.println("    jj_gen = 0;");
-        ostr.println("    for (int i = 0; i < " + JavaCCGlobals.maskIndex + "; i++) jj_la1[i] = -1;");
-        if (JavaCCGlobals.jj2index != 0) {
-          ostr.println("    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();");
-        }
-      }
-      ostr.println("  }");
-      ostr.println("");
-      ostr.println("  private Token jj_consume_token(int kind) throws java.io.IOException, ParseException {");
-      if (Options.getCacheTokens()) {
-        ostr.println("    Token oldToken = token;");
-        ostr.println("    if ((token = jj_nt).next != null) jj_nt = jj_nt.next;");
-        ostr.println("    else jj_nt = jj_nt.next = tokenManager.getNextToken();");
-      }
-      else {
-        ostr.println("    Token oldToken;");
-        ostr.println("    if ((oldToken = token).next != null) token = token.next;");
-        ostr.println("    else token = token.next = tokenManager.getNextToken();");
-        ostr.println("    jj_ntk = -1;");
-      }
-      ostr.println("    if (token.getKind() == kind) {");
-      if (Options.getErrorReporting()) {
-        ostr.println("      jj_gen++;");
-        if (JavaCCGlobals.jj2index != 0) {
-          ostr.println("      if (++jj_gc > 100) {");
-          ostr.println("        jj_gc = 0;");
-          ostr.println("        for (int i = 0; i < jj_2_rtns.length; i++) {");
-          ostr.println("          JJCalls c = jj_2_rtns[i];");
-          ostr.println("          while (c != null) {");
-          ostr.println("            if (c.gen < jj_gen) c.first = null;");
-          ostr.println("            c = c.next;");
-          ostr.println("          }");
-          ostr.println("        }");
-          ostr.println("      }");
-        }
-      }
-      if (Options.getDebugParser()) {
-        ostr.println("      trace_token(token, \"\");");
-      }
-      ostr.println("      return token;");
-      ostr.println("    }");
-      if (Options.getCacheTokens()) {
-        ostr.println("    jj_nt = token;");
-      }
-      ostr.println("    token = oldToken;");
-      if (Options.getErrorReporting()) {
-        ostr.println("    jj_kind = kind;");
-      }
-      ostr.println("    throw generateParseException();");
-      ostr.println("  }");
-      ostr.println("");
-      if (JavaCCGlobals.jj2index != 0) {
-        ostr.println("  @SuppressWarnings(\"serial\")");
-        ostr.println("  private static final class LookaheadSuccess extends Error {}");
-        ostr.println("  private final LookaheadSuccess jj_ls = new LookaheadSuccess();");
-        ostr.println("  private boolean jj_scan_token(int kind) throws java.io.IOException {");
-        ostr.println("    if (jj_scanpos == jj_lastpos) {");
-        ostr.println("      jj_la--;");
-        ostr.println("      if (jj_scanpos.next == null) {");
-        ostr.println("        jj_lastpos = jj_scanpos = jj_scanpos.next = tokenManager.getNextToken();");
-        ostr.println("      } else {");
-        ostr.println("        jj_lastpos = jj_scanpos = jj_scanpos.next;");
-        ostr.println("      }");
-        ostr.println("    } else {");
-        ostr.println("      jj_scanpos = jj_scanpos.next;");
-        ostr.println("    }");
-        if (Options.getErrorReporting()) {
-          ostr.println("    if (jj_rescan) {");
-          ostr.println("      int i = 0; Token tok = token;");
-          ostr.println("      while (tok != null && tok != jj_scanpos) { i++; tok = tok.next; }");
-          ostr.println("      if (tok != null) jj_add_error_token(kind, i);");
-          if (Options.getDebugLookahead()) {
-            ostr.println("    } else {");
-            ostr.println("      trace_scan(jj_scanpos, kind);");
-          }
-          ostr.println("    }");
-        }
-        else if (Options.getDebugLookahead()) {
-          ostr.println("    trace_scan(jj_scanpos, kind);");
-        }
-        ostr.println("    if (jj_scanpos.getKind() != kind) return true;");
-        ostr.println("    if (jj_la == 0 && jj_scanpos == jj_lastpos) throw jj_ls;");
-        ostr.println("    return false;");
-        ostr.println("  }");
-        ostr.println("");
-      }
-      ostr.println("");
-      ostr.println("/** Get the next Token. */");
-      ostr.println("  final public Token getNextToken() throws java.io.IOException {");
-      if (Options.getCacheTokens()) {
-        ostr.println("    if ((token = jj_nt).next != null) jj_nt = jj_nt.next;");
-        ostr.println("    else jj_nt = jj_nt.next = tokenManager.getNextToken();");
-      }
-      else {
-        ostr.println("    if (token.next != null) token = token.next;");
-        ostr.println("    else token = token.next = tokenManager.getNextToken();");
-        ostr.println("    jj_ntk = -1;");
-      }
-      if (Options.getErrorReporting()) {
-        ostr.println("    jj_gen++;");
-      }
-      if (Options.getDebugParser()) {
-        ostr.println("      trace_token(token, \" (in getNextToken)\");");
-      }
-      ostr.println("    return token;");
-      ostr.println("  }");
-      ostr.println("");
-      ostr.println("/** Get the specific Token. */");
-      ostr.println("  final public Token getToken(int index) throws java.io.IOException {");
-      if (JavaCCGlobals.lookaheadNeeded) {
-        ostr.println("    Token t = jj_lookingAhead ? jj_scanpos : token;");
-      }
-      else {
-        ostr.println("    Token t = token;");
-      }
-      ostr.println("    for (int i = 0; i < index; i++) {");
-      ostr.println("      if (t.next != null) t = t.next;");
-      ostr.println("      else t = t.next = tokenManager.getNextToken();");
-      ostr.println("    }");
-      ostr.println("    return t;");
-      ostr.println("  }");
-      ostr.println("");
-      if (!Options.getCacheTokens()) {
-        ostr.println("  private int jj_ntk() throws java.io.IOException {");
-        ostr.println("    if ((jj_nt=token.next) == null)");
-        ostr.println("      return (jj_ntk = (token.next=tokenManager.getNextToken()).getKind());");
-        ostr.println("    else");
-        ostr.println("      return (jj_ntk = jj_nt.getKind());");
-        ostr.println("  }");
-        ostr.println("");
-      }
-      if (Options.getErrorReporting()) {
-        if (!Options.getGenerateGenerics()) {
-          ostr.println("  private java.util.List jj_expentries = new java.util.ArrayList();");
-        }
-        else {
-          ostr.println("  private final java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();");
-        }
-        ostr.println("  private int[] jj_expentry;");
-        ostr.println("  private int jj_kind = -1;");
-        if (JavaCCGlobals.jj2index != 0) {
-          ostr.println("  private int[] jj_lasttokens = new int[100];");
-          ostr.println("  private int jj_endpos;");
-          ostr.println("");
-          ostr.println("  private void jj_add_error_token(int kind, int pos) {");
-          ostr.println("    if (pos >= 100) return;");
-          ostr.println("    if (pos == jj_endpos + 1) {");
-          ostr.println("      jj_lasttokens[jj_endpos++] = kind;");
-          ostr.println("    } else if (jj_endpos != 0) {");
-          ostr.println("      jj_expentry = new int[jj_endpos];");
-          ostr.println("      for (int i = 0; i < jj_endpos; i++) {");
-          ostr.println("        jj_expentry[i] = jj_lasttokens[i];");
-          ostr.println("      }");
-          if (!Options.getGenerateGenerics()) {
-            ostr.println("      jj_entries_loop: for (java.util.Iterator it = jj_expentries.iterator(); it.hasNext();) {");
-          }
-          else {
-            ostr.println("      jj_entries_loop: for (java.util.Iterator<?> it = jj_expentries.iterator(); it.hasNext();) {");
-          }
-          ostr.println("        int[] oldentry = (int[])(it.next());");
-          ostr.println("        if (oldentry.length == jj_expentry.length) {");
-          ostr.println("          for (int i = 0; i < jj_expentry.length; i++) {");
-          ostr.println("            if (oldentry[i] != jj_expentry[i]) {");
-          ostr.println("              continue jj_entries_loop;");
-          ostr.println("            }");
-          ostr.println("          }");
-          ostr.println("          jj_expentries.add(jj_expentry);");
-          ostr.println("          break jj_entries_loop;");
-          ostr.println("        }");
-          ostr.println("      }");
-          ostr.println("      if (pos != 0) jj_lasttokens[(jj_endpos = pos) - 1] = kind;");
-          ostr.println("    }");
-          ostr.println("  }");
-        }
-        ostr.println("");
-        ostr.println("  /** Generate ParseException. */");
-        ostr.println("  public ParseException generateParseException() throws java.io.IOException {");
-        ostr.println("    jj_expentries.clear();");
-        ostr.println("    boolean[] la1tokens = new boolean[" + JavaCCGlobals.tokenCount + "];");
-        ostr.println("    if (jj_kind >= 0) {");
-        ostr.println("      la1tokens[jj_kind] = true;");
-        ostr.println("      jj_kind = -1;");
-        ostr.println("    }");
-        ostr.println("    for (int i = 0; i < " + JavaCCGlobals.maskIndex + "; i++) {");
-        ostr.println("      if (jj_la1[i] == jj_gen) {");
-        ostr.println("        for (int j = 0; j < 32; j++) {");
-        for (int i = 0; i < (JavaCCGlobals.tokenCount - 1) / 32 + 1; i++) {
-          ostr.println("          if ((jj_la1_" + i + "[i] & (1<<j)) != 0) {");
-          ostr.print("            la1tokens[");
-          if (i != 0) {
-            ostr.print((32 * i) + "+");
-          }
-          ostr.println("j] = true;");
-          ostr.println("          }");
-        }
-        ostr.println("        }");
-        ostr.println("      }");
-        ostr.println("    }");
-        ostr.println("    for (int i = 0; i < " + JavaCCGlobals.tokenCount + "; i++) {");
-        ostr.println("      if (la1tokens[i]) {");
-        ostr.println("        jj_expentry = new int[1];");
-        ostr.println("        jj_expentry[0] = i;");
-        ostr.println("        jj_expentries.add(jj_expentry);");
-        ostr.println("      }");
-        ostr.println("    }");
-        if (JavaCCGlobals.jj2index != 0) {
-          ostr.println("    jj_endpos = 0;");
-          ostr.println("    jj_rescan_token();");
-          ostr.println("    jj_add_error_token(0, 0);");
-        }
-        ostr.println("    int[][] exptokseq = new int[jj_expentries.size()][];");
-        ostr.println("    for (int i = 0; i < jj_expentries.size(); i++) {");
-        if (!Options.getGenerateGenerics()) {
-          ostr.println("      exptokseq[i] = (int[])jj_expentries.get(i);");
-        }
-        else {
-          ostr.println("      exptokseq[i] = jj_expentries.get(i);");
-        }
-        ostr.println("    }");
-        ostr.println("    return new ParseException(token, exptokseq, tokenImage);");
-        ostr.println("  }");
-      }
-      else {
-        ostr.println("  /** Generate ParseException. */");
-        ostr.println("  public ParseException generateParseException() throws java.io.IOException {");
-        ostr.println("    Token errortok = token.next;");
-        if (Options.getKeepLineColumn()) {
-          ostr.println("    int line = errortok.beginLine, column = errortok.beginColumn;");
-        }
-        ostr.println("    String mess = (errortok.getKind() == 0) ? tokenImage[0] : errortok.image;");
-        if (Options.getKeepLineColumn()) {
-          ostr.println("    return new ParseException(" +
-              "\"Parse error at line \" + line + \", column \" + column + \".  " +
-              "Encountered: \" + mess);");
-        }
-        else {
-          ostr.println("    return new ParseException(\"Parse error at <unknown location>.  " +
-              "Encountered: \" + mess);");
-        }
-        ostr.println("  }");
-      }
-      ostr.println("");
-
-      if (Options.getDebugParser()) {
-        ostr.println("  private int trace_indent = 0;");
-        ostr.println("  private boolean trace_enabled = true;");
-        ostr.println("");
-        ostr.println("/** Enable tracing. */");
-        ostr.println("  final public void enable_tracing() {");
-        ostr.println("    trace_enabled = true;");
-        ostr.println("  }");
-        ostr.println("");
-        ostr.println("/** Disable tracing. */");
-        ostr.println("  final public void disable_tracing() {");
-        ostr.println("    trace_enabled = false;");
-        ostr.println("  }");
-        ostr.println("");
-        ostr.println("  private void trace_call(String s) {");
-        ostr.println("    if (trace_enabled) {");
-        ostr.println("      for (int i = 0; i < trace_indent; i++) { System.out.print(\" \"); }");
-        ostr.println("      System.out.println(\"Call:   \" + s);");
-        ostr.println("    }");
-        ostr.println("    trace_indent = trace_indent + 2;");
-        ostr.println("  }");
-        ostr.println("");
-        ostr.println("  private void trace_return(String s) {");
-        ostr.println("    trace_indent = trace_indent - 2;");
-        ostr.println("    if (trace_enabled) {");
-        ostr.println("      for (int i = 0; i < trace_indent; i++) { System.out.print(\" \"); }");
-        ostr.println("      System.out.println(\"Return: \" + s);");
-        ostr.println("    }");
-        ostr.println("  }");
-        ostr.println("");
-        ostr.println("  private void trace_token(Token t, String where) {");
-        ostr.println("    if (trace_enabled) {");
-        ostr.println("      for (int i = 0; i < trace_indent; i++) { System.out.print(\" \"); }");
-        ostr.println("      System.out.print(\"Consumed token: <\" + tokenImage[t.getKind()]);");
-        ostr.println("      if (t.getKind() != 0 && !tokenImage[t.getKind()].equals(\"\\\"\" + t.image + \"\\\"\")) {");
-        ostr.println("        System.out.print(\": \\\"\" + t.image + \"\\\"\");");
-        ostr.println("      }");
-        ostr.println("      System.out.println(\" at line \" + t.beginLine + " +
-            "\" column \" + t.beginColumn + \">\" + where);");
-        ostr.println("    }");
-        ostr.println("  }");
-        ostr.println("");
-        ostr.println("  private void trace_scan(Token t1, int t2) {");
-        ostr.println("    if (trace_enabled) {");
-        ostr.println("      for (int i = 0; i < trace_indent; i++) { System.out.print(\" \"); }");
-        ostr.println("      System.out.print(\"Visited token: <\" + tokenImage[t1.getKind()]);");
-        ostr.println("      if (t1.getKind() != 0 && !tokenImage[t1.getKind()].equals(\"\\\"\" + t1.image + \"\\\"\")) {");
-        ostr.println("        System.out.print(\": \\\"\" + t1.image + \"\\\"\");");
-        ostr.println("      }");
-        ostr.println("      System.out.println(\" at line \" + t1.beginLine + \"" +
-            " column \" + t1.beginColumn + \">; Expected token: <\" + tokenImage[t2] + \">\");");
-        ostr.println("    }");
-        ostr.println("  }");
-        ostr.println("");
-      }
-      else {
-        ostr.println("  /** Enable tracing. */");
-        ostr.println("  final public void enable_tracing() {");
-        ostr.println("  }");
-        ostr.println("");
-        ostr.println("  /** Disable tracing. */");
-        ostr.println("  final public void disable_tracing() {");
-        ostr.println("  }");
-        ostr.println("");
-      }
-
-      if (JavaCCGlobals.jj2index != 0 && Options.getErrorReporting()) {
-        ostr.println("  private void jj_rescan_token() throws java.io.IOException {");
-        ostr.println("    jj_rescan = true;");
-        ostr.println("    for (int i = 0; i < " + JavaCCGlobals.jj2index + "; i++) {");
-        ostr.println("    try {");
-        ostr.println("      JJCalls p = jj_2_rtns[i];");
-        ostr.println("      do {");
-        ostr.println("        if (p.gen > jj_gen) {");
-        ostr.println("          jj_la = p.arg; jj_lastpos = jj_scanpos = p.first;");
-        ostr.println("          switch (i) {");
-        for (int i = 0; i < JavaCCGlobals.jj2index; i++) {
-          ostr.println("            case " + i + ": jj_3_" + (i + 1) + "(); break;");
-        }
-        ostr.println("          }");
-        ostr.println("        }");
-        ostr.println("        p = p.next;");
-        ostr.println("      } while (p != null);");
-        ostr.println("      } catch(LookaheadSuccess ls) { }");
-        ostr.println("    }");
-        ostr.println("    jj_rescan = false;");
-        ostr.println("  }");
-        ostr.println("");
-        ostr.println("  private void jj_save(int index, int xla) throws java.io.IOException {");
-        ostr.println("    JJCalls p = jj_2_rtns[index];");
-        ostr.println("    while (p.gen > jj_gen) {");
-        ostr.println("      if (p.next == null) { p = p.next = new JJCalls(); break; }");
-        ostr.println("      p = p.next;");
-        ostr.println("    }");
-        ostr.println("    p.gen = jj_gen + xla - jj_la; p.first = token; p.arg = xla;");
-        ostr.println("  }");
-        ostr.println("");
-      }
-
-      if (JavaCCGlobals.jj2index != 0 && Options.getErrorReporting()) {
-        ostr.println("  static final class JJCalls {");
-        ostr.println("    int gen;");
-        ostr.println("    Token first;");
-        ostr.println("    int arg;");
-        ostr.println("    JJCalls next;");
-        ostr.println("  }");
-        ostr.println("");
-      }
-
-      if (JavaCCGlobals.cuFromInsertionPoint2.size() != 0) {
-        JavaCCGlobals.printTokenSetup((Token) (JavaCCGlobals.cuFromInsertionPoint2.get(0)));
-        JavaCCGlobals.ccol = 1;
-        for (Iterator it = JavaCCGlobals.cuFromInsertionPoint2.iterator(); it.hasNext();) {
-          t = (Token) it.next();
-          JavaCCGlobals.printToken(t, ostr);
-        }
-        JavaCCGlobals.printTrailingComments(t, ostr);
-      }
-      ostr.println("");
-
-      ostr.close();
-    } // matches "if (Options.getBuildParser())"
+    className = JavaCCGlobals.cuName;
+    path = new File(Options.getOutputDirectory(), JavaCCGlobals.cuName + ".java");
+    OutputFile outputFile = new OutputFile(path);
+    IndentingPrintWriter out = outputFile.getPrintWriter();
+    try {
+      generate(out);
+    }
+    finally {
+      out.close();
+    }
   }
 
-  private IndentingPrintWriter ostr;
+  private void generate(IndentingPrintWriter out) {
+    boolean implementsExists = false;
+
+    if (JavaCCGlobals.cuToInsertionPoint1.size() != 0) {
+      JavaCCGlobals.printTokenSetup(JavaCCGlobals.cuToInsertionPoint1.get(0));
+      JavaCCGlobals.ccol = 1;
+      for (Token t : JavaCCGlobals.cuToInsertionPoint1) {
+        if (t.getKind() == IMPLEMENTS) {
+          implementsExists = true;
+        }
+        else if (t.getKind() == CLASS) {
+          implementsExists = false;
+        }
+        JavaCCGlobals.printToken(t, out);
+      }
+    }
+    if (implementsExists) {
+      out.print(", ");
+    }
+    else {
+      out.print(" implements ");
+    }
+    out.print(JavaCCGlobals.cuName + "Constants ");
+    if (JavaCCGlobals.cuToInsertionPoint2.size() != 0) {
+      JavaCCGlobals.printTokenSetup(JavaCCGlobals.cuToInsertionPoint2.get(0));
+      for (Token t : JavaCCGlobals.cuToInsertionPoint2) {
+        JavaCCGlobals.printToken(t, out);
+      }
+    }
+
+    out.println("");
+    out.println("");
+
+    ParseEngine parseEngine = new ParseEngine(semanticize);
+    parseEngine.build(out);
+
+    out.println("  /** Either generated or user defined Token Manager. */");
+    out.println("  public final TokenManager tokenManager;");
+    out.println("  /** Current token. */");
+    out.println("  public Token token;");
+    out.println("  /** Next token. */");
+    out.println("  public Token jj_nt;");
+    if (!Options.getCacheTokens()) {
+      out.println("  private int jj_ntk;");
+    }
+    if (JavaCCGlobals.jj2index != 0) {
+      out.println("  private Token jj_scanpos, jj_lastpos;");
+      out.println("  private int jj_la;");
+      if (JavaCCGlobals.lookaheadNeeded) {
+        out.println("  /** Whether we are looking ahead. */");
+        out.println("  private boolean jj_lookingAhead = false;");
+        out.println("  private boolean jj_semLA;");
+      }
+    }
+    if (Options.getErrorReporting()) {
+      out.println("  private int jj_gen;");
+      out.println("  private final int[] jj_la1 = new int[" + JavaCCGlobals.maskIndex + "];");
+      int tokenMaskSize = (JavaCCGlobals.tokenCount - 1) / 32 + 1;
+      for (int i = 0; i < tokenMaskSize; i++) {
+        out.println("  static private int[] jj_la1_" + i + ";");
+      }
+      out.println("  static {");
+      for (int i = 0; i < tokenMaskSize; i++) {
+        out.println("      jj_la1_init_" + i + "();");
+      }
+      out.println("   }");
+      for (int i = 0; i < tokenMaskSize; i++) {
+        out.println("   private static void jj_la1_init_" + i + "() {");
+        out.print("      jj_la1_" + i + " = new int[] {");
+        for (Iterator it = JavaCCGlobals.maskVals.iterator(); it.hasNext(); ) {
+          int[] tokenMask = (int[]) it.next();
+          out.print("0x" + Integer.toHexString(tokenMask[i]) + ",");
+        }
+        out.println("};");
+        out.println("   }");
+      }
+    }
+    if (JavaCCGlobals.jj2index != 0 && Options.getErrorReporting()) {
+      out.println("  final private JJCalls[] jj_2_rtns = new JJCalls[" + JavaCCGlobals.jj2index + "];");
+      out.println("  private boolean jj_rescan = false;");
+      out.println("  private int jj_gc = 0;");
+    }
+    out.println("");
+
+    out.println("  /** Constructor with either generated or user provided Token Manager. */");
+    out.println("  public " + JavaCCGlobals.cuName + "(TokenManager tm) throws java.io.IOException, ParseException {");
+    out.println("    tokenManager = tm;");
+    out.println("    token = new Token();");
+    if (Options.getCacheTokens()) {
+      out.println("    token.next = jj_nt = tokenManager.getNextToken();");
+    }
+    else {
+      out.println("    jj_ntk = -1;");
+    }
+    if (Options.getErrorReporting()) {
+      out.println("    jj_gen = 0;");
+      out.println("    for (int i = 0; i < " + JavaCCGlobals.maskIndex + "; i++) jj_la1[i] = -1;");
+      if (JavaCCGlobals.jj2index != 0) {
+        out.println("    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();");
+      }
+    }
+    out.println("  }");
+    out.println("");
+    out.println("  private Token jj_consume_token(int kind) throws java.io.IOException, ParseException {");
+    if (Options.getCacheTokens()) {
+      out.println("    Token oldToken = token;");
+      out.println("    if ((token = jj_nt).next != null) jj_nt = jj_nt.next;");
+      out.println("    else jj_nt = jj_nt.next = tokenManager.getNextToken();");
+    }
+    else {
+      out.println("    Token oldToken;");
+      out.println("    if ((oldToken = token).next != null) token = token.next;");
+      out.println("    else token = token.next = tokenManager.getNextToken();");
+      out.println("    jj_ntk = -1;");
+    }
+    out.println("    if (token.getKind() == kind) {");
+    if (Options.getErrorReporting()) {
+      out.println("      jj_gen++;");
+      if (JavaCCGlobals.jj2index != 0) {
+        out.println("      if (++jj_gc > 100) {");
+        out.println("        jj_gc = 0;");
+        out.println("        for (int i = 0; i < jj_2_rtns.length; i++) {");
+        out.println("          JJCalls c = jj_2_rtns[i];");
+        out.println("          while (c != null) {");
+        out.println("            if (c.gen < jj_gen) c.first = null;");
+        out.println("            c = c.next;");
+        out.println("          }");
+        out.println("        }");
+        out.println("      }");
+      }
+    }
+    if (Options.getDebugParser()) {
+      out.println("      trace_token(token, \"\");");
+    }
+    out.println("      return token;");
+    out.println("    }");
+    if (Options.getCacheTokens()) {
+      out.println("    jj_nt = token;");
+    }
+    out.println("    token = oldToken;");
+    if (Options.getErrorReporting()) {
+      out.println("    jj_kind = kind;");
+    }
+    out.println("    throw generateParseException();");
+    out.println("  }");
+    out.println("");
+    if (JavaCCGlobals.jj2index != 0) {
+      out.println("  @SuppressWarnings(\"serial\")");
+      out.println("  private static final class LookaheadSuccess extends Error {}");
+      out.println("  private final LookaheadSuccess jj_ls = new LookaheadSuccess();");
+      out.println("  private boolean jj_scan_token(int kind) throws java.io.IOException {");
+      out.println("    if (jj_scanpos == jj_lastpos) {");
+      out.println("      jj_la--;");
+      out.println("      if (jj_scanpos.next == null) {");
+      out.println("        jj_lastpos = jj_scanpos = jj_scanpos.next = tokenManager.getNextToken();");
+      out.println("      } else {");
+      out.println("        jj_lastpos = jj_scanpos = jj_scanpos.next;");
+      out.println("      }");
+      out.println("    } else {");
+      out.println("      jj_scanpos = jj_scanpos.next;");
+      out.println("    }");
+      if (Options.getErrorReporting()) {
+        out.println("    if (jj_rescan) {");
+        out.println("      int i = 0; Token tok = token;");
+        out.println("      while (tok != null && tok != jj_scanpos) { i++; tok = tok.next; }");
+        out.println("      if (tok != null) jj_add_error_token(kind, i);");
+        if (Options.getDebugLookahead()) {
+          out.println("    } else {");
+          out.println("      trace_scan(jj_scanpos, kind);");
+        }
+        out.println("    }");
+      }
+      else if (Options.getDebugLookahead()) {
+        out.println("    trace_scan(jj_scanpos, kind);");
+      }
+      out.println("    if (jj_scanpos.getKind() != kind) return true;");
+      out.println("    if (jj_la == 0 && jj_scanpos == jj_lastpos) throw jj_ls;");
+      out.println("    return false;");
+      out.println("  }");
+      out.println("");
+    }
+    out.println("");
+    out.println("/** Get the next Token. */");
+    out.println("  final public Token getNextToken() throws java.io.IOException {");
+    if (Options.getCacheTokens()) {
+      out.println("    if ((token = jj_nt).next != null) jj_nt = jj_nt.next;");
+      out.println("    else jj_nt = jj_nt.next = tokenManager.getNextToken();");
+    }
+    else {
+      out.println("    if (token.next != null) token = token.next;");
+      out.println("    else token = token.next = tokenManager.getNextToken();");
+      out.println("    jj_ntk = -1;");
+    }
+    if (Options.getErrorReporting()) {
+      out.println("    jj_gen++;");
+    }
+    if (Options.getDebugParser()) {
+      out.println("      trace_token(token, \" (in getNextToken)\");");
+    }
+    out.println("    return token;");
+    out.println("  }");
+    out.println("");
+    out.println("/** Get the specific Token. */");
+    out.println("  final public Token getToken(int index) throws java.io.IOException {");
+    if (JavaCCGlobals.lookaheadNeeded) {
+      out.println("    Token t = jj_lookingAhead ? jj_scanpos : token;");
+    }
+    else {
+      out.println("    Token t = token;");
+    }
+    out.println("    for (int i = 0; i < index; i++) {");
+    out.println("      if (t.next != null) t = t.next;");
+    out.println("      else t = t.next = tokenManager.getNextToken();");
+    out.println("    }");
+    out.println("    return t;");
+    out.println("  }");
+    out.println("");
+    if (!Options.getCacheTokens()) {
+      out.println("  private int jj_ntk() throws java.io.IOException {");
+      out.println("    if ((jj_nt=token.next) == null)");
+      out.println("      return (jj_ntk = (token.next=tokenManager.getNextToken()).getKind());");
+      out.println("    else");
+      out.println("      return (jj_ntk = jj_nt.getKind());");
+      out.println("  }");
+      out.println("");
+    }
+    if (Options.getErrorReporting()) {
+      if (!Options.getGenerateGenerics()) {
+        out.println("  private java.util.List jj_expentries = new java.util.ArrayList();");
+      }
+      else {
+        out.println("  private final java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();");
+      }
+      out.println("  private int[] jj_expentry;");
+      out.println("  private int jj_kind = -1;");
+      if (JavaCCGlobals.jj2index != 0) {
+        out.println("  private int[] jj_lasttokens = new int[100];");
+        out.println("  private int jj_endpos;");
+        out.println("");
+        out.println("  private void jj_add_error_token(int kind, int pos) {");
+        out.println("    if (pos >= 100) return;");
+        out.println("    if (pos == jj_endpos + 1) {");
+        out.println("      jj_lasttokens[jj_endpos++] = kind;");
+        out.println("    } else if (jj_endpos != 0) {");
+        out.println("      jj_expentry = new int[jj_endpos];");
+        out.println("      for (int i = 0; i < jj_endpos; i++) {");
+        out.println("        jj_expentry[i] = jj_lasttokens[i];");
+        out.println("      }");
+        if (!Options.getGenerateGenerics()) {
+          out.println("      jj_entries_loop: for (java.util.Iterator it = jj_expentries.iterator(); it.hasNext();) {");
+        }
+        else {
+          out.println("      jj_entries_loop: for (java.util.Iterator<?> it = jj_expentries.iterator(); it.hasNext();) {");
+        }
+        out.println("        int[] oldentry = (int[])(it.next());");
+        out.println("        if (oldentry.length == jj_expentry.length) {");
+        out.println("          for (int i = 0; i < jj_expentry.length; i++) {");
+        out.println("            if (oldentry[i] != jj_expentry[i]) {");
+        out.println("              continue jj_entries_loop;");
+        out.println("            }");
+        out.println("          }");
+        out.println("          jj_expentries.add(jj_expentry);");
+        out.println("          break jj_entries_loop;");
+        out.println("        }");
+        out.println("      }");
+        out.println("      if (pos != 0) jj_lasttokens[(jj_endpos = pos) - 1] = kind;");
+        out.println("    }");
+        out.println("  }");
+      }
+      out.println("");
+      out.println("  /** Generate ParseException. */");
+      out.println("  public ParseException generateParseException() throws java.io.IOException {");
+      out.println("    jj_expentries.clear();");
+      out.println("    boolean[] la1tokens = new boolean[" + JavaCCGlobals.tokenCount + "];");
+      out.println("    if (jj_kind >= 0) {");
+      out.println("      la1tokens[jj_kind] = true;");
+      out.println("      jj_kind = -1;");
+      out.println("    }");
+      out.println("    for (int i = 0; i < " + JavaCCGlobals.maskIndex + "; i++) {");
+      out.println("      if (jj_la1[i] == jj_gen) {");
+      out.println("        for (int j = 0; j < 32; j++) {");
+      for (int i = 0; i < (JavaCCGlobals.tokenCount - 1) / 32 + 1; i++) {
+        out.println("          if ((jj_la1_" + i + "[i] & (1<<j)) != 0) {");
+        out.print("            la1tokens[");
+        if (i != 0) {
+          out.print((32 * i) + "+");
+        }
+        out.println("j] = true;");
+        out.println("          }");
+      }
+      out.println("        }");
+      out.println("      }");
+      out.println("    }");
+      out.println("    for (int i = 0; i < " + JavaCCGlobals.tokenCount + "; i++) {");
+      out.println("      if (la1tokens[i]) {");
+      out.println("        jj_expentry = new int[1];");
+      out.println("        jj_expentry[0] = i;");
+      out.println("        jj_expentries.add(jj_expentry);");
+      out.println("      }");
+      out.println("    }");
+      if (JavaCCGlobals.jj2index != 0) {
+        out.println("    jj_endpos = 0;");
+        out.println("    jj_rescan_token();");
+        out.println("    jj_add_error_token(0, 0);");
+      }
+      out.println("    int[][] exptokseq = new int[jj_expentries.size()][];");
+      out.println("    for (int i = 0; i < jj_expentries.size(); i++) {");
+      if (!Options.getGenerateGenerics()) {
+        out.println("      exptokseq[i] = (int[])jj_expentries.get(i);");
+      }
+      else {
+        out.println("      exptokseq[i] = jj_expentries.get(i);");
+      }
+      out.println("    }");
+      out.println("    return new ParseException(token, exptokseq, tokenImage);");
+      out.println("  }");
+    }
+    else {
+      out.println("  /** Generate ParseException. */");
+      out.println("  public ParseException generateParseException() throws java.io.IOException {");
+      out.println("    Token errortok = token.next;");
+      if (Options.getKeepLineColumn()) {
+        out.println("    int line = errortok.beginLine, column = errortok.beginColumn;");
+      }
+      out.println("    String mess = (errortok.getKind() == 0) ? tokenImage[0] : errortok.image;");
+      if (Options.getKeepLineColumn()) {
+        out.println("    return new ParseException(" +
+            "\"Parse error at line \" + line + \", column \" + column + \".  " +
+            "Encountered: \" + mess);");
+      }
+      else {
+        out.println("    return new ParseException(\"Parse error at <unknown location>.  " +
+            "Encountered: \" + mess);");
+      }
+      out.println("  }");
+    }
+    out.println("");
+
+    if (Options.getDebugParser()) {
+      out.println("  private int trace_indent = 0;");
+      out.println("  private boolean trace_enabled = true;");
+      out.println("");
+      out.println("/** Enable tracing. */");
+      out.println("  final public void enable_tracing() {");
+      out.println("    trace_enabled = true;");
+      out.println("  }");
+      out.println("");
+      out.println("/** Disable tracing. */");
+      out.println("  final public void disable_tracing() {");
+      out.println("    trace_enabled = false;");
+      out.println("  }");
+      out.println("");
+      out.println("  private void trace_call(String s) {");
+      out.println("    if (trace_enabled) {");
+      out.println("      for (int i = 0; i < trace_indent; i++) { System.out.print(\" \"); }");
+      out.println("      System.out.println(\"Call:   \" + s);");
+      out.println("    }");
+      out.println("    trace_indent = trace_indent + 2;");
+      out.println("  }");
+      out.println("");
+      out.println("  private void trace_return(String s) {");
+      out.println("    trace_indent = trace_indent - 2;");
+      out.println("    if (trace_enabled) {");
+      out.println("      for (int i = 0; i < trace_indent; i++) { System.out.print(\" \"); }");
+      out.println("      System.out.println(\"Return: \" + s);");
+      out.println("    }");
+      out.println("  }");
+      out.println("");
+      out.println("  private void trace_token(Token t, String where) {");
+      out.println("    if (trace_enabled) {");
+      out.println("      for (int i = 0; i < trace_indent; i++) { System.out.print(\" \"); }");
+      out.println("      System.out.print(\"Consumed token: <\" + tokenImage[t.getKind()]);");
+      out.println("      if (t.getKind() != 0 && !tokenImage[t.getKind()].equals(\"\\\"\" + t.image + \"\\\"\")) {");
+      out.println("        System.out.print(\": \\\"\" + t.image + \"\\\"\");");
+      out.println("      }");
+      out.println("      System.out.println(\" at line \" + t.beginLine + " +
+          "\" column \" + t.beginColumn + \">\" + where);");
+      out.println("    }");
+      out.println("  }");
+      out.println("");
+      out.println("  private void trace_scan(Token t1, int t2) {");
+      out.println("    if (trace_enabled) {");
+      out.println("      for (int i = 0; i < trace_indent; i++) { System.out.print(\" \"); }");
+      out.println("      System.out.print(\"Visited token: <\" + tokenImage[t1.getKind()]);");
+      out.println("      if (t1.getKind() != 0 && !tokenImage[t1.getKind()].equals(\"\\\"\" + t1.image + \"\\\"\")) {");
+      out.println("        System.out.print(\": \\\"\" + t1.image + \"\\\"\");");
+      out.println("      }");
+      out.println("      System.out.println(\" at line \" + t1.beginLine + \"" +
+          " column \" + t1.beginColumn + \">; Expected token: <\" + tokenImage[t2] + \">\");");
+      out.println("    }");
+      out.println("  }");
+      out.println("");
+    }
+    else {
+      out.println("  /** Enable tracing. */");
+      out.println("  final public void enable_tracing() {");
+      out.println("  }");
+      out.println("");
+      out.println("  /** Disable tracing. */");
+      out.println("  final public void disable_tracing() {");
+      out.println("  }");
+      out.println("");
+    }
+
+    if (JavaCCGlobals.jj2index != 0 && Options.getErrorReporting()) {
+      out.println("  private void jj_rescan_token() throws java.io.IOException {");
+      out.println("    jj_rescan = true;");
+      out.println("    for (int i = 0; i < " + JavaCCGlobals.jj2index + "; i++) {");
+      out.println("    try {");
+      out.println("      JJCalls p = jj_2_rtns[i];");
+      out.println("      do {");
+      out.println("        if (p.gen > jj_gen) {");
+      out.println("          jj_la = p.arg; jj_lastpos = jj_scanpos = p.first;");
+      out.println("          switch (i) {");
+      for (int i = 0; i < JavaCCGlobals.jj2index; i++) {
+        out.println("            case " + i + ": jj_3_" + (i + 1) + "(); break;");
+      }
+      out.println("          }");
+      out.println("        }");
+      out.println("        p = p.next;");
+      out.println("      } while (p != null);");
+      out.println("      } catch(LookaheadSuccess ls) {}");
+      out.println("    }");
+      out.println("    jj_rescan = false;");
+      out.println("  }");
+      out.println("");
+      out.println("  private void jj_save(int index, int xla) throws java.io.IOException {");
+      out.println("    JJCalls p = jj_2_rtns[index];");
+      out.println("    while (p.gen > jj_gen) {");
+      out.println("      if (p.next == null) { p = p.next = new JJCalls(); break; }");
+      out.println("      p = p.next;");
+      out.println("    }");
+      out.println("    p.gen = jj_gen + xla - jj_la; p.first = token; p.arg = xla;");
+      out.println("  }");
+      out.println("");
+    }
+
+    if (JavaCCGlobals.jj2index != 0 && Options.getErrorReporting()) {
+      out.println("  static final class JJCalls {");
+      out.println("    int gen;");
+      out.println("    Token first;");
+      out.println("    int arg;");
+      out.println("    JJCalls next;");
+      out.println("  }");
+      out.println("");
+    }
+
+    if (JavaCCGlobals.cuFromInsertionPoint2.size() != 0) {
+      JavaCCGlobals.printTokenSetup(JavaCCGlobals.cuFromInsertionPoint2.get(0));
+      JavaCCGlobals.ccol = 1;
+      Token t = null;
+      for (Iterator<Token> it = JavaCCGlobals.cuFromInsertionPoint2.iterator(); it.hasNext(); ) {
+        t = it.next();
+        JavaCCGlobals.printToken(t, out);
+      }
+      JavaCCGlobals.printTrailingComments(t, out);
+    }
+    out.println("");
+  }
 }

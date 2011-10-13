@@ -29,6 +29,7 @@
 package org.javacc.jjdoc;
 
 import org.javacc.parser.*;
+import org.javacc.utils.Parsers;
 
 import java.util.Iterator;
 import java.util.List;
@@ -79,11 +80,10 @@ public class JJDoc {
   }
   */
 
-  private void emitTokenProductions(Generator gen, List prods) {
+  private void emitTokenProductions(Generator gen, List<TokenProduction> prods) {
     gen.tokensStart();
     // FIXME there are many empty productions here
-    for (Iterator it = prods.iterator(); it.hasNext(); ) {
-      TokenProduction tp = (TokenProduction) it.next();
+    for (TokenProduction tp : prods) {
       emitTopLevelSpecialTokens(tp.firstToken, gen);
 
       String token = "";
@@ -131,7 +131,7 @@ public class JJDoc {
     gen.tokensEnd();
   }
 
-  private void emitNormalProductions(Generator gen, List prods) {
+  private void emitNormalProductions(Generator gen, List<NormalProduction> prods) {
     gen.nonterminalsStart();
     for (Iterator it = prods.iterator(); it.hasNext(); ) {
       NormalProduction np = (NormalProduction) it.next();
@@ -315,17 +315,17 @@ public class JJDoc {
         Object o = it.next();
         if (o instanceof SingleCharacter) {
           returnString += "\"";
-          char s[] = {((SingleCharacter) o).ch};
-          returnString += JavaCCGlobals.add_escapes(new String(s));
+          char[] s = {((SingleCharacter) o).ch};
+          returnString += Parsers.escape(new String(s));
           returnString += "\"";
         }
         else if (o instanceof CharacterRange) {
           returnString += "\"";
-          char s[] = {((CharacterRange) o).getLeft()};
-          returnString += JavaCCGlobals.add_escapes(new String(s));
+          char[] s = {((CharacterRange) o).getLeft()};
+          returnString += Parsers.escape(new String(s));
           returnString += "\"-\"";
           s[0] = ((CharacterRange) o).getRight();
-          returnString += JavaCCGlobals.add_escapes(new String(s));
+          returnString += Parsers.escape(new String(s));
           returnString += "\"";
         }
         else {
@@ -382,7 +382,7 @@ public class JJDoc {
     }
     else if (re instanceof RStringLiteral) {
       RStringLiteral sl = (RStringLiteral) re;
-      returnString += ("\"" + JavaCCGlobals.add_escapes(sl.image) + "\"");
+      returnString += ("\"" + Parsers.escape(sl.image) + "\"");
     }
     else if (re instanceof RZeroOrMore) {
       RZeroOrMore zm = (RZeroOrMore) re;

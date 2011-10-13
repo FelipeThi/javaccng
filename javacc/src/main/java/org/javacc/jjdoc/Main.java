@@ -29,12 +29,12 @@
 package org.javacc.jjdoc;
 
 import org.javacc.parser.JavaCCErrors;
-import org.javacc.parser.JavaCCGlobals;
 import org.javacc.parser.JavaCCParser;
 import org.javacc.parser.JavaCCParserTokenManager;
 import org.javacc.parser.JavaCharStream;
 import org.javacc.parser.MetaParseException;
 import org.javacc.parser.ParseException;
+import org.javacc.utils.Tools;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -45,15 +45,15 @@ import java.io.InputStreamReader;
 public final class Main {
   private Main() {}
 
-  public static void main(String args[]) throws Exception {
+  public static void main(String[] args) throws Exception {
     System.exit(mainProgram(args));
   }
 
-  public static int mainProgram(String args[]) throws Exception {
+  public static int mainProgram(String[] args) throws Exception {
     org.javacc.parser.Main.reInitAll();
     JJDocOptions.init();
 
-    JavaCCGlobals.bannerLine("Documentation Generator", "0.1.4");
+    Tools.bannerLine("Documentation Generator", "0.1.4");
 
     JavaCCParser parser;
     if (args.length == 0) {

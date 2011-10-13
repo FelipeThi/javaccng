@@ -25,8 +25,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.javacc.jjtree;
 
+package org.javacc.jjtree;
 
 public class ASTLHS extends JJTreeNode {
   ASTLHS(int id) {
@@ -34,8 +34,7 @@ public class ASTLHS extends JJTreeNode {
   }
 
   @Override
-  public void print(IO io)
-  {
+  public void print(IO io) {
     NodeScope ns = NodeScope.getEnclosingNodeScope(this);
 
     /* Print out all the tokens, converting all references to
@@ -45,6 +44,5 @@ public class ASTLHS extends JJTreeNode {
     for (Token t = first; t != last.next; t = t.next) {
       TokenUtils.print(t, io, "jjtThis", ns.getNodeVariable());
     }
-
   }
 }

@@ -57,8 +57,8 @@ public class TryBlock extends Expansion {
   public List finallyBlocks;
 
   @Override
-  public StringBuffer dump(int indent, Set alreadyDumped) {
-    StringBuffer sb = super.dump(indent, alreadyDumped);
+  public StringBuilder dump(int indent, Set alreadyDumped) {
+    StringBuilder sb = super.dump(indent, alreadyDumped);
     if (alreadyDumped.contains(this)) {
       return sb;
     }

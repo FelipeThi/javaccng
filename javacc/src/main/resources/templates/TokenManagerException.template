@@ -127,7 +127,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class TokenManagerException extends R
                            String prefix,
 #fi
                            int curChar) {
-    final StringBuilder s = new StringBuilder();
+    StringBuilder s = new StringBuilder();
 #if KEEP_LINE_COLUMN
     s.append("Lexical error at line ").append(line).append(", column ").append(column).append(". Encountered: ");
 #else
@@ -152,10 +152,10 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class TokenManagerException extends R
    * @param string String to escape.
    * @return Escaped string.
    */
-  static String escape(final String string) {
-    final StringBuffer b = new StringBuffer(string.length());
+  static String escape(String string) {
+    StringBuilder b = new StringBuilder(string.length());
     for (int i = 0; i < string.length(); i++) {
-      final char ch = string.charAt(i);
+      char ch = string.charAt(i);
       switch (ch) {
         case '\b':
           b.append("\\b");
@@ -184,7 +184,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class TokenManagerException extends R
         default:
           if (ch < 0x20 || ch > 0x7e) {
             b.append("\\u");
-            final String s = Integer.toString(ch, 16);
+            String s = Integer.toString(ch, 16);
             for (int n = 0; n < 4 - s.length(); n++) {
               b.append("0");
             }

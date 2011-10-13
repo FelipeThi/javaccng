@@ -49,8 +49,8 @@ package org.javacc.parser;
 import java.util.List;
 import java.util.ArrayList;
 
-public final class JavaCCParser extends JavaCCParserInternals {
-  /** * The name of the parser class. */
+public final class JavaCCParser extends JavaCCParserBase {
+  /** The name of the parser class. */
   String parserClassName;
 
   /**
@@ -59,7 +59,7 @@ public final class JavaCCParser extends JavaCCParserInternals {
    */
   boolean processingCu = false;
 
-  /** * The level of class nesting. */
+  /** The level of class nesting. */
   int classNesting = 0;
 
   /**
@@ -99,75 +99,6 @@ public final class JavaCCParser extends JavaCCParserInternals {
     }
     return true;
   }
-
-   /**
-    * Class to hold modifiers.
-    */
-   public static final class ModifierSet {
-     /* Definitions of the bits in the modifiers field.  */
-     public static final int PUBLIC = 0x0001;
-     public static final int PROTECTED = 0x0002;
-     public static final int PRIVATE = 0x0004;
-     public static final int ABSTRACT = 0x0008;
-     public static final int STATIC = 0x0010;
-     public static final int FINAL = 0x0020;
-     public static final int SYNCHRONIZED = 0x0040;
-     public static final int NATIVE = 0x0080;
-     public static final int TRANSIENT = 0x0100;
-     public static final int VOLATILE = 0x0200;
-     public static final int STRICTFP = 0x1000;
-
-     /** A set of accessors that indicate whether the specified modifier
-         is in the set. */
-
-     public boolean isPublic(int modifiers) {
-       return (modifiers & PUBLIC) != 0;
-     }
-
-     public boolean isProtected(int modifiers) {
-       return (modifiers & PROTECTED) != 0;
-     }
-
-     public boolean isPrivate(int modifiers) {
-       return (modifiers & PRIVATE) != 0;
-     }
-
-     public boolean isStatic(int modifiers) {
-       return (modifiers & STATIC) != 0;
-     }
-
-     public boolean isAbstract(int modifiers) {
-       return (modifiers & ABSTRACT) != 0;
-     }
-
-     public boolean isFinal(int modifiers) {
-       return (modifiers & FINAL) != 0;
-     }
-
-     public boolean isNative(int modifiers) {
-       return (modifiers & NATIVE) != 0;
-     }
-
-     public boolean isStrictfp(int modifiers) {
-       return (modifiers & STRICTFP) != 0;
-     }
-
-     public boolean isSynchronized(int modifiers) {
-       return (modifiers & SYNCHRONIZED) != 0;
-     }
-
-     public boolean isTransient(int modifiers) {
-       return (modifiers & TRANSIENT) != 0;
-     }
-
-     public boolean isVolatile(int modifiers) {
-       return (modifiers & VOLATILE) != 0;
-     }
-
-     static int removeModifier(int modifiers, int mod) {
-        return modifiers & ~mod;
-     }
-   }
 }
 PARSER_END(JavaCCParser)
 
@@ -633,7 +564,7 @@ void javacode_production() :
   Block(p.getCodeTokens())
 	{
 	  p.setLastToken(getToken(0));
-	  addproduction(p);
+	  addProduction(p);
 	}
 }
 
@@ -679,8 +610,9 @@ void bnf_production() :
 	{
 	  p.setLastToken(t);
 	  p.setJumpPatched(jumpPatched);
-	  production_addexpansion(p, (Expansion)(c.member));
-	  addproduction(p);
+	  c.member.parent = p;
+      p.setExpansion(c.member);
+	  addProduction(p);
 	}
 }
 
@@ -757,7 +689,7 @@ void regular_expr_production() :
   "{" regexpr_spec(p) ( "|" regexpr_spec(p) )* t="}"
 	{
 	  p.lastToken = t;
-	  addregexpr(p);
+	  addRegExp(p);
 	}
 }
 
@@ -1122,7 +1054,7 @@ void expansion_unit(Container<Expansion> c) :
     regular_expression(c)
 	{
 	  ((RegularExpression)(c.member)).lhsTokens = lhsTokens;
-	  add_inline_regexpr((RegularExpression)(c.member));
+	  addInlineRegExp((RegularExpression)(c.member));
 	}
 	[ "." t=<IDENTIFIER> { ((RegularExpression)(c.member)).rhsToken = t; } ]
   )
@@ -1435,14 +1367,14 @@ void CompilationUnit() :
  * within grammar code.
  */
 	{
-	  set_initial_cu_token(getToken(1));
+	  setInitialCuToken(getToken(1));
 	}
 {
   [ LOOKAHEAD( ( Annotation() )* "package" ) PackageDeclaration() ]
   ( ImportDeclaration() )*
   ( TypeDeclaration() )*
 	{
-	  insertionpointerrors(getToken(1));
+	  insertionPointErrors(getToken(1));
 	}
 }
 
@@ -2205,7 +2137,7 @@ String StringLiteral() :
 {
   t=<STRING_LITERAL>
 	{
-	  return remove_escapes_and_quotes(t, t.getImage());
+	  return org.javacc.utils.Parsers.unescape(t, t.getImage());
 	}
 }
 

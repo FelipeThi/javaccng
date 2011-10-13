@@ -40,21 +40,21 @@ public abstract class NormalProduction {
    */
   private int line, column;
   /** The NonTerminal nodes which refer to this production. */
-  private List parents = new ArrayList();
+  private List<Expansion> parents = new ArrayList<Expansion>();
   /** The access modifier of this production. */
   private String accessModifier;
   /** The name of the non-terminal of this production. */
   private String lhs;
   /** The tokens that make up the return type of this production. */
-  private List returnTypeTokens = new ArrayList();
+  private List<Token> returnTypeTokens = new ArrayList<Token>();
   /** The tokens that make up the parameters of this production. */
-  private List parameterListTokens = new ArrayList();
+  private List<Token> parameterListTokens = new ArrayList<Token>();
   /**
    * Each entry in this list is a list of tokens that represents an
    * exception in the throws list of this production.  This list does not
    * include ParseException which is always thrown.
    */
-  private List throwsList = new ArrayList();
+  private List<List<Token>> throwsList = new ArrayList<List<Token>>();
   /** The RHS of this production.  Not used for JavaCodeProduction. */
   private Expansion expansion;
   /** This boolean flag is true if this production can expand to empty. */
@@ -98,11 +98,7 @@ public abstract class NormalProduction {
     return column;
   }
 
-  void setParents(List parents) {
-    this.parents = parents;
-  }
-
-  List getParents() {
+  List<Expansion> getParents() {
     return parents;
   }
 
@@ -122,19 +118,19 @@ public abstract class NormalProduction {
     return lhs;
   }
 
-  public List getReturnTypeTokens() {
+  public List<Token> getReturnTypeTokens() {
     return returnTypeTokens;
   }
 
-  public List getParameterListTokens() {
+  public List<Token> getParameterListTokens() {
     return parameterListTokens;
   }
 
-  public void setThrowsList(List throwsList) {
+  public void setThrowsList(List<List<Token>> throwsList) {
     this.throwsList = throwsList;
   }
 
-  public List getThrowsList() {
+  public List<List<Token>> getThrowsList() {
     return throwsList;
   }
 
@@ -188,8 +184,8 @@ public abstract class NormalProduction {
     return lastToken;
   }
 
-  protected StringBuffer dumpPrefix(int indent) {
-    StringBuffer sb = new StringBuffer(128);
+  protected StringBuilder dumpPrefix(int indent) {
+    StringBuilder sb = new StringBuilder(128);
     for (int i = 0; i < indent; i++) { sb.append("  "); }
     return sb;
   }
@@ -199,8 +195,8 @@ public abstract class NormalProduction {
     return name.substring(name.lastIndexOf(".") + 1);
   }
 
-  public StringBuffer dump(int indent, Set alreadyDumped) {
-    StringBuffer sb = dumpPrefix(indent).append(System.identityHashCode(this)).append(' ').append(getSimpleName()).append(' ').append(getLhs());
+  public StringBuilder dump(int indent, Set alreadyDumped) {
+    StringBuilder sb = dumpPrefix(indent).append(System.identityHashCode(this)).append(' ').append(getSimpleName()).append(' ').append(getLhs());
     if (!alreadyDumped.contains(this)) {
       alreadyDumped.add(this);
       if (getExpansion() != null) {

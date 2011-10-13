@@ -82,8 +82,8 @@ public abstract class RegularExpression extends Expansion {
   public abstract Nfa generateNfa(LexGen lexGen, boolean ignoreCase);
 
   @Override
-  public StringBuffer dump(int indent, Set alreadyDumped) {
-    StringBuffer sb = super.dump(indent, alreadyDumped);
+  public StringBuilder dump(int indent, Set alreadyDumped) {
+    StringBuilder sb = super.dump(indent, alreadyDumped);
     alreadyDumped.add(this);
     sb.append(' ').append(label);
     return sb;

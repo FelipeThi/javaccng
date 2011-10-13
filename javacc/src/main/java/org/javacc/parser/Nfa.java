@@ -25,25 +25,21 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.javacc.parser;
 
-/**
- * A Non-deterministic Finite Automaton.
- */
-public class Nfa
-{
-   NfaState start;
-   NfaState end;
+/** A Non-deterministic Finite Automaton. */
+public final class Nfa {
+  final NfaState start;
+  final NfaState end;
 
-   public Nfa(LexGen lexGen)
-   {
-      start = new NfaState(lexGen);
-      end = new NfaState(lexGen);
-   }
+  public Nfa(LexGen lexGen) {
+    start = new NfaState(lexGen);
+    end = new NfaState(lexGen);
+  }
 
-   public Nfa(NfaState startGiven, NfaState finalGiven)
-   {
-      start = startGiven;
-      end = finalGiven;
-   }
+  public Nfa(NfaState start, NfaState end) {
+    this.start = start;
+    this.end = end;
+  }
 }

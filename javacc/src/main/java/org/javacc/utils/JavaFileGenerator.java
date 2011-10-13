@@ -42,12 +42,11 @@ import java.util.Map;
  * @since 4.2
  */
 public class JavaFileGenerator {
-
   /**
-   * @param templateName the name of the template. E.g.
-   *        "/templates/Token.template".
-   * @param options the processing options in force, such
-   *        as "ERROR_REPORTING=yes"
+   * @param templateName The name of the template. E.g.
+   *                     "/templates/Token.template".
+   * @param options      The processing options in force, such
+   *                     as "ERROR_REPORTING=yes"
    */
   public JavaFileGenerator(String templateName, Map options) {
     this.templateName = templateName;
@@ -56,72 +55,59 @@ public class JavaFileGenerator {
 
   private final String templateName;
   private final Map options;
-
   private String currentLine;
 
-  /**
-   * Generate the output file.
-   * @param out
-   * @throws IOException
-   */
-  public void generate(IndentingPrintWriter out) throws IOException
-  {
+  public void generate(IndentingPrintWriter out) throws IOException {
     InputStream is = getClass().getResourceAsStream(templateName);
-    if (is == null)
+    if (is == null) {
       throw new IOException("Invalid template name: " + templateName);
+    }
     BufferedReader in = new BufferedReader(new InputStreamReader(is));
     process(in, out, false);
   }
 
-  private String peekLine(BufferedReader in) throws IOException
-  {
-    if (currentLine == null)
+  private String peekLine(BufferedReader in) throws IOException {
+    if (currentLine == null) {
       currentLine = in.readLine();
-
+    }
     return currentLine;
   }
 
-  private String getLine(BufferedReader in) throws IOException
-  {
+  private String getLine(BufferedReader in) throws IOException {
     String line = currentLine;
     currentLine = null;
 
-    if (line == null)
+    if (line == null) {
       in.readLine();
+    }
 
     return line;
   }
 
-  private boolean evaluate(String condition)
-  {
+  private boolean evaluate(String condition) {
     condition = condition.trim();
 
     Object obj = options.get(condition);
 
-    if (obj == null)
-    {
+    if (obj == null) {
       return condition.equalsIgnoreCase("true") || condition.equalsIgnoreCase("yes");
     }
 
-    if (obj instanceof Boolean)
-    {
-      return ((Boolean)obj).booleanValue();
+    if (obj instanceof Boolean) {
+      return ((Boolean) obj).booleanValue();
     }
-    else if (obj instanceof String)
-    {
-      String string = ((String)obj).trim();
+    else if (obj instanceof String) {
+      String string = ((String) obj).trim();
       return string.length() > 0 && !string.equalsIgnoreCase("false") && !string.equalsIgnoreCase("no");
     }
 
     return false;
   }
 
-  private String substitute(String text) throws IOException
-  {
+  private String substitute(String text) throws IOException {
     int startPos;
 
-    if ( (startPos = text.indexOf("${")) == -1)
-    {
+    if ((startPos = text.indexOf("${")) == -1) {
       return text;
     }
 
@@ -129,130 +115,94 @@ public class JavaFileGenerator {
     int braceDepth = 1;
     int endPos = startPos + 2;
 
-    while ( endPos < text.length() && braceDepth > 0)
-    {
-      if (text.charAt(endPos) == '{')
-        braceDepth++;
-      else if (text.charAt(endPos) == '}')
-        braceDepth--;
+    while (endPos < text.length() && braceDepth > 0) {
+      if (text.charAt(endPos) == '{') { braceDepth++; }
+      else if (text.charAt(endPos) == '}') { braceDepth--; }
 
       endPos++;
     }
 
-    if (braceDepth != 0)
-      throw new IOException("Mismatched \"{}\" in template string: " + text);
+    if (braceDepth != 0) { throw new IOException("Mismatched \"{}\" in template string: " + text); }
 
-    final String variableExpression = text.substring(startPos + 2, endPos - 1);
+    String variableExpression = text.substring(startPos + 2, endPos - 1);
 
     // Find the end of the variable name
     String value = null;
 
-    for (int i = 0; i < variableExpression.length(); i++)
-    {
+    for (int i = 0; i < variableExpression.length(); i++) {
       char ch = variableExpression.charAt(i);
 
-      if (ch == ':' && i < variableExpression.length() - 1 && variableExpression.charAt(i+1) == '-' )
-      {
+      if (ch == ':' && i < variableExpression.length() - 1 && variableExpression.charAt(i + 1) == '-') {
         value = substituteWithDefault(variableExpression.substring(0, i), variableExpression.substring(i + 2));
         break;
       }
-      else if (ch == '?')
-      {
+      else if (ch == '?') {
         value = substituteWithConditional(variableExpression.substring(0, i), variableExpression.substring(i + 1));
         break;
       }
-      else if (ch != '_' && !Character.isJavaIdentifierPart(ch))
-      {
+      else if (ch != '_' && !Character.isJavaIdentifierPart(ch)) {
         throw new IOException("Invalid variable in " + text);
       }
     }
 
-    if (value == null)
-    {
+    if (value == null) {
       value = substituteWithDefault(variableExpression, "");
     }
 
     return text.substring(0, startPos) + value + text.substring(endPos);
   }
 
-  /**
-   * @param substring
-   * @param defaultValue
-   * @return
-   * @throws IOException
-   */
-  private String substituteWithConditional(String variableName, String values) throws IOException
-  {
+  private String substituteWithConditional(String variableName, String values) throws IOException {
     // Split values into true and false values.
 
     int pos = values.indexOf(':');
-    if (pos == -1)
-      throw new IOException("No ':' separator in " + values);
+    if (pos == -1) { throw new IOException("No ':' separator in " + values); }
 
-    if (evaluate(variableName))
-      return substitute(values.substring(0, pos));
-    else
-      return substitute(values.substring(pos + 1));
+    if (evaluate(variableName)) { return substitute(values.substring(0, pos)); }
+    else { return substitute(values.substring(pos + 1)); }
   }
 
-  /**
-   * @param variableName
-   * @param defaultValue
-   * @return
-   */
-  private String substituteWithDefault(String variableName, String defaultValue) throws IOException
-  {
+  private String substituteWithDefault(String variableName, String defaultValue) throws IOException {
     Object obj = options.get(variableName.trim());
-    if (obj == null || obj.toString().length() == 0)
-      return substitute(defaultValue);
+    if (obj == null || obj.toString().length() == 0) { return substitute(defaultValue); }
 
     return obj.toString();
   }
 
-  private void write(IndentingPrintWriter out, String text) throws IOException
-  {
-    while ( text.indexOf("${") != -1)
-    {
+  private void write(IndentingPrintWriter out, String text) throws IOException {
+    while (text.indexOf("${") != -1) {
       text = substitute(text);
     }
 
     out.println(text);
   }
 
-  private void process(BufferedReader in, IndentingPrintWriter out, boolean ignoring)  throws IOException
-  {
-//    out.println("*** process ignore=" + ignoring + " : " + peekLine(in));
-    while ( peekLine(in) != null)
-    {
-      if (peekLine(in).trim().startsWith("#if"))
-      {
+  private void process(BufferedReader in, IndentingPrintWriter out, boolean ignoring)
+      throws IOException {
+    while (peekLine(in) != null) {
+      if (peekLine(in).trim().startsWith("#if")) {
         String line = getLine(in).trim();
-        final boolean condition = evaluate(line.substring(3).trim());
+        boolean condition = evaluate(line.substring(3).trim());
 
         process(in, out, ignoring || !condition);
 
-        if (peekLine(in) != null && peekLine(in).trim().startsWith("#else"))
-        {
+        if (peekLine(in) != null && peekLine(in).trim().startsWith("#else")) {
           getLine(in);   // Discard the #else line
           process(in, out, ignoring || condition);
         }
 
         line = getLine(in);
 
-        if (line == null)
-          throw new IOException("Missing \"#fi\"");
+        if (line == null) { throw new IOException("Missing \"#fi\""); }
 
-        if (!line.trim().startsWith("#fi"))
-          throw new IOException("Expected \"#fi\", got: " + line);
+        if (!line.trim().startsWith("#fi")) { throw new IOException("Expected \"#fi\", got: " + line); }
       }
-      else if (peekLine(in).trim().startsWith("#"))
-      {
+      else if (peekLine(in).trim().startsWith("#")) {
         break;
       }
-      else
-      {
+      else {
         String line = getLine(in);
-        if (!ignoring) write(out, line);
+        if (!ignoring) { write(out, line); }
       }
     }
 

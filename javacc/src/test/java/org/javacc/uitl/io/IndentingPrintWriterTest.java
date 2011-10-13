@@ -1,10 +1,11 @@
 package org.javacc.uitl.io;
 
 import org.javacc.utils.io.IndentingPrintWriter;
-import static org.junit.Assert.*;
 import org.junit.Test;
 
 import java.io.StringWriter;
+
+import static org.junit.Assert.*;
 
 public class IndentingPrintWriterTest {
   @Test

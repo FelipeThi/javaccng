@@ -182,7 +182,7 @@ public final class RStringLiteral extends RegularExpression {
   }
 
   @Override
-  public StringBuffer dump(int indent, Set alreadyDumped) {
+  public StringBuilder dump(int indent, Set alreadyDumped) {
     return super.dump(indent, alreadyDumped).append(' ').append(image);
   }
 

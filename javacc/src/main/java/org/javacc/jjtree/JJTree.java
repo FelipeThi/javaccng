@@ -29,8 +29,9 @@
 package org.javacc.jjtree;
 
 import org.javacc.parser.Main;
-import org.javacc.parser.JavaCCGlobals;
+import org.javacc.utils.Tools;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
@@ -39,6 +40,109 @@ public final class JJTree {
 
   private void p(String s) {
     io.getMsg().println(s);
+  }
+
+  public int main(String[] args) {
+    // initialize static state for allowing repeat runs without exiting
+    ASTNodeDescriptor.nodeIds = new ArrayList<String>();
+    ASTNodeDescriptor.nodeNames = new ArrayList<String>();
+    ASTNodeDescriptor.nodeSeen = new Hashtable<String, String>();
+    Main.reInitAll();
+
+    Tools.bannerLine("Tree Builder", "");
+
+    io = new IO();
+    try {
+      return generate(args);
+    }
+    finally {
+      io.closeAll();
+    }
+  }
+
+  private int generate(String[] args) {
+    initializeOptions();
+
+    if (args.length == 0) {
+      p("");
+      usage();
+      return 1;
+    }
+    else {
+      p("(type \"jjtree\" with no arguments for help)");
+    }
+
+    String fn = args[args.length - 1];
+
+    if (JJTreeOptions.isOption(fn)) {
+      p("Last argument \"" + fn + "\" is not a filename");
+      return 1;
+    }
+
+    for (int arg = 0; arg < args.length - 1; arg++) {
+      if (!JJTreeOptions.isOption(args[arg])) {
+        p("Argument \"" + args[arg] + "\" must be an option setting.");
+        return 1;
+      }
+      JJTreeOptions.setCmdLineOption(args[arg]);
+    }
+
+    JJTreeOptions.validate();
+
+    try {
+      io.setInput(fn);
+    }
+    catch (IOException ex) {
+      p("Error setting input: " + ex.getMessage());
+      return 1;
+    }
+
+    p("Reading from file " + io.getInputFileName() + " . . .");
+
+    try {
+      JJTreeParser parser = new JJTreeParser(new JJTreeParserTokenManager(new JavaCharStream(io.getIn())));
+      parser.javacc_input();
+
+      ASTGrammar root = (ASTGrammar) parser.jjtree.rootNode();
+      if (Boolean.getBoolean("jjtree-dump")) {
+        root.dump(" ");
+      }
+      try {
+        io.setOutput();
+      }
+      catch (IOException ex) {
+        p("Error setting output: " + ex.getMessage());
+        return 1;
+      }
+
+      root.generate(io);
+
+      io.getOut().close();
+
+      NodeFiles.generateTreeConstants_java();
+      NodeFiles.generateVisitor_java();
+      JJTreeState.generateTreeState_java();
+
+      p("Annotated grammar generated successfully in " +
+          io.getOutputFileName());
+    }
+    catch (ParseException ex) {
+      p("Error parsing input: " + ex.toString());
+      return 1;
+    }
+    catch (Exception ex) {
+      p("Error parsing input: " + ex.toString());
+      ex.printStackTrace(io.getMsg());
+      return 1;
+    }
+
+    return 0;
+  }
+
+  /** Initialize for JJTree */
+  private void initializeOptions() {
+    JJTreeOptions.init();
+    JJTreeGlobals.initialize();
   }
 
   private void usage() {
@@ -96,104 +200,5 @@ public final class JJTree {
     p("    For more information, see the online JJTree documentation at ");
     p("    https://javacc.dev.java.net/doc/JJTree.html ");
     p("");
-  }
-
-  public int main(String args[]) {
-    // initialize static state for allowing repeat runs without exiting
-    ASTNodeDescriptor.nodeIds = new ArrayList();
-    ASTNodeDescriptor.nodeNames = new ArrayList();
-    ASTNodeDescriptor.nodeSeen = new Hashtable();
-    Main.reInitAll();
-
-    JavaCCGlobals.bannerLine("Tree Builder", "");
-
-    io = new IO();
-
-    try {
-
-      initializeOptions();
-      if (args.length == 0) {
-        p("");
-        usage();
-        return 1;
-      }
-      else {
-        p("(type \"jjtree\" with no arguments for help)");
-      }
-
-      String fn = args[args.length - 1];
-
-      if (JJTreeOptions.isOption(fn)) {
-        p("Last argument \"" + fn + "\" is not a filename");
-        return 1;
-      }
-      for (int arg = 0; arg < args.length - 1; arg++) {
-        if (!JJTreeOptions.isOption(args[arg])) {
-          p("Argument \"" + args[arg] + "\" must be an option setting.");
-          return 1;
-        }
-        JJTreeOptions.setCmdLineOption(args[arg]);
-      }
-
-      JJTreeOptions.validate();
-
-      try {
-        io.setInput(fn);
-      }
-      catch (JJTreeIOException ioe) {
-        p("Error setting input: " + ioe.getMessage());
-        return 1;
-      }
-      p("Reading from file " + io.getInputFileName() + " . . .");
-
-      JJTreeGlobals.toolList = JavaCCGlobals.getToolNames(fn);
-      JJTreeGlobals.toolList.add("JJTree");
-
-      try {
-        JJTreeParser parser = new JJTreeParser(new JJTreeParserTokenManager(new JavaCharStream(io.getIn())));
-        parser.javacc_input();
-
-        ASTGrammar root = (ASTGrammar) parser.jjtree.rootNode();
-        if (Boolean.getBoolean("jjtree-dump")) {
-          root.dump(" ");
-        }
-        try {
-          io.setOutput();
-        }
-        catch (JJTreeIOException ioe) {
-          p("Error setting output: " + ioe.getMessage());
-          return 1;
-        }
-        root.generate(io);
-        io.getOut().close();
-
-        NodeFiles.generateTreeConstants_java();
-        NodeFiles.generateVisitor_java();
-        JJTreeState.generateTreeState_java();
-
-        p("Annotated grammar generated successfully in " +
-            io.getOutputFileName());
-      }
-      catch (ParseException pe) {
-        p("Error parsing input: " + pe.toString());
-        return 1;
-      }
-      catch (Exception e) {
-        p("Error parsing input: " + e.toString());
-        e.printStackTrace(io.getMsg());
-        return 1;
-      }
-
-      return 0;
-    }
-    finally {
-      io.closeAll();
-    }
-  }
-
-  /** Initialize for JJTree */
-  private void initializeOptions() {
-    JJTreeOptions.init();
-    JJTreeGlobals.initialize();
   }
 }

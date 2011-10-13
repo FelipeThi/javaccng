@@ -53,12 +53,12 @@ public final class Sequence extends Expansion {
   }
 
   @Override
-  public StringBuffer dump(int indent, Set alreadyDumped) {
+  public StringBuilder dump(int indent, Set alreadyDumped) {
     if (alreadyDumped.contains(this)) {
       return super.dump(0, alreadyDumped).insert(0, '[').append(']').insert(0, dumpPrefix(indent));
     }
     alreadyDumped.add(this);
-    final StringBuffer sb = super.dump(indent, alreadyDumped);
+    final StringBuilder sb = super.dump(indent, alreadyDumped);
     for (Iterator it = units.iterator(); it.hasNext(); ) {
       Expansion next = (Expansion) it.next();
       sb.append("\n").append(next.dump(indent + 1, alreadyDumped));

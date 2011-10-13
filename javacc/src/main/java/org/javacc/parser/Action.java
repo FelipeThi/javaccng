@@ -49,8 +49,8 @@ public final class Action extends Expansion {
   }
 
   @Override
-  public StringBuffer dump(int indent, Set alreadyDumped) {
-    StringBuffer sb = super.dump(indent, alreadyDumped);
+  public StringBuilder dump(int indent, Set alreadyDumped) {
+    StringBuilder sb = super.dump(indent, alreadyDumped);
     alreadyDumped.add(this);
     if (getActionTokens().size() > 0) {
       sb.append(' ').append(getActionTokens().get(0));

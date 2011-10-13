@@ -5,6 +5,8 @@ import org.junit.Test;
 
 import java.io.File;
 
+import static java.lang.Boolean.*;
+
 /**
  * Test cases to prod at the validity of Options a little.
  *
@@ -16,7 +18,7 @@ public final class OptionsTest extends TestCase {
     Options.init();
     JavaCCErrors.reInit();
 
-    assertEquals(31, Options.optionValues.size());
+    assertEquals(29, Options.optionValues.size());
 
     assertEquals(true, Options.getBuildParser());
     assertEquals(true, Options.getBuildTokenManager());
@@ -84,7 +86,7 @@ public final class OptionsTest extends TestCase {
     Options.setCmdLineOption("LOOKAHEAD=0");
     assertEquals(2, Options.getLookahead());
     assertEquals(0, JavaCCErrors.getWarningCount());
-    Options.setInputFileOption(null, null, "LOOKAHEAD", new Integer(0));
+    Options.setInputFileOption(null, null, "LOOKAHEAD", 0);
     assertEquals(2, Options.getLookahead());
     assertEquals(1, JavaCCErrors.getWarningCount());
 
@@ -120,7 +122,7 @@ public final class OptionsTest extends TestCase {
     JavaCCErrors.reInit();
 
     assertEquals(0, JavaCCErrors.getWarningCount());
-    Options.setInputFileOption(null, null, "OPTION", Boolean.TRUE);
+    Options.setInputFileOption(null, null, "OPTION", TRUE);
     assertEquals(1, JavaCCErrors.getWarningCount());
 
     assertEquals(0, JavaCCErrors.getErrorCount());
@@ -135,7 +137,7 @@ public final class OptionsTest extends TestCase {
 
     assertEquals(0, JavaCCErrors.getWarningCount());
     assertEquals(0, JavaCCErrors.getErrorCount());
-    Options.setInputFileOption(null, null, "ERROR_REPORTING", new Integer(8));
+    Options.setInputFileOption(null, null, "ERROR_REPORTING", 8);
     assertEquals(1, JavaCCErrors.getWarningCount());
 
     assertEquals(0, JavaCCErrors.getErrorCount());
@@ -161,20 +163,5 @@ public final class OptionsTest extends TestCase {
     assertEquals(0, JavaCCErrors.getErrorCount());
     assertEquals(0, JavaCCErrors.getParseErrorCount());
     assertEquals(0, JavaCCErrors.getSemanticErrorCount());
-  }
-
-  @Test
-  public void testOptionsString() throws ParseException {
-    Options.init();
-    JavaCCErrors.reInit();
-
-    Options.setCmdLineOption("-UNICODE_INPUT=False");
-    Options.setCmdLineOption("-IGNORE_CASE=True");
-    String[] options = {
-        "UNICODE_INPUT",
-        "IGNORE_CASE"
-    };
-    String optionString = Options.getOptionsString(options);
-    assertEquals("UNICODE_INPUT=false,IGNORE_CASE=true", optionString);
   }
 }

@@ -20,12 +20,12 @@ public class IndentingPrintWriter extends Writer {
   private int level;
   private boolean indent;
 
-  public IndentingPrintWriter(final Writer writer) {
+  public IndentingPrintWriter(Writer writer) {
     out = writer;
     lineSeparator = System.getProperty("line.separator", "\n");
   }
 
-  public IndentingPrintWriter(final Writer writer, String eol) {
+  public IndentingPrintWriter(Writer writer, String eol) {
     out = writer;
     lineSeparator = eol;
   }
@@ -34,7 +34,7 @@ public class IndentingPrintWriter extends Writer {
     return indentString;
   }
 
-  public void setIndentString(final String indentString) {
+  public void setIndentString(String indentString) {
     this.indentString = indentString;
   }
 
@@ -60,7 +60,7 @@ public class IndentingPrintWriter extends Writer {
    * @param c A char to write.
    */
   @Override
-  public void write(final int c) {
+  public void write(int c) {
     try {
       if (c == '\n') {
         indent = true;
@@ -82,24 +82,24 @@ public class IndentingPrintWriter extends Writer {
   }
 
   @Override
-  public void write(final char[] buf) {
+  public void write(char[] buf) {
     write(buf, 0, buf.length);
   }
 
   @Override
-  public void write(final char[] buf, final int off, final int len) {
+  public void write(char[] buf, int off, int len) {
     for (int n = off; n < off + len; n++) {
       write(buf[n]);
     }
   }
 
   @Override
-  public void write(final String str) {
+  public void write(String str) {
     write(str, 0, str.length());
   }
 
   @Override
-  public void write(final String str, final int off, final int len) {
+  public void write(String str, int off, int len) {
     for (int n = off; n < off + len; n++) {
       write(str.charAt(n));
     }
@@ -162,7 +162,7 @@ public class IndentingPrintWriter extends Writer {
     return this;
   }
 
-  public IndentingPrintWriter print(char s[]) {
+  public IndentingPrintWriter print(char[] s) {
     write(s);
     return this;
   }
@@ -223,7 +223,7 @@ public class IndentingPrintWriter extends Writer {
     return this;
   }
 
-  public IndentingPrintWriter println(char x[]) {
+  public IndentingPrintWriter println(char[] x) {
     print(x);
     println();
     return this;

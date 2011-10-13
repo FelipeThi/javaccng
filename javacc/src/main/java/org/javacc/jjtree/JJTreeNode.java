@@ -25,10 +25,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.javacc.jjtree;
 
 public class JJTreeNode extends SimpleNode {
-
   private int myOrdinal;
 
   public JJTreeNode(int id) {
@@ -46,34 +46,35 @@ public class JJTreeNode extends SimpleNode {
   @Override
   public void jjtAddChild(Node n, int i) {
     super.jjtAddChild(n, i);
-    ((JJTreeNode)n).setOrdinal(i);
+    ((JJTreeNode) n).setOrdinal(i);
   }
 
-  public int getOrdinal()
-  {
+  public int getOrdinal() {
     return myOrdinal;
   }
 
-  public void setOrdinal(int o)
-  {
+  public void setOrdinal(int o) {
     myOrdinal = o;
   }
 
-
-  /*****************************************************************
+  /**
+   * **************************************************************
    *
    * The following is added manually to enhance all tree nodes with
    * attributes that store the first and last tokens corresponding to
    * each node, as well as to print the tokens back to the specified
    * output stream.
    *
-   *****************************************************************/
-
+   * ***************************************************************
+   */
   private Token first, last;
 
   public Token getFirstToken() { return first; }
+
   public void setFirstToken(Token t) { first = t; }
-  public Token getLastToken() { return last;  }
+
+  public Token getLastToken() { return last; }
+
   public void setLastToken(Token t) { last = t; }
 
   /* This method prints the tokens corresponding to this node
@@ -93,10 +94,10 @@ public class JJTreeNode extends SimpleNode {
     t.next = t1;
     JJTreeNode n;
     for (int ord = 0; ord < jjtGetNumChildren(); ord++) {
-      n = (JJTreeNode)jjtGetChild(ord);
+      n = (JJTreeNode) jjtGetChild(ord);
       while (true) {
         t = t.next;
-        if (t == n.getFirstToken()) break;
+        if (t == n.getFirstToken()) { break; }
         print(t, io);
       }
       n.print(io);
@@ -108,21 +109,19 @@ public class JJTreeNode extends SimpleNode {
     }
   }
 
-
-  String translateImage(Token t)
-  {
+  String translateImage(Token t) {
     return t.getImage();
   }
 
-  String whiteOut(Token t)
-  {
-    StringBuffer sb = new StringBuffer(t.getImage().length());
+  String whiteOut(Token t) {
+    StringBuilder sb = new StringBuilder(t.getImage().length());
 
     for (int i = 0; i < t.getImage().length(); ++i) {
       char ch = t.getImage().charAt(i);
       if (ch != '\t' && ch != '\n' && ch != '\r' && ch != '\f') {
         sb.append(' ');
-      } else {
+      }
+      else {
         sb.append(ch);
       }
     }
@@ -130,16 +129,14 @@ public class JJTreeNode extends SimpleNode {
     return sb.toString();
   }
 
-
-
   /* Indicates whether the token should be replaced by white space or
-     replaced with the actual node variable. */
+replaced with the actual node variable. */
   private boolean whitingOut = false;
 
   protected void print(Token t, IO io) {
     Token tt = t.specialToken;
     if (tt != null) {
-      while (tt.specialToken != null) tt = tt.specialToken;
+      while (tt.specialToken != null) { tt = tt.specialToken; }
       while (tt != null) {
         io.print(TokenUtils.addUnicodeEscapes(translateImage(tt)));
         tt = tt.next;
@@ -166,7 +163,8 @@ public class JJTreeNode extends SimpleNode {
     if (t.getImage().equals("jjtThis")) {
       io.print(s.getNodeVariable());
       return;
-    } else if (t.getImage().equals("jjtree")) {
+    }
+    else if (t.getImage().equals("jjtree")) {
       if (t.next.getImage().equals(".")) {
         if (t.next.next.getImage().equals("currentNode")) {
           if (t.next.next.next.getImage().equals("(")) {
@@ -184,10 +182,12 @@ public class JJTreeNode extends SimpleNode {
       if (t.getImage().equals("jjtree")) {
         io.print(s.getNodeVariable());
         io.print(" ");
-      } else if (t.getImage().equals(")")) {
+      }
+      else if (t.getImage().equals(")")) {
         io.print(" ");
         whitingOut = false;
-      } else {
+      }
+      else {
         for (int i = 0; i < t.getImage().length(); ++i) {
           io.print(" ");
         }
@@ -198,36 +198,28 @@ public class JJTreeNode extends SimpleNode {
     io.print(TokenUtils.addUnicodeEscapes(translateImage(t)));
   }
 
-
-  static void openJJTreeComment(IO io, String arg)
-  {
+  static void openJJTreeComment(IO io, String arg) {
     if (arg != null) {
       io.print("/*@bgen(jjtree) " + arg + " */");
-    } else {
+    }
+    else {
       io.print("/*@bgen(jjtree)*/");
     }
   }
 
-
-  static void closeJJTreeComment(IO io)
-  {
+  static void closeJJTreeComment(IO io) {
     io.print("/*@egen*/");
   }
 
-
-  String getIndentation(JJTreeNode n)
-  {
+  String getIndentation(JJTreeNode n) {
     return getIndentation(n, 0);
   }
 
-
-  String getIndentation(JJTreeNode n, int offset)
-  {
+  String getIndentation(JJTreeNode n, int offset) {
     String s = "";
     for (int i = offset + 1; i < n.getFirstToken().getBeginColumn(); ++i) {
       s += " ";
     }
     return s;
   }
-
 }

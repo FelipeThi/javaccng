@@ -2,10 +2,11 @@ package org.javacc.jjtree;
 
 import org.javacc.parser.JavaCCErrors;
 import org.javacc.parser.Options;
-import static org.junit.Assert.*;
 import org.junit.Test;
 
 import java.io.File;
+
+import static org.junit.Assert.*;
 
 /**
  * Test the JJTree-specific options.
@@ -22,12 +23,12 @@ public final class JJTreeOptionsTest {
     assertEquals(new File("."), JJTreeOptions.getJJTreeOutputDirectory());
 
     Options.setInputFileOption(null, null, "OUTPUT_DIRECTORY",
-                               "test/output");
+        "test/output");
     assertEquals(new File("test/output"), JJTreeOptions.getOutputDirectory());
     assertEquals(new File("test/output"), JJTreeOptions.getJJTreeOutputDirectory());
 
     Options.setInputFileOption(null, null, "JJTREE_OUTPUT_DIRECTORY",
-                               "test/jjtreeoutput");
+        "test/jjtreeoutput");
     assertEquals(new File("test/output"), JJTreeOptions.getOutputDirectory());
     assertEquals(new File("test/jjtreeoutput"), JJTreeOptions.getJJTreeOutputDirectory());
 

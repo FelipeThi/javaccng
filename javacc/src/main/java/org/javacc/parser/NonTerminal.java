@@ -63,10 +63,6 @@ public final class NonTerminal extends Expansion {
     return name;
   }
 
-  public void setArgumentTokens(List<Token> argumentTokens) {
-    this.argumentTokens = argumentTokens;
-  }
-
   public List<Token> getArgumentTokens() {
     return argumentTokens;
   }
@@ -80,7 +76,7 @@ public final class NonTerminal extends Expansion {
   }
 
   @Override
-  public StringBuffer dump(int indent, Set alreadyDumped) {
+  public StringBuilder dump(int indent, Set alreadyDumped) {
     return super.dump(indent, alreadyDumped).append(' ').append(name);
   }
 }

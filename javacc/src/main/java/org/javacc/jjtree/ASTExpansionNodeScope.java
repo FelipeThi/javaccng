@@ -28,6 +28,8 @@
 
 package org.javacc.jjtree;
 
+import java.io.IOException;
+
 public class ASTExpansionNodeScope extends JJTreeNode {
   ASTExpansionNodeScope(int id) {
     super(id);
@@ -41,7 +43,12 @@ public class ASTExpansionNodeScope extends JJTreeNode {
     String indent = getIndentation(expansionUnit);
     openJJTreeComment(io, nodeScope.getNodeDescriptor().getDescriptor());
     io.println();
-    nodeScope.insertOpenNodeAction(io, indent);
+    try {
+      nodeScope.insertOpenNodeAction(io, indent);
+    }
+    catch (IOException ex) {
+      throw new IllegalStateException(ex);
+    }
     nodeScope.tryExpansionUnit(io, indent, expansionUnit);
 
     // Print the "whiteOut" equivalent of the Node descriptor to preserve

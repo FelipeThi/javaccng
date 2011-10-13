@@ -80,7 +80,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class Token implements java.io.Serial
    *
    * @param kind New token kind.
    */
-  public void setKind(final int kind) {
+  public void setKind(int kind) {
     this.kind = kind;
   }
 #if KEEP_IMAGE
@@ -99,7 +99,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class Token implements java.io.Serial
    *
    * @param image New token image.
    */
-  public void setImage(final String image) {
+  public void setImage(String image) {
     this.image = image;
   }
 #fi

@@ -28,24 +28,21 @@
 
 package org.javacc.jjtree;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 class JJTreeGlobals {
   static void initialize() {
-    toolList = new ArrayList();
     parserName = null;
     packageName = "";
     parserImplements = null;
     parserClassBodyStart = null;
     parserImports = null;
-    productions = new HashMap();
+    productions = new HashMap<String, ASTProduction>();
 
-    jjtreeOptions = new HashSet();
+    jjtreeOptions = new HashSet<String>();
     jjtreeOptions.add("JJTREE_OUTPUT_DIRECTORY");
     jjtreeOptions.add("MULTI");
     jjtreeOptions.add("NODE_PREFIX");
@@ -75,13 +72,12 @@ class JJTreeGlobals {
    * This set stores the JJTree-specific options that should not be
    * passed down to JavaCC
    */
-  private static Set jjtreeOptions;
+  private static Set<String> jjtreeOptions;
 
   public static boolean isOptionJJTreeOnly(String optionName) {
     return jjtreeOptions.contains(optionName.toUpperCase());
   }
 
-  static List toolList = new ArrayList();
   /** Use this like className. */
   public static String parserName;
   /**
@@ -111,8 +107,8 @@ class JJTreeGlobals {
    * for the Node Package is inserted after this token.
    */
   public static Token parserImports;
-  /** This is mapping from production names to ASTProduction objects. */
-  static Map productions = new HashMap();
+  /** The mapping from production names to ASTProduction objects. */
+  static Map<String, ASTProduction> productions = new HashMap<String, ASTProduction>();
 }
 
 

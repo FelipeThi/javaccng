@@ -28,6 +28,8 @@
 
 package org.javacc.jjtree;
 
+import java.io.IOException;
+
 public class ASTBNFDeclaration extends JJTreeNode {
   ASTBNFDeclaration(int id) {
     super(id);
@@ -50,7 +52,12 @@ public class ASTBNFDeclaration extends JJTreeNode {
 
       openJJTreeComment(io, nodeScope.getNodeDescriptorText());
       io.println();
-      nodeScope.insertOpenNodeCode(io, indent);
+      try {
+        nodeScope.insertOpenNodeCode(io, indent);
+      }
+      catch (IOException ex) {
+        throw new IllegalStateException(ex);
+      }
       closeJJTreeComment(io);
     }
     super.print(io);

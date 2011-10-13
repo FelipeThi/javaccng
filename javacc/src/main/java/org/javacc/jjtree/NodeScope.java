@@ -28,6 +28,7 @@
 
 package org.javacc.jjtree;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -85,7 +86,7 @@ public class NodeScope {
     return true;
   }
 
-  void insertOpenNodeCode(IO io, String indent) {
+  void insertOpenNodeCode(IO io, String indent) throws IOException {
     String type = nodeDescriptor.getNodeType();
     String nodeClass;
     if (JJTreeOptions.getNodeClass().length() > 0 && !JJTreeOptions.getMulti()) {
@@ -141,7 +142,7 @@ public class NodeScope {
     }
   }
 
-  void insertOpenNodeAction(IO io, String indent) {
+  void insertOpenNodeAction(IO io, String indent) throws IOException {
     io.println(indent + "{");
     insertOpenNodeCode(io, indent + "  ");
     io.println(indent + "}");
@@ -210,7 +211,7 @@ public class NodeScope {
     if (expansionUnit instanceof ASTBNFNonTerminal) {
       // Should really make the nonterminal explicitly maintain its name.
       String nt = expansionUnit.getFirstToken().getImage();
-      ASTProduction prod = (ASTProduction) JJTreeGlobals.productions.get(nt);
+      ASTProduction prod = JJTreeGlobals.productions.get(nt);
       if (prod != null) {
         for (String t : prod.throwsList) {
           thrownSet.put(t, t);

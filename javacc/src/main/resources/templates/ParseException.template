@@ -12,7 +12,7 @@ public class ParseException extends Exception {
   private final int[][] expectedTokenSequences;
 
   /** Constructor with message. */
-  public ParseException(final String message) {
+  public ParseException(String message) {
     super(message);
     currentToken = null;
     expectedTokenSequences = null;
@@ -28,9 +28,9 @@ public class ParseException extends Exception {
    * @param expectedTokenSequences What token kinds expected after
    *                               the current token.
    */
-  public ParseException(final Token currentToken,
-                        final int[][] expectedTokenSequences,
-                        final String[] tokenImage) {
+  public ParseException(Token currentToken,
+                        int[][] expectedTokenSequences,
+                        String[] tokenImage) {
     super(generateMessage(currentToken, expectedTokenSequences, tokenImage));
     this.currentToken = currentToken;
     this.expectedTokenSequences = expectedTokenSequences;
@@ -63,10 +63,10 @@ public class ParseException extends Exception {
    * and you do not catch it (it gets thrown * from the parser) the correct
    * error message gets displayed.
    */
-  private static String generateMessage(final Token currentToken,
-                                        final int[][] expectedTokenSequences,
-                                        final String[] tokenImage) {
-    final StringBuilder s = new StringBuilder();
+  private static String generateMessage(Token currentToken,
+                                        int[][] expectedTokenSequences,
+                                        String[] tokenImage) {
+    StringBuilder s = new StringBuilder();
     int max = 0;
     for (int i = 0; i < expectedTokenSequences.length; i++) {
       max = Math.max(max, expectedTokenSequences[i].length);
@@ -98,7 +98,7 @@ public class ParseException extends Exception {
       s.append("Was expecting one of:\n");
     }
     for (int i = 0; i < expectedTokenSequences.length; i++) {
-      final int length = expectedTokenSequences[i].length;
+      int length = expectedTokenSequences[i].length;
       if (i > 0) {
         s.append("\n");
       }

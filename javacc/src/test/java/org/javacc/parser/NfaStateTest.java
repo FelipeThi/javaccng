@@ -2,7 +2,6 @@ package org.javacc.parser;
 
 import org.javacc.JavaCCTestCase;
 import org.javacc.utils.io.IndentingPrintWriter;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -10,8 +9,9 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
-import java.lang.String;
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * A sea anchor, to ensure that code is not inadvertently broken.
@@ -20,7 +20,7 @@ import java.util.List;
  * @since 16 Mar 2007
  */
 public class NfaStateTest extends JavaCCTestCase {
-  String parserInput = getJJInputDirectory() + "JavaCC.jj";
+  String path = getJJInputDirectory() + "JavaCC.jj";
   private final LexGen lexGen = new LexGen();
 
   @Before
@@ -30,30 +30,26 @@ public class NfaStateTest extends JavaCCTestCase {
   }
 
   protected void setupState() throws Exception {
-    final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(parserInput), Options.getGrammarEncoding()));
-    JavaCCParser parser = new JavaCCParser(new JavaCCParserTokenManager(new JavaCharStream(bufferedReader)));
+    BufferedReader reader = new BufferedReader(
+        new InputStreamReader(
+            new FileInputStream(path), Options.getGrammarEncoding()));
+    JavaCCParser parser = new JavaCCParser(new JavaCCParserTokenManager(new JavaCharStream(reader)));
     parser.javacc_input();
-    JavaCCGlobals.fileName = JavaCCGlobals.origFileName = parserInput;
-    JavaCCGlobals.jjtreeGenerated = JavaCCGlobals.isGeneratedBy("JJTree", parserInput);
-    JavaCCGlobals.toolNames = JavaCCGlobals.getToolNames(parserInput);
+    JavaCCGlobals.fileName = JavaCCGlobals.origFileName = path;
     Semanticize semanticize = new Semanticize();
     semanticize.start();
     lexGen.start();
-  }
-
-  /** Test method for {@link NfaStates#ReInit()}. */
-  public void testReInit() {
   }
 
   /** Test method for {@link NfaState#hasTransitions()}. */
   public void testHasTransitions() {
   }
 
-  /** Test method for {@link NfaStates#ComputeClosures()}. */
+  /** Test method for {@link NfaStates#computeClosures()}. */
   public void testComputeClosures() {
   }
 
-  /** Test method for {@link NfaStates#CanStartNfaUsingAscii(LexGen, char)}. */
+  /** Test method for {@link NfaStates#canStartNfaUsingAscii(LexGen, char)}. */
   public void testCanStartNfaUsingAscii() {
   }
 
@@ -61,11 +57,11 @@ public class NfaStateTest extends JavaCCTestCase {
   public void testGetFirstValidPos() {
   }
 
-  /** Test method for {@link NfaStates#MoveFromSet(char, List, List)}. */
+  /** Test method for {@link NfaStates#moveFromSet(char, List, List)}. */
   public void testMoveFrom() {
   }
 
-  /** Test method for {@link NfaStates#MoveFromSet(char, List, List)}. */
+  /** Test method for {@link NfaStates#moveFromSet(char, List, List)}. */
   public void testMoveFromSet() {
   }
 
@@ -95,7 +91,7 @@ public class NfaStateTest extends JavaCCTestCase {
     LexGen lexGen = new LexGen();
     lexGen.nfaStates.DumpStateSets(contentWriter);
     assertEquals("static final int[] jjNextStates = {\n};\n",
-                 output.toString().replaceAll("\r", ""));
+        output.toString().replaceAll("\r", ""));
   }
 
   /**
@@ -114,18 +110,18 @@ public class NfaStateTest extends JavaCCTestCase {
         "   60, 61, 62, 10, 11, 17, 18, 20, 25, 27, 29, 36, 37, 40, 41, 46, \n" +
         "   47, 55, 56, 57, 58, 63, 64, \n" +
         "};\n",
-                 output.toString().replaceAll("\r", ""));
+        output.toString().replaceAll("\r", ""));
   }
 
   /**
    * Test method for {@link NfaState#
-   * DumpCharAndRangeMoves(IndentingPrintWriter)}.
+   * dumpCharAndRangeMoves(IndentingPrintWriter)}.
    */
   @Test
   public void testDumpCharAndRangeMoves() throws Exception {
     StringWriter output = new StringWriter();
     IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
-    lexGen.nfaStates.DumpCharAndRangeMoves(lexGen, contentWriter);
+    lexGen.nfaStates.dumpCharAndRangeMoves(lexGen, contentWriter);
     assertEquals(
         "         int i2 = (jjChar & 0xff) >> 6;\n" +
             "         long l2 = 1L << (jjChar & 077);\n" +
@@ -141,14 +137,14 @@ public class NfaStateTest extends JavaCCTestCase {
 
   /**
    * Test method for {@link NfaState#
-   * DumpCharAndRangeMoves(IndentingPrintWriter)}.
+   * dumpCharAndRangeMoves(IndentingPrintWriter)}.
    */
   @Test
   public void testDumpCharAndRangeMovesInitialised() throws Exception {
     StringWriter output = new StringWriter();
     IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     setupState();
-    lexGen.nfaStates.DumpCharAndRangeMoves(lexGen, contentWriter);
+    lexGen.nfaStates.dumpCharAndRangeMoves(lexGen, contentWriter);
     assertEquals(
         "         int hiByte = (int)(jjChar >> 8);\n" +
             "         int i1 = hiByte >> 6;\n" +
@@ -167,26 +163,26 @@ public class NfaStateTest extends JavaCCTestCase {
 
   /**
    * Test method for {@link NfaState#
-   * DumpNonAsciiMoveMethods(IndentingPrintWriter)}.
+   * dumpNonAsciiMoveMethods(IndentingPrintWriter)}.
    */
   @Test
   public void testDumpNonAsciiMoveMethods() {
     StringWriter output = new StringWriter();
     IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
-    lexGen.nfaStates.DumpNonAsciiMoveMethods(contentWriter);
+    lexGen.nfaStates.dumpNonAsciiMoveMethods(contentWriter);
     assertEquals("", output.toString());
   }
 
   /**
    * Test method for {@link NfaState#
-   * DumpNonAsciiMoveMethods(IndentingPrintWriter)}.
+   * dumpNonAsciiMoveMethods(IndentingPrintWriter)}.
    */
   @Test
   public void testDumpNonAsciiMoveMethodsInitialised() throws Exception {
     StringWriter output = new StringWriter();
     IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     setupState();
-    lexGen.nfaStates.DumpNonAsciiMoveMethods(contentWriter);
+    lexGen.nfaStates.dumpNonAsciiMoveMethods(contentWriter);
     assertEquals("private static boolean jjCanMove_0(int hiByte, int i1, int i2, long l1, long l2)\n" +
         "{\n" +
         "   switch(hiByte)\n" +
@@ -369,13 +365,13 @@ public class NfaStateTest extends JavaCCTestCase {
         "}\n", output.toString().replaceAll("\r", ""));
   }
 
-  /** Test method for {@link NfaStates#DumpMoveNfa(LexGen, IndentingPrintWriter)}. */
+  /** Test method for {@link NfaStates#dumpMoveNfa(LexGen, IndentingPrintWriter)}. */
   @Test
   public void testDumpMoveNfa() throws Exception {
     StringWriter output = new StringWriter();
     IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     try {
-      lexGen.nfaStates.DumpMoveNfa(lexGen, contentWriter);
+      lexGen.nfaStates.dumpMoveNfa(lexGen, contentWriter);
       fail("Should have bombed");
     }
     catch (ArrayIndexOutOfBoundsException e) {
@@ -417,13 +413,13 @@ public class NfaStateTest extends JavaCCTestCase {
         */
   }
 
-  /** Test method for {@link NfaStates#DumpMoveNfa(LexGen, IndentingPrintWriter)} )}. */
+  /** Test method for {@link NfaStates#dumpMoveNfa(LexGen, IndentingPrintWriter)} )}. */
   @Test
   public void testDumpMoveNfaInitialised() throws Exception {
     StringWriter output = new StringWriter();
     IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     setupState();
-    lexGen.nfaStates.DumpMoveNfa(lexGen, contentWriter);
+    lexGen.nfaStates.dumpMoveNfa(lexGen, contentWriter);
     assertEquals("private int jjMoveNfa_3(int startState, int curPos) throws java.io.IOException\n" +
         "{\n" +
         "   return curPos;\n" +
@@ -432,27 +428,27 @@ public class NfaStateTest extends JavaCCTestCase {
 
   /**
    * Test method for {@link NfaState#
-   * DumpStatesForState(IndentingPrintWriter)}.
+   * dumpStatesForState(IndentingPrintWriter)}.
    */
   @Test
   public void testDumpStatesForState() throws Exception {
     StringWriter output = new StringWriter();
     IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
-    lexGen.nfaStates.DumpStatesForState(contentWriter);
+    lexGen.nfaStates.dumpStatesForState(contentWriter);
     assertEquals("protected static final int[][][] statesForState = null;\n",
-                 output.toString().replaceAll("\r", ""));
+        output.toString().replaceAll("\r", ""));
   }
 
   /**
    * Test method for {@link NfaState#
-   * DumpStatesForState(IndentingPrintWriter)}.
+   * dumpStatesForState(IndentingPrintWriter)}.
    */
   @Test
   public void testDumpStatesForStateInitialised() throws Exception {
     StringWriter output = new StringWriter();
     IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     setupState();
-    lexGen.nfaStates.DumpStatesForState(contentWriter);
+    lexGen.nfaStates.dumpStatesForState(contentWriter);
     assertEquals("protected static final int[][][] statesForState = {\n" +
         " {\n" +
         "   { 0 },\n" +
@@ -531,27 +527,27 @@ public class NfaStateTest extends JavaCCTestCase {
         " null,\n" +
         "\n" +
         "};\n",
-                 output.toString().replaceAll("\r", ""));
+        output.toString().replaceAll("\r", ""));
   }
 
-  /** Test method for {@link NfaStates#DumpStatesForKind(IndentingPrintWriter)}. */
+  /** Test method for {@link NfaStates#dumpStatesForKind(IndentingPrintWriter)}. */
   @Test
   public void testDumpStatesForKind() {
     StringWriter output = new StringWriter();
     IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
-    lexGen.nfaStates.DumpStatesForKind(contentWriter);
+    lexGen.nfaStates.dumpStatesForKind(contentWriter);
     assertEquals("protected static final int[][][] statesForState = null;\n" +
         "protected static final int[][] kindForState = null;\n",
-                 output.toString().replaceAll("\r", ""));
+        output.toString().replaceAll("\r", ""));
   }
 
-  /** Test method for {@link NfaStates#DumpStatesForKind(IndentingPrintWriter)}. */
+  /** Test method for {@link NfaStates#dumpStatesForKind(IndentingPrintWriter)}. */
   @Test
   public void testDumpStatesForKindInitialised() throws Exception {
     StringWriter output = new StringWriter();
     IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     setupState();
-    lexGen.nfaStates.DumpStatesForKind(contentWriter);
+    lexGen.nfaStates.dumpStatesForKind(contentWriter);
     assertEquals("protected static final int[][][] statesForState = {\n" +
         " {\n" +
         "   { 0 },\n" +
@@ -642,10 +638,6 @@ public class NfaStateTest extends JavaCCTestCase {
         "null\n,\n" +
         "null\n\n" +
         "};\n",
-                 output.toString().replaceAll("\r", ""));
-  }
-
-  /** Test method for {@link NfaState#reInit()}. */
-  public void testReInit1() {
+        output.toString().replaceAll("\r", ""));
   }
 }

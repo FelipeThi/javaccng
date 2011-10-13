@@ -204,7 +204,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}final class JavaCharStream implements
    * @throws java.io.IOException If reader throws exception.
    */
   private int read() throws java.io.IOException {
-    final int c = reader.read();
+    int c = reader.read();
     if (c != -1) {
       appendChar(c);
     }
@@ -216,10 +216,10 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}final class JavaCharStream implements
    *
    * @param c Character to append.
    */
-  private void appendChar(final int c) {
+  private void appendChar(int c) {
     endOffset++;
     if (offset == buffer.length) {
-      final int newLength = buffer.length * 3 / 2 + 1;
+      int newLength = buffer.length * 3 / 2 + 1;
       buffer = copyOf(buffer, newLength);
 #if KEEP_LINE_COLUMN
       bufLine = copyOf(bufLine, newLength);
@@ -239,7 +239,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}final class JavaCharStream implements
    * @param c     Character to put at the specified index.
    * @param index New buffer length.
    */
-  private void insertChar(final int c, int index) {
+  private void insertChar(int c, int index) {
     buffer[index] = (char) c;
     length = offset = index + 1;
   }
@@ -293,7 +293,7 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}final class JavaCharStream implements
     }
   }
 
-  private void count(final int c) {
+  private void count(int c) {
     bufLine[offset] = line;
     bufColumn[offset] = column;
     if (c == '\t') {
@@ -353,14 +353,14 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}final class JavaCharStream implements
 
   /** Backported from JDK6 Arrays.copyOf(...). */
   private static char[] copyOf(char[] original, int newLength) {
-    final char[] copy = new char[newLength];
+    char[] copy = new char[newLength];
     System.arraycopy(original, 0, copy, 0, Math.min(original.length, newLength));
     return copy;
   }
 
   /** Backported from JDK6 Arrays.copyOf(...). */
   private static int[] copyOf(int[] original, int newLength) {
-    final int[] copy = new int[newLength];
+    int[] copy = new int[newLength];
     System.arraycopy(original, 0, copy, 0, Math.min(original.length, newLength));
     return copy;
   }

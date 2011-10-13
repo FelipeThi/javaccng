@@ -25,6 +25,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.javacc.parser;
 
 /**
@@ -32,7 +33,6 @@ package org.javacc.parser;
  * routines in ExpansionTreeWalker.
  */
 public interface TreeWalkerOp {
-
   /**
    * When called at a particular node, this specifies to the
    * tree walker if it should visit more nodes under this node.
@@ -44,5 +44,4 @@ public interface TreeWalkerOp {
    * node as parameter.
    */
   void action(Expansion e);
-
 }

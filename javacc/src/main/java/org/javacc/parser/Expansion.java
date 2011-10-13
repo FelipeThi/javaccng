@@ -88,13 +88,13 @@ public abstract class Expansion {
     return "[" + getLine() + "," + getColumn() + " " + System.identityHashCode(this) + " " + getSimpleName() + "]";
   }
 
-  protected StringBuffer dumpPrefix(int indent) {
-    StringBuffer sb = new StringBuffer(128);
+  protected StringBuilder dumpPrefix(int indent) {
+    StringBuilder sb = new StringBuilder(128);
     for (int i = 0; i < indent; i++) { sb.append("  "); }
     return sb;
   }
 
-  public StringBuffer dump(int indent, Set alreadyDumped) {
+  public StringBuilder dump(int indent, Set alreadyDumped) {
     return dumpPrefix(indent).append(System.identityHashCode(this)).append(" ").append(getSimpleName());
   }
 

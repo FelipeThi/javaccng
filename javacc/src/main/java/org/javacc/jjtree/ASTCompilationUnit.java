@@ -42,7 +42,8 @@ public class ASTCompilationUnit extends JJTreeNode {
 
         // If the parser and nodes are in separate packages (NODE_PACKAGE specified in
         // OPTIONS), then generate an import for the node package.
-        if (!JJTreeGlobals.nodePackageName.equals("") && !JJTreeGlobals.nodePackageName.equals(JJTreeGlobals.packageName)) {
+        if (!JJTreeGlobals.nodePackageName.equals("")
+            && !JJTreeGlobals.nodePackageName.equals(JJTreeGlobals.packageName)) {
           io.getOut().println("");
           io.getOut().println("import " + JJTreeGlobals.nodePackageName + ".*;");
         }

@@ -28,9 +28,7 @@
 
 package org.javacc.parser;
 
-/**
- * Thrown when there is a mis-configuration or a bug.
- */
+/** Thrown when there is a mis-configuration or a bug. */
 public class MetaParseException extends ParseException {
   public MetaParseException() {
     super("Unexpected error");

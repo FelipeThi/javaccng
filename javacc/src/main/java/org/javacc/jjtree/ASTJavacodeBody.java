@@ -28,6 +28,8 @@
 
 package org.javacc.jjtree;
 
+import java.io.IOException;
+
 public class ASTJavacodeBody extends JJTreeNode {
   ASTJavacodeBody(int id) {
     super(id);
@@ -51,7 +53,12 @@ public class ASTJavacodeBody extends JJTreeNode {
 
     JJTreeNode.openJJTreeComment(io, nodeScope.getNodeDescriptorText());
     io.println();
-    nodeScope.insertOpenNodeCode(io, indent);
+    try {
+      nodeScope.insertOpenNodeCode(io, indent);
+    }
+    catch (IOException ex) {
+      throw new IllegalStateException(ex);
+    }
     nodeScope.tryTokenSequence(io, indent, first, getLastToken());
   }
 }

@@ -25,16 +25,15 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package org.javacc.parser;
 
-/**
- * Describes a match, within a given lookahead.
- */
+/** Describes a match, within a given lookahead. */
 public final class MatchInfo {
   final int[] match;
   int firstFreeLoc;
 
-  public MatchInfo(final int laLimit) {
+  public MatchInfo(int laLimit) {
     match = new int[laLimit];
   }
 }
