@@ -12,6 +12,7 @@
     <module>javacc-examples</module>
     <module>javacc-example-java</module>
     <module>javacc-example-jjtree</module>
+    <module>javacc-example-corba-idl</module>
     <!--<module>javacc-maven-plugin</module>-->
   </modules>
   <name>JavaCC</name>
