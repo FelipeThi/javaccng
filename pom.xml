@@ -11,6 +11,7 @@
     <!--<module>javacc-tests</module>-->
     <module>javacc-examples</module>
     <module>javacc-example-java</module>
+    <module>javacc-example-jjtree</module>
     <!--<module>javacc-maven-plugin</module>-->
   </modules>
   <name>JavaCC</name>
