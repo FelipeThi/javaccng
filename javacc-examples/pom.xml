@@ -8,41 +8,14 @@
     <version>5.1</version>
   </parent>
   <artifactId>javacc-examples</artifactId>
-  <name>JavaCC Examples</name>
   <packaging>pom</packaging>
-  <description>
-    JavaCC is a parser/scanner generator for Java.
-  </description>
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>javacc-maven-plugin</artifactId>
-        <version>2.6</version>
-        <executions>
-          <execution>
-            <id>javacc</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>javacc</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>jjtree-javacc</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>jjtree-javacc</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+  <modules>
+    <module>javacc-example-simple</module>
+    <module>javacc-example-lookahead</module>
+    <module>javacc-example-jjtree</module>
+    <module>javacc-example-java</module>
+    <module>javacc-example-corba-idl</module>
+    <module>javacc-example-interpreter</module>
+    <module>javacc-example-transformer</module>
+  </modules>
 </project>
