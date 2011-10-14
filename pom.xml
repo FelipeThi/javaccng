@@ -15,6 +15,7 @@
     <module>javacc-example-java</module>
     <module>javacc-example-corba-idl</module>
     <module>javacc-example-interpreter</module>
+    <module>javacc-example-transformer</module>
     <!--<module>javacc-maven-plugin</module>-->
   </modules>
   <name>JavaCC</name>
