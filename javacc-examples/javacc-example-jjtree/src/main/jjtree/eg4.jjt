@@ -41,7 +41,7 @@ public class Eg4 {
   public static void main(String[] args) throws java.io.IOException, ParseException {
     System.out.println("Reading from standard input...");
     Eg4 parser = new Eg4(
-        new Eg4TokenManager(
+        new Eg4Scanner(
             new SimpleCharStream(
                 new java.io.InputStreamReader(System.in))));
     ASTStart n = parser.Start();

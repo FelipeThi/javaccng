@@ -103,7 +103,7 @@ final class ParseGen implements SingeFileGenerator, JavaCCParserConstants {
     parseEngine.build(out);
 
     out.println("  /** Either generated or user defined Token Manager. */");
-    out.println("  public final TokenManager tokenManager;");
+    out.println("  public final Scanner scanner;");
     out.println("  /** Current token. */");
     out.println("  public Token token;");
     out.println("  /** Next token. */");
@@ -151,11 +151,11 @@ final class ParseGen implements SingeFileGenerator, JavaCCParserConstants {
     out.println("");
 
     out.println("  /** Constructor with either generated or user provided Token Manager. */");
-    out.println("  public " + JavaCCGlobals.cuName + "(TokenManager tm) throws java.io.IOException, ParseException {");
-    out.println("    tokenManager = tm;");
+    out.println("  public " + JavaCCGlobals.cuName + "(Scanner s) throws java.io.IOException, ParseException {");
+    out.println("    scanner = s;");
     out.println("    token = new Token();");
     if (Options.getCacheTokens()) {
-      out.println("    token.next = jj_nt = tokenManager.getNextToken();");
+      out.println("    token.next = jj_nt = scanner.getNextToken();");
     }
     else {
       out.println("    jj_ntk = -1;");
@@ -173,12 +173,12 @@ final class ParseGen implements SingeFileGenerator, JavaCCParserConstants {
     if (Options.getCacheTokens()) {
       out.println("    Token oldToken = token;");
       out.println("    if ((token = jj_nt).next != null) jj_nt = jj_nt.next;");
-      out.println("    else jj_nt = jj_nt.next = tokenManager.getNextToken();");
+      out.println("    else jj_nt = jj_nt.next = scanner.getNextToken();");
     }
     else {
       out.println("    Token oldToken;");
       out.println("    if ((oldToken = token).next != null) token = token.next;");
-      out.println("    else token = token.next = tokenManager.getNextToken();");
+      out.println("    else token = token.next = scanner.getNextToken();");
       out.println("    jj_ntk = -1;");
     }
     out.println("    if (token.getKind() == kind) {");
@@ -220,7 +220,7 @@ final class ParseGen implements SingeFileGenerator, JavaCCParserConstants {
       out.println("    if (jj_scanpos == jj_lastpos) {");
       out.println("      jj_la--;");
       out.println("      if (jj_scanpos.next == null) {");
-      out.println("        jj_lastpos = jj_scanpos = jj_scanpos.next = tokenManager.getNextToken();");
+      out.println("        jj_lastpos = jj_scanpos = jj_scanpos.next = scanner.getNextToken();");
       out.println("      } else {");
       out.println("        jj_lastpos = jj_scanpos = jj_scanpos.next;");
       out.println("      }");
@@ -252,11 +252,11 @@ final class ParseGen implements SingeFileGenerator, JavaCCParserConstants {
     out.println("  final public Token getNextToken() throws java.io.IOException {");
     if (Options.getCacheTokens()) {
       out.println("    if ((token = jj_nt).next != null) jj_nt = jj_nt.next;");
-      out.println("    else jj_nt = jj_nt.next = tokenManager.getNextToken();");
+      out.println("    else jj_nt = jj_nt.next = scanner.getNextToken();");
     }
     else {
       out.println("    if (token.next != null) token = token.next;");
-      out.println("    else token = token.next = tokenManager.getNextToken();");
+      out.println("    else token = token.next = scanner.getNextToken();");
       out.println("    jj_ntk = -1;");
     }
     if (Options.getErrorReporting()) {
@@ -278,15 +278,15 @@ final class ParseGen implements SingeFileGenerator, JavaCCParserConstants {
     }
     out.println("    for (int i = 0; i < index; i++) {");
     out.println("      if (t.next != null) t = t.next;");
-    out.println("      else t = t.next = tokenManager.getNextToken();");
+    out.println("      else t = t.next = scanner.getNextToken();");
     out.println("    }");
     out.println("    return t;");
     out.println("  }");
     out.println("");
     if (!Options.getCacheTokens()) {
       out.println("  private int jj_ntk() throws java.io.IOException {");
-      out.println("    if ((jj_nt=token.next) == null)");
-      out.println("      return (jj_ntk = (token.next=tokenManager.getNextToken()).getKind());");
+      out.println("    if ((jj_nt = token.next) == null)");
+      out.println("      return (jj_ntk = (token.next = scanner.getNextToken()).getKind());");
       out.println("    else");
       out.println("      return (jj_ntk = jj_nt.getKind());");
       out.println("  }");

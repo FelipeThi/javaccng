@@ -165,12 +165,12 @@ abstract class JavaCCParserBase {
 
   protected void addRegExp(TokenProduction production) {
     JavaCCGlobals.regExpList.add(production);
-    if (Options.getUserTokenManager()) {
+    if (Options.getUserScanner()) {
       if (production.lexStates == null
           || production.lexStates.length != 1
           || !production.lexStates[0].equals(DEFAULT)) {
         JavaCCErrors.warning(production, "Ignoring lexical state specifications since option " +
-            "USER_TOKEN_MANAGER has been set to true.");
+            "USER_SCANNER has been set to true.");
       }
     }
     if (production.lexStates == null) {
@@ -210,14 +210,14 @@ abstract class JavaCCParserBase {
   }
 
   protected static void add_token_manager_decls(Token t, List<Token> decls) {
-    if (JavaCCGlobals.tokenManagerDeclarations != null) {
+    if (JavaCCGlobals.scannerDeclarations != null) {
       JavaCCErrors.parseError(t, "Multiple occurrence of \"TOKEN_MGR_DECLS\".");
     }
     else {
-      JavaCCGlobals.tokenManagerDeclarations = decls;
-      if (Options.getUserTokenManager()) {
+      JavaCCGlobals.scannerDeclarations = decls;
+      if (Options.getUserScanner()) {
         JavaCCErrors.warning(t, "Ignoring declarations in \"TOKEN_MGR_DECLS\" since option " +
-            "USER_TOKEN_MANAGER has been set to true.");
+            "USER_SCANNER has been set to true.");
       }
     }
   }

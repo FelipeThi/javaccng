@@ -48,8 +48,8 @@ public class JavaParserTest {
     for (Source source : sources) {
       Reader reader = new StringReader(source.content);
       CharStream charStream = new JavaCharStream(reader);
-      TokenManager tokenManager = new JavaParserTokenManager(charStream);
-      JavaParser parser = new JavaParser(tokenManager);
+      Scanner scanner = new JavaParserScanner(charStream);
+      JavaParser parser = new JavaParser(scanner);
       try {
         parser.CompilationUnit();
       }
@@ -74,12 +74,12 @@ public class JavaParserTest {
   public void lexicalErrorReporting() throws IOException {
     Reader reader = new StringReader("/* comment");
     CharStream charStream = new JavaCharStream(reader);
-    TokenManager tokenManager = new JavaParserTokenManager(charStream);
-    TokenManagerException exception = null;
+    Scanner scanner = new JavaParserScanner(charStream);
+    ScannerException exception = null;
     try {
-      tokenManager.getNextToken();
+      scanner.getNextToken();
     }
-    catch (TokenManagerException ex) {
+    catch (ScannerException ex) {
       exception = ex;
     }
     assertNotNull(exception);
@@ -90,10 +90,10 @@ public class JavaParserTest {
   public void parsingErrorReporting() throws IOException {
     Reader reader = new StringReader("final class MyClass {\nvoid ();\n}");
     CharStream charStream = new JavaCharStream(reader);
-    TokenManager tokenManager = new JavaParserTokenManager(charStream);
+    Scanner scanner = new JavaParserScanner(charStream);
     ParseException exception = null;
     try {
-      JavaParser parser = new JavaParser(tokenManager);
+      JavaParser parser = new JavaParser(scanner);
       parser.CompilationUnit();
     }
     catch (ParseException ex) {

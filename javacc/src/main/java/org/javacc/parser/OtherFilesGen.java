@@ -54,7 +54,7 @@ final class OtherFilesGen implements SingeFileGenerator, JavaCCParserConstants {
     javaFiles.gen_TokenMgrError();
     javaFiles.gen_ParseException();
     javaFiles.gen_Token();
-    javaFiles.gen_TokenManager();
+    javaFiles.gen_Scanner();
     javaFiles.gen_CharStream();
     if (Options.getJavaUnicodeEscape()) {
       javaFiles.gen_JavaCharStream();
@@ -109,7 +109,7 @@ final class OtherFilesGen implements SingeFileGenerator, JavaCCParserConstants {
       out.println("  int " + re.label + " = " + re.ordinal + ";");
     }
     out.println("");
-    if (!Options.getUserTokenManager() && Options.getBuildTokenManager()) {
+    if (!Options.getUserScanner() && Options.getBuildScanner()) {
       for (int i = 0; i < lexGen.lexStateName.length; i++) {
         out.println("  /** Lexical state. */");
         out.println("  int " + lexGen.lexStateName[i] + " = " + i + ";");

@@ -10,7 +10,7 @@ public class TransformerTest {
   @Test
   public void test() throws Exception {
     ToyParser parser = new ToyParser(
-        new ToyParserTokenManager(
+        new ToyParserScanner(
             new JavaCharStream(
                 new InputStreamReader(
                     getClass().getResourceAsStream("/divide.toy")))));

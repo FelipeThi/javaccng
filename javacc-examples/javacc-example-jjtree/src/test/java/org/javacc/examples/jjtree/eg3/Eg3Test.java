@@ -9,7 +9,7 @@ public class Eg3Test {
   @Test
   public void test() throws IOException, ParseException {
     Eg3 parser = new Eg3(
-        new Eg3TokenManager(
+        new Eg3Scanner(
             new SimpleCharStream(
                 new StringReader("(a + b) * a + d;"))));
     ASTStart n = parser.Start();

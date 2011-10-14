@@ -35,7 +35,7 @@ public class Eg1 {
   public static void main(String[] args) throws java.io.IOException, ParseException {
     System.out.println("Reading from standard input...");
     Eg1 parser = new Eg1(
-        new Eg1TokenManager(
+        new Eg1Scanner(
             new SimpleCharStream(
                 new java.io.InputStreamReader(System.in))));
     SimpleNode n = parser.Start();

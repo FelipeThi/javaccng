@@ -110,7 +110,7 @@ public class Obfuscator extends Globals {
       Token first;
       try {
         parser = new JavaParser(
-            new JavaParserTokenManager(
+            new JavaParserScanner(
                 new JavaCharStream(
                     new InputStreamReader(
                         new FileInputStream(dirFile[dirStackSize])))));

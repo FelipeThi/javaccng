@@ -3,7 +3,7 @@
  * is never expected to throw this exception.
  * Therefore it extends Error rather than Exception.
  */
-public class TokenManagerException extends RuntimeException {
+public class ScannerException extends RuntimeException {
   /** Lexical error occurred. */
   public static final int LEXICAL_ERROR = 0;
 
@@ -24,7 +24,7 @@ public class TokenManagerException extends RuntimeException {
    * @param message   Descriptive error message.
    * @param errorCode Reason for lexical error.
    */
-  public TokenManagerException(String message, int errorCode) {
+  public ScannerException(String message, int errorCode) {
     super(message);
     this.errorCode = errorCode;
     this.lexState = -1;
@@ -49,16 +49,16 @@ public class TokenManagerException extends RuntimeException {
 #fi
    * @param character The offending character, or -1 if EOF causes the error.
    */
-  public TokenManagerException(int errorCode,
-                               int lexState,
+  public ScannerException(int errorCode,
+                          int lexState,
 #if KEEP_LINE_COLUMN
-                               int line,
-                               int column,
+                          int line,
+                          int column,
 #fi
 #if KEEP_IMAGE
-                               String prefix,
+                          String prefix,
 #fi
-                               int character) {
+                          int character) {
     super(genMessage(lexState,
 #if KEEP_LINE_COLUMN
             line, column,

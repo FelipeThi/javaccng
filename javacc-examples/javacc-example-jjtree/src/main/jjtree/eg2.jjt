@@ -40,7 +40,7 @@ public class Eg2 {
   public static void main(String[] args) throws java.io.IOException, ParseException {
     System.out.println("Reading from standard input...");
     Eg2 parser = new Eg2(
-        new Eg2TokenManager(
+        new Eg2Scanner(
             new SimpleCharStream(
                 new java.io.InputStreamReader(System.in))));
     ASTStart n = parser.Start();

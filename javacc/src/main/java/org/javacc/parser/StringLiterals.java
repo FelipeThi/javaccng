@@ -225,7 +225,7 @@ final class StringLiterals {
     ostr.println("jjMatchedKind = kind;");
     ostr.println("jjMatchedPos = pos;");
 
-    if (Options.getDebugTokenManager()) {
+    if (Options.getDebugScanner()) {
       ostr.println("debugPrinter.println(\"   No more string literal token matches are possible.\");");
       ostr.println("debugPrinter.println(\"   Currently matched the first \" " +
           "+ (jjMatchedPos + 1) + \" characters as a \" + tokenImage[jjMatchedKind] + \" token.\");");
@@ -234,11 +234,11 @@ final class StringLiterals {
     ostr.println("jjChar = charStream.readChar();");
     ostr.println("if (jjChar == -1) { return pos + 1; }");
 
-    if (Options.getDebugTokenManager()) {
+    if (Options.getDebugScanner()) {
       ostr.println("debugPrinter.println(" +
           (lexGen.maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
           "\"Current character : \" + " +
-          "TokenManagerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
+          "ScannerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
           "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
     }
 
@@ -256,7 +256,7 @@ final class StringLiterals {
     ostr.println("jjMatchedKind = kind;");
     ostr.println("jjMatchedPos = pos;");
 
-    if (Options.getDebugTokenManager()) {
+    if (Options.getDebugScanner()) {
       ostr.println("debugPrinter.println(\"   No more string literal token matches are possible.\");");
       ostr.println("debugPrinter.println(\"   Currently matched the first \" + (jjMatchedPos + 1) + " +
           "\" characters as a \" + tokenImage[jjMatchedKind] + \" token.\");");
@@ -394,7 +394,7 @@ final class StringLiterals {
           ostr.unindent();
         }
 
-        if (i != 0 && Options.getDebugTokenManager()) {
+        if (i != 0 && Options.getDebugScanner()) {
           ostr.println("if (jjMatchedKind != 0 && jjMatchedKind != 0x" +
               Integer.toHexString(Integer.MAX_VALUE) + ")");
           ostr.println("debugPrinter.println(\"   Currently matched the first \" + " +
@@ -429,7 +429,7 @@ final class StringLiterals {
           if (i <= maxLenForActive[k]) { ostr.println("active" + k + ");"); }
           else { ostr.println("0L);"); }
 
-          if (i != 0 && Options.getDebugTokenManager()) {
+          if (i != 0 && Options.getDebugScanner()) {
             ostr.println("if (jjMatchedKind != 0 && jjMatchedKind != 0x" +
                 Integer.toHexString(Integer.MAX_VALUE) + ")");
             ostr.println("debugPrinter.println(\"   Currently matched the first \" + " +
@@ -447,11 +447,11 @@ final class StringLiterals {
         ostr.println("}");
       }
 
-      if (i != 0 && Options.getDebugTokenManager()) {
+      if (i != 0 && Options.getDebugScanner()) {
         ostr.println("debugPrinter.println(" +
             (lexGen.maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
             "\"Current character : \" + " +
-            "TokenManagerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
+            "ScannerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
             "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
       }
 
@@ -673,7 +673,7 @@ final class StringLiterals {
   strings at this position. */
       ostr.println("default:");
 
-      if (Options.getDebugTokenManager()) {
+      if (Options.getDebugScanner()) {
         ostr.println("debugPrinter.println(\"   No string literal matches possible.\");");
       }
 
@@ -863,7 +863,7 @@ final class StringLiterals {
     for (i = 0; i < maxKindsReqd - 1; i++) { ostr.print("long active" + i + ", "); }
     ostr.println("long active" + i + ")\n{");
 
-    if (Options.getDebugTokenManager()) {
+    if (Options.getDebugScanner()) {
       ostr.println("debugPrinter.println(\"   No more string literal token matches are possible.\");");
     }
 

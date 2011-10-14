@@ -101,7 +101,7 @@ public final class JJTree {
 
     try {
       JJTreeParser parser = new JJTreeParser(
-          new JJTreeParserTokenManager(
+          new JJTreeParserScanner(
               new JavaCharStream(io.getIn())));
       parser.javacc_input();
 

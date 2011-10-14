@@ -98,8 +98,8 @@ public final class JavaCCGlobals {
    */
   public static Map<Integer, String> lexStateI2S
       = new HashMap<Integer, String>();
-  /** The declarations to be inserted into the TokenManager class. */
-  public static List<Token> tokenManagerDeclarations;
+  /** The declarations to be inserted into the Scanner class. */
+  public static List<Token> scannerDeclarations;
   /**
    * The list of all TokenProductions from the input file.  This list includes
    * implicit TokenProductions that are created for uses of regular expressions
@@ -330,7 +330,7 @@ public final class JavaCCGlobals {
     productionTable = new HashMap<String, NormalProduction>();
     lexStateS2I = new HashMap<String, Integer>();
     lexStateI2S = new HashMap<Integer, String>();
-    tokenManagerDeclarations = null;
+    scannerDeclarations = null;
     regExpList = new ArrayList<TokenProduction>();
     tokenCount = 0;
     namedTokensTable = new HashMap<String, RegularExpression>();

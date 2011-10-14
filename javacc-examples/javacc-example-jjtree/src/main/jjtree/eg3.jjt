@@ -40,7 +40,7 @@ public class Eg3 {
   public static void main(String[] args) throws java.io.IOException, ParseException {
     System.out.println("Reading from standard input...");
     Eg3 parser = new Eg3(
-        new Eg3TokenManager(
+        new Eg3Scanner(
             new SimpleCharStream(
                 new java.io.InputStreamReader(System.in))));
     ASTStart n = parser.Start();

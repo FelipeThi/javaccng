@@ -98,7 +98,7 @@ public final class Semanticize {
      * <EOF> and <name> in token productions.  After reporting an
      * error, these entries are removed.  Also checked are definitions
      * on inline private regular expressions.
-     * This loop works slightly differently when USER_TOKEN_MANAGER
+     * This loop works slightly differently when USER_SCANNER
      * is set to true.  In this case, <name> occurrences are OK, while
      * regular expression specs generate a warning.
      */
@@ -128,11 +128,11 @@ public final class Semanticize {
           JavaCCGlobals.eofNextState = reSpec.nextState;
           prepareToRemove(reSpecs, reSpec);
         }
-        else if (tp.explicit && Options.getUserTokenManager()) {
+        else if (tp.explicit && Options.getUserScanner()) {
           JavaCCErrors.warning(reSpec.regExp, "Ignoring regular expression specification since " +
-              "option USER_TOKEN_MANAGER has been set to true.");
+              "option USER_SCANNER has been set to true.");
         }
-        else if (tp.explicit && !Options.getUserTokenManager() && reSpec.regExp instanceof RJustName) {
+        else if (tp.explicit && !Options.getUserScanner() && reSpec.regExp instanceof RJustName) {
           JavaCCErrors.warning(reSpec.regExp, "Ignoring free-standing regular expression reference.  " +
               "If you really want this, you must give it a different label as <NEWLABEL:<"
               + reSpec.regExp.label + ">>.");
@@ -315,11 +315,11 @@ public final class Semanticize {
      * regular expressions or to regular expressions of any kind other
      * than TOKEN.  In addition, this loop also removes top level
      * "RJustName"s from "rexprlist".
-     * This code is not executed if Options.getUserTokenManager() is set to
+     * This code is not executed if Options.getUserScanner() is set to
      * true.  Instead the following block of code is executed.
      */
 
-    if (!Options.getUserTokenManager()) {
+    if (!Options.getUserScanner()) {
       FixRJustNames frjn = new FixRJustNames();
       for (TokenProduction tp : JavaCCGlobals.regExpList) {
         List<RegExpSpec> reSpecs = tp.reSpecs;
@@ -336,7 +336,7 @@ public final class Semanticize {
     removePreparedItems();
 
     /*
-     * The following code is executed only if Options.getUserTokenManager() is
+     * The following code is executed only if Options.getUserScanner() is
      * set to true.  This code visits all top-level "RJustName"s (ignores
      * "RJustName"s nested within regular expressions).  Since regular expressions
      * are optional in this case, "RJustName"s without corresponding regular
@@ -346,7 +346,7 @@ public final class Semanticize {
      * execution of this code.
      */
 
-    if (Options.getUserTokenManager()) {
+    if (Options.getUserScanner()) {
       for (TokenProduction tp : JavaCCGlobals.regExpList) {
         List<RegExpSpec> reSpecs = tp.reSpecs;
         for (RegExpSpec reSpec : reSpecs) {
@@ -371,13 +371,13 @@ public final class Semanticize {
     removePreparedItems();
 
     /*
-     * The following code is executed only if Options.getUserTokenManager() is
+     * The following code is executed only if Options.getUserScanner() is
      * set to true.  This loop labels any unlabeled regular expression and
      * prints a warning that it is doing so.  These labels are added to
      * "ordered_named_tokens" so that they may be generated into the ...Constants
      * file.
      */
-    if (Options.getUserTokenManager()) {
+    if (Options.getUserScanner()) {
       for (TokenProduction tp : JavaCCGlobals.regExpList) {
         List<RegExpSpec> reSpecs = tp.reSpecs;
         for (RegExpSpec reSpec : reSpecs) {
@@ -437,8 +437,8 @@ public final class Semanticize {
       // Now we do a similar, but much simpler walk for the regular expression part of
       // the grammar.  Here we are looking for any kind of loop, not just left recursions,
       // so we only need to do the equivalent of the above walk.
-      // This is not done if option USER_TOKEN_MANAGER is set to true.
-      if (!Options.getUserTokenManager()) {
+      // This is not done if option USER_SCANNER is set to true.
+      if (!Options.getUserScanner()) {
         for (TokenProduction tp : JavaCCGlobals.regExpList) {
           List<RegExpSpec> reSpecs = tp.reSpecs;
           for (RegExpSpec reSpec : reSpecs) {

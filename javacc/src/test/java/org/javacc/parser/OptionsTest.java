@@ -21,12 +21,12 @@ public final class OptionsTest extends TestCase {
     assertEquals(28, Options.optionValues.size());
 
     assertEquals(true, Options.getBuildParser());
-    assertEquals(true, Options.getBuildTokenManager());
+    assertEquals(true, Options.getBuildScanner());
     assertEquals(false, Options.getCacheTokens());
     assertEquals(false, Options.getCommonTokenAction());
     assertEquals(false, Options.getDebugLookahead());
     assertEquals(false, Options.getDebugParser());
-    assertEquals(false, Options.getDebugTokenManager());
+    assertEquals(false, Options.getDebugScanner());
     assertEquals(true, Options.getErrorReporting());
     assertEquals(false, Options.getForceLaCheck());
     assertEquals(false, Options.getIgnoreCase());
@@ -36,8 +36,8 @@ public final class OptionsTest extends TestCase {
     assertEquals(true, Options.getSanityCheck());
     assertEquals(false, Options.getUnicodeInput());
     assertEquals(false, Options.getUserCharStream());
-    assertEquals(false, Options.getUserTokenManager());
-    assertEquals(false, Options.getTokenManagerUsesParser());
+    assertEquals(false, Options.getUserScanner());
+    assertEquals(false, Options.getScannerUsesParser());
 
     assertEquals(2, Options.getChoiceAmbiguityCheck());
     assertEquals(1, Options.getLookahead());

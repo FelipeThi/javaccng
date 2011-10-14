@@ -92,7 +92,7 @@ public final class Main {
               new FileInputStream(path),
               Options.getGrammarEncoding()));
       parser = new JavaCCParser(
-          new JavaCCParserTokenManager(
+          new JavaCCParserScanner(
               new JavaCharStream(reader)));
     }
     catch (SecurityException ex) {
@@ -130,7 +130,7 @@ public final class Main {
       otherFilesGen.start();
 
       if (JavaCCErrors.getErrorCount() == 0
-          && (Options.getBuildParser() || Options.getBuildTokenManager())) {
+          && (Options.getBuildParser() || Options.getBuildScanner())) {
         if (JavaCCErrors.getWarningCount() == 0) {
           System.out.println("Parser generated successfully.");
         }
@@ -192,17 +192,17 @@ public final class Main {
     System.out.println("");
     System.out.println("    DEBUG_PARSER           (default false)");
     System.out.println("    DEBUG_LOOKAHEAD        (default false)");
-    System.out.println("    DEBUG_TOKEN_MANAGER    (default false)");
+    System.out.println("    DEBUG_SCANNER          (default false)");
     System.out.println("    ERROR_REPORTING        (default true)");
     System.out.println("    JAVA_UNICODE_ESCAPE    (default false)");
     System.out.println("    UNICODE_INPUT          (default false)");
     System.out.println("    IGNORE_CASE            (default false)");
     System.out.println("    COMMON_TOKEN_ACTION    (default false)");
-    System.out.println("    USER_TOKEN_MANAGER     (default false)");
+    System.out.println("    USER_SCANNER           (default false)");
     System.out.println("    USER_CHAR_STREAM       (default false)");
     System.out.println("    BUILD_PARSER           (default true)");
-    System.out.println("    BUILD_TOKEN_MANAGER    (default true)");
-    System.out.println("    TOKEN_MANAGER_USES_PARSER (default false)");
+    System.out.println("    BUILD_SCANNER          (default true)");
+    System.out.println("    SCANNER_USES_PARSER    (default false)");
     System.out.println("    SANITY_CHECK           (default true)");
     System.out.println("    FORCE_LA_CHECK         (default false)");
     System.out.println("    CACHE_TOKENS           (default false)");

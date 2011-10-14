@@ -9,7 +9,7 @@ public class Eg4Test {
   @Test
   public void test() throws IOException, ParseException {
     Eg4 parser = new Eg4(
-        new Eg4TokenManager(
+        new Eg4Scanner(
             new SimpleCharStream(
                 new StringReader("(a + b) * a + d;"))));
     ASTStart n = parser.Start();

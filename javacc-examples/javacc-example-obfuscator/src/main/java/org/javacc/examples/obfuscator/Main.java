@@ -79,7 +79,7 @@ public class Main extends Globals {
       String arg2 = args[2];
       try {
         MapFile parser = new MapFile(
-            new MapFileTokenManager(
+            new MapFileScanner(
                 new JavaCharStream(
                     new InputStreamReader(
                         new FileInputStream(arg2)))));
@@ -96,7 +96,7 @@ public class Main extends Globals {
       String arg3 = args[3];
       try {
         idParser = new IdsFile(
-            new IdsFileTokenManager(
+            new IdsFileScanner(
                 new JavaCharStream(
                     new InputStreamReader(
                         new FileInputStream(arg3)))));

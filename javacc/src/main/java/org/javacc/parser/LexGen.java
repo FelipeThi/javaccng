@@ -93,12 +93,12 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
       throw new MetaParseException();
     }
 
-    if (!Options.getBuildTokenManager()
-        || Options.getUserTokenManager()) {
+    if (!Options.getBuildScanner()
+        || Options.getUserScanner()) {
       return;
     }
 
-    className = JavaCCGlobals.cuName + "TokenManager";
+    className = JavaCCGlobals.cuName + "Scanner";
     path = new File(Options.getOutputDirectory(), className + ".java");
     OutputFile outputFile = new OutputFile(path);
     IndentingPrintWriter out = outputFile.getPrintWriter();
@@ -309,7 +309,7 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
     dumpFillToken(out);
     dumpGetNextToken(out);
 
-    if (Options.getDebugTokenManager()) {
+    if (Options.getDebugScanner()) {
       nfaStates.dumpStatesForKind(out);
       dumpDebugMethods(out);
     }
@@ -375,22 +375,21 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
     }
 
     out.println();
-    out.println("/** Token Manager. */");
     out.println("@SuppressWarnings(\"unused\")");
-    out.print("public class " + className + " implements TokenManager, " +
+    out.print("public class " + className + " implements Scanner, " +
         JavaCCGlobals.cuName + "Constants");
     out.println("{"); // }
 
-    if (JavaCCGlobals.tokenManagerDeclarations != null
-        && JavaCCGlobals.tokenManagerDeclarations.size() > 0) {
+    if (JavaCCGlobals.scannerDeclarations != null
+        && JavaCCGlobals.scannerDeclarations.size() > 0) {
       boolean commonTokenActionSeen = false;
       boolean commonTokenActionNeeded = Options.getCommonTokenAction();
 
-      JavaCCGlobals.printTokenSetup(JavaCCGlobals.tokenManagerDeclarations.get(0));
+      JavaCCGlobals.printTokenSetup(JavaCCGlobals.scannerDeclarations.get(0));
       JavaCCGlobals.ccol = 1;
 
-      for (j = 0; j < JavaCCGlobals.tokenManagerDeclarations.size(); j++) {
-        Token t = JavaCCGlobals.tokenManagerDeclarations.get(j);
+      for (j = 0; j < JavaCCGlobals.scannerDeclarations.size(); j++) {
+        Token t = JavaCCGlobals.scannerDeclarations.get(j);
         if (t.getKind() == IDENTIFIER &&
             commonTokenActionNeeded &&
             !commonTokenActionSeen) {
@@ -418,7 +417,7 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
     out.indent();
 
     out.println();
-    if (Options.getDebugTokenManager()) {
+    if (Options.getDebugScanner()) {
       out.println("/** Debug output. */");
       out.println("private java.io.PrintWriter debugPrinter = new java.io.PrintWriter(System.out);");
       out.println();
@@ -427,7 +426,7 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
       out.println();
     }
 
-    if (Options.getTokenManagerUsesParser()) {
+    if (Options.getScannerUsesParser()) {
       out.println();
       out.println("/** The parser. */");
       out.println("public " + JavaCCGlobals.cuName + " parser = null;");
@@ -752,7 +751,7 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
 
     out.println("protected int jjChar;");
 
-    if (Options.getTokenManagerUsesParser()) {
+    if (Options.getScannerUsesParser()) {
       out.println();
       out.println("/** Constructor with parser. */");
       out.println("public " + className + "(" + JavaCCGlobals.cuName + " parserArg, CharStream stream) {");
@@ -767,7 +766,7 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
 
     out.println("}");
 
-    if (Options.getTokenManagerUsesParser()) {
+    if (Options.getScannerUsesParser()) {
       out.println();
       out.println("/** Constructor with parser. */");
       out.println("public " + className + "(" + JavaCCGlobals.cuName + " parserArg, CharStream stream, int lexState) {");
@@ -947,7 +946,7 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
     out.println("if (jjChar == -1) {");
     out.indent();
 
-    if (Options.getDebugTokenManager()) {
+    if (Options.getDebugScanner()) {
       out.println("debugPrinter.println(\"Returning the <EOF> token.\");");
     }
 
@@ -1023,12 +1022,12 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
 
         out.println("{");
         out.indent();
-        if (Options.getDebugTokenManager()) {
+        if (Options.getDebugScanner()) {
           out.println("debugPrinter.println(" +
               (maxLexStates > 1 ?
                   "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
               "\"Skipping character : \" + " +
-              "TokenManagerException.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \")\");");
+              "ScannerException.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \")\");");
         }
         out.println("charStream.beginToken();");
         out.println("jjChar = charStream.readChar();");
@@ -1038,7 +1037,7 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
       }
 
       if (initMatch[i] != Integer.MAX_VALUE && initMatch[i] != 0) {
-        if (Options.getDebugTokenManager()) {
+        if (Options.getDebugScanner()) {
           out.println("debugPrinter.println(\"   Matched the empty string as \" + tokenImage[" +
               initMatch[i] + "] + \" token.\");");
         }
@@ -1052,11 +1051,11 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
         out.println("jjMatchedPos = 0;");
       }
 
-      if (Options.getDebugTokenManager()) {
+      if (Options.getDebugScanner()) {
         out.println("debugPrinter.println(" +
             (maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
             "\"Current character : \" + " +
-            "TokenManagerException.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
+            "ScannerException.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
             "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
       }
 
@@ -1074,7 +1073,7 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
         out.println("{");
         out.indent();
 
-        if (Options.getDebugTokenManager()) {
+        if (Options.getDebugScanner()) {
           out.println("debugPrinter.println(\"   Current character matched as a \" + tokenImage[" +
               canMatchAnyChar[i] + "] + \" token.\");");
         }
@@ -1113,7 +1112,7 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
       out.indent();
       out.println("if (jjMatchedPos + 1 < curPos)");
 
-      if (Options.getDebugTokenManager()) {
+      if (Options.getDebugScanner()) {
         out.println("{");
         out.println("debugPrinter.println(" +
             "\"   Putting back \" + (curPos - jjMatchedPos - 1) + \" characters into the input stream.\");");
@@ -1121,14 +1120,14 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
 
       out.println("charStream.backup(curPos - jjMatchedPos - 1);");
 
-      if (Options.getDebugTokenManager()) {
+      if (Options.getDebugScanner()) {
         out.println("}");
       }
 
-      if (Options.getDebugTokenManager()) {
+      if (Options.getDebugScanner()) {
         out.println("debugPrinter.println(" +
             "\"****** FOUND A \" + tokenImage[jjMatchedKind] + \" MATCH " +
-            "(\" + TokenManagerException.escape(new String(charStream.getSuffix(jjMatchedPos + 1))) + " +
+            "(\" + ScannerException.escape(new String(charStream.getSuffix(jjMatchedPos + 1))) + " +
             "\") ******\\n\");");
       }
 
@@ -1234,11 +1233,11 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
           out.println("jjChar = charStream.readChar();");
           out.println("if (jjChar != -1) {");
           out.indent();
-          if (Options.getDebugTokenManager()) {
+          if (Options.getDebugScanner()) {
             out.println("debugPrinter.println(" +
                 (maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
                 "\"Current character : \" + " +
-                "TokenManagerException.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
+                "ScannerException.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
                 "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
           }
           out.println("continue;");
@@ -1310,8 +1309,8 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
 
     out.println();
     out.println("void reportLexicalError(int curPos) throws java.io.IOException {");
-    out.println("   throw new TokenManagerException(jjLexState,");
-    out.println("        TokenManagerException.LEXICAL_ERROR,");
+    out.println("   throw new ScannerException(jjLexState,");
+    out.println("        ScannerException.LEXICAL_ERROR,");
     if (keepLineCol) {
       out.println("        charStream.getEndLine(),");
       out.println("        charStream.getEndColumn(),");
@@ -1351,10 +1350,10 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
           out.println("            if (jjBeenHere[" + lexStates[i] + "] &&");
           out.println("                jjEmptyLineNo[" + lexStates[i] + "] == charStream.getBeginLine() &&");
           out.println("                jjEmptyColumnNo[" + lexStates[i] + "] == charStream.getBeginColumn())");
-          out.println("               throw new TokenManagerException(" +
+          out.println("               throw new ScannerException(" +
               "(\"Bailing out of infinite loop caused by repeated empty string matches " +
               "at line \" + charStream.getBeginLine() + \", " +
-              "column \" + charStream.getBeginColumn() + \".\"), TokenManagerException.LOOP_DETECTED);");
+              "column \" + charStream.getBeginColumn() + \".\"), ScannerException.LOOP_DETECTED);");
           out.println("            jjEmptyLineNo[" + lexStates[i] + "] = charStream.getBeginLine();");
           out.println("            jjEmptyColumnNo[" + lexStates[i] + "] = charStream.getBeginColumn();");
           out.println("            jjBeenHere[" + lexStates[i] + "] = true;");
@@ -1426,10 +1425,10 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
           out.println("            if (jjBeenHere[" + lexStates[i] + "] &&");
           out.println("                jjEmptyLineNo[" + lexStates[i] + "] == charStream.getBeginLine() &&");
           out.println("                jjEmptyColumnNo[" + lexStates[i] + "] == charStream.getBeginColumn())");
-          out.println("               throw new TokenManagerException(" +
+          out.println("               throw new ScannerException(" +
               "(\"Bailing out of infinite loop caused by repeated empty string matches " +
               "at line \" + charStream.getBeginLine() + \", " +
-              "column \" + charStream.getBeginColumn() + \".\"), TokenManagerException.LOOP_DETECTED);");
+              "column \" + charStream.getBeginColumn() + \".\"), ScannerException.LOOP_DETECTED);");
           out.println("            jjEmptyLineNo[" + lexStates[i] + "] = charStream.getBeginLine();");
           out.println("            jjEmptyColumnNo[" + lexStates[i] + "] = charStream.getBeginColumn();");
           out.println("            jjBeenHere[" + lexStates[i] + "] = true;");
@@ -1500,10 +1499,10 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
           out.println("            if (jjBeenHere[" + lexStates[i] + "] &&");
           out.println("                jjEmptyLineNo[" + lexStates[i] + "] == charStream.getBeginLine() &&");
           out.println("                jjEmptyColumnNo[" + lexStates[i] + "] == charStream.getBeginColumn())");
-          out.println("               throw new TokenManagerException(" +
+          out.println("               throw new ScannerException(" +
               "(\"Bailing out of infinite loop caused by repeated empty string matches " +
               "at line \" + charStream.getBeginLine() + \", " +
-              "column \" + charStream.getBeginColumn() + \".\"), TokenManagerException.LOOP_DETECTED);");
+              "column \" + charStream.getBeginColumn() + \".\"), ScannerException.LOOP_DETECTED);");
           out.println("            jjEmptyLineNo[" + lexStates[i] + "] = charStream.getBeginLine();");
           out.println("            jjEmptyColumnNo[" + lexStates[i] + "] = charStream.getBeginColumn();");
           out.println("            jjBeenHere[" + lexStates[i] + "] = true;");

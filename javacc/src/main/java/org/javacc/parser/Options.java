@@ -93,16 +93,16 @@ public class Options {
 
     optionValues.put("DEBUG_PARSER", FALSE);
     optionValues.put("DEBUG_LOOKAHEAD", FALSE);
-    optionValues.put("DEBUG_TOKEN_MANAGER", FALSE);
+    optionValues.put("DEBUG_SCANNER", FALSE);
     optionValues.put("ERROR_REPORTING", TRUE);
     optionValues.put("JAVA_UNICODE_ESCAPE", FALSE);
     optionValues.put("UNICODE_INPUT", FALSE);
     optionValues.put("IGNORE_CASE", FALSE);
-    optionValues.put("USER_TOKEN_MANAGER", FALSE);
+    optionValues.put("USER_SCANNER", FALSE);
     optionValues.put("USER_CHAR_STREAM", FALSE);
     optionValues.put("BUILD_PARSER", TRUE);
-    optionValues.put("BUILD_TOKEN_MANAGER", TRUE);
-    optionValues.put("TOKEN_MANAGER_USES_PARSER", FALSE);
+    optionValues.put("BUILD_SCANNER", TRUE);
+    optionValues.put("SCANNER_USES_PARSER", FALSE);
     optionValues.put("SANITY_CHECK", TRUE);
     optionValues.put("FORCE_LA_CHECK", FALSE);
     optionValues.put("COMMON_TOKEN_ACTION", FALSE);
@@ -355,12 +355,12 @@ public class Options {
   }
 
   /**
-   * Find the debug tokenmanager value.
+   * Find the debug scanner value.
    *
-   * @return The requested debug tokenmanager value.
+   * @return The requested debug scanner value.
    */
-  public static boolean getDebugTokenManager() {
-    return booleanValue("DEBUG_TOKEN_MANAGER");
+  public static boolean getDebugScanner() {
+    return booleanValue("DEBUG_SCANNER");
   }
 
   /**
@@ -400,18 +400,18 @@ public class Options {
   }
 
   /**
-   * Find the user tokenmanager value.
+   * Find the user scanner value.
    *
-   * @return The requested user tokenmanager value.
+   * @return The requested user scanner value.
    */
-  public static boolean getUserTokenManager() {
-    return booleanValue("USER_TOKEN_MANAGER");
+  public static boolean getUserScanner() {
+    return booleanValue("USER_SCANNER");
   }
 
   /**
-   * Find the user charstream value.
+   * Find the user char stream value.
    *
-   * @return The requested user charstream value.
+   * @return The requested user char stream value.
    */
   public static boolean getUserCharStream() {
     return booleanValue("USER_CHAR_STREAM");
@@ -431,8 +431,8 @@ public class Options {
    *
    * @return The requested build token manager value.
    */
-  public static boolean getBuildTokenManager() {
-    return booleanValue("BUILD_TOKEN_MANAGER");
+  public static boolean getBuildScanner() {
+    return booleanValue("BUILD_SCANNER");
   }
 
   /**
@@ -440,8 +440,8 @@ public class Options {
    *
    * @return The requested token manager uses parser value;
    */
-  public static boolean getTokenManagerUsesParser() {
-    return booleanValue("TOKEN_MANAGER_USES_PARSER");
+  public static boolean getScannerUsesParser() {
+    return booleanValue("SCANNER_USES_PARSER");
   }
 
   /**

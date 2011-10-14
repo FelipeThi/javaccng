@@ -39,7 +39,7 @@ public class Example5 {
   }
 
   public Example5(java.io.InputStream in) throws ParseException, java.io.IOException {
-    this(new Example5TokenManager(new SimpleCharStream(new java.io.InputStreamReader(in))));
+    this(new Example5Scanner(new SimpleCharStream(new java.io.InputStreamReader(in))));
   }
 
 }

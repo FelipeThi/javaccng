@@ -35,7 +35,7 @@ public class Main {
   public static void main(String args[]) throws IOException, ParseException {
     System.err.println("Reading from standard input...");
     JavaParser parser = new JavaParser(
-        new JavaParserTokenManager(
+        new JavaParserScanner(
             new JavaCharStream(
                 new InputStreamReader(System.in))));
     ASTCompilationUnit cu = parser.CompilationUnit();

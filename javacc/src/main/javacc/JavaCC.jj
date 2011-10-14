@@ -657,16 +657,16 @@ void regular_expr_production() :
   ]
   regexpr_kind(p)
 	{
-	  if (p.kind != TokenProduction.TOKEN && Options.getUserTokenManager()) {
-	    JavaCCErrors.warning(getToken(0), "Regular expression is being treated as if it were a TOKEN since option USER_TOKEN_MANAGER has been set to true.");
+	  if (p.kind != TokenProduction.TOKEN && Options.getUserScanner()) {
+	    JavaCCErrors.warning(getToken(0), "Regular expression is being treated as if it were a TOKEN since option USER_SCANNER has been set to true.");
 	  }
 	}
   [
     "[" t="IGNORE_CASE" "]"
 	{
 	  p.ignoreCase = true;
-	  if (Options.getUserTokenManager()) {
-	    JavaCCErrors.warning(t, "Ignoring \"IGNORE_CASE\" specification since option USER_TOKEN_MANAGER has been set to true.");
+	  if (Options.getUserScanner()) {
+	    JavaCCErrors.warning(t, "Ignoring IGNORE_CASE specification since option USER_SCANNER has been set to true.");
 	  }
 	}
   ]
@@ -719,8 +719,8 @@ void regexpr_spec(TokenProduction p) :
 	}
     Block(act.getActionTokens())
 	{
-	  if (Options.getUserTokenManager()) {
-	    JavaCCErrors.warning(t, "Ignoring action in regular expression specification since option USER_TOKEN_MANAGER has been set to true.");
+	  if (Options.getUserScanner()) {
+	    JavaCCErrors.warning(t, "Ignoring action in regular expression specification since option USER_SCANNER has been set to true.");
 	  }
 	  if (res.regExp.isPrivate) {
 	    JavaCCErrors.parseError(t, "Actions are not permitted on private (#) regular expressions.");

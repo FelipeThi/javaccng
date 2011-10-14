@@ -943,16 +943,16 @@ final class NfaStates {
     out.println("   int i = 1;");
     out.println("   jjStateSet[0] = startState;");
 
-    if (Options.getDebugTokenManager()) {
+    if (Options.getDebugScanner()) {
       out.println("      debugPrinter.println(\"   Starting NFA to match one of : \" + " +
           "jjKindsForStateVector(jjLexState, jjStateSet, 0, 1));");
     }
 
-    if (Options.getDebugTokenManager()) {
+    if (Options.getDebugScanner()) {
       out.println("      debugPrinter.println(" + (lexGen.maxLexStates > 1 ?
           "\"<\" + jjLexStateNames[jjLexState] + \">\" + " :
           "") + "\"Current character : \" + " +
-          "TokenManagerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
+          "ScannerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
           "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
     }
 
@@ -991,7 +991,7 @@ final class NfaStates {
     out.println("      }");
     out.println("      ++curPos;");
 
-    if (Options.getDebugTokenManager()) {
+    if (Options.getDebugScanner()) {
       out.println("      if (jjMatchedKind != 0 && jjMatchedKind != 0x" +
           Integer.toHexString(Integer.MAX_VALUE) + ")");
       out.println("         debugPrinter.println(" +
@@ -1004,7 +1004,7 @@ final class NfaStates {
     if (lexGen.mixed[lexGen.lexStateIndex]) { out.println("         break;"); }
     else { out.println("         return curPos;"); }
 
-    if (Options.getDebugTokenManager()) {
+    if (Options.getDebugScanner()) {
       out.println("      debugPrinter.println(\"   Possible kinds of longer matches : \" + " +
           "jjKindsForStateVector(jjLexState, jjStateSet, startsAt, i));");
     }
@@ -1014,11 +1014,11 @@ final class NfaStates {
     if (lexGen.mixed[lexGen.lexStateIndex]) { out.println("      if (jjChar == -1) { break; }"); }
     else { out.println("      if (jjChar == -1) { return curPos; }"); }
 
-    if (Options.getDebugTokenManager()) {
+    if (Options.getDebugScanner()) {
       out.println("      debugPrinter.println(" + (lexGen.maxLexStates > 1 ?
           "\"<\" + jjLexStateNames[jjLexState] + \">\" + " :
           "") + "\"Current character : \" + " +
-          "TokenManagerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
+          "ScannerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
           "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
     }
 

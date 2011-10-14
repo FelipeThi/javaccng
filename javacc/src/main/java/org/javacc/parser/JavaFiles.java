@@ -34,7 +34,7 @@ import org.javacc.utils.io.IndentingPrintWriter;
 import java.io.File;
 import java.io.IOException;
 
-/** Generate CharStream, TokenManager and Exceptions. */
+/** Generate CharStream, Scanner and Exceptions. */
 public class JavaFiles implements JavaCCParserConstants {
   public void gen_JavaCharStream() throws IOException {
     File path = new File(Options.getOutputDirectory(), "JavaCharStream.java");
@@ -153,7 +153,7 @@ public class JavaFiles implements JavaCCParserConstants {
   }
 
   public void gen_TokenMgrError() throws IOException {
-    File path = new File(Options.getOutputDirectory(), "TokenManagerException.java");
+    File path = new File(Options.getOutputDirectory(), "ScannerException.java");
     OutputFile outputFile = new OutputFile(path);
     IndentingPrintWriter out = outputFile.getPrintWriter();
     try {
@@ -173,7 +173,7 @@ public class JavaFiles implements JavaCCParserConstants {
         }
       }
       JavaFileGenerator generator = new JavaFileGenerator(
-          "/templates/TokenManagerException.template", Options.getOptions());
+          "/templates/ScannerException.template", Options.getOptions());
       generator.generate(out);
     }
     finally {
@@ -210,8 +210,8 @@ public class JavaFiles implements JavaCCParserConstants {
     }
   }
 
-  public void gen_TokenManager() throws IOException {
-    File path = new File(Options.getOutputDirectory(), "TokenManager.java");
+  public void gen_Scanner() throws IOException {
+    File path = new File(Options.getOutputDirectory(), "Scanner.java");
     OutputFile outputFile = new OutputFile(path);
     IndentingPrintWriter out = outputFile.getPrintWriter();
     try {
@@ -231,7 +231,7 @@ public class JavaFiles implements JavaCCParserConstants {
         }
       }
       JavaFileGenerator generator = new JavaFileGenerator(
-          "/templates/TokenManager.template", Options.getOptions());
+          "/templates/Scanner.template", Options.getOptions());
       generator.generate(out);
     }
     finally {

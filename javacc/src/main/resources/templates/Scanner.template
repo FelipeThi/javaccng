@@ -3,7 +3,7 @@
  * JavaCCParser.  The user is free to use any implementation
  * of their choice.
  */
-public interface TokenManager {
+public interface Scanner {
   /**
    * Gets the next token from the input stream.
    * A token of kind 0 (&lt;EOF&gt;) should be returned on EOF.
