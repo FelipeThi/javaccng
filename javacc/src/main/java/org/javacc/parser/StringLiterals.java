@@ -82,31 +82,7 @@ final class StringLiterals {
         continue;
       }
 
-      String toPrint = "\"";
-
-      for (int j = 0; j < image.length(); j++) {
-        final char c = image.charAt(j);
-        if (c >= 0x20 && c < 0x80) {
-          if (c == '"') {
-            toPrint += "\"";
-          }
-          else if (c == '\\') {
-            toPrint += "\\\\";
-          }
-          else {
-            toPrint += c;
-          }
-        }
-        else {
-          String hexVal = Integer.toHexString((int) c);
-          while (hexVal.length() < 4) {
-            hexVal = "0" + hexVal;
-          }
-          toPrint += "\\u" + hexVal;
-        }
-      }
-
-      toPrint += ("\", ");
+      String toPrint = "\"" + Parsers.escape(image) + "\", ";
 
       if ((charCnt += toPrint.length()) >= 80) {
         ostr.println("");
@@ -171,9 +147,15 @@ final class StringLiterals {
   String GetLabel(LexGen lexGen, int kind) {
     RegularExpression re = lexGen.rexprs[kind];
 
-    if (re instanceof RStringLiteral) { return " \"" + Parsers.escape(((RStringLiteral) re).image) + "\""; }
-    else if (!re.label.equals("")) { return " <" + re.label + ">"; }
-    else { return " <token of kind " + kind + ">"; }
+    if (re instanceof RStringLiteral) {
+      return " \"" + Parsers.escape(((RStringLiteral) re).image) + "\"";
+    }
+    else if (!re.label.equals("")) {
+      return " <" + re.label + ">";
+    }
+    else {
+      return " <token of kind " + kind + ">";
+    }
   }
 
   int GetLine(LexGen lexGen, int kind) {
