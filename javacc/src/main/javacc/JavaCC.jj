@@ -170,7 +170,6 @@ SKIP :
 | "\r"
 | "\f"
 | "/*@egen*/" : AFTER_EGEN
-
 }
 
 <AFTER_EGEN> SKIP :
@@ -183,15 +182,11 @@ SKIP :
 MORE :
 {
   "//" : IN_SINGLE_LINE_COMMENT
-|
-  <"/**" ~["/"]> { charStream.backup(1); } : IN_FORMAL_COMMENT
-|
-  "/*" : IN_MULTI_LINE_COMMENT
-|
-  "/*@bgen(jjtree"
+| <"/**" ~["/"]> { charStream.backup(1); } : IN_FORMAL_COMMENT
+| "/*" : IN_MULTI_LINE_COMMENT
+| "/*@bgen(jjtree"
      {
-        saveBeginLineCol(charStream.getBeginLine(),
-                         charStream.getBeginColumn());
+        saveBeginLineCol(charStream.getBeginLine(), charStream.getBeginColumn());
      } : IN_MULTI_LINE_COMMENT
 }
 
@@ -287,35 +282,26 @@ TOKEN :
       | <HEX_LITERAL> (["l","L"])?
       | <OCTAL_LITERAL> (["l","L"])?
   >
-|
-  < #DECIMAL_LITERAL: ["1"-"9"] (["0"-"9"])* >
-|
-  < #HEX_LITERAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ >
-|
-  < #OCTAL_LITERAL: "0" (["0"-"7"])* >
-|
-  < FLOATING_POINT_LITERAL:
+| < #DECIMAL_LITERAL: ["1"-"9"] (["0"-"9"])* >
+| < #HEX_LITERAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ >
+| < #OCTAL_LITERAL: "0" (["0"-"7"])* >
+| < FLOATING_POINT_LITERAL:
         <DECIMAL_FLOATING_POINT_LITERAL>
       | <HEXADECIMAL_FLOATING_POINT_LITERAL>
   >
-|
-  < #DECIMAL_FLOATING_POINT_LITERAL:
+| < #DECIMAL_FLOATING_POINT_LITERAL:
         (["0"-"9"])+ "." (["0"-"9"])* (<DECIMAL_EXPONENT>)? (["f","F","d","D"])?
       | "." (["0"-"9"])+ (<DECIMAL_EXPONENT>)? (["f","F","d","D"])?
       | (["0"-"9"])+ <DECIMAL_EXPONENT> (["f","F","d","D"])?
       | (["0"-"9"])+ (<DECIMAL_EXPONENT>)? ["f","F","d","D"]
   >
-|
-  < #DECIMAL_EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+ >
-|
-  < #HEXADECIMAL_FLOATING_POINT_LITERAL:
+| < #DECIMAL_EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+ >
+| < #HEXADECIMAL_FLOATING_POINT_LITERAL:
         "0" ["x", "X"] (["0"-"9","a"-"f","A"-"F"])+ (".")? <HEXADECIMAL_EXPONENT> (["f","F","d","D"])?
       | "0" ["x", "X"] (["0"-"9","a"-"f","A"-"F"])* "." (["0"-"9","a"-"f","A"-"F"])+ <HEXADECIMAL_EXPONENT> (["f","F","d","D"])?
   >
-|
-  < #HEXADECIMAL_EXPONENT: ["p","P"] (["+","-"])? (["0"-"9"])+ >
-|
-  < CHARACTER_LITERAL:
+| < #HEXADECIMAL_EXPONENT: ["p","P"] (["+","-"])? (["0"-"9"])+ >
+| < CHARACTER_LITERAL:
       "'"
       (   (~["'","\\","\n","\r"])
         | ("\\"
@@ -327,8 +313,7 @@ TOKEN :
       )
       "'"
   >
-|
-  < STRING_LITERAL:
+| < STRING_LITERAL:
       "\""
       (   (~["\"","\\","\n","\r"])
         | ("\\"
@@ -529,19 +514,19 @@ void production() :
 void javacode_production() :
 	{
 	  JavaCodeProduction p = new JavaCodeProduction();
-	  String lhs;
 	  Token t = getToken(1);
 	  p.setFirstToken(t);
-	  List excName;
-	  p.setThrowsList(new ArrayList());
 	  p.setLine(t.getBeginLine());
 	  p.setColumn(t.getBeginColumn());
+	  p.setThrowsList(new ArrayList());
+	  String lhs;
+	  List excName;
 	}
 {
   "JAVACODE"
   AccessModifier(p)
   ResultType(p.getReturnTypeTokens())
-  lhs=identifier()	{ p.setLhs(lhs); }
+  lhs=identifier() { p.setLhs(lhs); }
   FormalParameters(p.getParameterListTokens())
   [ "throws"
 	{
@@ -571,14 +556,14 @@ void javacode_production() :
 void bnf_production() :
 	{
 	  BNFProduction p = new BNFProduction();
-	  Container<Expansion> c = new Container<Expansion>();
 	  Token t = getToken(1);
 	  p.setFirstToken(t);
-	  List excName;
-	  String lhs;
-	  p.setThrowsList(new ArrayList());
 	  p.setLine(t.getBeginLine());
 	  p.setColumn(t.getBeginColumn());
+	  p.setThrowsList(new ArrayList());
+	  Container<Expansion> c = new Container<Expansion>();
+	  String lhs;
+	  List excName;
 	  jumpPatched = false;
 	}
 {
@@ -623,7 +608,7 @@ void AccessModifier(NormalProduction p) :
 {
 	( t = "public" | t = "protected" | t = "private" )?
 	{
-	  if(t != null){
+	  if (t != null) {
 	    p.setAccessModifier(t.getImage());
 	  }
 	}
@@ -632,10 +617,10 @@ void AccessModifier(NormalProduction p) :
 void regular_expr_production() :
 	{
 	  TokenProduction p = new TokenProduction();
-	  List states;
 	  Token t = p.firstToken = getToken(1);
 	  p.setLine(t.getBeginLine());
 	  p.setColumn(t.getBeginColumn());
+	  List states;
 	}
 {
 	{
@@ -666,7 +651,7 @@ void regular_expr_production() :
 	{
 	  p.lexStates = new String[states.size()];
 	  for (int i = 0; i < states.size(); i++) {
-	    p.lexStates[i] = (String)states.get(i);
+	    p.lexStates[i] = (String) states.get(i);
 	  }
 	}
   ]
@@ -709,25 +694,10 @@ void token_manager_decls() :
 void regexpr_kind(TokenProduction p) :
 {}
 {
-  "TOKEN"
-	{
-	  p.kind = TokenProduction.TOKEN;
-	}
-|
-  "SPECIAL_TOKEN"
-	{
-	  p.kind = TokenProduction.SPECIAL;
-	}
-|
-  "SKIP"
-	{
-	  p.kind = TokenProduction.SKIP;
-	}
-|
-  "MORE"
-	{
-	  p.kind = TokenProduction.MORE;
-	}
+  "TOKEN"         { p.kind = TokenProduction.TOKEN; }
+| "SPECIAL_TOKEN" { p.kind = TokenProduction.SPECIAL; }
+| "SKIP"          { p.kind = TokenProduction.SKIP; }
+| "MORE"          { p.kind = TokenProduction.MORE; }
 }
 
 void regexpr_spec(TokenProduction p) :
@@ -775,7 +745,7 @@ void regexpr_spec(TokenProduction p) :
 void expansion_choices(Container<Expansion> c1) :
 	{
 	  boolean moreThanOne = false;
-	  Choice ch = null; // unnecessary initialization to make Java compiler happy!
+	  Choice ch = null;
 	  Container<Expansion> c2 = new Container<Expansion>();
 	}
 {
@@ -922,7 +892,7 @@ void expansion_unit(Container<Expansion> c) :
    * We give this priority over primary expressions which use LOOKAHEAD as the
    * name of its identifier.
    */
-  t="LOOKAHEAD" "(" la=local_lookahead() ")"
+  t="LOOKAHEAD" "(" la = local_lookahead() ")"
 	{
 	  // Now set the la_expansion field of la with a dummy
 	  // expansion (we use EOF).
@@ -979,8 +949,8 @@ void expansion_unit(Container<Expansion> c) :
 	  List vec = new ArrayList();
 	  Token t0;
 	}
-  t0="try" "{" expansion_choices(expch) "}"
-  ( "catch" "(" Name(vec) t=<IDENTIFIER> ")"
+  t0 = "try" "{" expansion_choices(expch) "}"
+  ( "catch" "(" Name(vec) t = <IDENTIFIER> ")"
 	{
 	  types.add(vec);
 	  ids.add(t);
@@ -1159,7 +1129,7 @@ void complex_regular_expression_choices(Container<Expansion> c1) :
 void complex_regular_expression(Container<Expansion> c1) :
 	{
 	  int count = 0;
-	  RSequence seq = null; // unnecessary initialization to make Java compiler happy!
+	  RSequence seq = null;
 	  Container<Expansion> c2 = new Container<Expansion>();
 	}
 {
@@ -1273,7 +1243,7 @@ void character_list(Container<Expansion> c1) :
 
 void character_descriptor(Container<CharacterDescriptor> c) :
 	{
-	  char c1, c2 = ' '; // unnecessary initialization to make Java compiler happy!
+	  char c1, c2 = ' ';
 	  boolean isrange = false;
 	  String imageL, imageR;
 	  Token t = getToken(1);
@@ -1976,12 +1946,9 @@ void UnaryExpression():
 {}
 {
   ( "+" | "-" ) UnaryExpression()
-|
-  PreIncrementExpression()
-|
-  PreDecrementExpression()
-|
-  UnaryExpressionNotPlusMinus()
+| PreIncrementExpression()
+| PreDecrementExpression()
+| UnaryExpressionNotPlusMinus()
 }
 
 void PreIncrementExpression():
@@ -2091,16 +2058,11 @@ void Literal():
 {}
 {
   <INTEGER_LITERAL>
-|
-  <FLOATING_POINT_LITERAL>
-|
-  <CHARACTER_LITERAL>
-|
-  <STRING_LITERAL>
-|
-  BooleanLiteral()
-|
-  NullLiteral()
+| <FLOATING_POINT_LITERAL>
+| <CHARACTER_LITERAL>
+| <STRING_LITERAL>
+| BooleanLiteral()
+| NullLiteral()
 }
 
 int IntegerLiteral() :
@@ -2222,36 +2184,21 @@ void Statement():
 {
   LOOKAHEAD(2)
   LabeledStatement()
-|
-  AssertStatement()
-|
-  Block(null)
-|
-  EmptyStatement()
-|
-  StatementExpression() ";"
-|
-  SwitchStatement()
-|
-  IfStatement()
-|
-  WhileStatement()
-|
-  DoStatement()
-|
-  ForStatement()
-|
-  BreakStatement()
-|
-  ContinueStatement()
-|
-  ReturnStatement()
-|
-  ThrowStatement()
-|
-  SynchronizedStatement()
-|
-  TryStatement()
+| AssertStatement()
+| Block(null)
+| EmptyStatement()
+| StatementExpression() ";"
+| SwitchStatement()
+| IfStatement()
+| WhileStatement()
+| DoStatement()
+| ForStatement()
+| BreakStatement()
+| ContinueStatement()
+| ReturnStatement()
+| ThrowStatement()
+| SynchronizedStatement()
+| TryStatement()
 }
 
 void AssertStatement():
@@ -2330,16 +2277,11 @@ void StatementExpression():
 {}
 {
   PreIncrementExpression()
-|
-  PreDecrementExpression()
-|
-  PrimaryExpression()
-  [
-    "++"
-  |
-    "--"
-  |
-    AssignmentOperator() Expression(null)
+| PreDecrementExpression()
+| PrimaryExpression()
+  [ "++"
+  | "--"
+  | AssignmentOperator() Expression(null)
   ]
 }
 
@@ -2568,10 +2510,8 @@ void MemberValue():
 {}
 {
    Annotation()
- |
-   MemberValueArrayInitializer()
- |
-   ConditionalExpression()
+ | MemberValueArrayInitializer()
+ | ConditionalExpression()
 }
 
 void  MemberValueArrayInitializer():
@@ -2602,19 +2542,14 @@ void AnnotationTypeMemberDeclaration():
 {
  modifiers = Modifiers()
  (
-   LOOKAHEAD(Type() <IDENTIFIER> "(")
-   Type() <IDENTIFIER> "(" ")" [ DefaultValue() ] ";"
-  |
-   ClassOrInterfaceDeclaration(modifiers, null)
-  |
-   EnumDeclaration(modifiers)
-  |
-   AnnotationTypeDeclaration(modifiers)
-  |
-   FieldDeclaration(modifiers)
+    LOOKAHEAD(Type() <IDENTIFIER> "(")
+    Type() <IDENTIFIER> "(" ")" [ DefaultValue() ] ";"
+  | ClassOrInterfaceDeclaration(modifiers, null)
+  | EnumDeclaration(modifiers)
+  | AnnotationTypeDeclaration(modifiers)
+  | FieldDeclaration(modifiers)
  )
- |
-   ( ";" )
+ | ( ";" )
 }
 
 void DefaultValue():

@@ -35,17 +35,15 @@ options {
 }
 
 PARSER_BEGIN(JJTreeParser)
-
 package org.javacc.jjtree;
 
 public class JJTreeParser {
-
   void jjtreeOpenNodeScope(Node n) throws java.io.IOException {
-	((JJTreeNode)n).setFirstToken(getToken(1));
+	((JJTreeNode) n).setFirstToken(getToken(1));
   }
 
   void jjtreeCloseNodeScope(Node n) throws java.io.IOException {
-	((JJTreeNode)n).setLastToken(getToken(0));
+	((JJTreeNode) n).setLastToken(getToken(0));
   }
 
   /**
@@ -64,7 +62,6 @@ public class JJTreeParser {
     return true;
   }
 }
-
 PARSER_END(JJTreeParser)
 
 /**********************************************
@@ -112,12 +109,9 @@ SPECIAL_TOKEN :
 MORE :
 {
   "//" : IN_SINGLE_LINE_COMMENT
-|
-  <"/**" ~["/"]> { charStream.backup(1); } : IN_FORMAL_COMMENT
-|
-  "/*" : IN_MULTI_LINE_COMMENT
+| <"/**" ~["/"]> { charStream.backup(1); } : IN_FORMAL_COMMENT
+| "/*" : IN_MULTI_LINE_COMMENT
 }
-
 
 <IN_SINGLE_LINE_COMMENT>
 SPECIAL_TOKEN :
@@ -321,21 +315,20 @@ TOKEN :
 //	| < RUNSIGNEDSHIFTASSIGN: ">>>=" >
 }
 
-
 /* >'s need special attention due to generics syntax. */
 TOKEN :
 {
   < RUNSIGNEDSHIFT: ">>>" >
   {
      matchedToken.setKind(GT);
-     ((Token.GTToken)matchedToken).realKind = RUNSIGNEDSHIFT;
+     ((Token.GTToken) matchedToken).realKind = RUNSIGNEDSHIFT;
      charStream.backup(2);
      matchedToken.setImage(">");
   }
 | < RSIGNEDSHIFT: ">>" >
   {
      matchedToken.setKind(GT);
-     ((Token.GTToken)matchedToken).realKind = RSIGNEDSHIFT;
+     ((Token.GTToken) matchedToken).realKind = RSIGNEDSHIFT;
      charStream.backup(1);
      matchedToken.setImage(">");
   }
@@ -363,7 +356,8 @@ void javacc_input() #Grammar :
 	{
 	  if (JJTreeOptions.getNodePackage().equals("")) {
 	    JJTreeGlobals.nodePackageName = JJTreeGlobals.packageName;
-	  } else {
+	  }
+	  else {
 	    JJTreeGlobals.nodePackageName = JJTreeOptions.getNodePackage();
 	  }
 	}
@@ -451,7 +445,7 @@ void javacode_production() #Javacode :
 	  String n;
 	}
 {
-        {
+    {
 	  prod = jjtThis;
 	}
   "JAVACODE"
@@ -594,7 +588,7 @@ JJTreeNode expansion_choices(ASTProduction p) #BNFChoice(>1) :
 	}
 {
   expansion(p) ( "|" expansion(p) )*
-        {
+    {
 	  return (JJTreeNode)jjtree.peekNode();
 	}
 }
@@ -614,7 +608,7 @@ void expansion(ASTProduction p) #BNFSequence(>1) :
    (
      eu=expansion_unit(p)
      [ nd=node_descriptor() ]
-        {
+    {
 	  if (jjtree.nodeCreated()) {
 	    jjtThis.nodeScope = new NodeScope(p, nd);
 	    jjtThis.expansionUnit = eu;
@@ -811,9 +805,9 @@ Token identifier() :
 }
 {
   t=<IDENTIFIER>
-                {
-		  return t;
-		}
+      {
+        return t;
+      }
 }
 
 
@@ -830,32 +824,32 @@ ASTNodeDescriptor node_descriptor() #NodeDescriptor :
   "#"
   (
     s=Name()
-                   {
-                     jjtThis.name = s;
+           {
+              jjtThis.name = s;
 		   }
   | t=<VOID>
-                   {
-                     jjtThis.name = t.getImage();
+           {
+              jjtThis.name = t.getImage();
 		   }
   )
   [
    LOOKAHEAD(1)
    "("
       [ ">"
-                   {
-		     jjtThis.isGT = true;
+           {
+              jjtThis.isGT = true;
 		   }
       ]
       node_descriptor_expression()
-	           {
-		     jjtThis.expression =
-		       (ASTNodeDescriptorExpression)jjtree.peekNode();
+           {
+		      jjtThis.expression =
+		        (ASTNodeDescriptorExpression)jjtree.peekNode();
 		   }
    ")"
   ]
-                   {
-		     jjtThis.setNodeIdValue();
-		     return jjtThis;
+           {
+		      jjtThis.setNodeIdValue();
+		      return jjtThis;
 		   }
 }
 
@@ -870,17 +864,19 @@ void node_descriptor_expression() #NodeDescriptorExpression
     if (tok.getKind() == 0) {
       throw new ParseException("Premature end of file");
     }
-    if (tok.getKind() == LPAREN) nesting++;
+    if (tok.getKind() == LPAREN) {
+      nesting++;
+    }
     if (tok.getKind() == RPAREN) {
       nesting--;
-      if (nesting == 0) break;
+      if (nesting == 0) {
+        break;
+      }
     }
     tok = getNextToken();
   }
 }
 
-
-
 /**********************************************
  * THE JAVA GRAMMAR SPECIFICATION STARTS HERE *
  **********************************************/
@@ -911,9 +907,9 @@ String JavaIdentifier() :
 | "TOKEN_MGR_DECLS"
 | "EOF"
 )
-                {
-		  return token.getImage();
-		}
+    {
+      return token.getImage();
+    }
 }
 
 /*
@@ -935,9 +931,9 @@ void PackageDeclaration() :
 }
 {
   Modifiers() "package" s=Name() ";"
-                {
-		  JJTreeGlobals.packageName = s;
-		}
+    {
+      JJTreeGlobals.packageName = s;
+    }
 }
 
 void ImportDeclaration() :
@@ -1017,16 +1013,17 @@ void ClassOrInterfaceDeclaration():
   [ TypeParameters() ]
   [ ExtendsList() ]
   [ { t = getToken(1); } ImplementsList() ]
-                {
-		  if (s.equals(JJTreeGlobals.parserName)) {
-		    if (t != null) {
-		      JJTreeGlobals.parserImplements = t;
-		    } else {
-		      JJTreeGlobals.parserImplements = getToken(1);
-		    }
-		    JJTreeGlobals.parserClassBodyStart = getToken(1);
-		  }
-		}
+    {
+      if (s.equals(JJTreeGlobals.parserName)) {
+        if (t != null) {
+          JJTreeGlobals.parserImplements = t;
+        }
+        else {
+          JJTreeGlobals.parserImplements = getToken(1);
+        }
+        JJTreeGlobals.parserClassBodyStart = getToken(1);
+      }
+    }
   ClassOrInterfaceBody()
 }
 
@@ -1310,9 +1307,9 @@ String Name() :
 {
   s=JavaIdentifier()
   ( LOOKAHEAD(2) "." ss=JavaIdentifier() { s += "." + ss; } )*
-                {
-		  return s;
-		}
+    {
+      return s;
+    }
 }
 
 void NameList():
@@ -1561,9 +1558,9 @@ Token IntegerLiteral() :
 }
 {
   t=<INTEGER_LITERAL>
-                {
-		  return t;
-		}
+    {
+      return t;
+    }
 }
 
 Token BooleanLiteral() :
@@ -1572,14 +1569,14 @@ Token BooleanLiteral() :
 }
 {
   t="true"
-                {
-		  return t;
-		}
+    {
+      return t;
+    }
 |
   t="false"
-                {
-		  return t;
-		}
+    {
+      return t;
+    }
 }
 
 Token StringLiteral() :
@@ -1588,9 +1585,9 @@ Token StringLiteral() :
 }
 {
   t=<STRING_LITERAL>
-                {
-		  return t;
-		}
+    {
+      return t;
+    }
 }
 
 void NullLiteral() :
@@ -1880,7 +1877,7 @@ void RUNSIGNEDSHIFT():
 {}
 {
   ( LOOKAHEAD({ getToken(1).getKind() == GT &&
-                ((Token.GTToken)getToken(1)).realKind == RUNSIGNEDSHIFT} )
+                ((Token.GTToken) getToken(1)).realKind == RUNSIGNEDSHIFT} )
    ">" ">" ">"
   )
 }
@@ -1889,7 +1886,7 @@ void RSIGNEDSHIFT():
 {}
 {
   ( LOOKAHEAD({ getToken(1).getKind() == GT &&
-                ((Token.GTToken)getToken(1)).realKind == RSIGNEDSHIFT} )
+                ((Token.GTToken) getToken(1)).realKind == RSIGNEDSHIFT} )
   ">" ">"
   )
 }
