@@ -100,7 +100,9 @@ public final class JJTree {
     p("Reading from file " + io.getInputFileName() + " . . .");
 
     try {
-      JJTreeParser parser = new JJTreeParser(new JJTreeParserTokenManager(new JavaCharStream(io.getIn())));
+      JJTreeParser parser = new JJTreeParser(
+          new JJTreeParserTokenManager(
+              new JavaCharStream(io.getIn())));
       parser.javacc_input();
 
       ASTGrammar root = (ASTGrammar) parser.jjtree.rootNode();

@@ -110,18 +110,18 @@ final class NodeFiles {
     List<String> nodeNames = ASTNodeDescriptor.getNodeNames();
 
     generatePrologue(out);
-    out.println("public interface " + name);
-    out.println("{");
+
+    out.println("public interface " + name + " {");
 
     for (int i = 0; i < nodeIds.size(); i++) {
       String n = nodeIds.get(i);
-      out.println("  public int " + n + " = " + i + ";");
+      out.println("  int " + n + " = " + i + ";");
     }
 
     out.println();
     out.println();
 
-    out.println("  public String[] jjtNodeName = {");
+    out.println("  String[] jjtNodeName = {");
     for (int i = 0; i < nodeNames.size(); i++) {
       String n = nodeNames.get(i);
       out.println("    \"" + n + "\",");
@@ -147,12 +147,11 @@ final class NodeFiles {
     OutputFile outputFile = new OutputFile(file);
     IndentingPrintWriter out = outputFile.getPrintWriter();
     try {
-      List nodeNames = ASTNodeDescriptor.getNodeNames();
+      List<String> nodeNames = ASTNodeDescriptor.getNodeNames();
 
       generatePrologue(out);
 
-      out.println("public interface " + name);
-      out.println("{");
+      out.println("public interface " + name + " {");
 
       String ve = mergeVisitorException();
 
@@ -161,16 +160,15 @@ final class NodeFiles {
         argumentType = JJTreeOptions.getVisitorDataType();
       }
 
-      out.println("  public " + JJTreeOptions.getVisitorReturnType() + " visit(SimpleNode node, " + argumentType + " data)" +
+      out.println("  " + JJTreeOptions.getVisitorReturnType() + " visit(SimpleNode node, " + argumentType + " data)" +
           ve + ";");
       if (JJTreeOptions.getMulti()) {
-        for (int i = 0; i < nodeNames.size(); ++i) {
-          String n = (String) nodeNames.get(i);
-          if (n.equals("void")) {
+        for (String nodeName : nodeNames) {
+          if (nodeName.equals("void")) {
             continue;
           }
-          String nodeType = JJTreeOptions.getNodePrefix() + n;
-          out.println("  public " + JJTreeOptions.getVisitorReturnType() + " visit(" + nodeType +
+          String nodeType = JJTreeOptions.getNodePrefix() + nodeName;
+          out.println("  " + JJTreeOptions.getVisitorReturnType() + " visit(" + nodeType +
               " node, " + argumentType + " data)" + ve + ";");
         }
       }
