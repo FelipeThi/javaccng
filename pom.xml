@@ -10,8 +10,9 @@
     <module>javacc</module>
     <!--<module>javacc-tests</module>-->
     <module>javacc-examples</module>
-    <module>javacc-example-java</module>
+    <module>javacc-example-simple</module>
     <module>javacc-example-jjtree</module>
+    <module>javacc-example-java</module>
     <module>javacc-example-corba-idl</module>
     <module>javacc-example-interpreter</module>
     <!--<module>javacc-maven-plugin</module>-->
