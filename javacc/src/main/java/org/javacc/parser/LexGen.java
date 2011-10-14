@@ -301,7 +301,7 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
       ((RChoice) choices.get(i)).checkUnmatchability(this);
     }
 
-    nfaStates.DumpStateSets(out);
+    nfaStates.dumpStateSets(out);
     checkEmptyStringMatch();
     nfaStates.dumpNonAsciiMoveMethods(out);
     stringLiterals.DumpStrLiteralImages(this, out);
@@ -439,15 +439,12 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
 
   private void dumpDebugMethods(IndentingPrintWriter out) {
     out.println("   int kindCnt = 0;");
-    out.println("  protected  final String jjKindsForBitVector(int i, long vec)");
-    out.println("  {");
+    out.println("  protected  final String jjKindsForBitVector(int i, long vec) {");
     out.println("    String retVal = \"\";");
     out.println("    if (i == 0)");
     out.println("       kindCnt = 0;");
-    out.println("    for (int j = 0; j < 64; j++)");
-    out.println("    {");
-    out.println("       if ((vec & (1L << j)) != 0L)");
-    out.println("       {");
+    out.println("    for (int j = 0; j < 64; j++) {");
+    out.println("       if ((vec & (1L << j)) != 0L) {");
     out.println("          if (kindCnt++ > 0)");
     out.println("             retVal += \", \";");
     out.println("          if (kindCnt % 5 == 0)");
@@ -460,21 +457,17 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
     out.println();
 
     out.println("  protected  final String jjKindsForStateVector(" +
-        "int lexState, int[] vec, int start, int end)");
-    out.println("  {");
+        "int lexState, int[] vec, int start, int end) {");
     out.println("    boolean[] kindDone = new boolean[" + maxOrdinal + "];");
     out.println("    String retVal = \"\";");
     out.println("    int cnt = 0;");
-    out.println("    for (int i = start; i < end; i++)");
-    out.println("    {");
+    out.println("    for (int i = start; i < end; i++) {");
     out.println("     if (vec[i] == -1)");
     out.println("       continue;");
     out.println("     int[] stateSet = statesForState[jjLexState][vec[i]];");
-    out.println("     for (int j = 0; j < stateSet.length; j++)");
-    out.println("     {");
+    out.println("     for (int j = 0; j < stateSet.length; j++) {");
     out.println("       int state = stateSet[j];");
-    out.println("       if (!kindDone[kindForState[lexState][state]])");
-    out.println("       {");
+    out.println("       if (!kindDone[kindForState[lexState][state]]) {");
     out.println("          kindDone[kindForState[lexState][state]] = true;");
     out.println("          if (cnt++ > 0)");
     out.println("             retVal += \", \";");
@@ -765,12 +758,12 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
     if (Options.getTokenManagerUsesParser()) {
       out.println();
       out.println("/** Constructor with parser. */");
-      out.println("public " + className + "(" + JavaCCGlobals.cuName + " parserArg, CharStream stream){");
+      out.println("public " + className + "(" + JavaCCGlobals.cuName + " parserArg, CharStream stream) {");
       out.println("   parser = parserArg;");
     }
     else {
       out.println("/** Constructor. */");
-      out.println("public " + className + "(CharStream stream){");
+      out.println("public " + className + "(CharStream stream) {");
     }
 
     out.println("   charStream = stream;");
@@ -780,21 +773,20 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
     if (Options.getTokenManagerUsesParser()) {
       out.println();
       out.println("/** Constructor with parser. */");
-      out.println("public " + className + "(" + JavaCCGlobals.cuName + " parserArg, CharStream stream, int lexState){");
+      out.println("public " + className + "(" + JavaCCGlobals.cuName + " parserArg, CharStream stream, int lexState) {");
       out.println("   this(parserArg, stream);");
     }
     else {
       out.println();
       out.println("/** Constructor. */");
-      out.println("public " + className + "(CharStream stream, int lexState){");
+      out.println("public " + className + "(CharStream stream, int lexState) {");
       out.println("   this(stream);");
     }
     out.println("   switchTo(lexState);");
     out.println("}");
 
     // Method to reinitialize the jjRounds array.
-    out.println("private void ReInitRounds()");
-    out.println("{");
+    out.println("private void ReInitRounds() {");
     out.println("   int i;");
     out.println("   jjRound = 0x" + Integer.toHexString(Integer.MIN_VALUE + 1) + ";");
     out.println("   for (i = " + stateSetSize + "; i-- > 0;)");
@@ -803,8 +795,7 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
 
     out.println();
     out.println("/** Switch to specified lex state. */");
-    out.println("public void switchTo(int lexState)");
-    out.println("{");
+    out.println("public void switchTo(int lexState) {");
     out.println("   if (lexState < 0 || lexState >= " + lexStateName.length + ")");
     out.println("      throw new IllegalArgumentException(\"Invalid lexical state: \" + lexState + \"\");");
     out.println("   jjLexState = lexState;");
@@ -825,16 +816,14 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
   }
 
   private void dumpFillToken(IndentingPrintWriter out) {
-    out.println("protected Token jjFillToken()");
-    out.println("{");
+    out.println("protected Token jjFillToken() {");
     out.indent();
     if (keepImage) {
-      out.println("final String curTokenImage;");
+      out.println("String curTokenImage;");
     }
 
     if (hasEmptyMatch) {
-      out.println("if (jjMatchedPos < 0)");
-      out.println("{");
+      out.println("if (jjMatchedPos < 0) {");
       if (keepImage) {
         out.println("   if (image == null)");
         out.println("      curTokenImage = \"\";");
@@ -843,56 +832,55 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
       }
 
       if (keepLineCol) {
-        out.println("final int beginLine = charStream.getBeginLine();");
-        out.println("final int beginColumn = charStream.getBeginColumn();");
-        out.println("final int endLine = charStream.getBeginLine();");
-        out.println("final int endColumn = charStream.getBeginColumn();");
+        out.println("int beginLine = charStream.getBeginLine();");
+        out.println("int beginColumn = charStream.getBeginColumn();");
+        out.println("int endLine = charStream.getBeginLine();");
+        out.println("int endColumn = charStream.getBeginColumn();");
       }
 
       out.println("}");
-      out.println("else");
-      out.println("{");
+      out.println("else {");
       if (keepImage) {
-        out.println("   final String literalImage = jjLiteralImages[jjMatchedKind];");
+        out.println("   String literalImage = jjLiteralImages[jjMatchedKind];");
         out.println("   curTokenImage = literalImage == null ? charStream.getImage() : literalImage;");
       }
 
       if (keepLineCol) {
-        out.println("   final int beginLine = charStream.getBeginLine();");
-        out.println("   final int beginColumn = charStream.getBeginColumn();");
-        out.println("   final int endLine = charStream.getEndLine();");
-        out.println("   final int endColumn = charStream.getEndColumn();");
+        out.println("   int beginLine = charStream.getBeginLine();");
+        out.println("   int beginColumn = charStream.getBeginColumn();");
+        out.println("   int endLine = charStream.getEndLine();");
+        out.println("   int endColumn = charStream.getEndColumn();");
       }
 
       out.println("}");
     }
     else {
       if (keepImage) {
-        out.println("final String literalImage = jjLiteralImages[jjMatchedKind];");
+        out.println("String literalImage = jjLiteralImages[jjMatchedKind];");
         out.println("curTokenImage = literalImage == null ? charStream.getImage() : literalImage;");
       }
       if (keepLineCol) {
-        out.println("final int beginLine = charStream.getBeginLine();");
-        out.println("final int beginColumn = charStream.getBeginColumn();");
-        out.println("final int endLine = charStream.getEndLine();");
-        out.println("final int endColumn = charStream.getEndColumn();");
+        out.println("int beginLine = charStream.getBeginLine();");
+        out.println("int beginColumn = charStream.getBeginColumn();");
+        out.println("int endLine = charStream.getEndLine();");
+        out.println("int endColumn = charStream.getEndColumn();");
       }
     }
 
     if (keepImage) {
       if (Options.getTokenFactory().length() > 0) {
-        out.println("final Token t = " + Options.getTokenFactory() + ".newToken(jjMatchedKind, curTokenImage);");
+        out.println("Token t = " + Options.getTokenFactory() + ".newToken(jjMatchedKind, curTokenImage);");
       }
       else {
-        out.println("final Token t = Token.newToken(jjMatchedKind, curTokenImage);");
+        out.println("Token t = Token.newToken(jjMatchedKind, curTokenImage);");
       }
     }
     else {
       if (Options.getTokenFactory().length() > 0) {
-        out.println("final Token t = " + Options.getTokenFactory() + ".newToken(jjMatchedKind);");
+        out.println("Token t = " + Options.getTokenFactory() + ".newToken(jjMatchedKind);");
       }
       else {
-        out.println("final Token t = Token.newToken(jjMatchedKind);");
+        out.println("Token t = Token.newToken(jjMatchedKind);");
       }
     }
 
@@ -955,13 +943,11 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
     out.println("Token token;");
     out.println("int curPos = 0;");
     out.println();
-    out.println("loop:\nwhile (true)");
-    out.println("{");
+    out.println("loop:\nwhile (true) {");
     out.indent();
     out.println("charStream.beginToken();");
     out.println("jjChar = charStream.readChar();");
-    out.println("if (jjChar == -1)");
-    out.println("{");
+    out.println("if (jjChar == -1) {");
     out.indent();
 
     if (Options.getDebugTokenManager()) {
@@ -994,15 +980,13 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
     out.println();
 
     if (hasMore) {
-      out.println("while (true)");
-      out.println("{");
+      out.println("while (true) {");
       out.indent();
     }
 
     // this also sets up the start state of the nfa
     if (maxLexStates > 1) {
-      out.println("switch (jjLexState)");
-      out.println("{");
+      out.println("switch (jjLexState) {");
       out.indent();
     }
 
@@ -1128,8 +1112,7 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
     out.indent();
 
     if (maxLexStates > 0) {
-      out.println("if (jjMatchedKind != 0x" + Integer.toHexString(Integer.MAX_VALUE) + ")");
-      out.println("{");
+      out.println("if (jjMatchedKind != 0x" + Integer.toHexString(Integer.MAX_VALUE) + ") {");
       out.indent();
       out.println("if (jjMatchedPos + 1 < curPos)");
 
@@ -1153,8 +1136,7 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
       }
 
       if (hasSkip || hasMore || hasSpecial) {
-        out.println("if (isToken(jjMatchedKind))");
-        out.println("{");
+        out.println("if (isToken(jjMatchedKind)) {");
         out.indent();
       }
 
@@ -1193,8 +1175,7 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
           out.indent();
 
           if (hasSpecial) {
-            out.println("if (isSpecial(jjMatchedKind))");
-            out.println("{");
+            out.println("if (isSpecial(jjMatchedKind)) {");
             out.indent();
             out.println("token = jjFillToken();");
 
@@ -1293,7 +1274,7 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
           .println(" * @param kind A token kind.")
           .println(" * @return <code>true</code> if a normal token, </code>false</code> otherwise.")
           .println(" */")
-          .println("public static boolean isToken(final int kind) {")
+          .println("public static boolean isToken(int kind) {")
           .indent()
           .println("return (jjToToken[kind >> 6] & (1L << (kind & 077))) != 0L;")
           .unindent()
@@ -1308,7 +1289,7 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
           .println(" * @param kind A token kind.")
           .println(" * @return <code>true</code> if ignore token, </code>false</code> otherwise.")
           .println(" */")
-          .println("public static boolean isSkip(final int kind) {")
+          .println("public static boolean isSkip(int kind) {")
           .indent()
           .println("return (jjToSkip[kind >> 6] & (1L << (kind & 077))) != 0L;")
           .unindent()
@@ -1323,7 +1304,7 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
           .println(" * @param kind A token kind.")
           .println(" * @return <code>true</code> if ignore special token, </code>false</code> otherwise.")
           .println(" */")
-          .println("public static boolean isSpecial(final int kind) {")
+          .println("public static boolean isSpecial(int kind) {")
           .indent()
           .println("return (jjToSpecial[kind >> 6] & (1L << (kind & 077))) != 0L;")
           .unindent()
@@ -1331,7 +1312,7 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
     }
 
     out.println();
-    out.println("void reportLexicalError(final int curPos) throws java.io.IOException {");
+    out.println("void reportLexicalError(int curPos) throws java.io.IOException {");
     out.println("   throw new TokenManagerException(jjLexState,");
     out.println("        TokenManagerException.LEXICAL_ERROR,");
     if (keepLineCol) {
@@ -1350,10 +1331,8 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
   public void dumpSkipActions(IndentingPrintWriter out) {
     Action act;
 
-    out.println("void skipLexicalActions(final Token matchedToken)");
-    out.println("{");
-    out.println("   switch(jjMatchedKind)");
-    out.println("   {");
+    out.println("void skipLexicalActions(Token matchedToken) {");
+    out.println("   switch(jjMatchedKind) {");
 
     Outer:
     for (int i = 0; i < maxOrdinal; i++) {
@@ -1371,8 +1350,7 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
         out.println("      case " + i + " :");
 
         if (initMatch[lexStates[i]] == i && canLoop[lexStates[i]]) {
-          out.println("         if (jjMatchedPos == -1)");
-          out.println("         {");
+          out.println("         if (jjMatchedPos == -1) {");
           out.println("            if (jjBeenHere[" + lexStates[i] + "] &&");
           out.println("                jjEmptyLineNo[" + lexStates[i] + "] == charStream.getBeginLine() &&");
           out.println("                jjEmptyColumnNo[" + lexStates[i] + "] == charStream.getBeginColumn())");
@@ -1425,13 +1403,11 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
   public void dumpMoreActions(IndentingPrintWriter out) {
     Action act;
 
-    out.println("void moreLexicalActions()");
-    out.println("{");
+    out.println("void moreLexicalActions() {");
     if (keepImage) {
       out.println("   jjImageLength += (lengthOfMatch = jjMatchedPos + 1);");
     }
-    out.println("   switch(jjMatchedKind)");
-    out.println("   {");
+    out.println("   switch(jjMatchedKind) {");
 
     Outer:
     for (int i = 0; i < maxOrdinal; i++) {
@@ -1449,8 +1425,7 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
         out.println("      case " + i + " :");
 
         if (initMatch[lexStates[i]] == i && canLoop[lexStates[i]]) {
-          out.println("         if (jjMatchedPos == -1)");
-          out.println("         {");
+          out.println("         if (jjMatchedPos == -1) {");
           out.println("            if (jjBeenHere[" + lexStates[i] + "] &&");
           out.println("                jjEmptyLineNo[" + lexStates[i] + "] == charStream.getBeginLine() &&");
           out.println("                jjEmptyColumnNo[" + lexStates[i] + "] == charStream.getBeginColumn())");
@@ -1505,10 +1480,8 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
     Action act;
     int i;
 
-    out.println("void tokenLexicalActions(final Token matchedToken)");
-    out.println("{");
-    out.println("   switch(jjMatchedKind)");
-    out.println("   {");
+    out.println("void tokenLexicalActions(Token matchedToken) {");
+    out.println("   switch(jjMatchedKind) {");
 
     Outer:
     for (i = 0; i < maxOrdinal; i++) {
@@ -1526,8 +1499,7 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
         out.println("      case " + i + " :");
 
         if (initMatch[lexStates[i]] == i && canLoop[lexStates[i]]) {
-          out.println("         if (jjMatchedPos == -1)");
-          out.println("         {");
+          out.println("         if (jjMatchedPos == -1) {");
           out.println("            if (jjBeenHere[" + lexStates[i] + "] &&");
           out.println("                jjEmptyLineNo[" + lexStates[i] + "] == charStream.getBeginLine() &&");
           out.println("                jjEmptyColumnNo[" + lexStates[i] + "] == charStream.getBeginColumn())");
@@ -1541,8 +1513,8 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
           out.println("         }");
         }
 
-        if ((act = actions[i]) == null ||
-            act.getActionTokens().size() == 0) {
+        if ((act = actions[i]) == null
+            || act.getActionTokens().size() == 0) {
           break;
         }
 

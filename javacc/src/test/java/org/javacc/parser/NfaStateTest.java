@@ -89,7 +89,7 @@ public class NfaStateTest extends JavaCCTestCase {
     StringWriter output = new StringWriter();
     IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     LexGen lexGen = new LexGen();
-    lexGen.nfaStates.DumpStateSets(contentWriter);
+    lexGen.nfaStates.dumpStateSets(contentWriter);
     assertEquals("static final int[] jjNextStates = {\n};\n",
         output.toString().replaceAll("\r", ""));
   }
@@ -103,7 +103,7 @@ public class NfaStateTest extends JavaCCTestCase {
     StringWriter output = new StringWriter();
     IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     setupState();
-    lexGen.nfaStates.DumpStateSets(contentWriter);
+    lexGen.nfaStates.dumpStateSets(contentWriter);
     assertEquals("static final int[] jjNextStates = {\n" +
         "   34, 35, 12, 38, 39, 42, 43, 23, 24, 26, 14, 16, 49, 51, 6, 52, \n" +
         "   59, 8, 9, 12, 23, 24, 28, 26, 34, 35, 12, 44, 45, 12, 53, 54, \n" +

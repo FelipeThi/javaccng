@@ -597,7 +597,7 @@ the function names for char matching using the common bit vectors.
 It also generates code to match a char with the common bit vectors.
 (Need a better comment). */
 
-  void generateNonAsciiMoves(IndentingPrintWriter ostr) {
+  void generateNonAsciiMoves(IndentingPrintWriter out) {
     int i = 0, j = 0;
     char hiByte;
     int cnt = 0;
@@ -685,7 +685,7 @@ It also generates code to match a char with the common bit vectors.
           lexGen.nfaStates.allBitVectors.add(tmp);
 
           if (!lexGen.nfaStates.allBitsSet(tmp)) {
-            ostr.println("static final long[] jjbitVec" + lexGen.nfaStates.lohiByteCnt + " = " + tmp);
+            out.println("static final long[] jjbitVec" + lexGen.nfaStates.lohiByteCnt + " = " + tmp);
           }
           lexGen.nfaStates.lohiByteTab.put(tmp, ind = new Integer(lexGen.nfaStates.lohiByteCnt++));
         }
@@ -700,7 +700,7 @@ It also generates code to match a char with the common bit vectors.
           lexGen.nfaStates.allBitVectors.add(tmp);
 
           if (!lexGen.nfaStates.allBitsSet(tmp)) {
-            ostr.println("static final long[] jjbitVec" + lexGen.nfaStates.lohiByteCnt + " = " + tmp);
+            out.println("static final long[] jjbitVec" + lexGen.nfaStates.lohiByteCnt + " = " + tmp);
           }
           lexGen.nfaStates.lohiByteTab.put(tmp, ind = new Integer(lexGen.nfaStates.lohiByteCnt++));
         }
@@ -740,7 +740,7 @@ It also generates code to match a char with the common bit vectors.
           lexGen.nfaStates.allBitVectors.add(tmp);
 
           if (!lexGen.nfaStates.allBitsSet(tmp)) {
-            ostr.println("static final long[] jjbitVec" + lexGen.nfaStates.lohiByteCnt + " = " + tmp);
+            out.println("static final long[] jjbitVec" + lexGen.nfaStates.lohiByteCnt + " = " + tmp);
           }
           lexGen.nfaStates.lohiByteTab.put(tmp, ind = new Integer(lexGen.nfaStates.lohiByteCnt++));
         }
@@ -769,7 +769,7 @@ It also generates code to match a char with the common bit vectors.
     lexGen.nfaStates.nonAsciiTableForMethod.add(this);
   }
 
-  public void generateInitMoves(IndentingPrintWriter ostr) {
+  public void generateInitMoves(IndentingPrintWriter out) {
     GetEpsilonMovesString();
 
     if (epsilonMovesString == null) { epsilonMovesString = "null;"; }
@@ -961,21 +961,21 @@ It also generates code to match a char with the common bit vectors.
     //next.epsilonMovesString = getStateSetString(newSet);
   }
 
-  String printNoBreak(IndentingPrintWriter ostr, int byteNum, boolean[] dumped) {
+  String printNoBreak(IndentingPrintWriter out, int byteNum, boolean[] dumped) {
     if (inNextOf != 1) { throw new Error("JavaCC Bug: Please send mail to sankar@cs.stanford.edu"); }
 
     dumped[stateName] = true;
 
     if (byteNum >= 0) {
       if (asciiMoves[byteNum] != 0L) {
-        ostr.println("               case " + stateName + ":");
-        dumpAsciiMoveForCompositeState(ostr, byteNum, false);
+        out.println("               case " + stateName + ":");
+        dumpAsciiMoveForCompositeState(out, byteNum, false);
         return "";
       }
     }
     else if (nonAsciiMethod != -1) {
-      ostr.println("               case " + stateName + ":");
-      dumpNonAsciiMoveForCompositeState(ostr);
+      out.println("               case " + stateName + ":");
+      dumpNonAsciiMoveForCompositeState(out);
       return "";
     }
 
@@ -989,7 +989,7 @@ It also generates code to match a char with the common bit vectors.
     return lexGen.nfaStates.elemOccurs(stateName, set) >= 0;
   }
 
-  void dumpAsciiMoveForCompositeState(IndentingPrintWriter ostr, int byteNum, boolean elseNeeded) {
+  void dumpAsciiMoveForCompositeState(IndentingPrintWriter out, int byteNum, boolean elseNeeded) {
     boolean nextIntersects = selfLoop();
 
     for (int j = 0; j < lexGen.nfaStates.allStates.size(); j++) {
@@ -1011,11 +1011,11 @@ It also generates code to match a char with the common bit vectors.
       int oneBit = lexGen.nfaStates.onlyOneBitSet(asciiMoves[byteNum]);
 
       if (oneBit != -1) {
-        ostr.println("                  " + (elseNeeded ? "else " : "") + "if (jjChar == " +
+        out.println("                  " + (elseNeeded ? "else " : "") + "if (jjChar == " +
             (64 * byteNum + oneBit) + ")");
       }
       else {
-        ostr.println("                  " + (elseNeeded ? "else " : "") +
+        out.println("                  " + (elseNeeded ? "else " : "") +
             "if ((0x" + Long.toHexString(asciiMoves[byteNum]) + "L & l) != 0L)");
       }
       prefix = "   ";
@@ -1023,11 +1023,11 @@ It also generates code to match a char with the common bit vectors.
 
     if (kindToPrint != Integer.MAX_VALUE) {
       if (asciiMoves[byteNum] != 0xffffffffffffffffL) {
-        ostr.println("                  {");
+        out.println("                  {");
       }
 
-      ostr.println("                  if (kind > " + kindToPrint + ")");
-      ostr.println("                     kind = " + kindToPrint + ";");
+      out.println("                  if (kind > " + kindToPrint + ")");
+      out.println("                     kind = " + kindToPrint + ";");
     }
 
     if (next != null && next.usefulEpsilonMoves > 0) {
@@ -1036,11 +1036,15 @@ It also generates code to match a char with the common bit vectors.
       if (next.usefulEpsilonMoves == 1) {
         int name = stateNames[0];
 
-        if (nextIntersects) { ostr.println("                  jjCheckNAdd(" + name + ");"); }
-        else { ostr.println("                  jjStateSet[jjNewStateCount++] = " + name + ";"); }
+        if (nextIntersects) {
+          out.println("                  jjCheckNAdd(" + name + ");");
+        }
+        else {
+          out.println("                  jjStateSet[jjNewStateCount++] = " + name + ";");
+        }
       }
       else if (next.usefulEpsilonMoves == 2 && nextIntersects) {
-        ostr.println("                  jjCheckNAddTwoStates(" +
+        out.println("                  jjCheckNAddTwoStates(" +
             stateNames[0] + ", " + stateNames[1] + ");");
       }
       else {
@@ -1048,29 +1052,29 @@ It also generates code to match a char with the common bit vectors.
         boolean notTwo = (indices[0] + 1 != indices[1]);
 
         if (nextIntersects) {
-          ostr.print("                  jjCheckNAddStates(" + indices[0]);
+          out.print("                  jjCheckNAddStates(" + indices[0]);
           if (notTwo) {
             lexGen.nfaStates.jjCheckNAddStatesDualNeeded = true;
-            ostr.print(", " + indices[1]);
+            out.print(", " + indices[1]);
           }
           else {
             lexGen.nfaStates.jjCheckNAddStatesUnaryNeeded = true;
           }
-          ostr.println(");");
+          out.println(");");
         }
         else {
-          ostr.println("                  jjAddStates(" +
+          out.println("                  jjAddStates(" +
               indices[0] + ", " + indices[1] + ");");
         }
       }
     }
 
     if (asciiMoves[byteNum] != 0xffffffffffffffffL && kindToPrint != Integer.MAX_VALUE) {
-      ostr.println("                  }");
+      out.println("                  }");
     }
   }
 
-  void dumpAsciiMove(IndentingPrintWriter ostr, int byteNum, boolean[] dumped) {
+  void dumpAsciiMove(IndentingPrintWriter out, int byteNum, boolean[] dumped) {
     boolean nextIntersects = selfLoop() && isComposite;
     boolean onlyState = true;
 
@@ -1094,7 +1098,7 @@ It also generates code to match a char with the common bit vectors.
                   next.epsilonMovesString.equals(
                       temp1.next.epsilonMovesString)))) {
         dumped[temp1.stateName] = true;
-        ostr.println("               case " + temp1.stateName + ":");
+        out.println("               case " + temp1.stateName + ":");
       }
     }
 
@@ -1110,19 +1114,19 @@ It also generates code to match a char with the common bit vectors.
         if (!onlyState) { kindCheck = " && kind > " + kindToPrint; }
 
         if (oneBit != -1) {
-          ostr.println("                  if (jjChar == " +
+          out.println("                  if (jjChar == " +
               (64 * byteNum + oneBit) + kindCheck + ")");
         }
         else {
-          ostr.println("                  if ((0x" +
+          out.println("                  if ((0x" +
               Long.toHexString(asciiMoves[byteNum]) +
               "L & l) != 0L" + kindCheck + ")");
         }
 
-        ostr.println("                     kind = " + kindToPrint + ";");
+        out.println("                     kind = " + kindToPrint + ";");
 
-        if (onlyState) { ostr.println("                  break;"); }
-        else { ostr.println("                  break;"); }
+        if (onlyState) { out.println("                  break;"); }
+        else { out.println("                  break;"); }
 
         return;
       }
@@ -1132,31 +1136,31 @@ It also generates code to match a char with the common bit vectors.
     if (kindToPrint != Integer.MAX_VALUE) {
 
       if (oneBit != -1) {
-        ostr.println("                  if (jjChar != " +
+        out.println("                  if (jjChar != " +
             (64 * byteNum + oneBit) + ")");
-        ostr.println("                     break;");
+        out.println("                     break;");
       }
       else if (asciiMoves[byteNum] != 0xffffffffffffffffL) {
-        ostr.println("                  if ((0x" + Long.toHexString(asciiMoves[byteNum]) + "L & l) == 0L)");
-        ostr.println("                     break;");
+        out.println("                  if ((0x" + Long.toHexString(asciiMoves[byteNum]) + "L & l) == 0L)");
+        out.println("                     break;");
       }
 
       if (onlyState) {
-        ostr.println("                  kind = " + kindToPrint + ";");
+        out.println("                  kind = " + kindToPrint + ";");
       }
       else {
-        ostr.println("                  if (kind > " + kindToPrint + ")");
-        ostr.println("                     kind = " + kindToPrint + ";");
+        out.println("                  if (kind > " + kindToPrint + ")");
+        out.println("                     kind = " + kindToPrint + ";");
       }
     }
     else {
       if (oneBit != -1) {
-        ostr.println("                  if (jjChar == " +
+        out.println("                  if (jjChar == " +
             (64 * byteNum + oneBit) + ")");
         prefix = "   ";
       }
       else if (asciiMoves[byteNum] != 0xffffffffffffffffL) {
-        ostr.println("                  if ((0x" + Long.toHexString(asciiMoves[byteNum]) + "L & l) != 0L)");
+        out.println("                  if ((0x" + Long.toHexString(asciiMoves[byteNum]) + "L & l) != 0L)");
         prefix = "   ";
       }
     }
@@ -1166,11 +1170,11 @@ It also generates code to match a char with the common bit vectors.
           next.epsilonMovesString);
       if (next.usefulEpsilonMoves == 1) {
         int name = stateNames[0];
-        if (nextIntersects) { ostr.println("                  jjCheckNAdd(" + name + ");"); }
-        else { ostr.println("                  jjStateSet[jjNewStateCount++] = " + name + ";"); }
+        if (nextIntersects) { out.println("                  jjCheckNAdd(" + name + ");"); }
+        else { out.println("                  jjStateSet[jjNewStateCount++] = " + name + ";"); }
       }
       else if (next.usefulEpsilonMoves == 2 && nextIntersects) {
-        ostr.println("                  jjCheckNAddTwoStates(" +
+        out.println("                  jjCheckNAddTwoStates(" +
             stateNames[0] + ", " + stateNames[1] + ");");
       }
       else {
@@ -1178,28 +1182,28 @@ It also generates code to match a char with the common bit vectors.
         boolean notTwo = (indices[0] + 1 != indices[1]);
 
         if (nextIntersects) {
-          ostr.print("                  jjCheckNAddStates(" + indices[0]);
+          out.print("                  jjCheckNAddStates(" + indices[0]);
           if (notTwo) {
             lexGen.nfaStates.jjCheckNAddStatesDualNeeded = true;
-            ostr.print(", " + indices[1]);
+            out.print(", " + indices[1]);
           }
           else {
             lexGen.nfaStates.jjCheckNAddStatesUnaryNeeded = true;
           }
-          ostr.println(");");
+          out.println(");");
         }
         else {
-          ostr.println("                  jjAddStates(" +
+          out.println("                  jjAddStates(" +
               indices[0] + ", " + indices[1] + ");");
         }
       }
     }
 
-    if (onlyState) { ostr.println("                  break;"); }
-    else { ostr.println("                  break;"); }
+    if (onlyState) { out.println("                  break;"); }
+    else { out.println("                  break;"); }
   }
 
-  void dumpNonAsciiMoveForCompositeState(IndentingPrintWriter ostr) {
+  void dumpNonAsciiMoveForCompositeState(IndentingPrintWriter out) {
     boolean nextIntersects = selfLoop();
     for (int j = 0; j < lexGen.nfaStates.allStates.size(); j++) {
       NfaState temp1 = (NfaState) lexGen.nfaStates.allStates.get(j);
@@ -1216,20 +1220,20 @@ It also generates code to match a char with the common bit vectors.
 
     if (!Options.getJavaUnicodeEscape() && !lexGen.nfaStates.unicodeWarningGiven) {
       if (loByteVec != null && loByteVec.size() > 1) {
-        ostr.println("                  if ((jjbitVec" +
+        out.println("                  if ((jjbitVec" +
             ((Integer) loByteVec.get(1)).intValue() + "[i2" +
             "] & l2) != 0L)");
       }
     }
     else {
-      ostr.println("                  if (jjCanMove_" + nonAsciiMethod +
+      out.println("                  if (jjCanMove_" + nonAsciiMethod +
           "(hiByte, i1, i2, l1, l2))");
     }
 
     if (kindToPrint != Integer.MAX_VALUE) {
-      ostr.println("                  {");
-      ostr.println("                     if (kind > " + kindToPrint + ")");
-      ostr.println("                        kind = " + kindToPrint + ";");
+      out.println("                  {");
+      out.println("                     if (kind > " + kindToPrint + ")");
+      out.println("                        kind = " + kindToPrint + ";");
     }
 
     if (next != null && next.usefulEpsilonMoves > 0) {
@@ -1237,11 +1241,11 @@ It also generates code to match a char with the common bit vectors.
           next.epsilonMovesString);
       if (next.usefulEpsilonMoves == 1) {
         int name = stateNames[0];
-        if (nextIntersects) { ostr.println("                     jjCheckNAdd(" + name + ");"); }
-        else { ostr.println("                     jjStateSet[jjNewStateCount++] = " + name + ";"); }
+        if (nextIntersects) { out.println("                     jjCheckNAdd(" + name + ");"); }
+        else { out.println("                     jjStateSet[jjNewStateCount++] = " + name + ";"); }
       }
       else if (next.usefulEpsilonMoves == 2 && nextIntersects) {
-        ostr.println("                     jjCheckNAddTwoStates(" +
+        out.println("                     jjCheckNAddTwoStates(" +
             stateNames[0] + ", " + stateNames[1] + ");");
       }
       else {
@@ -1249,24 +1253,24 @@ It also generates code to match a char with the common bit vectors.
         boolean notTwo = (indices[0] + 1 != indices[1]);
 
         if (nextIntersects) {
-          ostr.print("                     jjCheckNAddStates(" + indices[0]);
+          out.print("                     jjCheckNAddStates(" + indices[0]);
           if (notTwo) {
             lexGen.nfaStates.jjCheckNAddStatesDualNeeded = true;
-            ostr.print(", " + indices[1]);
+            out.print(", " + indices[1]);
           }
           else {
             lexGen.nfaStates.jjCheckNAddStatesUnaryNeeded = true;
           }
-          ostr.println(");");
+          out.println(");");
         }
-        else { ostr.println("                     jjAddStates(" + indices[0] + ", " + indices[1] + ");"); }
+        else { out.println("                     jjAddStates(" + indices[0] + ", " + indices[1] + ");"); }
       }
     }
 
-    if (kindToPrint != Integer.MAX_VALUE) { ostr.println("                  }"); }
+    if (kindToPrint != Integer.MAX_VALUE) { out.println("                  }"); }
   }
 
-  void dumpNonAsciiMove(IndentingPrintWriter ostr, boolean[] dumped) {
+  void dumpNonAsciiMove(IndentingPrintWriter out, boolean[] dumped) {
     boolean nextIntersects = selfLoop() && isComposite;
 
     for (int j = 0; j < lexGen.nfaStates.allStates.size(); j++) {
@@ -1286,7 +1290,7 @@ It also generates code to match a char with the common bit vectors.
                   temp1.next.epsilonMovesString != null &&
                   next.epsilonMovesString.equals(temp1.next.epsilonMovesString)))) {
         dumped[temp1.stateName] = true;
-        ostr.println("               case " + temp1.stateName + ":");
+        out.println("               case " + temp1.stateName + ":");
       }
     }
 
@@ -1295,17 +1299,17 @@ It also generates code to match a char with the common bit vectors.
 
       if (!Options.getJavaUnicodeEscape() && !lexGen.nfaStates.unicodeWarningGiven) {
         if (loByteVec != null && loByteVec.size() > 1) {
-          ostr.println("                  if ((jjbitVec" +
+          out.println("                  if ((jjbitVec" +
               ((Integer) loByteVec.get(1)).intValue() + "[i2" +
               "] & l2) != 0L" + kindCheck + ")");
         }
       }
       else {
-        ostr.println("                  if (jjCanMove_" + nonAsciiMethod +
+        out.println("                  if (jjCanMove_" + nonAsciiMethod +
             "(hiByte, i1, i2, l1, l2)" + kindCheck + ")");
       }
-      ostr.println("                     kind = " + kindToPrint + ";");
-      ostr.println("                  break;");
+      out.println("                     kind = " + kindToPrint + ";");
+      out.println("                  break;");
       return;
     }
 
@@ -1313,31 +1317,31 @@ It also generates code to match a char with the common bit vectors.
     if (kindToPrint != Integer.MAX_VALUE) {
       if (!Options.getJavaUnicodeEscape() && !lexGen.nfaStates.unicodeWarningGiven) {
         if (loByteVec != null && loByteVec.size() > 1) {
-          ostr.println("                  if ((jjbitVec" +
+          out.println("                  if ((jjbitVec" +
               ((Integer) loByteVec.get(1)).intValue() + "[i2" +
               "] & l2) == 0L)");
-          ostr.println("                     break;");
+          out.println("                     break;");
         }
       }
       else {
-        ostr.println("                  if (!jjCanMove_" + nonAsciiMethod +
+        out.println("                  if (!jjCanMove_" + nonAsciiMethod +
             "(hiByte, i1, i2, l1, l2))");
-        ostr.println("                     break;");
+        out.println("                     break;");
       }
 
-      ostr.println("                  if (kind > " + kindToPrint + ")");
-      ostr.println("                     kind = " + kindToPrint + ";");
+      out.println("                  if (kind > " + kindToPrint + ")");
+      out.println("                     kind = " + kindToPrint + ";");
       prefix = "";
     }
     else if (!Options.getJavaUnicodeEscape() && !lexGen.nfaStates.unicodeWarningGiven) {
       if (loByteVec != null && loByteVec.size() > 1) {
-        ostr.println("                  if ((jjbitVec" +
+        out.println("                  if ((jjbitVec" +
             ((Integer) loByteVec.get(1)).intValue() + "[i2" +
             "] & l2) != 0L)");
       }
     }
     else {
-      ostr.println("                  if (jjCanMove_" + nonAsciiMethod +
+      out.println("                  if (jjCanMove_" + nonAsciiMethod +
           "(hiByte, i1, i2, l1, l2))");
     }
 
@@ -1346,11 +1350,11 @@ It also generates code to match a char with the common bit vectors.
           next.epsilonMovesString);
       if (next.usefulEpsilonMoves == 1) {
         int name = stateNames[0];
-        if (nextIntersects) { ostr.println("                  jjCheckNAdd(" + name + ");"); }
-        else { ostr.println("                  jjStateSet[jjNewStateCount++] = " + name + ";"); }
+        if (nextIntersects) { out.println("                  jjCheckNAdd(" + name + ");"); }
+        else { out.println("                  jjStateSet[jjNewStateCount++] = " + name + ";"); }
       }
       else if (next.usefulEpsilonMoves == 2 && nextIntersects) {
-        ostr.println("                  jjCheckNAddTwoStates(" +
+        out.println("                  jjCheckNAddTwoStates(" +
             stateNames[0] + ", " + stateNames[1] + ");");
       }
       else {
@@ -1358,69 +1362,69 @@ It also generates code to match a char with the common bit vectors.
         boolean notTwo = (indices[0] + 1 != indices[1]);
 
         if (nextIntersects) {
-          ostr.print("                  jjCheckNAddStates(" + indices[0]);
+          out.print("                  jjCheckNAddStates(" + indices[0]);
           if (notTwo) {
             lexGen.nfaStates.jjCheckNAddStatesDualNeeded = true;
-            ostr.print(", " + indices[1]);
+            out.print(", " + indices[1]);
           }
           else {
             lexGen.nfaStates.jjCheckNAddStatesUnaryNeeded = true;
           }
-          ostr.println(");");
+          out.println(");");
         }
-        else { ostr.println("                  jjAddStates(" + indices[0] + ", " + indices[1] + ");"); }
+        else { out.println("                  jjAddStates(" + indices[0] + ", " + indices[1] + ");"); }
       }
     }
 
-    ostr.println("                  break;");
+    out.println("                  break;");
   }
 
-  void dumpNonAsciiMoveMethod(IndentingPrintWriter ostr) {
+  void dumpNonAsciiMoveMethod(IndentingPrintWriter out) {
     int j;
-    ostr.println("private static boolean jjCanMove_" + nonAsciiMethod +
+    out.println("private static boolean jjCanMove_" + nonAsciiMethod +
         "(int hiByte, int i1, int i2, long l1, long l2)");
-    ostr.println("{");
-    ostr.println("   switch(hiByte)");
-    ostr.println("   {");
+    out.println("{");
+    out.println("   switch(hiByte)");
+    out.println("   {");
 
     if (loByteVec != null && loByteVec.size() > 0) {
       for (j = 0; j < loByteVec.size(); j += 2) {
-        ostr.println("      case " +
+        out.println("      case " +
             ((Integer) loByteVec.get(j)).intValue() + ":");
         if (!lexGen.nfaStates.allBitsSet((String) lexGen.nfaStates.allBitVectors.get(
             ((Integer) loByteVec.get(j + 1)).intValue()))) {
-          ostr.println("         return ((jjbitVec" +
+          out.println("         return ((jjbitVec" +
               ((Integer) loByteVec.get(j + 1)).intValue() + "[i2" +
               "] & l2) != 0L);");
         }
-        else { ostr.println("            return true;"); }
+        else { out.println("            return true;"); }
       }
     }
 
-    ostr.println("      default:");
+    out.println("      default:");
 
     if (nonAsciiMoveIndices != null &&
         (j = nonAsciiMoveIndices.length) > 0) {
       do {
         if (!lexGen.nfaStates.allBitsSet((String) lexGen.nfaStates.allBitVectors.get(
             nonAsciiMoveIndices[j - 2]))) {
-          ostr.println("         if ((jjbitVec" + nonAsciiMoveIndices[j - 2] +
+          out.println("         if ((jjbitVec" + nonAsciiMoveIndices[j - 2] +
               "[i1] & l1) != 0L)");
         }
         if (!lexGen.nfaStates.allBitsSet((String) lexGen.nfaStates.allBitVectors.get(
             nonAsciiMoveIndices[j - 1]))) {
-          ostr.println("            if ((jjbitVec" + nonAsciiMoveIndices[j - 1] +
+          out.println("            if ((jjbitVec" + nonAsciiMoveIndices[j - 1] +
               "[i2] & l2) == 0L)");
-          ostr.println("               return false;");
-          ostr.println("            else");
+          out.println("               return false;");
+          out.println("            else");
         }
-        ostr.println("            return true;");
+        out.println("            return true;");
       }
       while ((j -= 2) > 0);
     }
 
-    ostr.println("         return false;");
-    ostr.println("   }");
-    ostr.println("}");
+    out.println("         return false;");
+    out.println("   }");
+    out.println("}");
   }
 }
