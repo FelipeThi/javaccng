@@ -11,16 +11,16 @@ class Parse {
       System.out.println("usage: Parse FILE [ENCODING]");
       return;
     }
-    final Reader reader;
+    Reader reader;
     if (args.length == 2) {
       reader = new InputStreamReader(new FileInputStream(new File(args[0])), args[1]);
     }
     else {
       reader = new InputStreamReader(new FileInputStream(new File(args[0])));
     }
-    final CharStream charStream = new JavaCharStream(reader);
-    final TokenManager tokenManager = new JavaParserTokenManager(charStream);
-    final JavaParser parser = new JavaParser(tokenManager);
+    CharStream charStream = new JavaCharStream(reader);
+    TokenManager tokenManager = new JavaParserTokenManager(charStream);
+    JavaParser parser = new JavaParser(tokenManager);
     parser.CompilationUnit();
   }
 }

@@ -22,16 +22,16 @@ public class JavaParserTest {
     final String fileName;
     final String content;
 
-    Source(final String fileName, final String content) {
+    Source(String fileName, String content) {
       this.fileName = fileName;
       this.content = content;
     }
   }
 
   final List<Source> sources = new ArrayList<Source>(1000);
-
   static final FileFilter filter = new FileFilter() {
-    public boolean accept(final File f) {
+    @Override
+    public boolean accept(File f) {
       return f.isDirectory()
           || f.getName().endsWith(".java")
           && !"package-info.java".equals(f.getName());
@@ -46,10 +46,10 @@ public class JavaParserTest {
     long chars = 0;
 
     for (Source source : sources) {
-      final Reader reader = new StringReader(source.content);
-      final CharStream charStream = new JavaCharStream(reader);
-      final TokenManager tokenManager = new JavaParserTokenManager(charStream);
-      final JavaParser parser = new JavaParser(tokenManager);
+      Reader reader = new StringReader(source.content);
+      CharStream charStream = new JavaCharStream(reader);
+      TokenManager tokenManager = new JavaParserTokenManager(charStream);
+      JavaParser parser = new JavaParser(tokenManager);
       try {
         parser.CompilationUnit();
       }
@@ -72,9 +72,9 @@ public class JavaParserTest {
 
   @Test
   public void lexicalErrorReporting() throws IOException {
-    final Reader reader = new StringReader("/* comment");
-    final CharStream charStream = new JavaCharStream(reader);
-    final TokenManager tokenManager = new JavaParserTokenManager(charStream);
+    Reader reader = new StringReader("/* comment");
+    CharStream charStream = new JavaCharStream(reader);
+    TokenManager tokenManager = new JavaParserTokenManager(charStream);
     TokenManagerException exception = null;
     try {
       tokenManager.getNextToken();
@@ -88,12 +88,12 @@ public class JavaParserTest {
 
   @Test
   public void parsingErrorReporting() throws IOException {
-    final Reader reader = new StringReader("final class MyClass {\nvoid ();\n}");
-    final CharStream charStream = new JavaCharStream(reader);
-    final TokenManager tokenManager = new JavaParserTokenManager(charStream);
+    Reader reader = new StringReader("final class MyClass {\nvoid ();\n}");
+    CharStream charStream = new JavaCharStream(reader);
+    TokenManager tokenManager = new JavaParserTokenManager(charStream);
     ParseException exception = null;
     try {
-      final JavaParser parser = new JavaParser(tokenManager);
+      JavaParser parser = new JavaParser(tokenManager);
       parser.CompilationUnit();
     }
     catch (ParseException ex) {
@@ -103,12 +103,12 @@ public class JavaParserTest {
     assertEquals("Encountered: \"(\" at line 2, column 6.\nWas expecting:\n   <IDENTIFIER>...", exception.getMessage());
   }
 
-  void load(final File file) throws IOException, ParseException {
+  void load(File file) throws IOException, ParseException {
     sources.add(new Source(file.getCanonicalPath(), readFile(file)));
   }
 
   void list(File parentFile) throws IOException, ParseException {
-    final File[] files = parentFile.listFiles(filter);
+    File[] files = parentFile.listFiles(filter);
     if (files != null) {
       for (File file : files) {
         if (file.isDirectory()) {
@@ -124,11 +124,11 @@ public class JavaParserTest {
   final StringBuilder buffer = new StringBuilder(0x4000);
 
   String readFile(File file) throws IOException {
-    final String s;
+    String s;
     try {
-      final InputStream inputStream = new FileInputStream(file);
+      InputStream inputStream = new FileInputStream(file);
       try {
-        final Reader reader = new BufferedReader(
+        Reader reader = new BufferedReader(
             new InputStreamReader(inputStream, "UTF-8"));
         int c;
         while ((c = reader.read()) != -1) {
