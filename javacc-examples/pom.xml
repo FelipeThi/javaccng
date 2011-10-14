@@ -18,5 +18,6 @@
     <module>javacc-example-interpreter</module>
     <module>javacc-example-transformer</module>
     <module>javacc-example-vtransformer</module>
+    <module>javacc-example-obfuscator</module>
   </modules>
 </project>
