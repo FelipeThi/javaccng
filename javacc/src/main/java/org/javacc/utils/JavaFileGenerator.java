@@ -57,7 +57,8 @@ public class JavaFileGenerator {
   private final Map options;
   private String currentLine;
 
-  public void generate(IndentingPrintWriter out) throws IOException {
+  public void generate(IndentingPrintWriter out)
+      throws IOException {
     InputStream is = getClass().getResourceAsStream(templateName);
     if (is == null) {
       throw new IOException("Invalid template name: " + templateName);
@@ -66,14 +67,16 @@ public class JavaFileGenerator {
     process(in, out, false);
   }
 
-  private String peekLine(BufferedReader in) throws IOException {
+  private String peekLine(BufferedReader in)
+      throws IOException {
     if (currentLine == null) {
       currentLine = in.readLine();
     }
     return currentLine;
   }
 
-  private String getLine(BufferedReader in) throws IOException {
+  private String getLine(BufferedReader in)
+      throws IOException {
     String line = currentLine;
     currentLine = null;
 
@@ -90,7 +93,8 @@ public class JavaFileGenerator {
     Object obj = options.get(condition);
 
     if (obj == null) {
-      return condition.equalsIgnoreCase("true") || condition.equalsIgnoreCase("yes");
+      return condition.equalsIgnoreCase("true")
+          || condition.equalsIgnoreCase("yes");
     }
 
     if (obj instanceof Boolean) {
@@ -98,13 +102,16 @@ public class JavaFileGenerator {
     }
     else if (obj instanceof String) {
       String string = ((String) obj).trim();
-      return string.length() > 0 && !string.equalsIgnoreCase("false") && !string.equalsIgnoreCase("no");
+      return string.length() > 0
+          && !string.equalsIgnoreCase("false")
+          && !string.equalsIgnoreCase("no");
     }
 
     return false;
   }
 
-  private String substitute(String text) throws IOException {
+  private String substitute(String text)
+      throws IOException {
     int startPos;
 
     if ((startPos = text.indexOf("${")) == -1) {
@@ -122,7 +129,9 @@ public class JavaFileGenerator {
       endPos++;
     }
 
-    if (braceDepth != 0) { throw new IOException("Mismatched \"{}\" in template string: " + text); }
+    if (braceDepth != 0) {
+      throw new IOException("Mismatched \"{}\" in template string: " + text);
+    }
 
     String variableExpression = text.substring(startPos + 2, endPos - 1);
 
@@ -133,11 +142,13 @@ public class JavaFileGenerator {
       char ch = variableExpression.charAt(i);
 
       if (ch == ':' && i < variableExpression.length() - 1 && variableExpression.charAt(i + 1) == '-') {
-        value = substituteWithDefault(variableExpression.substring(0, i), variableExpression.substring(i + 2));
+        value = substituteWithDefault(
+            variableExpression.substring(0, i), variableExpression.substring(i + 2));
         break;
       }
       else if (ch == '?') {
-        value = substituteWithConditional(variableExpression.substring(0, i), variableExpression.substring(i + 1));
+        value = substituteWithConditional(
+            variableExpression.substring(0, i), variableExpression.substring(i + 1));
         break;
       }
       else if (ch != '_' && !Character.isJavaIdentifierPart(ch)) {
@@ -152,25 +163,34 @@ public class JavaFileGenerator {
     return text.substring(0, startPos) + value + text.substring(endPos);
   }
 
-  private String substituteWithConditional(String variableName, String values) throws IOException {
+  private String substituteWithConditional(String variableName, String values)
+      throws IOException {
     // Split values into true and false values.
-
     int pos = values.indexOf(':');
-    if (pos == -1) { throw new IOException("No ':' separator in " + values); }
+    if (pos == -1) {
+      throw new IOException("No ':' separator in " + values);
+    }
 
-    if (evaluate(variableName)) { return substitute(values.substring(0, pos)); }
-    else { return substitute(values.substring(pos + 1)); }
+    if (evaluate(variableName)) {
+      return substitute(values.substring(0, pos));
+    }
+    else {
+      return substitute(values.substring(pos + 1));
+    }
   }
 
-  private String substituteWithDefault(String variableName, String defaultValue) throws IOException {
+  private String substituteWithDefault(String variableName, String defaultValue)
+      throws IOException {
     Object obj = options.get(variableName.trim());
-    if (obj == null || obj.toString().length() == 0) { return substitute(defaultValue); }
-
+    if (obj == null || obj.toString().length() == 0) {
+      return substitute(defaultValue);
+    }
     return obj.toString();
   }
 
-  private void write(IndentingPrintWriter out, String text) throws IOException {
-    while (text.indexOf("${") != -1) {
+  private void write(IndentingPrintWriter out, String text)
+      throws IOException {
+    while (text.contains("${")) {
       text = substitute(text);
     }
 
@@ -193,16 +213,22 @@ public class JavaFileGenerator {
 
         line = getLine(in);
 
-        if (line == null) { throw new IOException("Missing \"#fi\""); }
+        if (line == null) {
+          throw new IOException("Missing \"#fi\"");
+        }
 
-        if (!line.trim().startsWith("#fi")) { throw new IOException("Expected \"#fi\", got: " + line); }
+        if (!line.trim().startsWith("#fi")) {
+          throw new IOException("Expected \"#fi\", got: " + line);
+        }
       }
       else if (peekLine(in).trim().startsWith("#")) {
         break;
       }
       else {
         String line = getLine(in);
-        if (!ignoring) { write(out, line); }
+        if (!ignoring) {
+          write(out, line);
+        }
       }
     }
 
