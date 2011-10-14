@@ -8,9 +8,9 @@
   <packaging>pom</packaging>
   <modules>
     <module>javacc</module>
-    <!--<module>javacc-tests</module>-->
     <module>javacc-examples</module>
     <module>javacc-example-simple</module>
+    <module>javacc-example-lookahead</module>
     <module>javacc-example-jjtree</module>
     <module>javacc-example-java</module>
     <module>javacc-example-corba-idl</module>
