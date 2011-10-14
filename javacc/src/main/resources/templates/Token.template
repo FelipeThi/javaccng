@@ -2,9 +2,9 @@
  * Describes the input token stream.
  */
 #if TOKEN_EXTENDS
-${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class Token extends ${TOKEN_EXTENDS} implements java.io.Serializable {
+public class Token extends ${TOKEN_EXTENDS} implements java.io.Serializable {
 #else
-${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class Token implements java.io.Serializable {
+public class Token implements java.io.Serializable {
 #fi
   private int kind;
   private int beginOffset;

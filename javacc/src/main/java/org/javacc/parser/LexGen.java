@@ -377,10 +377,7 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
     out.println();
     out.println("/** Token Manager. */");
     out.println("@SuppressWarnings(\"unused\")");
-    if (Options.getSupportClassVisibilityPublic()) {
-      out.print("public ");
-    }
-    out.println("class " + className + " implements TokenManager, " +
+    out.print("public class " + className + " implements TokenManager, " +
         JavaCCGlobals.cuName + "Constants");
     out.println("{"); // }
 

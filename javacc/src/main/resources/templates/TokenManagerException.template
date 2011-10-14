@@ -3,7 +3,7 @@
  * is never expected to throw this exception.
  * Therefore it extends Error rather than Exception.
  */
-${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class TokenManagerException extends RuntimeException {
+public class TokenManagerException extends RuntimeException {
   /** Lexical error occurred. */
   public static final int LEXICAL_ERROR = 0;
 

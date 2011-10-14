@@ -2,7 +2,7 @@
  * An implementation of interface CharStream, where the stream is assumed to
  * contain only ASCII characters (with java-like unicode escape processing).
  */
-${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}final class JavaCharStream implements CharStream {
+public final class JavaCharStream implements CharStream {
   /** Reader that provides characters. */
   private final java.io.Reader reader;
   /** Buffer contains character of the token currently being read. */

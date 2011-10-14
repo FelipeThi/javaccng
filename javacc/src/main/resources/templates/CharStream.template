@@ -12,7 +12,7 @@
  * by the lexer. Hence their implementation won't affect the generated lexer's
  * operation.
  */
-${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}interface CharStream extends java.io.Closeable {
+public interface CharStream extends java.io.Closeable {
   /**
    * Marks the beginning of the next token. It means, the next
    * character returned will belong to the next token.
