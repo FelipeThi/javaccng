@@ -17,5 +17,6 @@
     <module>javacc-example-corba-idl</module>
     <module>javacc-example-interpreter</module>
     <module>javacc-example-transformer</module>
+    <module>javacc-example-vtransformer</module>
   </modules>
 </project>
