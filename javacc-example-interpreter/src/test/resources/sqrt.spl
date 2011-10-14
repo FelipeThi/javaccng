@@ -1,0 +1,14 @@
+
+int val;
+
+// read val;
+val = 16;
+int sqrt;
+
+sqrt = 1;
+
+while (sqrt * sqrt <= val && ((sqrt + 1) * (sqrt + 1)) <= val) {
+  sqrt = sqrt + 1;
+}
+
+write sqrt
