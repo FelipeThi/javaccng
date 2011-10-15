@@ -41,134 +41,154 @@ import org.javacc.utils.io.IndentingPrintWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.HashMap;
-import java.util.Map;
 
 public class BNFGenerator implements Generator {
-  private Map id_map = new HashMap();
-  private int id = 1;
-  protected IndentingPrintWriter ostr;
+  protected IndentingPrintWriter out;
   private boolean printing = true;
 
   protected IndentingPrintWriter createOutputStream() {
     if (JJDocOptions.getOutputFile().equals("")) {
-      if (JJDocGlobals.input_file.equals("standard input")) {
+      if (JJDocGlobals.inputFile.equals("standard input")) {
         return new IndentingPrintWriter(
             new OutputStreamWriter(System.out));
       }
       else {
         String ext = ".bnf";
-        int i = JJDocGlobals.input_file.lastIndexOf('.');
+        int i = JJDocGlobals.inputFile.lastIndexOf('.');
         if (i == -1) {
-          JJDocGlobals.output_file = JJDocGlobals.input_file + ext;
+          JJDocGlobals.outputFile = JJDocGlobals.inputFile + ext;
         }
         else {
-          String suffix = JJDocGlobals.input_file.substring(i);
+          String suffix = JJDocGlobals.inputFile.substring(i);
           if (suffix.equals(ext)) {
-            JJDocGlobals.output_file = JJDocGlobals.input_file + ext;
+            JJDocGlobals.outputFile = JJDocGlobals.inputFile + ext;
           }
           else {
-            JJDocGlobals.output_file = JJDocGlobals.input_file.substring(0, i) + ext;
+            JJDocGlobals.outputFile = JJDocGlobals.inputFile.substring(0, i) + ext;
           }
         }
       }
     }
     else {
-      JJDocGlobals.output_file = JJDocOptions.getOutputFile();
+      JJDocGlobals.outputFile = JJDocOptions.getOutputFile();
     }
     try {
-      ostr = new IndentingPrintWriter(
+      out = new IndentingPrintWriter(
           new FileWriter(
-              JJDocGlobals.output_file));
+              JJDocGlobals.outputFile));
     }
-    catch (IOException e) {
+    catch (IOException ex) {
       error("JJDoc: can't open output stream on file "
-          + JJDocGlobals.output_file + ".  Using standard output.");
-      ostr = new IndentingPrintWriter(new OutputStreamWriter(System.out));
+          + JJDocGlobals.outputFile + ".  Using standard output.");
+      out = new IndentingPrintWriter(new OutputStreamWriter(System.out));
     }
 
-    return ostr;
+    return out;
   }
 
   private void println(String s) {
     print(s + "\n");
   }
 
+  @Override
   public void text(String s) {
     if (printing && !(s.length() == 1 && (s.charAt(0) == '\n' || s.charAt(0) == '\r'))) {
       print(s);
     }
   }
 
+  @Override
   public void print(String s) {
-    ostr.print(s);
+    out.print(s);
   }
 
+  @Override
   public void documentStart() {
-    ostr = createOutputStream();
+    out = createOutputStream();
   }
 
+  @Override
   public void documentEnd() {
-    ostr.close();
+    out.close();
   }
 
+  @Override
   public void specialTokens(String s) {
   }
 
+  @Override
   public void tokenStart(TokenProduction tp) {
     printing = false;
   }
 
+  @Override
   public void tokenEnd(TokenProduction tp) {
     printing = true;
   }
 
+  @Override
   public void nonterminalsStart() { }
 
+  @Override
   public void nonterminalsEnd() { }
 
+  @Override
   public void tokensStart() { }
 
+  @Override
   public void tokensEnd() { }
 
+  @Override
   public void javacode(JavaCodeProduction jp) { }
 
+  @Override
   public void expansionEnd(Expansion e, boolean first) { }
 
+  @Override
   public void nonTerminalStart(NonTerminal nt) { }
 
+  @Override
   public void nonTerminalEnd(NonTerminal nt) { }
 
+  @Override
   public void productionStart(NormalProduction np) {
     println("");
     print(np.getLhs() + " ::= ");
   }
 
+  @Override
   public void productionEnd(NormalProduction np) {
     println("");
   }
 
+  @Override
   public void expansionStart(Expansion e, boolean first) {
     if (!first) {
       print(" | ");
     }
   }
 
+  @Override
   public void reStart(RegularExpression r) {
     if (r.getClass().equals(RJustName.class) || r.getClass().equals(RCharacterList.class)) {
       printing = false;
     }
   }
 
+  @Override
   public void reEnd(RegularExpression r) {
     printing = true;
   }
 
+  @Override
   public void debug(String message) { System.err.println(message); }
 
+  @Override
   public void info(String message) { System.err.println(message); }
 
+  @Override
   public void warn(String message) { System.err.println(message); }
 
+  @Override
   public void error(String message) { System.err.println(message); }
 }

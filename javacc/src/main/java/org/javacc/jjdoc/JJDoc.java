@@ -74,12 +74,12 @@ public class JJDoc {
     generator.documentEnd();
   }
 
-  private Token getPrecedingSpecialToken(Token tok) {
-    Token t = tok;
+  private Token getPrecedingSpecialToken(Token token) {
+    Token t = token;
     while (t.specialToken != null) {
       t = t.specialToken;
     }
-    return (t != tok) ? t : null;
+    return t != token ? t : null;
   }
 
   private void emitTopLevelSpecialTokens(Token token, Generator gen) {
@@ -97,7 +97,7 @@ public class JJDoc {
         token = token.next;
       }
     }
-    if (!s.equals("")) { gen.specialTokens(s); }
+    if (!"".equals(s)) { gen.specialTokens(s); }
   }
 
   /*
@@ -152,7 +152,7 @@ public class JJDoc {
         }
         token += "}\n\n";
       }
-      if (!token.equals("")) {
+      if (!"".equals(token)) {
         gen.tokenStart(tp);
         gen.text(token);
         gen.tokenEnd(tp);
@@ -163,19 +163,17 @@ public class JJDoc {
 
   private void emitNormalProductions(Generator gen, List<NormalProduction> prods) {
     gen.nonterminalsStart();
-    for (Iterator it = prods.iterator(); it.hasNext(); ) {
-      NormalProduction np = (NormalProduction) it.next();
+    for (NormalProduction np : prods) {
       emitTopLevelSpecialTokens(np.getFirstToken(), gen);
       if (np instanceof BNFProduction) {
         gen.productionStart(np);
         if (np.getExpansion() instanceof Choice) {
           boolean first = true;
           Choice c = (Choice) np.getExpansion();
-          for (Iterator expansionsIterator = c.getChoices().iterator(); expansionsIterator.hasNext(); ) {
-            Expansion e = (Expansion) (expansionsIterator.next());
-            gen.expansionStart(e, first);
-            emitExpansionTree(e, gen);
-            gen.expansionEnd(e, first);
+          for (Expansion expansion : c.getChoices()) {
+            gen.expansionStart(expansion, first);
+            emitExpansionTree(expansion, gen);
+            gen.expansionEnd(expansion, first);
             first = false;
           }
         }
@@ -194,7 +192,7 @@ public class JJDoc {
   }
 
   private void emitExpansionTree(Expansion exp, Generator gen) {
-//     gen.text("[->" + exp.getClass().getName() + "]");
+    //     gen.text("[->" + exp.getClass().getName() + "]");
     if (exp instanceof Action) {
       emitExpansionAction((Action) exp, gen);
     }
@@ -228,15 +226,14 @@ public class JJDoc {
     else {
       JJDocGlobals.error("Oops: Unknown expansion type.");
     }
-//     gen.text("[<-" + exp.getClass().getName() + "]");
+    //     gen.text("[<-" + exp.getClass().getName() + "]");
   }
 
-  private void emitExpansionAction(Action a, Generator gen) {
-  }
+  private void emitExpansionAction(Action a, Generator gen) {}
 
   private void emitExpansionChoice(Choice c, Generator gen) {
-    for (Iterator it = c.getChoices().iterator(); it.hasNext(); ) {
-      Expansion e = (Expansion) (it.next());
+    for (Iterator<Expansion> it = c.getChoices().iterator(); it.hasNext(); ) {
+      Expansion e = it.next();
       emitExpansionTree(e, gen);
       if (it.hasNext()) {
         gen.text(" | ");
@@ -244,8 +241,7 @@ public class JJDoc {
     }
   }
 
-  private void emitExpansionLookahead(Lookahead l, Generator gen) {
-  }
+  private void emitExpansionLookahead(Lookahead l, Generator gen) {}
 
   private void emitExpansionNonTerminal(NonTerminal nt, Generator gen) {
     gen.nonTerminalStart(nt);
@@ -262,7 +258,7 @@ public class JJDoc {
   private void emitExpansionRegularExpression(RegularExpression r,
                                               Generator gen) {
     String reRendered = emitRE(r);
-    if (!reRendered.equals("")) {
+    if (!"".equals(reRendered)) {
       gen.reStart(r);
       gen.text(reRendered);
       gen.reEnd(r);
@@ -271,19 +267,19 @@ public class JJDoc {
 
   private void emitExpansionSequence(Sequence s, Generator gen) {
     boolean firstUnit = true;
-    for (Iterator it = s.units.iterator(); it.hasNext(); ) {
-      Expansion e = (Expansion) it.next();
-      if (e instanceof Lookahead || e instanceof Action) {
+    for (Expansion expansion : s.units) {
+      if (expansion instanceof Lookahead || expansion instanceof Action) {
         continue;
       }
       if (!firstUnit) {
         gen.text(" ");
       }
-      boolean needParens = (e instanceof Choice) || (e instanceof Sequence);
+      boolean needParens = expansion instanceof Choice
+          || expansion instanceof Sequence;
       if (needParens) {
         gen.text("( ");
       }
-      emitExpansionTree(e, gen);
+      emitExpansionTree(expansion, gen);
       if (needParens) {
         gen.text(" )");
       }
@@ -316,13 +312,13 @@ public class JJDoc {
 
   private String emitRE(RegularExpression re) {
     String returnString = "";
-    boolean hasLabel = !re.label.equals("");
+    boolean hasLabel = !"".equals(re.label);
     boolean justName = re instanceof RJustName;
     boolean eof = re instanceof REndOfFile;
     boolean isString = re instanceof RStringLiteral;
-    boolean toplevelRE = (re.tpContext != null);
+    boolean toplevelRE = re.tpContext != null;
     boolean needBrackets
-        = justName || eof || hasLabel || (!isString && toplevelRE);
+        = justName || eof || hasLabel || !isString && toplevelRE;
     if (needBrackets) {
       returnString += "<";
       if (!justName) {
@@ -369,8 +365,8 @@ public class JJDoc {
     }
     else if (re instanceof RChoice) {
       RChoice c = (RChoice) re;
-      for (Iterator it = c.getChoices().iterator(); it.hasNext(); ) {
-        RegularExpression sub = (RegularExpression) (it.next());
+      for (Iterator<RegularExpression> it = c.getChoices().iterator(); it.hasNext(); ) {
+        RegularExpression sub = it.next();
         returnString += emitRE(sub);
         if (it.hasNext()) {
           returnString += " | ";
@@ -392,8 +388,8 @@ public class JJDoc {
     }
     else if (re instanceof RSequence) {
       RSequence s = (RSequence) re;
-      for (Iterator it = s.units.iterator(); it.hasNext(); ) {
-        RegularExpression sub = (RegularExpression) (it.next());
+      for (Iterator<RegularExpression> it = s.units.iterator(); it.hasNext(); ) {
+        RegularExpression sub = it.next();
         boolean needParens = false;
         if (sub instanceof RChoice) {
           needParens = true;
@@ -412,7 +408,7 @@ public class JJDoc {
     }
     else if (re instanceof RStringLiteral) {
       RStringLiteral sl = (RStringLiteral) re;
-      returnString += ("\"" + Parsers.escape(sl.image) + "\"");
+      returnString += "\"" + Parsers.escape(sl.image) + "\"";
     }
     else if (re instanceof RZeroOrMore) {
       RZeroOrMore zm = (RZeroOrMore) re;
@@ -450,45 +446,4 @@ public class JJDoc {
     }
     return returnString;
   }
-
-  /*
-  private String v2s(Vector v, boolean newLine) {
-    String s = "";
-    boolean firstToken = true;
-    for (Enumeration enumeration = v.elements(); enumeration.hasMoreElements();) {
-      Token tok = (Token)enumeration.nextElement();
-      Token stok = getPrecedingSpecialToken(tok);
-      if (firstToken) {
-        if (stok != null) {
-          cLine = stok.beginLine;
-          cCol = stok.beginColumn;
-        } else {
-          cLine = tok.beginLine;
-          cCol = tok.beginColumn;
-        }
-        s = ws(cCol - 1);
-        firstToken = false;
-      }
-      while (stok != null) {
-        s += printToken(stok);
-        stok = stok.next;
-      }
-      s += printToken(tok);
-    }
-    return s;
-  }
-  */
-  /**
-   * A utility to produce a string of blanks.
-   */
-
-  /*
-  private static String ws(int len) {
-    String s = "";
-    for (int i = 0; i < len; ++i) {
-      s += " ";
-    }
-    return s;
-  }
-  */
 }

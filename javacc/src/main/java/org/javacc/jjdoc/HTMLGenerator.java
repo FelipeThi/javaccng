@@ -35,18 +35,19 @@ import org.javacc.parser.NormalProduction;
 import org.javacc.parser.RegularExpression;
 import org.javacc.parser.TokenProduction;
 
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 /** Output BNF in HTML 3.2 format. */
-public class HTMLGenerator extends TextGenerator implements Generator {
-  private Hashtable id_map = new Hashtable();
+public class HTMLGenerator extends TextGenerator {
+  private Map<String, String> idMap = new HashMap<String, String>();
   private int id = 1;
 
-  protected String get_id(String nt) {
-    String i = (String) id_map.get(nt);
+  private String getId(String nt) {
+    String i = idMap.get(nt);
     if (i == null) {
       i = "prod" + id++;
-      id_map.put(nt, i);
+      idMap.put(nt, i);
     }
     return i;
   }
@@ -89,15 +90,15 @@ public class HTMLGenerator extends TextGenerator implements Generator {
     if (!"".equals(JJDocOptions.getCSS())) {
       println("<LINK REL=\"stylesheet\" type=\"text/css\" href=\"" + JJDocOptions.getCSS() + "\"/>");
     }
-    if (JJDocGlobals.input_file != null) {
-      println("<TITLE>BNF for " + JJDocGlobals.input_file + "</TITLE>");
+    if (JJDocGlobals.inputFile != null) {
+      println("<TITLE>BNF for " + JJDocGlobals.inputFile + "</TITLE>");
     }
     else {
       println("<TITLE>A BNF grammar by JJDoc</TITLE>");
     }
     println("</HEAD>");
     println("<BODY>");
-    println("<H1 ALIGN=CENTER>BNF for " + JJDocGlobals.input_file + "</H1>");
+    println("<H1 ALIGN=CENTER>BNF for " + JJDocGlobals.inputFile + "</H1>");
   }
 
   @Override
@@ -107,12 +108,6 @@ public class HTMLGenerator extends TextGenerator implements Generator {
     out.close();
   }
 
-  /**
-   * Prints out comments, used for tokens and non-terminals.
-   * {@inheritDoc}
-   *
-   * @see org.javacc.jjdoc.TextGenerator#specialTokens(java.lang.String)
-   */
   @Override
   public void specialTokens(String s) {
     println(" <!-- Special token -->");
@@ -181,7 +176,7 @@ public class HTMLGenerator extends TextGenerator implements Generator {
       println("<CAPTION><STRONG>" + np.getLhs() + "</STRONG></CAPTION>");
     }
     println("<TR>");
-    println("<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME=\"" + get_id(np.getLhs()) + "\">" + np.getLhs() + "</A></TD>");
+    println("<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME=\"" + getId(np.getLhs()) + "\">" + np.getLhs() + "</A></TD>");
     println("<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>");
     print("<TD ALIGN=LEFT VALIGN=BASELINE>");
   }
@@ -212,7 +207,7 @@ public class HTMLGenerator extends TextGenerator implements Generator {
 
   @Override
   public void nonTerminalStart(NonTerminal nt) {
-    print("<A HREF=\"#" + get_id(nt.getName()) + "\">");
+    print("<A HREF=\"#" + getId(nt.getName()) + "\">");
   }
 
   @Override

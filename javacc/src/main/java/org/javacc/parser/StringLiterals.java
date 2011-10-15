@@ -616,7 +616,7 @@ final class StringLiterals {
               ostr.print("0x" + Long.toHexString(info.validKinds[j]) + "L");
             }
             ostr.println(");");
-            //ostr.unindent();
+            //out.unindent();
           }
           else {
             ostr.print("return jjMoveStringLiteralDfa" + (i + 1) +
@@ -645,7 +645,7 @@ final class StringLiterals {
             }
 
             ostr.println(");");
-            //ostr.unindent();
+            //out.unindent();
           }
         }
         else {
@@ -661,7 +661,7 @@ final class StringLiterals {
           else if (i != 0) // No more str literals to look for
           {
             ostr.println("break;");
-            //ostr.unindent();
+            //out.unindent();
             startNfaNeeded = true;
           }
         }
@@ -686,7 +686,7 @@ final class StringLiterals {
         }
         else {
           ostr.println("break;");
-          //ostr.unindent();
+          //out.unindent();
           startNfaNeeded = true;
         }
       }

@@ -39,78 +39,97 @@ import org.javacc.utils.io.IndentingPrintWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.lang.String;
 
 /** Output BNF in text format. */
 public class TextGenerator implements Generator {
   protected IndentingPrintWriter out;
 
+  @Override
   public void text(String s) {
     print(s);
   }
 
+  @Override
   public void print(String s) {
     out.print(s);
   }
 
+  @Override
   public void documentStart() {
     out = createOutputStream();
     out.print("\nDOCUMENT START\n");
   }
 
+  @Override
   public void documentEnd() {
     out.print("\nDOCUMENT END\n");
     out.close();
   }
 
+  @Override
   public void specialTokens(String s) {
     out.print(s);
   }
 
+  @Override
   public void tokenStart(TokenProduction tp) {}
 
+  @Override
   public void tokenEnd(TokenProduction tp) {}
 
+  @Override
   public void nonterminalsStart() {
     text("NON-TERMINALS\n");
   }
 
+  @Override
   public void nonterminalsEnd() {}
 
+  @Override
   public void tokensStart() {
     text("TOKENS\n");
   }
 
+  @Override
   public void tokensEnd() {}
 
+  @Override
   public void javacode(JavaCodeProduction jp) {
     productionStart(jp);
     text("java code");
     productionEnd(jp);
   }
 
+  @Override
   public void productionStart(NormalProduction np) {
     out.print("\t" + np.getLhs() + "\t:=\t");
   }
 
+  @Override
   public void productionEnd(NormalProduction np) {
     out.print("\n");
   }
 
+  @Override
   public void expansionStart(Expansion e, boolean first) {
     if (!first) {
       out.print("\n\t\t|\t");
     }
   }
 
+  @Override
   public void expansionEnd(Expansion e, boolean first) {}
 
+  @Override
   public void nonTerminalStart(NonTerminal nt) {}
 
+  @Override
   public void nonTerminalEnd(NonTerminal nt) {}
 
+  @Override
   public void reStart(RegularExpression r) {}
 
+  @Override
   public void reEnd(RegularExpression r) {}
 
   /**
@@ -120,7 +139,7 @@ public class TextGenerator implements Generator {
    */
   protected final IndentingPrintWriter createOutputStream() {
     if (JJDocOptions.getOutputFile().equals("")) {
-      if (JJDocGlobals.input_file.equals("standard input")) {
+      if (JJDocGlobals.inputFile.equals("standard input")) {
         return new IndentingPrintWriter(
             new OutputStreamWriter(
                 System.out));
@@ -130,51 +149,55 @@ public class TextGenerator implements Generator {
         if (JJDocOptions.getText()) {
           ext = ".txt";
         }
-        int i = JJDocGlobals.input_file.lastIndexOf('.');
+        int i = JJDocGlobals.inputFile.lastIndexOf('.');
         if (i == -1) {
-          JJDocGlobals.output_file = JJDocGlobals.input_file + ext;
+          JJDocGlobals.outputFile = JJDocGlobals.inputFile + ext;
         }
         else {
-          String suffix = JJDocGlobals.input_file.substring(i);
+          String suffix = JJDocGlobals.inputFile.substring(i);
           if (suffix.equals(ext)) {
-            JJDocGlobals.output_file = JJDocGlobals.input_file + ext;
+            JJDocGlobals.outputFile = JJDocGlobals.inputFile + ext;
           }
           else {
-            JJDocGlobals.output_file = JJDocGlobals.input_file.substring(0, i) + ext;
+            JJDocGlobals.outputFile = JJDocGlobals.inputFile.substring(0, i) + ext;
           }
         }
       }
     }
     else {
-      JJDocGlobals.output_file = JJDocOptions.getOutputFile();
+      JJDocGlobals.outputFile = JJDocOptions.getOutputFile();
     }
 
     try {
       out = new IndentingPrintWriter(
           new FileWriter(
-              JJDocGlobals.output_file));
+              JJDocGlobals.outputFile));
     }
     catch (IOException e) {
       error("JJDoc: can't open output stream on file "
-          + JJDocGlobals.output_file + ".  Using standard output.");
+          + JJDocGlobals.outputFile + ".  Using standard output.");
       out = new IndentingPrintWriter(new OutputStreamWriter(System.out));
     }
 
     return out;
   }
 
+  @Override
   public void debug(String message) {
     System.err.println(message);
   }
 
+  @Override
   public void info(String message) {
     System.err.println(message);
   }
 
+  @Override
   public void warn(String message) {
     System.err.println(message);
   }
 
+  @Override
   public void error(String message) {
     System.err.println(message);
   }

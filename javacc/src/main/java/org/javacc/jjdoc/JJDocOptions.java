@@ -36,11 +36,6 @@ import org.javacc.parser.Options;
  * @author Kees Jan Koster &lt;kjkoster@kjkoster.org&gt;
  */
 public class JJDocOptions extends Options {
-  /** Limit subclassing to derived classes. */
-  protected JJDocOptions() {
-    super();
-  }
-
   /** Initialize the options. */
   public static void init() {
     Options.init();

@@ -31,9 +31,9 @@ package org.javacc.jjdoc;
 /** Global variables for JJDoc. */
 public final class JJDocGlobals {
   /** The name of the input file. */
-  public static String input_file;
+  public static String inputFile;
   /** The name of the output file. */
-  public static String output_file;
+  public static String outputFile;
   /** The Generator to create output with. */
   public static Generator generator;
 

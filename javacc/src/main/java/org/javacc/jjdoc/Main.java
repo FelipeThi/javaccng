@@ -79,8 +79,8 @@ public final class Main {
     if (args[args.length - 1].equals("-")) {
       JJDocGlobals.info("Reading from standard input . . .");
       parser = new JavaCCParser(new JavaCCParserScanner(new JavaCharStream(new InputStreamReader(System.in))));
-      JJDocGlobals.input_file = "standard input";
-      JJDocGlobals.output_file = "standard output";
+      JJDocGlobals.inputFile = "standard input";
+      JJDocGlobals.outputFile = "standard output";
     }
     else {
       JJDocGlobals.info("Reading from file " + args[args.length - 1] + " . . .");
@@ -94,7 +94,7 @@ public final class Main {
           JJDocGlobals.error(args[args.length - 1] + " is a directory. Please use a valid file name.");
           return 1;
         }
-        JJDocGlobals.input_file = fp.getName();
+        JJDocGlobals.inputFile = fp.getName();
         BufferedReader reader = new BufferedReader(
             new InputStreamReader(
                 new FileInputStream(args[args.length - 1]),
@@ -118,7 +118,7 @@ public final class Main {
 
       if (JavaCCErrors.getErrorCount() == 0) {
         if (JavaCCErrors.getWarningCount() == 0) {
-          JJDocGlobals.info("Grammar documentation generated successfully in " + JJDocGlobals.output_file);
+          JJDocGlobals.info("Grammar documentation generated successfully in " + JJDocGlobals.outputFile);
         }
         else {
           JJDocGlobals.info("Grammar documentation generated with 0 errors and "
