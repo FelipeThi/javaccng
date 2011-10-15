@@ -38,82 +38,83 @@ import java.util.Map;
  * This data is what is used by the back-ends of JavaCC as well as any other back-end
  * of JavaCC related tools such as JJTree.
  */
-public final class JavaCCGlobals {
+public final class JavaCCState {
+  public static final String DEFAULT = "DEFAULT";
   /** The name of the grammar file being processed. */
-  public static String fileName;
+  public String fileName;
   /** The name of the parser class (what appears in PARSER_BEGIN and PARSER_END). */
-  public static String cuName;
+  public String cuName;
   /**
    * The list of tokens that appear after "PARSER_BEGIN(name)" all the
    * way until (but not including) the opening brace "{" of the class "name".
    */
-  public static List<Token> cuToInsertionPoint1
+  public List<Token> cuToInsertionPoint1
       = new ArrayList<Token>();
   /**
    * The list of all tokens that appear after the tokens in
    * "cu_to_insertion_point_1" and until (but not including) the closing brace "}"
    * of the class "name".
    */
-  public static List<Token> cuToInsertionPoint2
+  public List<Token> cuToInsertionPoint2
       = new ArrayList<Token>();
   /**
    * The list of all tokens that appear after the tokens in
    * "cu_to_insertion_point_2" and until "PARSER_END".
    */
-  public static List<Token> cuFromInsertionPoint2
+  public List<Token> cuFromInsertionPoint2
       = new ArrayList<Token>();
   /**
    * A list of all grammar productions - normal and JAVACODE - in the order
    * they appear in the input file.  Each entry here will be a subclass of
    * "NormalProduction".
    */
-  public static List<NormalProduction> bnfProductions
+  public List<NormalProduction> bnfProductions
       = new ArrayList<NormalProduction>();
   /**
    * A symbol table of all grammar productions - normal and JAVACODE.  The
    * symbol table is indexed by the name of the left hand side non-terminal.
    * Its contents are of type "NormalProduction".
    */
-  public static Map<String, NormalProduction> productionTable
+  public Map<String, NormalProduction> productionTable
       = new HashMap<String, NormalProduction>();
   /**
    * A mapping of lexical state strings to their integer internal representation.
    * Integers are stored as java.lang.Integer's.
    */
-  public static Map<String, Integer> lexStateS2I
+  public Map<String, Integer> lexStateS2I
       = new HashMap<String, Integer>();
   /**
    * A mapping of the internal integer representations of lexical states to
    * their strings.  Integers are stored as java.lang.Integer's.
    */
-  public static Map<Integer, String> lexStateI2S
+  public Map<Integer, String> lexStateI2S
       = new HashMap<Integer, String>();
   /** The declarations to be inserted into the Scanner class. */
-  public static List<Token> scannerDeclarations;
+  public List<Token> scannerDeclarations;
   /**
    * The list of all TokenProductions from the input file.  This list includes
    * implicit TokenProductions that are created for uses of regular expressions
    * within BNF productions.
    */
-  public static List<TokenProduction> regExpList
+  public List<TokenProduction> regExpList
       = new ArrayList<TokenProduction>();
   /**
    * The total number of distinct tokens.  This is therefore one more than the
    * largest assigned token ordinal.
    */
-  public static int tokenCount;
+  public int tokenCount;
   /**
    * This is a symbol table that contains all named tokens (those that are
    * defined with a label).  The index to the table is the image of the label
    * and the contents of the table are of type "RegularExpression".
    */
-  public static Map<String, RegularExpression> namedTokensTable
+  public Map<String, RegularExpression> namedTokensTable
       = new HashMap<String, RegularExpression>();
   /**
    * Contains the same entries as "named_tokens_table", but this is an ordered
    * list which is ordered by the order of appearance in the input file.
    */
-  public static List<RegularExpression> orderedNamedTokens
+  public List<RegularExpression> orderedNamedTokens
       = new ArrayList<RegularExpression>();
   /**
    * A mapping of ordinal values (represented as objects of type "Integer") to
@@ -122,13 +123,13 @@ public final class JavaCCGlobals {
    * If there are multiple labels representing the same ordinal value, then
    * only one label is stored.
    */
-  public static Map<Integer, String> namesOfTokens
+  public Map<Integer, String> namesOfTokens
       = new HashMap<Integer, String>();
   /**
    * A mapping of ordinal values (represented as objects of type "Integer") to
    * the corresponding RegularExpression's.
    */
-  public static Map<Integer, RegularExpression> regExpsOfTokens
+  public Map<Integer, RegularExpression> regExpsOfTokens
       = new HashMap<Integer, RegularExpression>();
   /**
    * This is a three-level symbol table that contains all simple tokens (those
@@ -139,12 +140,19 @@ public final class JavaCCGlobals {
    * This third level hashtable contains the actual string of the simple token
    * and maps it to its RegularExpression.
    */
-  public static Map<String, Map<String, RegularExpression>> simpleTokensTable
+  public Map<String, Map<String, RegularExpression>> simpleTokensTable
       = new HashMap<String, Map<String, RegularExpression>>();
-  static Action eofAction;
-  static String eofNextState;
+  Action eofAction;
+  String eofNextState;
 
-  public static String constantsClass() {
+  public JavaCCState() {
+    lexStateS2I.put(DEFAULT, 0);
+    lexStateI2S.put(0, DEFAULT);
+    simpleTokensTable.put(DEFAULT,
+        new HashMap<String, RegularExpression>());
+  }
+
+  public String constantsClass() {
     String name = cuName;
     if (name.endsWith("Parser")) {
       name = name.substring(0, name.length() - "Parser".length());
@@ -152,7 +160,7 @@ public final class JavaCCGlobals {
     return name + "Constants";
   }
 
-  public static String scannerClass() {
+  public String scannerClass() {
     String name = cuName;
     if (name.endsWith("Parser")) {
       name = name.substring(0, name.length() - "Parser".length());
@@ -160,32 +168,7 @@ public final class JavaCCGlobals {
     return name + "Scanner";
   }
 
-  public static String parserClass() {
+  public String parserClass() {
     return cuName;
-  }
-
-  @Deprecated
-  public static void reInit() {
-    fileName = null;
-    cuName = null;
-    cuToInsertionPoint1 = new ArrayList<Token>();
-    cuToInsertionPoint2 = new ArrayList<Token>();
-    cuFromInsertionPoint2 = new ArrayList<Token>();
-    bnfProductions = new ArrayList<NormalProduction>();
-    productionTable = new HashMap<String, NormalProduction>();
-    lexStateS2I = new HashMap<String, Integer>();
-    lexStateI2S = new HashMap<Integer, String>();
-    scannerDeclarations = null;
-    regExpList = new ArrayList<TokenProduction>();
-    tokenCount = 0;
-    namedTokensTable = new HashMap<String, RegularExpression>();
-    orderedNamedTokens = new ArrayList<RegularExpression>();
-    namesOfTokens = new HashMap<Integer, String>();
-    regExpsOfTokens = new HashMap<Integer, RegularExpression>();
-    simpleTokensTable = new HashMap<String, Map<String, RegularExpression>>();
-    TokenPrinter.cLine = 0;
-    TokenPrinter.cCol = 0;
-    eofAction = null;
-    eofNextState = null;
   }
 }

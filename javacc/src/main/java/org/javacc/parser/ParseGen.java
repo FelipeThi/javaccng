@@ -36,9 +36,11 @@ import java.util.List;
 
 /** Generate the parser. */
 final class ParseGen implements FileGenerator, JavaCCConstants {
+  private final JavaCCState state;
   private final Semanticize semanticize;
 
-  ParseGen(Semanticize semanticize) {
+  ParseGen(JavaCCState state, Semanticize semanticize) {
+    this.state = state;
     this.semanticize = semanticize;
   }
 
@@ -52,7 +54,7 @@ final class ParseGen implements FileGenerator, JavaCCConstants {
       return;
     }
 
-    File path = new File(Options.getOutputDirectory(), JavaCCGlobals.parserClass() + ".java");
+    File path = new File(Options.getOutputDirectory(), state.parserClass() + ".java");
     OutputFile outputFile = new OutputFile(path);
     IndentingPrintWriter out = outputFile.getPrintWriter();
     try {
@@ -67,7 +69,7 @@ final class ParseGen implements FileGenerator, JavaCCConstants {
       throws IOException {
     printHeader(out);
 
-    ParseEngine parseEngine = new ParseEngine(semanticize);
+    ParseEngine parseEngine = new ParseEngine(state, semanticize);
     parseEngine.build(out);
 
     printBoilerplate(parseEngine, out);
@@ -79,7 +81,7 @@ final class ParseGen implements FileGenerator, JavaCCConstants {
       throws IOException {
     boolean implementsExists = false;
 
-    List<Token> tokens1 = JavaCCGlobals.cuToInsertionPoint1;
+    List<Token> tokens1 = state.cuToInsertionPoint1;
     if (tokens1.size() != 0) {
       TokenPrinter.printTokenSetup(tokens1.get(0));
       TokenPrinter.cCol = 1;
@@ -100,9 +102,9 @@ final class ParseGen implements FileGenerator, JavaCCConstants {
       out.print(" implements ");
     }
 
-    out.print(JavaCCGlobals.constantsClass() + " ");
+    out.print(state.constantsClass() + " ");
 
-    List<Token> tokens2 = JavaCCGlobals.cuToInsertionPoint2;
+    List<Token> tokens2 = state.cuToInsertionPoint2;
     if (tokens2.size() != 0) {
       TokenPrinter.printTokenSetup(tokens2.get(0));
       for (Token t : tokens2) {
@@ -116,7 +118,7 @@ final class ParseGen implements FileGenerator, JavaCCConstants {
 
   private void printFooter(IndentingPrintWriter out)
       throws IOException {
-    List<Token> tokens = JavaCCGlobals.cuFromInsertionPoint2;
+    List<Token> tokens = state.cuFromInsertionPoint2;
     if (tokens.size() != 0) {
       TokenPrinter.printTokenSetup(tokens.get(0));
       TokenPrinter.cCol = 1;
@@ -151,7 +153,7 @@ final class ParseGen implements FileGenerator, JavaCCConstants {
     if (Options.getErrorReporting()) {
       out.println("  private int jj_gen;");
       out.println("  private final int[] jj_la1 = new int[" + parseEngine.maskIndex + "];");
-      int tokenMaskSize = (JavaCCGlobals.tokenCount - 1) / 32 + 1;
+      int tokenMaskSize = (state.tokenCount - 1) / 32 + 1;
       for (int i = 0; i < tokenMaskSize; i++) {
         out.println("  static private int[] jj_la1_" + i + ";");
       }
@@ -178,7 +180,7 @@ final class ParseGen implements FileGenerator, JavaCCConstants {
     out.println();
 
     out.println("  /** Constructor with either generated or user provided Token Manager. */");
-    out.println("  public " + JavaCCGlobals.parserClass() + "(Scanner s) throws java.io.IOException, ParseException {");
+    out.println("  public " + state.parserClass() + "(Scanner s) throws java.io.IOException, ParseException {");
     out.println("    scanner = s;");
     out.println("    token = new Token();");
     if (Options.getCacheTokens()) {
@@ -366,7 +368,7 @@ final class ParseGen implements FileGenerator, JavaCCConstants {
       out.println("  /** Generate ParseException. */");
       out.println("  public ParseException generateParseException() throws java.io.IOException {");
       out.println("    jj_expentries.clear();");
-      out.println("    boolean[] la1tokens = new boolean[" + JavaCCGlobals.tokenCount + "];");
+      out.println("    boolean[] la1tokens = new boolean[" + state.tokenCount + "];");
       out.println("    if (jj_kind >= 0) {");
       out.println("      la1tokens[jj_kind] = true;");
       out.println("      jj_kind = -1;");
@@ -374,7 +376,7 @@ final class ParseGen implements FileGenerator, JavaCCConstants {
       out.println("    for (int i = 0; i < " + parseEngine.maskIndex + "; i++) {");
       out.println("      if (jj_la1[i] == jj_gen) {");
       out.println("        for (int j = 0; j < 32; j++) {");
-      for (int i = 0; i < (JavaCCGlobals.tokenCount - 1) / 32 + 1; i++) {
+      for (int i = 0; i < (state.tokenCount - 1) / 32 + 1; i++) {
         out.println("          if ((jj_la1_" + i + "[i] & (1<<j)) != 0) {");
         out.print("            la1tokens[");
         if (i != 0) {
@@ -386,7 +388,7 @@ final class ParseGen implements FileGenerator, JavaCCConstants {
       out.println("        }");
       out.println("      }");
       out.println("    }");
-      out.println("    for (int i = 0; i < " + JavaCCGlobals.tokenCount + "; i++) {");
+      out.println("    for (int i = 0; i < " + state.tokenCount + "; i++) {");
       out.println("      if (la1tokens[i]) {");
       out.println("        jj_expentry = new int[1];");
       out.println("        jj_expentry[0] = i;");

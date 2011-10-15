@@ -36,6 +36,12 @@ import java.io.IOException;
 
 /** Generate boilerplate java files. */
 public class JavaFiles implements FileGenerator, JavaCCConstants {
+  private final JavaCCState state;
+
+  public JavaFiles(JavaCCState state) {
+    this.state = state;
+  }
+
   @Override
   public void start() throws IOException {
     generateScanner();
@@ -79,12 +85,12 @@ public class JavaFiles implements FileGenerator, JavaCCConstants {
     generate("/templates/JavaCharStream.template", "JavaCharStream.java");
   }
 
-  private static void generate(String templateName, String fileName) throws IOException {
+  private void generate(String templateName, String fileName) throws IOException {
     File path = new File(Options.getOutputDirectory(), fileName);
     OutputFile outputFile = new OutputFile(path);
     IndentingPrintWriter out = outputFile.getPrintWriter();
     try {
-      TokenPrinter.packageDeclaration(JavaCCGlobals.cuToInsertionPoint1, out);
+      TokenPrinter.packageDeclaration(state.cuToInsertionPoint1, out);
       JavaFileGenerator generator = new JavaFileGenerator(
           templateName, Options.getOptions());
       generator.generate(out);

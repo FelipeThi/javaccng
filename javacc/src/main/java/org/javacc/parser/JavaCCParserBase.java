@@ -99,22 +99,22 @@ abstract class JavaCCParserBase {
     }
   }
 
-  private static final String DEFAULT = "DEFAULT";
-  private List<Token> cuTokens = JavaCCGlobals.cuToInsertionPoint1;
+  private JavaCCState state;
+  private List<Token> cuTokens;
   private Token firstCuToken;
-  private boolean insertionPoint1Set = false;
-  private boolean insertionPoint2Set = false;
+  private boolean insertionPoint1Set;
+  private boolean insertionPoint2Set;
   private int nextFreeLexState = 1;
 
-  protected static void initialize() {
-    JavaCCGlobals.lexStateS2I.put(DEFAULT, 0);
-    JavaCCGlobals.lexStateI2S.put(0, DEFAULT);
-    JavaCCGlobals.simpleTokensTable.put(DEFAULT,
-        new HashMap<String, RegularExpression>());
+  public void setState(JavaCCState state) {
+    this.state = state;
+    cuTokens = state.cuToInsertionPoint1;
   }
 
-  protected static void setCuName(String name) {
-    JavaCCGlobals.cuName = name;
+  protected void initialize() {}
+
+  protected void setCuName(String name) {
+    state.cuName = name;
   }
 
   protected void setInsertionPoint(Token t, int no) {
@@ -129,11 +129,11 @@ abstract class JavaCCParserBase {
       }
       else {
         insertionPoint1Set = true;
-        cuTokens = JavaCCGlobals.cuToInsertionPoint2;
+        cuTokens = state.cuToInsertionPoint2;
       }
     }
     else {
-      cuTokens = JavaCCGlobals.cuFromInsertionPoint2;
+      cuTokens = state.cuFromInsertionPoint2;
       insertionPoint2Set = true;
     }
     firstCuToken = t;
@@ -153,12 +153,12 @@ abstract class JavaCCParserBase {
     firstCuToken = t;
   }
 
-  protected static void addScannerDeclarations(Token t, List<Token> decls) {
-    if (JavaCCGlobals.scannerDeclarations != null) {
+  protected void addScannerDeclarations(Token t, List<Token> decls) {
+    if (state.scannerDeclarations != null) {
       JavaCCErrors.parseError(t, "Multiple occurrence of \"SCANNER_DECLS\".");
     }
     else {
-      JavaCCGlobals.scannerDeclarations = decls;
+      state.scannerDeclarations = decls;
       if (Options.getUserScanner()) {
         JavaCCErrors.warning(t, "Ignoring declarations in \"SCANNER_DECLS\" since option " +
             "USER_SCANNER has been set to true.");
@@ -167,15 +167,15 @@ abstract class JavaCCParserBase {
   }
 
   protected void addProduction(NormalProduction p) {
-    JavaCCGlobals.bnfProductions.add(p);
+    state.bnfProductions.add(p);
   }
 
   protected void addRegExp(TokenProduction production) {
-    JavaCCGlobals.regExpList.add(production);
+    state.regExpList.add(production);
     if (Options.getUserScanner()) {
       if (production.lexStates == null
           || production.lexStates.length != 1
-          || !production.lexStates[0].equals(DEFAULT)) {
+          || !production.lexStates[0].equals(JavaCCState.DEFAULT)) {
         JavaCCErrors.warning(production, "Ignoring lexical state specifications since option " +
             "USER_SCANNER has been set to true.");
       }
@@ -189,21 +189,21 @@ abstract class JavaCCParserBase {
           JavaCCErrors.parseError(production, "Multiple occurrence of \"" + production.lexStates[i] + "\" in lexical state list.");
         }
       }
-      if (JavaCCGlobals.lexStateS2I.get(production.lexStates[i]) == null) {
+      if (state.lexStateS2I.get(production.lexStates[i]) == null) {
         Integer n = nextFreeLexState++;
-        JavaCCGlobals.lexStateS2I.put(production.lexStates[i], n);
-        JavaCCGlobals.lexStateI2S.put(n, production.lexStates[i]);
-        JavaCCGlobals.simpleTokensTable.put(production.lexStates[i],
+        state.lexStateS2I.put(production.lexStates[i], n);
+        state.lexStateI2S.put(n, production.lexStates[i]);
+        state.simpleTokensTable.put(production.lexStates[i],
             new HashMap<String, RegularExpression>());
       }
     }
   }
 
-  protected static void addInlineRegExp(RegularExpression r) {
+  protected void addInlineRegExp(RegularExpression r) {
     if (!(r instanceof REndOfFile)) {
       TokenProduction p = new TokenProduction();
       p.explicit = false;
-      p.lexStates = new String[]{DEFAULT};
+      p.lexStates = new String[]{JavaCCState.DEFAULT};
       p.kind = TokenProduction.TOKEN;
       RegExpSpec res = new RegExpSpec();
       res.regExp = r;
@@ -212,11 +212,11 @@ abstract class JavaCCParserBase {
       res.nextState = null;
       res.nsToken = null;
       p.reSpecs.add(res);
-      JavaCCGlobals.regExpList.add(p);
+      state.regExpList.add(p);
     }
   }
 
-  protected static char character_descriptor_assign(Token t, String s) {
+  protected char character_descriptor_assign(Token t, String s) {
     if (s.length() != 1) {
       JavaCCErrors.parseError(t, "String in character list may contain only one character.");
       return ' ';
@@ -226,7 +226,7 @@ abstract class JavaCCParserBase {
     }
   }
 
-  protected static char character_descriptor_assign(Token t, String s, String left) {
+  protected char character_descriptor_assign(Token t, String s, String left) {
     if (s.length() != 1) {
       JavaCCErrors.parseError(t, "String in character list may contain only one character.");
       return ' ';
@@ -241,7 +241,7 @@ abstract class JavaCCParserBase {
     }
   }
 
-  protected static void makeTryBlock(
+  protected void makeTryBlock(
       Token tryLoc,
       Container<Expansion> result,
       Container<Expansion> nestedExp,

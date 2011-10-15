@@ -38,8 +38,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public final class Main {
-  private Main() {}
-
   public static void main(String[] args) throws Exception {
     System.exit(mainProgram(args));
   }
@@ -91,6 +89,7 @@ public final class Main {
           new InputStreamReader(
               new FileInputStream(path),
               Options.getGrammarEncoding()));
+
       parser = new JavaCCParser(
           new JavaCCScanner(
               new JavaCharStream(reader)));
@@ -106,19 +105,24 @@ public final class Main {
 
     try {
       System.out.println("Reading from file " + path + " . . .");
-      JavaCCGlobals.fileName = path;
+
+      JavaCCState state = new JavaCCState();
+
+      state.fileName = path;
+
+      parser.setState(state);
 
       parser.javacc_input();
 
       Tools.createOutputDir(Options.getOutputDirectory());
 
-      Semanticize semanticize = new Semanticize();
+      Semanticize semanticize = new Semanticize(state);
       semanticize.start();
 
-      ParseGen parseGen = new ParseGen(semanticize);
+      ParseGen parseGen = new ParseGen(state, semanticize);
       parseGen.start();
 
-      LexGen lexGen = new LexGen();
+      LexGen lexGen = new LexGen(state);
       if (Options.getUnicodeInput()) {
         lexGen.nfaStates.unicodeWarningGiven = true;
         System.out.println("Note: UNICODE_INPUT option is specified. " +
@@ -126,10 +130,10 @@ public final class Main {
       }
       lexGen.start();
 
-      OtherFilesGen otherFilesGen = new OtherFilesGen(lexGen);
+      OtherFilesGen otherFilesGen = new OtherFilesGen(state, lexGen);
       otherFilesGen.start();
 
-      JavaFiles javaFiles = new JavaFiles();
+      JavaFiles javaFiles = new JavaFiles(state);
       javaFiles.start();
 
       if (JavaCCErrors.getErrorCount() == 0
@@ -165,7 +169,6 @@ public final class Main {
   @Deprecated
   public static void reInitAll() {
     JavaCCErrors.reInit();
-    JavaCCGlobals.reInit();
     Options.init();
   }
 

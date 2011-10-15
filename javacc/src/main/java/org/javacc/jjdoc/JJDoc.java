@@ -33,7 +33,7 @@ import org.javacc.parser.BNFProduction;
 import org.javacc.parser.CharacterRange;
 import org.javacc.parser.Choice;
 import org.javacc.parser.Expansion;
-import org.javacc.parser.JavaCCGlobals;
+import org.javacc.parser.JavaCCState;
 import org.javacc.parser.JavaCodeProduction;
 import org.javacc.parser.Lookahead;
 import org.javacc.parser.NonTerminal;
@@ -66,11 +66,17 @@ import java.util.List;
 
 /** The main entry point for JJDoc. */
 public class JJDoc {
+  private final JavaCCState state;
+
+  public JJDoc(JavaCCState state) {
+    this.state = state;
+  }
+
   void start() {
     Generator generator = JJDocGlobals.getGenerator();
     generator.documentStart();
-    emitTokenProductions(generator, JavaCCGlobals.regExpList);
-    emitNormalProductions(generator, JavaCCGlobals.bnfProductions);
+    emitTokenProductions(generator, state.regExpList);
+    emitNormalProductions(generator, state.bnfProductions);
     generator.documentEnd();
   }
 

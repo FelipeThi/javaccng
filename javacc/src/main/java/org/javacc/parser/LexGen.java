@@ -40,6 +40,7 @@ import java.util.List;
 
 /** Generate lexer. */
 final class LexGen implements FileGenerator, JavaCCConstants {
+  private final JavaCCState state;
   // Hashtable of vectors
   Hashtable allTpsForState = new Hashtable();
   int lexStateIndex;
@@ -85,6 +86,10 @@ final class LexGen implements FileGenerator, JavaCCConstants {
   final NfaStates nfaStates = new NfaStates();
   final StringLiterals stringLiterals = new StringLiterals();
 
+  LexGen(JavaCCState state) {
+    this.state = state;
+  }
+
   @Override
   public void start() throws MetaParseException, IOException {
     if (JavaCCErrors.getErrorCount() != 0) {
@@ -96,7 +101,7 @@ final class LexGen implements FileGenerator, JavaCCConstants {
       return;
     }
 
-    File path = new File(Options.getOutputDirectory(), JavaCCGlobals.scannerClass() + ".java");
+    File path = new File(Options.getOutputDirectory(), state.scannerClass() + ".java");
     OutputFile outputFile = new OutputFile(path);
     IndentingPrintWriter out = outputFile.getPrintWriter();
     try {
@@ -338,7 +343,7 @@ final class LexGen implements FileGenerator, JavaCCConstants {
 
     int l = 0, kind;
     i = 1;
-    List<Token> tokens = JavaCCGlobals.cuToInsertionPoint1;
+    List<Token> tokens = state.cuToInsertionPoint1;
     while (true) {
       if (tokens.size() <= l) {
         break;
@@ -375,8 +380,8 @@ final class LexGen implements FileGenerator, JavaCCConstants {
 
     out.println();
     out.println("@SuppressWarnings(\"unused\")");
-    out.print("public class " + JavaCCGlobals.scannerClass() + " implements Scanner, " +
-        JavaCCGlobals.constantsClass() + " {");
+    out.print("public class " + state.scannerClass() + " implements Scanner, " +
+        state.constantsClass() + " {");
 
     writeScannerDeclarations(out);
 
@@ -396,13 +401,13 @@ final class LexGen implements FileGenerator, JavaCCConstants {
     if (Options.getScannerUsesParser()) {
       out.println();
       out.println("/** The parser. */");
-      out.println("public " + JavaCCGlobals.parserClass() + " parser = null;");
+      out.println("public " + state.parserClass() + " parser = null;");
     }
   }
 
   private void writeScannerDeclarations(IndentingPrintWriter out)
       throws IOException {
-    List<Token> tokens = JavaCCGlobals.scannerDeclarations;
+    List<Token> tokens = state.scannerDeclarations;
     if (tokens != null
         && tokens.size() > 0) {
       boolean commonTokenActionSeen = false;
@@ -486,11 +491,11 @@ final class LexGen implements FileGenerator, JavaCCConstants {
   }
 
   private void buildLexStatesTable() {
-    Iterator<TokenProduction> it = JavaCCGlobals.regExpList.iterator();
+    Iterator<TokenProduction> it = state.regExpList.iterator();
     TokenProduction tp;
     int i;
 
-    String[] tmpLexStateName = new String[JavaCCGlobals.lexStateI2S.size()];
+    String[] tmpLexStateName = new String[state.lexStateI2S.size()];
     while (it.hasNext()) {
       tp = it.next();
       List respecs = tp.reSpecs;
@@ -524,8 +529,8 @@ final class LexGen implements FileGenerator, JavaCCConstants {
     toToken = new long[maxOrdinal / 64 + 1];
     toToken[0] = 1L;
     actions = new Action[maxOrdinal];
-    actions[0] = JavaCCGlobals.eofAction;
-    hasTokenActions = JavaCCGlobals.eofAction != null;
+    actions[0] = state.eofAction;
+    hasTokenActions = state.eofAction != null;
     initStates = new Hashtable();
     canMatchAnyChar = new int[maxLexStates];
     canLoop = new boolean[maxLexStates];
@@ -543,7 +548,7 @@ final class LexGen implements FileGenerator, JavaCCConstants {
     maxLongsReqd = new int[maxLexStates];
     initMatch = new int[maxLexStates];
     newLexState = new String[maxOrdinal];
-    newLexState[0] = JavaCCGlobals.eofNextState;
+    newLexState[0] = state.eofNextState;
     hasEmptyMatch = false;
     lexStates = new int[maxOrdinal];
     ignoreCase = new boolean[maxOrdinal];
@@ -758,12 +763,12 @@ final class LexGen implements FileGenerator, JavaCCConstants {
     if (Options.getScannerUsesParser()) {
       out.println();
       out.println("/** Constructor with parser. */");
-      out.println("public " + JavaCCGlobals.scannerClass() + "(" + JavaCCGlobals.parserClass() + " parserArg, CharStream stream) {");
+      out.println("public " + state.scannerClass() + "(" + state.parserClass() + " parserArg, CharStream stream) {");
       out.println("   parser = parserArg;");
     }
     else {
       out.println("/** Constructor. */");
-      out.println("public " + JavaCCGlobals.scannerClass() + "(CharStream stream) {");
+      out.println("public " + state.scannerClass() + "(CharStream stream) {");
     }
 
     out.println("   charStream = stream;");
@@ -773,13 +778,13 @@ final class LexGen implements FileGenerator, JavaCCConstants {
     if (Options.getScannerUsesParser()) {
       out.println();
       out.println("/** Constructor with parser. */");
-      out.println("public " + JavaCCGlobals.scannerClass() + "(" + JavaCCGlobals.parserClass() + " parserArg, CharStream stream, int lexState) {");
+      out.println("public " + state.scannerClass() + "(" + state.parserClass() + " parserArg, CharStream stream, int lexState) {");
       out.println("   this(parserArg, stream);");
     }
     else {
       out.println();
       out.println("/** Constructor. */");
-      out.println("public " + JavaCCGlobals.scannerClass() + "(CharStream stream, int lexState) {");
+      out.println("public " + state.scannerClass() + "(CharStream stream, int lexState) {");
       out.println("   this(stream);");
     }
     out.println("   switchTo(lexState);");
@@ -957,7 +962,7 @@ final class LexGen implements FileGenerator, JavaCCConstants {
     out.println("jjMatchedKind = 0;");
     out.println("token = jjFillToken();");
 
-    if (JavaCCGlobals.eofNextState != null || JavaCCGlobals.eofAction != null) {
+    if (state.eofNextState != null || state.eofAction != null) {
       out.println("tokenLexicalActions(token);");
     }
 

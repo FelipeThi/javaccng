@@ -30,7 +30,9 @@ package org.javacc.parser;
 
 /** Output error messages and keep track of totals. */
 public final class JavaCCErrors {
-  private static int parseErrorCount = 0, semanticErrorCount = 0, warningCount = 0;
+  private static int parseErrorCount;
+  private static int semanticErrorCount;
+  private static int warningCount;
 
   private JavaCCErrors() {}
 

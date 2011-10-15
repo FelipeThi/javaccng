@@ -31,6 +31,7 @@ package org.javacc.jjdoc;
 import org.javacc.parser.JavaCCErrors;
 import org.javacc.parser.JavaCCParser;
 import org.javacc.parser.JavaCCScanner;
+import org.javacc.parser.JavaCCState;
 import org.javacc.parser.JavaCharStream;
 import org.javacc.parser.MetaParseException;
 import org.javacc.parser.ParseException;
@@ -114,10 +115,14 @@ public final class Main {
       }
     }
     try {
+      JavaCCState state = new JavaCCState();
+
+      parser.setState(state);
 
       parser.javacc_input();
-      JJDoc jjDoc = new JJDoc();
-      jjDoc.start();
+
+      JJDoc doc = new JJDoc(state);
+      doc.start();
 
       if (JavaCCErrors.getErrorCount() == 0) {
         if (JavaCCErrors.getWarningCount() == 0) {

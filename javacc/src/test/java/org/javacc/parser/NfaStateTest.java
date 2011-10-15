@@ -20,8 +20,9 @@ import static org.junit.Assert.*;
  * @since 16 Mar 2007
  */
 public class NfaStateTest extends JavaCCTestCase {
-  String path = getJJInputDirectory() + "JavaCC.jj";
-  private final LexGen lexGen = new LexGen();
+  private final String path = getJJInputDirectory() + "JavaCC.jj";
+  private final JavaCCState state = new JavaCCState();
+  private final LexGen lexGen = new LexGen(state);
 
   @Before
   public void setUp() throws Exception {
@@ -34,9 +35,10 @@ public class NfaStateTest extends JavaCCTestCase {
         new InputStreamReader(
             new FileInputStream(path), Options.getGrammarEncoding()));
     JavaCCParser parser = new JavaCCParser(new JavaCCScanner(new JavaCharStream(reader)));
+    parser.setState(state);
     parser.javacc_input();
-    JavaCCGlobals.fileName = path;
-    Semanticize semanticize = new Semanticize();
+    state.fileName = path;
+    Semanticize semanticize = new Semanticize(state);
     semanticize.start();
     lexGen.start();
   }
@@ -88,7 +90,7 @@ public class NfaStateTest extends JavaCCTestCase {
   public void testDumpStateSets() {
     StringWriter output = new StringWriter();
     IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
-    LexGen lexGen = new LexGen();
+    LexGen lexGen = new LexGen(state);
     lexGen.nfaStates.dumpStateSets(contentWriter);
     assertEquals("static final int[] jjNextStates = {\n};\n",
         output.toString().replaceAll("\r", ""));

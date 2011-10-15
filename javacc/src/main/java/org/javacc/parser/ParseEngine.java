@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 public final class ParseEngine {
+  private final JavaCCState state;
   /**
    * maskIndex, jj2index, maskValues are variables that are shared between
    * ParseEngine and ParseGen.
@@ -74,7 +75,8 @@ public final class ParseEngine {
   private final List<Phase3Data> phase3list = new ArrayList<Phase3Data>();
   private final Map<Expansion, Phase3Data> phase3table = new HashMap<Expansion, Phase3Data>();
 
-  public ParseEngine(Semanticize semanticize) {
+  public ParseEngine(JavaCCState state, Semanticize semanticize) {
+    this.state = state;
     this.semanticize = semanticize;
   }
 
@@ -227,7 +229,7 @@ public final class ParseEngine {
   static final int OPENSWITCH = 2;
 
   void build(IndentingPrintWriter out) throws IOException {
-    for (NormalProduction production : JavaCCGlobals.bnfProductions) {
+    for (NormalProduction production : state.bnfProductions) {
       if (production instanceof JavaCodeProduction) {
         JavaCodeProduction jp = (JavaCodeProduction) production;
         Token t = jp.getReturnTypeTokens().get(0);
@@ -331,11 +333,11 @@ public final class ParseEngine {
     // The state variables.
     int state = NOOPENSTM;
     int indentAmt = 0;
-    boolean[] casedValues = new boolean[JavaCCGlobals.tokenCount];
+    boolean[] casedValues = new boolean[this.state.tokenCount];
     String retval = "";
     Lookahead la;
     Token t = null;
-    int tokenMaskSize = (JavaCCGlobals.tokenCount - 1) / 32 + 1;
+    int tokenMaskSize = (this.state.tokenCount - 1) / 32 + 1;
     int[] tokenMask = null;
 
     // Iterate over all the conditions.
@@ -398,9 +400,9 @@ public final class ParseEngine {
         // is no semantic lookahead.
 
         if (firstSet == null) {
-          firstSet = new boolean[JavaCCGlobals.tokenCount];
+          firstSet = new boolean[this.state.tokenCount];
         }
-        for (int i = 0; i < JavaCCGlobals.tokenCount; i++) {
+        for (int i = 0; i < this.state.tokenCount; i++) {
           firstSet[i] = false;
         }
         // jj2LA is set to false at the beginning of the containing "if" statement.
@@ -425,7 +427,7 @@ public final class ParseEngine {
               else {
                 retval += "(jj_ntk==-1)?jj_ntk():jj_ntk) {\u0001";
               }
-              for (int i = 0; i < JavaCCGlobals.tokenCount; i++) {
+              for (int i = 0; i < this.state.tokenCount; i++) {
                 casedValues[i] = false;
               }
               indentAmt++;
@@ -435,7 +437,7 @@ public final class ParseEngine {
               }
               // Don't need to do anything if state is OPENSWITCH.
           }
-          for (int i = 0; i < JavaCCGlobals.tokenCount; i++) {
+          for (int i = 0; i < this.state.tokenCount; i++) {
             if (firstSet[i]) {
               if (!casedValues[i]) {
                 casedValues[i] = true;
@@ -443,7 +445,7 @@ public final class ParseEngine {
                 int j1 = i / 32;
                 int j2 = i % 32;
                 tokenMask[j1] |= 1 << j2;
-                String s = JavaCCGlobals.namesOfTokens.get(i);
+                String s = this.state.namesOfTokens.get(i);
                 if (s == null) {
                   retval += i;
                 }
@@ -670,7 +672,7 @@ public final class ParseEngine {
       }
       String tail = e_nrw.rhsToken == null ? ");" : ")." + e_nrw.rhsToken.getImage() + ";";
       if (e_nrw.label.equals("")) {
-        String label = JavaCCGlobals.namesOfTokens.get(e_nrw.ordinal);
+        String label = state.namesOfTokens.get(e_nrw.ordinal);
         if (label != null) {
           retval += "jj_consume_token(" + label + tail;
         }
@@ -909,7 +911,7 @@ public final class ParseEngine {
         }
         else if (seq instanceof NonTerminal) {
           NonTerminal e_nrw = (NonTerminal) seq;
-          NormalProduction production = JavaCCGlobals.productionTable.get(e_nrw.getName());
+          NormalProduction production = state.productionTable.get(e_nrw.getName());
           if (production instanceof JavaCodeProduction) {
             break; // nothing to do here
           }
@@ -954,7 +956,7 @@ public final class ParseEngine {
       // fact, we rely here on the fact that the "name" fields of both these
       // variables are the same.
       NonTerminal e_nrw = (NonTerminal) e;
-      NormalProduction production = JavaCCGlobals.productionTable.get(e_nrw.getName());
+      NormalProduction production = state.productionTable.get(e_nrw.getName());
       if (production instanceof JavaCodeProduction) {
         // nothing to do here
       }
@@ -1036,7 +1038,7 @@ public final class ParseEngine {
     if (e instanceof RegularExpression) {
       RegularExpression e_nrw = (RegularExpression) e;
       if (e_nrw.label.equals("")) {
-        String label = JavaCCGlobals.namesOfTokens.get(e_nrw.ordinal);
+        String label = state.namesOfTokens.get(e_nrw.ordinal);
         if (label != null) {
           out.println("    if (jj_scan_token(" + label + ")) " + genReturn(true));
         }
@@ -1055,7 +1057,7 @@ public final class ParseEngine {
       // fact, we rely here on the fact that the "name" fields of both these
       // variables are the same.
       NonTerminal e_nrw = (NonTerminal) e;
-      NormalProduction ntprod = JavaCCGlobals.productionTable.get(e_nrw.getName());
+      NormalProduction ntprod = state.productionTable.get(e_nrw.getName());
       if (ntprod instanceof JavaCodeProduction) {
         out.println("    if (true) { jj_la = 0; jj_scanPos = jj_lastPos; " + genReturn(false) + "}");
       }
@@ -1204,7 +1206,7 @@ public final class ParseEngine {
     }
     else if (e instanceof NonTerminal) {
       NonTerminal e_nrw = (NonTerminal) e;
-      NormalProduction production = JavaCCGlobals.productionTable.get(e_nrw.getName());
+      NormalProduction production = state.productionTable.get(e_nrw.getName());
       if (production instanceof JavaCodeProduction) {
         retval = Integer.MAX_VALUE;
         // Make caller think this is unending (for we do not go beyond JAVACODE during

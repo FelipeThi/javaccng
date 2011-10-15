@@ -73,14 +73,14 @@ public final class LookaheadCalc {
     return false;
   }
 
-  static String image(MatchInfo m) {
+  static String image(JavaCCState state, MatchInfo m) {
     String ret = "";
     for (int i = 0; i < m.firstFreeLoc; i++) {
       if (m.match[i] == 0) {
         ret += " <EOF>";
       }
       else {
-        RegularExpression re = JavaCCGlobals.regExpsOfTokens.get(m.match[i]);
+        RegularExpression re = state.regExpsOfTokens.get(m.match[i]);
         if (re instanceof RStringLiteral) {
           ret += " \"" + Parsers.escape(((RStringLiteral) re).image) + "\"";
         }
@@ -100,7 +100,7 @@ public final class LookaheadCalc {
     }
   }
 
-  public void choiceCalc(Semanticize semanticize, Choice ch) {
+  public void choiceCalc(JavaCCState state, Semanticize semanticize, Choice ch) {
     int first = firstChoice(ch);
     // dbl[i] and dbr[i] are lists of size limited matches for choice i
     // of ch.  dbl ignores matches with semantic lookaheads (when force_la_check
@@ -177,7 +177,7 @@ public final class LookaheadCalc {
         System.err.print(" and line " + ch.getChoices().get(other[i]).getLine());
         System.err.print(", column " + ch.getChoices().get(other[i]).getColumn());
         System.err.println(" respectively.");
-        System.err.println("         A common prefix is: " + image(overlapInfo[i]));
+        System.err.println("         A common prefix is: " + image(state, overlapInfo[i]));
         System.err.println("         Consider using a lookahead of " + minLA[i] + " or more for earlier expansion.");
       }
       else if (minLA[i] > 1) {
@@ -187,7 +187,7 @@ public final class LookaheadCalc {
         System.err.print(" and line " + ch.getChoices().get(other[i]).getLine());
         System.err.print(", column " + ch.getChoices().get(other[i]).getColumn());
         System.err.println(" respectively.");
-        System.err.println("         A common prefix is: " + image(overlapInfo[i]));
+        System.err.println("         A common prefix is: " + image(state, overlapInfo[i]));
         System.err.println("         Consider using a lookahead of " + minLA[i] + " for earlier expansion.");
       }
     }
@@ -230,7 +230,7 @@ public final class LookaheadCalc {
     }
   }
 
-  public void ebnfCalc(Expansion exp, Expansion nested) {
+  public void ebnfCalc(JavaCCState state, Expansion exp, Expansion nested) {
     // exp is one of OneOrMore, ZeroOrMore, ZeroOrOne
     MatchInfo m, m1 = null;
     List<MatchInfo> v, first, follow;
@@ -265,14 +265,14 @@ public final class LookaheadCalc {
       JavaCCErrors.warning("Choice conflict in " + image(exp) + " construct " +
           "at line " + exp.getLine() + ", column " + exp.getColumn() + ".");
       System.err.println("         Expansion nested within construct and expansion following construct");
-      System.err.println("         have common prefixes, one of which is: " + image(m1));
+      System.err.println("         have common prefixes, one of which is: " + image(state, m1));
       System.err.println("         Consider using a lookahead of " + la + " or more for nested expansion.");
     }
     else if (la > 1) {
       JavaCCErrors.warning("Choice conflict in " + image(exp) + " construct " +
           "at line " + exp.getLine() + ", column " + exp.getColumn() + ".");
       System.err.println("         Expansion nested within construct and expansion following construct");
-      System.err.println("         have common prefixes, one of which is: " + image(m1));
+      System.err.println("         have common prefixes, one of which is: " + image(state, m1));
       System.err.println("         Consider using a lookahead of " + la + " for nested expansion.");
     }
   }

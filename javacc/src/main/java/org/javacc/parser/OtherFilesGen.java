@@ -37,9 +37,11 @@ import java.util.List;
 
 /** Generates the Constants file. */
 final class OtherFilesGen implements FileGenerator, JavaCCConstants {
+  private final JavaCCState state;
   private final LexGen lexGen;
 
-  OtherFilesGen(LexGen lexGen) {
+  OtherFilesGen(JavaCCState state, LexGen lexGen) {
+    this.state = state;
     this.lexGen = lexGen;
   }
 
@@ -49,7 +51,7 @@ final class OtherFilesGen implements FileGenerator, JavaCCConstants {
       throw new MetaParseException();
     }
 
-    File path = new File(Options.getOutputDirectory(), JavaCCGlobals.constantsClass() + ".java");
+    File path = new File(Options.getOutputDirectory(), state.constantsClass() + ".java");
     OutputFile outputFile = new OutputFile(path);
     IndentingPrintWriter out = outputFile.getPrintWriter();
     try {
@@ -62,16 +64,16 @@ final class OtherFilesGen implements FileGenerator, JavaCCConstants {
 
   private void generate(LexGen lexGen, IndentingPrintWriter out)
       throws IOException {
-    TokenPrinter.packageDeclaration(JavaCCGlobals.cuToInsertionPoint1, out);
+    TokenPrinter.packageDeclaration(state.cuToInsertionPoint1, out);
 
     out.println();
     out.println("/** Token literal values and constants. */");
-    out.print("public interface " + JavaCCGlobals.constantsClass() + " {");
+    out.print("public interface " + state.constantsClass() + " {");
     out.println();
 
     out.println("  /** End of File. */");
     out.println("  int EOF = 0;");
-    for (RegularExpression re : JavaCCGlobals.orderedNamedTokens) {
+    for (RegularExpression re : state.orderedNamedTokens) {
       out.println("  /** RegularExpression Id. */");
       out.println("  int " + re.label + " = " + re.ordinal + ";");
     }
@@ -87,7 +89,7 @@ final class OtherFilesGen implements FileGenerator, JavaCCConstants {
     out.println("  String[] tokenImage = {");
     out.println("    \"<EOF>\",");
 
-    for (TokenProduction tp : JavaCCGlobals.regExpList) {
+    for (TokenProduction tp : state.regExpList) {
       List<RegExpSpec> reSpecs = tp.reSpecs;
       for (RegExpSpec reSpec : reSpecs) {
         RegularExpression re = reSpec.regExp;
