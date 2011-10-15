@@ -47,8 +47,8 @@ public class JavaParserTest {
 
     for (Source source : sources) {
       Reader reader = new StringReader(source.content);
-      CharStream charStream = new JavaCharStream(reader);
-      Scanner scanner = new JavaParserScanner(charStream);
+      JavaCharStream charStream = new JavaCharStream(reader);
+      JavaParserScanner scanner = new JavaParserScanner(charStream);
       JavaParser parser = new JavaParser(scanner);
       try {
         parser.CompilationUnit();
@@ -89,8 +89,8 @@ public class JavaParserTest {
   @Test
   public void parsingErrorReporting() throws IOException {
     Reader reader = new StringReader("final class MyClass {\nvoid ();\n}");
-    CharStream charStream = new JavaCharStream(reader);
-    Scanner scanner = new JavaParserScanner(charStream);
+    JavaCharStream charStream = new JavaCharStream(reader);
+    JavaParserScanner scanner = new JavaParserScanner(charStream);
     ParseException exception = null;
     try {
       JavaParser parser = new JavaParser(scanner);

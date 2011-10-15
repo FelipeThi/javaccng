@@ -18,9 +18,9 @@ class Parse {
     else {
       reader = new InputStreamReader(new FileInputStream(new File(args[0])));
     }
-    CharStream charStream = new JavaCharStream(reader);
-    Scanner tokenManager = new JavaParserScanner(charStream);
-    JavaParser parser = new JavaParser(tokenManager);
+    JavaCharStream charStream = new JavaCharStream(reader);
+    JavaParserScanner scanner = new JavaParserScanner(charStream);
+    JavaParser parser = new JavaParser(scanner);
     parser.CompilationUnit();
   }
 }
