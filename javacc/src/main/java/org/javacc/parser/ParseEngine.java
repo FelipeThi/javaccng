@@ -473,7 +473,7 @@ public final class ParseEngine {
           phase1NewLine();
         }
         else {
-          out.println("");
+          out.println();
         }
       }
       else if (ch == '\u0001') {
@@ -533,7 +533,7 @@ public final class ParseEngine {
     out.print(" {");
     indentamt = 4;
     if (Options.getDebugParser()) {
-      out.println("");
+      out.println();
       out.println("    trace_call(\"" + p.getLhs() + "\");");
       out.print("    try {");
       indentamt = 6;
@@ -549,7 +549,7 @@ public final class ParseEngine {
     }
     String code = phase1ExpansionGen(p.getExpansion());
     dumpFormattedString(code);
-    out.println("");
+    out.println();
     if (p.isJumpPatched() && !voidReturn) {
       out.println("    throw new Error(\"Missing return statement in function\");");
     }
@@ -559,11 +559,11 @@ public final class ParseEngine {
       out.println("    }");
     }
     out.println("  }");
-    out.println("");
+    out.println();
   }
 
   void phase1NewLine() {
-    out.println("");
+    out.println();
     for (int i = 0; i < indentamt; i++) {
       out.print(" ");
     }
@@ -787,14 +787,14 @@ public final class ParseEngine {
   void buildPhase2Routine(Lookahead la) {
     Expansion e = la.getLaExpansion();
     out.println("  private boolean jj_2" + e.internalName + "(int xla) throws java.io.IOException {");
-    out.println("    jj_la = xla; jj_lastpos = jj_scanpos = token;");
+    out.println("    jj_la = xla; jj_lastPos = jj_scanPos = token;");
     out.println("    try { return !jj_3" + e.internalName + "(); }");
     out.println("    catch(LookaheadSuccess ls) { return true; }");
     if (Options.getErrorReporting()) {
       out.println("    finally { jj_save(" + (Integer.parseInt(e.internalName.substring(1)) - 1) + ", xla); }");
     }
     out.println("  }");
-    out.println("");
+    out.println();
     Phase3Data p3d = new Phase3Data(e, la.getAmount());
     phase3list.add(p3d);
     phase3table.put(e, p3d);
@@ -965,7 +965,7 @@ public final class ParseEngine {
       else {
         out.println("    if (jj_scan_token(" + e_nrw.label + ")) " + genReturn(true));
       }
-      //out.println("    if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
+      //out.println("    if (jj_la == 0 && jj_scanPos == jj_lastPos) " + genReturn(false));
     }
     else if (e instanceof NonTerminal) {
       // All expansions of non-terminals have the "name" fields set.  So
@@ -975,13 +975,13 @@ public final class ParseEngine {
       NonTerminal e_nrw = (NonTerminal) e;
       NormalProduction ntprod = JavaCCGlobals.productionTable.get(e_nrw.getName());
       if (ntprod instanceof JavaCodeProduction) {
-        out.println("    if (true) { jj_la = 0; jj_scanpos = jj_lastpos; " + genReturn(false) + "}");
+        out.println("    if (true) { jj_la = 0; jj_scanPos = jj_lastPos; " + genReturn(false) + "}");
       }
       else {
         Expansion ntexp = ntprod.getExpansion();
         //out.println("    if (jj_3" + ntexp.internal_name + "()) " + genReturn(true));
         out.println("    if (" + genjj_3Call(ntexp) + ") " + genReturn(true));
-        //out.println("    if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
+        //out.println("    if (jj_la == 0 && jj_scanPos == jj_lastPos) " + genReturn(false));
       }
     }
     else if (e instanceof Choice) {
@@ -992,7 +992,7 @@ public final class ParseEngine {
           xsp_declared = true;
           out.println("    Token xsp;");
         }
-        out.println("    xsp = jj_scanpos;");
+        out.println("    xsp = jj_scanPos;");
       }
       for (int i = 0; i < e_nrw.getChoices().size(); i++) {
         nested_seq = (Sequence) e_nrw.getChoices().get(i);
@@ -1018,16 +1018,16 @@ public final class ParseEngine {
         if (i != e_nrw.getChoices().size() - 1) {
           //out.println("jj_3" + nested_seq.internal_name + "()) {");
           out.println(genjj_3Call(nested_seq) + ") {");
-          out.println("    jj_scanpos = xsp;");
+          out.println("    jj_scanPos = xsp;");
         }
         else {
           //out.println("jj_3" + nested_seq.internal_name + "()) " + genReturn(true));
           out.println(genjj_3Call(nested_seq) + ") " + genReturn(true));
-          //out.println("    if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
+          //out.println("    if (jj_la == 0 && jj_scanPos == jj_lastPos) " + genReturn(false));
         }
       }
       for (int i = 1; i < e_nrw.getChoices().size(); i++) {
-        //out.println("    } else if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
+        //out.println("    } else if (jj_la == 0 && jj_scanPos == jj_lastPos) " + genReturn(false));
         out.println("    }");
       }
     }
@@ -1062,12 +1062,12 @@ public final class ParseEngine {
       Expansion nested_e = e_nrw.expansion;
       //out.println("    if (jj_3" + nested_e.internal_name + "()) " + genReturn(true));
       out.println("    if (" + genjj_3Call(nested_e) + ") " + genReturn(true));
-      //out.println("    if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
+      //out.println("    if (jj_la == 0 && jj_scanPos == jj_lastPos) " + genReturn(false));
       out.println("    while (true) {");
-      out.println("      xsp = jj_scanpos;");
-      //out.println("      if (jj_3" + nested_e.internal_name + "()) { jj_scanpos = xsp; break; }");
-      out.println("      if (" + genjj_3Call(nested_e) + ") { jj_scanpos = xsp; break; }");
-      //out.println("      if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
+      out.println("      xsp = jj_scanPos;");
+      //out.println("      if (jj_3" + nested_e.internal_name + "()) { jj_scanPos = xsp; break; }");
+      out.println("      if (" + genjj_3Call(nested_e) + ") { jj_scanPos = xsp; break; }");
+      //out.println("      if (jj_la == 0 && jj_scanPos == jj_lastPos) " + genReturn(false));
       out.println("    }");
     }
     else if (e instanceof ZeroOrMore) {
@@ -1078,10 +1078,10 @@ public final class ParseEngine {
       ZeroOrMore e_nrw = (ZeroOrMore) e;
       Expansion nested_e = e_nrw.expansion;
       out.println("    while (true) {");
-      out.println("      xsp = jj_scanpos;");
-      //out.println("      if (jj_3" + nested_e.internal_name + "()) { jj_scanpos = xsp; break; }");
-      out.println("      if (" + genjj_3Call(nested_e) + ") { jj_scanpos = xsp; break; }");
-      //out.println("      if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
+      out.println("      xsp = jj_scanPos;");
+      //out.println("      if (jj_3" + nested_e.internal_name + "()) { jj_scanPos = xsp; break; }");
+      out.println("      if (" + genjj_3Call(nested_e) + ") { jj_scanPos = xsp; break; }");
+      //out.println("      if (jj_la == 0 && jj_scanPos == jj_lastPos) " + genReturn(false));
       out.println("    }");
     }
     else if (e instanceof ZeroOrOne) {
@@ -1091,15 +1091,15 @@ public final class ParseEngine {
       }
       ZeroOrOne e_nrw = (ZeroOrOne) e;
       Expansion nested_e = e_nrw.expansion;
-      out.println("    xsp = jj_scanpos;");
-      //out.println("    if (jj_3" + nested_e.internal_name + "()) jj_scanpos = xsp;");
-      out.println("    if (" + genjj_3Call(nested_e) + ") jj_scanpos = xsp;");
-      //out.println("    else if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
+      out.println("    xsp = jj_scanPos;");
+      //out.println("    if (jj_3" + nested_e.internal_name + "()) jj_scanPos = xsp;");
+      out.println("    if (" + genjj_3Call(nested_e) + ") jj_scanPos = xsp;");
+      //out.println("    else if (jj_la == 0 && jj_scanPos == jj_lastPos) " + genReturn(false));
     }
     if (!recursive_call) {
       out.println("    " + genReturn(false));
       out.println("  }");
-      out.println("");
+      out.println();
     }
   }
 
@@ -1231,7 +1231,7 @@ public final class ParseEngine {
         }
         out.print(" {");
         if (Options.getDebugParser()) {
-          out.println("");
+          out.println();
           out.println("    trace_call(\"" + jp.getLhs() + "\");");
           out.print("    try {");
         }
@@ -1240,14 +1240,14 @@ public final class ParseEngine {
           TokenPrinter.cLine--;
           TokenPrinter.printTokenList(jp.getCodeTokens(), out);
         }
-        out.println("");
+        out.println();
         if (Options.getDebugParser()) {
           out.println("    } finally {");
           out.println("      trace_return(\"" + jp.getLhs() + "\");");
           out.println("    }");
         }
         out.println("  }");
-        out.println("");
+        out.println();
       }
       else {
         buildPhase1Routine((BNFProduction) production);
