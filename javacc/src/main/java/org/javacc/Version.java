@@ -36,6 +36,8 @@ import java.util.Properties;
 public class Version {
   private Version() {}
 
+  /** String that identifies the JavaCC generated files. */
+  public static final String toolName = "JavaCC";
   public static final String majorVersion;
   public static final String minorVersion;
   public static final String patchVersion;
@@ -52,8 +54,8 @@ public class Version {
       try {
         props.load(is);
       }
-      catch (IOException e) {
-        System.err.println("Could not read version.properties: " + e);
+      catch (IOException ex) {
+        System.err.println("Could not read version.properties: " + ex.getMessage());
       }
       major = props.getProperty("version.major", major);
       minor = props.getProperty("version.minor", minor);

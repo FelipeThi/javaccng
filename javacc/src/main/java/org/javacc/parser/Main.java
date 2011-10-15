@@ -129,6 +129,9 @@ public final class Main {
       OtherFilesGen otherFilesGen = new OtherFilesGen(lexGen);
       otherFilesGen.start();
 
+      JavaFiles javaFiles = new JavaFiles();
+      javaFiles.start();
+
       if (JavaCCErrors.getErrorCount() == 0
           && (Options.getBuildParser() || Options.getBuildScanner())) {
         if (JavaCCErrors.getWarningCount() == 0) {

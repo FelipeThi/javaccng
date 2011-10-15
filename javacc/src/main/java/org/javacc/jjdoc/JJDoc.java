@@ -28,7 +28,37 @@
 
 package org.javacc.jjdoc;
 
-import org.javacc.parser.*;
+import org.javacc.parser.Action;
+import org.javacc.parser.BNFProduction;
+import org.javacc.parser.CharacterRange;
+import org.javacc.parser.Choice;
+import org.javacc.parser.Expansion;
+import org.javacc.parser.JavaCCGlobals;
+import org.javacc.parser.JavaCodeProduction;
+import org.javacc.parser.Lookahead;
+import org.javacc.parser.NonTerminal;
+import org.javacc.parser.NormalProduction;
+import org.javacc.parser.OneOrMore;
+import org.javacc.parser.RCharacterList;
+import org.javacc.parser.RChoice;
+import org.javacc.parser.REndOfFile;
+import org.javacc.parser.RJustName;
+import org.javacc.parser.ROneOrMore;
+import org.javacc.parser.RRepetitionRange;
+import org.javacc.parser.RSequence;
+import org.javacc.parser.RStringLiteral;
+import org.javacc.parser.RZeroOrMore;
+import org.javacc.parser.RZeroOrOne;
+import org.javacc.parser.RegExpSpec;
+import org.javacc.parser.RegularExpression;
+import org.javacc.parser.Sequence;
+import org.javacc.parser.SingleCharacter;
+import org.javacc.parser.Token;
+import org.javacc.parser.TokenPrinter;
+import org.javacc.parser.TokenProduction;
+import org.javacc.parser.TryBlock;
+import org.javacc.parser.ZeroOrMore;
+import org.javacc.parser.ZeroOrOne;
 import org.javacc.utils.Parsers;
 
 import java.util.Iterator;
@@ -60,10 +90,10 @@ public class JJDoc {
     token = getPrecedingSpecialToken(token);
     String s = "";
     if (token != null) {
-      JavaCCGlobals.cline = token.getBeginLine();
-      JavaCCGlobals.ccol = token.getBeginColumn();
+      TokenPrinter.cLine = token.getBeginLine();
+      TokenPrinter.cCol = token.getBeginColumn();
       while (token != null) {
-        s += JavaCCGlobals.printTokenOnly(token);
+        s += TokenPrinter.printTokenOnly(token);
         token = token.next;
       }
     }
@@ -430,13 +460,13 @@ public class JJDoc {
       Token stok = getPrecedingSpecialToken(tok);
       if (firstToken) {
         if (stok != null) {
-          cline = stok.beginLine;
-          ccol = stok.beginColumn;
+          cLine = stok.beginLine;
+          cCol = stok.beginColumn;
         } else {
-          cline = tok.beginLine;
-          ccol = tok.beginColumn;
+          cLine = tok.beginLine;
+          cCol = tok.beginColumn;
         }
-        s = ws(ccol - 1);
+        s = ws(cCol - 1);
         firstToken = false;
       }
       while (stok != null) {

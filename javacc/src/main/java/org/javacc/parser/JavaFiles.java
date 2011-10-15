@@ -34,204 +34,59 @@ import org.javacc.utils.io.IndentingPrintWriter;
 import java.io.File;
 import java.io.IOException;
 
-/** Generate CharStream, Scanner and Exceptions. */
-public class JavaFiles implements JavaCCParserConstants {
-  public void gen_JavaCharStream() throws IOException {
-    File path = new File(Options.getOutputDirectory(), "JavaCharStream.java");
-    OutputFile outputFile = new OutputFile(path);
-    IndentingPrintWriter out = outputFile.getPrintWriter();
-    try {
-      if (JavaCCGlobals.cuToInsertionPoint1.size() != 0
-          && JavaCCGlobals.cuToInsertionPoint1.get(0).getKind() == PACKAGE) {
-        for (int i = 1; i < JavaCCGlobals.cuToInsertionPoint1.size(); i++) {
-          if (JavaCCGlobals.cuToInsertionPoint1.get(i).getKind() == SEMICOLON) {
-            JavaCCGlobals.cline = JavaCCGlobals.cuToInsertionPoint1.get(0).getBeginLine();
-            JavaCCGlobals.ccol = JavaCCGlobals.cuToInsertionPoint1.get(0).getBeginColumn();
-            for (int j = 0; j <= i; j++) {
-              JavaCCGlobals.printToken(JavaCCGlobals.cuToInsertionPoint1.get(j), out);
-            }
-            out.println("");
-            out.println("");
-            break;
-          }
-        }
-      }
-      JavaFileGenerator generator = new JavaFileGenerator(
-          "/templates/JavaCharStream.template", Options.getOptions());
-      generator.generate(out);
+/** Generate boilerplate java files. */
+public class JavaFiles implements FileGenerator, JavaCCParserConstants {
+  @Override
+  public void start() throws IOException {
+    generateScanner();
+    generateToken();
+    generateScannerException();
+    generateParseException();
+    generateCharStream();
+    if (Options.getJavaUnicodeEscape()) {
+      generateJavaCharStream();
     }
-    finally {
-      out.close();
+    else {
+      generateSimpleCharStream();
     }
   }
 
-  public void gen_SimpleCharStream() throws IOException {
-    File path = new File(Options.getOutputDirectory(), "SimpleCharStream.java");
-    OutputFile outputFile = new OutputFile(path);
-    IndentingPrintWriter out = outputFile.getPrintWriter();
-    try {
-      if (JavaCCGlobals.cuToInsertionPoint1.size() != 0
-          && JavaCCGlobals.cuToInsertionPoint1.get(0).getKind() == PACKAGE) {
-        for (int i = 1; i < JavaCCGlobals.cuToInsertionPoint1.size(); i++) {
-          if (JavaCCGlobals.cuToInsertionPoint1.get(i).getKind() == SEMICOLON) {
-            JavaCCGlobals.cline = JavaCCGlobals.cuToInsertionPoint1.get(0).getBeginLine();
-            JavaCCGlobals.ccol = JavaCCGlobals.cuToInsertionPoint1.get(0).getBeginColumn();
-            for (int j = 0; j <= i; j++) {
-              JavaCCGlobals.printToken(JavaCCGlobals.cuToInsertionPoint1.get(j), out);
-            }
-            out.println("");
-            out.println("");
-            break;
-          }
-        }
-      }
-      JavaFileGenerator generator = new JavaFileGenerator(
-          "/templates/SimpleCharStream.template", Options.getOptions());
-      generator.generate(out);
-    }
-    finally {
-      out.close();
-    }
+  public void generateScanner() throws IOException {
+    generate("/templates/Scanner.template", "Scanner.java");
   }
 
-  public void gen_CharStream() throws IOException {
-    File path = new File(Options.getOutputDirectory(), "CharStream.java");
-    OutputFile outputFile = new OutputFile(path);
-    IndentingPrintWriter out = outputFile.getPrintWriter();
-    try {
-      if (JavaCCGlobals.cuToInsertionPoint1.size() != 0
-          && JavaCCGlobals.cuToInsertionPoint1.get(0).getKind() == PACKAGE) {
-        for (int i = 1; i < JavaCCGlobals.cuToInsertionPoint1.size(); i++) {
-          if (JavaCCGlobals.cuToInsertionPoint1.get(i).getKind() == SEMICOLON) {
-            JavaCCGlobals.cline = JavaCCGlobals.cuToInsertionPoint1.get(0).getBeginLine();
-            JavaCCGlobals.ccol = JavaCCGlobals.cuToInsertionPoint1.get(0).getBeginColumn();
-            for (int j = 0; j <= i; j++) {
-              JavaCCGlobals.printToken(JavaCCGlobals.cuToInsertionPoint1.get(j), out);
-            }
-            out.println("");
-            out.println("");
-            break;
-          }
-        }
-      }
-      JavaFileGenerator generator = new JavaFileGenerator(
-          "/templates/CharStream.template", Options.getOptions());
-      generator.generate(out);
-    }
-    finally {
-      out.close();
-    }
+  public void generateToken() throws IOException {
+    generate("/templates/Token.template", "Token.java");
   }
 
-  public void gen_ParseException() throws IOException {
-    File path = new File(Options.getOutputDirectory(), "ParseException.java");
-    OutputFile outputFile = new OutputFile(path);
-    IndentingPrintWriter out = outputFile.getPrintWriter();
-    try {
-      if (JavaCCGlobals.cuToInsertionPoint1.size() != 0
-          && JavaCCGlobals.cuToInsertionPoint1.get(0).getKind() == PACKAGE) {
-        for (int i = 1; i < JavaCCGlobals.cuToInsertionPoint1.size(); i++) {
-          if (JavaCCGlobals.cuToInsertionPoint1.get(i).getKind() == SEMICOLON) {
-            JavaCCGlobals.cline = JavaCCGlobals.cuToInsertionPoint1.get(0).getBeginLine();
-            JavaCCGlobals.ccol = JavaCCGlobals.cuToInsertionPoint1.get(0).getBeginColumn();
-            for (int j = 0; j <= i; j++) {
-              JavaCCGlobals.printToken(JavaCCGlobals.cuToInsertionPoint1.get(j), out);
-            }
-            out.println("");
-            out.println("");
-            break;
-          }
-        }
-      }
-      JavaFileGenerator generator = new JavaFileGenerator(
-          "/templates/ParseException.template", Options.getOptions());
-      generator.generate(out);
-    }
-    finally {
-      out.close();
-    }
+  public void generateScannerException() throws IOException {
+    generate("/templates/ScannerException.template", "ScannerException.java");
   }
 
-  public void gen_TokenMgrError() throws IOException {
-    File path = new File(Options.getOutputDirectory(), "ScannerException.java");
-    OutputFile outputFile = new OutputFile(path);
-    IndentingPrintWriter out = outputFile.getPrintWriter();
-    try {
-      if (JavaCCGlobals.cuToInsertionPoint1.size() != 0
-          && JavaCCGlobals.cuToInsertionPoint1.get(0).getKind() == PACKAGE) {
-        for (int i = 1; i < JavaCCGlobals.cuToInsertionPoint1.size(); i++) {
-          if (JavaCCGlobals.cuToInsertionPoint1.get(i).getKind() == SEMICOLON) {
-            JavaCCGlobals.cline = JavaCCGlobals.cuToInsertionPoint1.get(0).getBeginLine();
-            JavaCCGlobals.ccol = JavaCCGlobals.cuToInsertionPoint1.get(0).getBeginColumn();
-            for (int j = 0; j <= i; j++) {
-              JavaCCGlobals.printToken(JavaCCGlobals.cuToInsertionPoint1.get(j), out);
-            }
-            out.println("");
-            out.println("");
-            break;
-          }
-        }
-      }
-      JavaFileGenerator generator = new JavaFileGenerator(
-          "/templates/ScannerException.template", Options.getOptions());
-      generator.generate(out);
-    }
-    finally {
-      out.close();
-    }
+  public void generateParseException() throws IOException {
+    generate("/templates/ParseException.template", "ParseException.java");
   }
 
-  public void gen_Token() throws IOException {
-    File path = new File(Options.getOutputDirectory(), "Token.java");
-    OutputFile outputFile = new OutputFile(path);
-    IndentingPrintWriter out = outputFile.getPrintWriter();
-    try {
-      if (JavaCCGlobals.cuToInsertionPoint1.size() != 0
-          && JavaCCGlobals.cuToInsertionPoint1.get(0).getKind() == PACKAGE) {
-        for (int i = 1; i < JavaCCGlobals.cuToInsertionPoint1.size(); i++) {
-          if (JavaCCGlobals.cuToInsertionPoint1.get(i).getKind() == SEMICOLON) {
-            JavaCCGlobals.cline = JavaCCGlobals.cuToInsertionPoint1.get(0).getBeginLine();
-            JavaCCGlobals.ccol = JavaCCGlobals.cuToInsertionPoint1.get(0).getBeginColumn();
-            for (int j = 0; j <= i; j++) {
-              JavaCCGlobals.printToken(JavaCCGlobals.cuToInsertionPoint1.get(j), out);
-            }
-            out.println("");
-            out.println("");
-            break;
-          }
-        }
-      }
-      JavaFileGenerator generator = new JavaFileGenerator(
-          "/templates/Token.template", Options.getOptions());
-      generator.generate(out);
-    }
-    finally {
-      out.close();
-    }
+  public void generateCharStream() throws IOException {
+    generate("/templates/CharStream.template", "CharStream.java");
   }
 
-  public void gen_Scanner() throws IOException {
-    File path = new File(Options.getOutputDirectory(), "Scanner.java");
+  public void generateSimpleCharStream() throws IOException {
+    generate("/templates/SimpleCharStream.template", "SimpleCharStream.java");
+  }
+
+  public void generateJavaCharStream() throws IOException {
+    generate("/templates/JavaCharStream.template", "JavaCharStream.java");
+  }
+
+  private static void generate(String templateName, String fileName) throws IOException {
+    File path = new File(Options.getOutputDirectory(), fileName);
     OutputFile outputFile = new OutputFile(path);
     IndentingPrintWriter out = outputFile.getPrintWriter();
     try {
-      if (JavaCCGlobals.cuToInsertionPoint1.size() != 0
-          && JavaCCGlobals.cuToInsertionPoint1.get(0).getKind() == PACKAGE) {
-        for (int i = 1; i < JavaCCGlobals.cuToInsertionPoint1.size(); i++) {
-          if (JavaCCGlobals.cuToInsertionPoint1.get(i).getKind() == SEMICOLON) {
-            JavaCCGlobals.cline = JavaCCGlobals.cuToInsertionPoint1.get(0).getBeginLine();
-            JavaCCGlobals.ccol = JavaCCGlobals.cuToInsertionPoint1.get(0).getBeginColumn();
-            for (int j = 0; j <= i; j++) {
-              JavaCCGlobals.printToken(JavaCCGlobals.cuToInsertionPoint1.get(j), out);
-            }
-            out.println("");
-            out.println("");
-            break;
-          }
-        }
-      }
+      TokenPrinter.packageDeclaration(JavaCCGlobals.cuToInsertionPoint1, out);
       JavaFileGenerator generator = new JavaFileGenerator(
-          "/templates/Scanner.template", Options.getOptions());
+          templateName, Options.getOptions());
       generator.generate(out);
     }
     finally {

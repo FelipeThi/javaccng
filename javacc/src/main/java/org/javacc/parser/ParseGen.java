@@ -33,9 +33,10 @@ import org.javacc.utils.io.IndentingPrintWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
 
 /** Generate the parser. */
-final class ParseGen implements SingeFileGenerator, JavaCCParserConstants {
+final class ParseGen implements FileGenerator, JavaCCParserConstants {
   private final Semanticize semanticize;
   private File path;
   private String className;
@@ -66,20 +67,21 @@ final class ParseGen implements SingeFileGenerator, JavaCCParserConstants {
     }
   }
 
-  private void generate(IndentingPrintWriter out) {
+  private void generate(IndentingPrintWriter out) throws IOException {
     boolean implementsExists = false;
 
-    if (JavaCCGlobals.cuToInsertionPoint1.size() != 0) {
-      JavaCCGlobals.printTokenSetup(JavaCCGlobals.cuToInsertionPoint1.get(0));
-      JavaCCGlobals.ccol = 1;
-      for (Token t : JavaCCGlobals.cuToInsertionPoint1) {
+    List<Token> tokens = JavaCCGlobals.cuToInsertionPoint1;
+    if (tokens.size() != 0) {
+      TokenPrinter.printTokenSetup(tokens.get(0));
+      TokenPrinter.cCol = 1;
+      for (Token t : tokens) {
         if (t.getKind() == IMPLEMENTS) {
           implementsExists = true;
         }
         else if (t.getKind() == CLASS) {
           implementsExists = false;
         }
-        JavaCCGlobals.printToken(t, out);
+        TokenPrinter.printToken(t, out);
       }
     }
     if (implementsExists) {
@@ -90,9 +92,9 @@ final class ParseGen implements SingeFileGenerator, JavaCCParserConstants {
     }
     out.print(JavaCCGlobals.cuName + "Constants ");
     if (JavaCCGlobals.cuToInsertionPoint2.size() != 0) {
-      JavaCCGlobals.printTokenSetup(JavaCCGlobals.cuToInsertionPoint2.get(0));
+      TokenPrinter.printTokenSetup(JavaCCGlobals.cuToInsertionPoint2.get(0));
       for (Token t : JavaCCGlobals.cuToInsertionPoint2) {
-        JavaCCGlobals.printToken(t, out);
+        TokenPrinter.printToken(t, out);
       }
     }
 
@@ -514,14 +516,14 @@ final class ParseGen implements SingeFileGenerator, JavaCCParserConstants {
     }
 
     if (JavaCCGlobals.cuFromInsertionPoint2.size() != 0) {
-      JavaCCGlobals.printTokenSetup(JavaCCGlobals.cuFromInsertionPoint2.get(0));
-      JavaCCGlobals.ccol = 1;
+      TokenPrinter.printTokenSetup(JavaCCGlobals.cuFromInsertionPoint2.get(0));
+      TokenPrinter.cCol = 1;
       Token t = null;
       for (Iterator<Token> it = JavaCCGlobals.cuFromInsertionPoint2.iterator(); it.hasNext(); ) {
         t = it.next();
-        JavaCCGlobals.printToken(t, out);
+        TokenPrinter.printToken(t, out);
       }
-      JavaCCGlobals.printTrailingComments(t, out);
+      TokenPrinter.printTrailingComments(t);
     }
     out.println("");
   }

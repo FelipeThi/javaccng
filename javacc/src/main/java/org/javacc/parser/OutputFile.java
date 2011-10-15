@@ -85,7 +85,7 @@ public final class OutputFile implements Closeable {
       writer = new AutoClosePrintWriter(out);
 
       // Write the headers....
-      writer.printf(HEADER_LINE_1, JavaCCGlobals.toolName, Version.versionNumber);
+      writer.printf(HEADER_LINE_1, Version.toolName, Version.versionNumber);
       writer.println();
       writer.printf(HEADER_LINE_2);
       writer.println();

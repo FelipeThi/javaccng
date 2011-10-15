@@ -30,6 +30,7 @@ package org.javacc.parser;
 
 import org.javacc.utils.io.IndentingPrintWriter;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,7 +41,7 @@ import java.util.Map;
 
 public final class ParseEngine {
   private final Semanticize semanticize;
-  private IndentingPrintWriter ostr;
+  private IndentingPrintWriter out;
   private int gensymindex = 0;
   private int indentamt;
   private boolean jj2LA;
@@ -300,12 +301,12 @@ public final class ParseEngine {
               retval += "\n" + "if (";
               indentAmt++;
           }
-          JavaCCGlobals.printTokenSetup(la.getActionTokens().get(0));
+          TokenPrinter.printTokenSetup(la.getActionTokens().get(0));
           for (Token token : la.getActionTokens()) {
             t = token;
-            retval += JavaCCGlobals.printToken(t);
+            retval += TokenPrinter.printToken(t);
           }
-          retval += JavaCCGlobals.printTrailingComments(t);
+          retval += TokenPrinter.printTrailingComments(t);
           retval += ") {\u0001" + actions[index];
           state = OPENIF;
         }
@@ -414,12 +415,12 @@ public final class ParseEngine {
           // In addition, there is also a semantic lookahead.  So concatenate
           // the semantic check with the syntactic one.
           retval += " && (";
-          JavaCCGlobals.printTokenSetup(la.getActionTokens().get(0));
+          TokenPrinter.printTokenSetup(la.getActionTokens().get(0));
           for (Token token : la.getActionTokens()) {
             t = token;
-            retval += JavaCCGlobals.printToken(t);
+            retval += TokenPrinter.printToken(t);
           }
-          retval += JavaCCGlobals.printTrailingComments(t);
+          retval += TokenPrinter.printTrailingComments(t);
           retval += ")";
         }
         retval += ") {\u0001" + actions[index];
@@ -472,7 +473,7 @@ public final class ParseEngine {
           phase1NewLine();
         }
         else {
-          ostr.println("");
+          out.println("");
         }
       }
       else if (ch == '\u0001') {
@@ -488,83 +489,83 @@ public final class ParseEngine {
         indentOn = true;
       }
       else {
-        ostr.print(ch);
+        out.print(ch);
       }
     }
   }
 
-  void buildPhase1Routine(BNFProduction p) {
+  void buildPhase1Routine(BNFProduction p) throws IOException {
     Token t;
     t = p.getReturnTypeTokens().get(0);
     boolean voidReturn = false;
     if (t.getKind() == JavaCCParserConstants.VOID) {
       voidReturn = true;
     }
-    JavaCCGlobals.printTokenSetup(t);
-    JavaCCGlobals.ccol = 1;
-    JavaCCGlobals.printLeadingComments(t, ostr);
-    ostr.print("  final " + (p.getAccessModifier() != null ? p.getAccessModifier() : "public") + " ");
-    JavaCCGlobals.cline = t.getBeginLine();
-    JavaCCGlobals.ccol = t.getBeginColumn();
-    JavaCCGlobals.printTokenOnly(t, ostr);
+    TokenPrinter.printTokenSetup(t);
+    TokenPrinter.cCol = 1;
+    TokenPrinter.printLeadingComments(t, out);
+    out.print("  final " + (p.getAccessModifier() != null ? p.getAccessModifier() : "public") + " ");
+    TokenPrinter.cLine = t.getBeginLine();
+    TokenPrinter.cCol = t.getBeginColumn();
+    TokenPrinter.printTokenOnly(t, out);
     for (int i = 1; i < p.getReturnTypeTokens().size(); i++) {
       t = p.getReturnTypeTokens().get(i);
-      JavaCCGlobals.printToken(t, ostr);
+      TokenPrinter.printToken(t, out);
     }
-    JavaCCGlobals.printTrailingComments(t, ostr);
-    ostr.print(" " + p.getLhs() + "(");
+    TokenPrinter.printTrailingComments(t);
+    out.print(" " + p.getLhs() + "(");
     if (p.getParameterListTokens().size() != 0) {
-      JavaCCGlobals.printTokenSetup(p.getParameterListTokens().get(0));
+      TokenPrinter.printTokenSetup(p.getParameterListTokens().get(0));
       for (Token token : p.getParameterListTokens()) {
         t = token;
-        JavaCCGlobals.printToken(t, ostr);
+        TokenPrinter.printToken(t, out);
       }
-      JavaCCGlobals.printTrailingComments(t, ostr);
+      TokenPrinter.printTrailingComments(t);
     }
-    ostr.print(") throws java.io.IOException, ParseException");
+    out.print(") throws java.io.IOException, ParseException");
     for (List<Token> tokens : p.getThrowsList()) {
-      ostr.print(", ");
+      out.print(", ");
       for (Token token : tokens) {
         t = token;
-        ostr.print(t.getImage());
+        out.print(t.getImage());
       }
     }
-    ostr.print(" {");
+    out.print(" {");
     indentamt = 4;
     if (Options.getDebugParser()) {
-      ostr.println("");
-      ostr.println("    trace_call(\"" + p.getLhs() + "\");");
-      ostr.print("    try {");
+      out.println("");
+      out.println("    trace_call(\"" + p.getLhs() + "\");");
+      out.print("    try {");
       indentamt = 6;
     }
     if (p.getTokens().size() != 0) {
-      JavaCCGlobals.printTokenSetup(p.getTokens().get(0));
-      JavaCCGlobals.cline--;
+      TokenPrinter.printTokenSetup(p.getTokens().get(0));
+      TokenPrinter.cLine--;
       for (Token token : p.getTokens()) {
         t = token;
-        JavaCCGlobals.printToken(t, ostr);
+        TokenPrinter.printToken(t, out);
       }
-      JavaCCGlobals.printTrailingComments(t, ostr);
+      TokenPrinter.printTrailingComments(t);
     }
     String code = phase1ExpansionGen(p.getExpansion());
     dumpFormattedString(code);
-    ostr.println("");
+    out.println("");
     if (p.isJumpPatched() && !voidReturn) {
-      ostr.println("    throw new Error(\"Missing return statement in function\");");
+      out.println("    throw new Error(\"Missing return statement in function\");");
     }
     if (Options.getDebugParser()) {
-      ostr.println("    } finally {");
-      ostr.println("      trace_return(\"" + p.getLhs() + "\");");
-      ostr.println("    }");
+      out.println("    } finally {");
+      out.println("      trace_return(\"" + p.getLhs() + "\");");
+      out.println("    }");
     }
-    ostr.println("  }");
-    ostr.println("");
+    out.println("  }");
+    out.println("");
   }
 
   void phase1NewLine() {
-    ostr.println("");
+    out.println("");
     for (int i = 0; i < indentamt; i++) {
-      ostr.print(" ");
+      out.print(" ");
     }
   }
 
@@ -577,12 +578,12 @@ public final class ParseEngine {
       RegularExpression e_nrw = (RegularExpression) e;
       retval += "\n";
       if (e_nrw.lhsTokens.size() != 0) {
-        JavaCCGlobals.printTokenSetup(e_nrw.lhsTokens.get(0));
+        TokenPrinter.printTokenSetup(e_nrw.lhsTokens.get(0));
         for (Token lhsToken : e_nrw.lhsTokens) {
           t = lhsToken;
-          retval += JavaCCGlobals.printToken(t);
+          retval += TokenPrinter.printToken(t);
         }
-        retval += JavaCCGlobals.printTrailingComments(t);
+        retval += TokenPrinter.printTrailingComments(t);
         retval += " = ";
       }
       String tail = e_nrw.rhsToken == null ? ");" : ")." + e_nrw.rhsToken.getImage() + ";";
@@ -603,22 +604,22 @@ public final class ParseEngine {
       NonTerminal e_nrw = (NonTerminal) e;
       retval += "\n";
       if (e_nrw.getLhsTokens().size() != 0) {
-        JavaCCGlobals.printTokenSetup(e_nrw.getLhsTokens().get(0));
+        TokenPrinter.printTokenSetup(e_nrw.getLhsTokens().get(0));
         for (Token token : e_nrw.getLhsTokens()) {
           t = token;
-          retval += JavaCCGlobals.printToken(t);
+          retval += TokenPrinter.printToken(t);
         }
-        retval += JavaCCGlobals.printTrailingComments(t);
+        retval += TokenPrinter.printTrailingComments(t);
         retval += " = ";
       }
       retval += e_nrw.getName() + "(";
       if (e_nrw.getArgumentTokens().size() != 0) {
-        JavaCCGlobals.printTokenSetup(e_nrw.getArgumentTokens().get(0));
+        TokenPrinter.printTokenSetup(e_nrw.getArgumentTokens().get(0));
         for (Token token : e_nrw.getArgumentTokens()) {
           t = token;
-          retval += JavaCCGlobals.printToken(t);
+          retval += TokenPrinter.printToken(t);
         }
-        retval += JavaCCGlobals.printTrailingComments(t);
+        retval += TokenPrinter.printTrailingComments(t);
       }
       retval += ");";
     }
@@ -626,13 +627,13 @@ public final class ParseEngine {
       Action e_nrw = (Action) e;
       retval += "\u0003\n";
       if (e_nrw.getActionTokens().size() != 0) {
-        JavaCCGlobals.printTokenSetup(e_nrw.getActionTokens().get(0));
-        JavaCCGlobals.ccol = 1;
+        TokenPrinter.printTokenSetup(e_nrw.getActionTokens().get(0));
+        TokenPrinter.cCol = 1;
         for (Token token : e_nrw.getActionTokens()) {
           t = token;
-          retval += JavaCCGlobals.printToken(t);
+          retval += TokenPrinter.printToken(t);
         }
-        retval += JavaCCGlobals.printTrailingComments(t);
+        retval += TokenPrinter.printTrailingComments(t);
       }
       retval += "\u0004";
     }
@@ -741,41 +742,41 @@ public final class ParseEngine {
         retval += " catch (";
         list = (List<Token>) e_nrw.types.get(i);
         if (list.size() != 0) {
-          JavaCCGlobals.printTokenSetup(list.get(0));
+          TokenPrinter.printTokenSetup(list.get(0));
           for (Token token : list) {
             t = token;
-            retval += JavaCCGlobals.printToken(t);
+            retval += TokenPrinter.printToken(t);
           }
-          retval += JavaCCGlobals.printTrailingComments(t);
+          retval += TokenPrinter.printTrailingComments(t);
         }
         retval += " ";
         t = (Token) e_nrw.ids.get(i);
-        JavaCCGlobals.printTokenSetup(t);
-        retval += JavaCCGlobals.printToken(t);
-        retval += JavaCCGlobals.printTrailingComments(t);
+        TokenPrinter.printTokenSetup(t);
+        retval += TokenPrinter.printToken(t);
+        retval += TokenPrinter.printTrailingComments(t);
         retval += ") {\u0003\n";
         list = (List<Token>) (e_nrw.catchBlocks.get(i));
         if (list.size() != 0) {
-          JavaCCGlobals.printTokenSetup(list.get(0));
-          JavaCCGlobals.ccol = 1;
+          TokenPrinter.printTokenSetup(list.get(0));
+          TokenPrinter.cCol = 1;
           for (Token token : list) {
             t = token;
-            retval += JavaCCGlobals.printToken(t);
+            retval += TokenPrinter.printToken(t);
           }
-          retval += JavaCCGlobals.printTrailingComments(t);
+          retval += TokenPrinter.printTrailingComments(t);
         }
         retval += "\u0004\n" + "}";
       }
       if (e_nrw.finallyBlocks != null) {
         retval += " finally {\u0003\n";
         if (e_nrw.finallyBlocks.size() != 0) {
-          JavaCCGlobals.printTokenSetup((Token) (e_nrw.finallyBlocks.get(0)));
-          JavaCCGlobals.ccol = 1;
+          TokenPrinter.printTokenSetup((Token) (e_nrw.finallyBlocks.get(0)));
+          TokenPrinter.cCol = 1;
           for (Token token : (Iterable<Token>) e_nrw.finallyBlocks) {
             t = token;
-            retval += JavaCCGlobals.printToken(t);
+            retval += TokenPrinter.printToken(t);
           }
-          retval += JavaCCGlobals.printTrailingComments(t);
+          retval += TokenPrinter.printTrailingComments(t);
         }
         retval += "\u0004\n" + "}";
       }
@@ -785,15 +786,15 @@ public final class ParseEngine {
 
   void buildPhase2Routine(Lookahead la) {
     Expansion e = la.getLaExpansion();
-    ostr.println("  private boolean jj_2" + e.internalName + "(int xla) throws java.io.IOException {");
-    ostr.println("    jj_la = xla; jj_lastpos = jj_scanpos = token;");
-    ostr.println("    try { return !jj_3" + e.internalName + "(); }");
-    ostr.println("    catch(LookaheadSuccess ls) { return true; }");
+    out.println("  private boolean jj_2" + e.internalName + "(int xla) throws java.io.IOException {");
+    out.println("    jj_la = xla; jj_lastpos = jj_scanpos = token;");
+    out.println("    try { return !jj_3" + e.internalName + "(); }");
+    out.println("    catch(LookaheadSuccess ls) { return true; }");
     if (Options.getErrorReporting()) {
-      ostr.println("    finally { jj_save(" + (Integer.parseInt(e.internalName.substring(1)) - 1) + ", xla); }");
+      out.println("    finally { jj_save(" + (Integer.parseInt(e.internalName.substring(1)) - 1) + ", xla); }");
     }
-    ostr.println("  }");
-    ostr.println("");
+    out.println("  }");
+    out.println("");
     Phase3Data p3d = new Phase3Data(e, la.getAmount());
     phase3list.add(p3d);
     phase3table.put(e, p3d);
@@ -928,7 +929,7 @@ public final class ParseEngine {
 
   Hashtable generated = new Hashtable();
 
-  void buildPhase3Routine(Phase3Data inf, boolean recursive_call) {
+  void buildPhase3Routine(Phase3Data inf, boolean recursive_call) throws IOException {
     Expansion e = inf.exp;
     Token t = null;
     if (e.internalName.startsWith("jj_scan_token")) {
@@ -936,14 +937,14 @@ public final class ParseEngine {
     }
 
     if (!recursive_call) {
-      ostr.println("  private boolean jj_3" + e.internalName + "() throws java.io.IOException {");
+      out.println("  private boolean jj_3" + e.internalName + "() throws java.io.IOException {");
       xsp_declared = false;
       if (Options.getDebugLookahead() && e.parent instanceof NormalProduction) {
-        ostr.print("    ");
+        out.print("    ");
         if (Options.getErrorReporting()) {
-          ostr.print("if (!jj_rescan) ");
+          out.print("if (!jj_rescan) ");
         }
-        ostr.println("trace_call(\"" + ((NormalProduction) e.parent).getLhs() + "(LOOKING AHEAD...)\");");
+        out.println("trace_call(\"" + ((NormalProduction) e.parent).getLhs() + "(LOOKING AHEAD...)\");");
         jj3_expansion = e;
       }
       else {
@@ -955,16 +956,16 @@ public final class ParseEngine {
       if (e_nrw.label.equals("")) {
         String label = JavaCCGlobals.namesOfTokens.get(e_nrw.ordinal);
         if (label != null) {
-          ostr.println("    if (jj_scan_token(" + label + ")) " + genReturn(true));
+          out.println("    if (jj_scan_token(" + label + ")) " + genReturn(true));
         }
         else {
-          ostr.println("    if (jj_scan_token(" + e_nrw.ordinal + ")) " + genReturn(true));
+          out.println("    if (jj_scan_token(" + e_nrw.ordinal + ")) " + genReturn(true));
         }
       }
       else {
-        ostr.println("    if (jj_scan_token(" + e_nrw.label + ")) " + genReturn(true));
+        out.println("    if (jj_scan_token(" + e_nrw.label + ")) " + genReturn(true));
       }
-      //ostr.println("    if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
+      //out.println("    if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
     }
     else if (e instanceof NonTerminal) {
       // All expansions of non-terminals have the "name" fields set.  So
@@ -974,13 +975,13 @@ public final class ParseEngine {
       NonTerminal e_nrw = (NonTerminal) e;
       NormalProduction ntprod = JavaCCGlobals.productionTable.get(e_nrw.getName());
       if (ntprod instanceof JavaCodeProduction) {
-        ostr.println("    if (true) { jj_la = 0; jj_scanpos = jj_lastpos; " + genReturn(false) + "}");
+        out.println("    if (true) { jj_la = 0; jj_scanpos = jj_lastpos; " + genReturn(false) + "}");
       }
       else {
         Expansion ntexp = ntprod.getExpansion();
-        //ostr.println("    if (jj_3" + ntexp.internal_name + "()) " + genReturn(true));
-        ostr.println("    if (" + genjj_3Call(ntexp) + ") " + genReturn(true));
-        //ostr.println("    if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
+        //out.println("    if (jj_3" + ntexp.internal_name + "()) " + genReturn(true));
+        out.println("    if (" + genjj_3Call(ntexp) + ") " + genReturn(true));
+        //out.println("    if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
       }
     }
     else if (e instanceof Choice) {
@@ -989,9 +990,9 @@ public final class ParseEngine {
       if (e_nrw.getChoices().size() != 1) {
         if (!xsp_declared) {
           xsp_declared = true;
-          ostr.println("    Token xsp;");
+          out.println("    Token xsp;");
         }
-        ostr.println("    xsp = jj_scanpos;");
+        out.println("    xsp = jj_scanpos;");
       }
       for (int i = 0; i < e_nrw.getChoices().size(); i++) {
         nested_seq = (Sequence) e_nrw.getChoices().get(i);
@@ -999,35 +1000,35 @@ public final class ParseEngine {
         if (la.getActionTokens().size() != 0) {
           // We have semantic lookahead that must be evaluated.
           JavaCCGlobals.lookaheadNeeded = true;
-          ostr.println("    jj_lookingAhead = true;");
-          ostr.print("    jj_semLA = ");
-          JavaCCGlobals.printTokenSetup(la.getActionTokens().get(0));
+          out.println("    jj_lookingAhead = true;");
+          out.print("    jj_semLA = ");
+          TokenPrinter.printTokenSetup(la.getActionTokens().get(0));
           for (Token token : la.getActionTokens()) {
             t = token;
-            JavaCCGlobals.printToken(t, ostr);
+            TokenPrinter.printToken(t, out);
           }
-          JavaCCGlobals.printTrailingComments(t, ostr);
-          ostr.println(";");
-          ostr.println("    jj_lookingAhead = false;");
+          TokenPrinter.printTrailingComments(t);
+          out.println(";");
+          out.println("    jj_lookingAhead = false;");
         }
-        ostr.print("    if (");
+        out.print("    if (");
         if (la.getActionTokens().size() != 0) {
-          ostr.print("!jj_semLA || ");
+          out.print("!jj_semLA || ");
         }
         if (i != e_nrw.getChoices().size() - 1) {
-          //ostr.println("jj_3" + nested_seq.internal_name + "()) {");
-          ostr.println(genjj_3Call(nested_seq) + ") {");
-          ostr.println("    jj_scanpos = xsp;");
+          //out.println("jj_3" + nested_seq.internal_name + "()) {");
+          out.println(genjj_3Call(nested_seq) + ") {");
+          out.println("    jj_scanpos = xsp;");
         }
         else {
-          //ostr.println("jj_3" + nested_seq.internal_name + "()) " + genReturn(true));
-          ostr.println(genjj_3Call(nested_seq) + ") " + genReturn(true));
-          //ostr.println("    if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
+          //out.println("jj_3" + nested_seq.internal_name + "()) " + genReturn(true));
+          out.println(genjj_3Call(nested_seq) + ") " + genReturn(true));
+          //out.println("    if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
         }
       }
       for (int i = 1; i < e_nrw.getChoices().size(); i++) {
-        //ostr.println("    } else if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
-        ostr.println("    }");
+        //out.println("    } else if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
+        out.println("    }");
       }
     }
     else if (e instanceof Sequence) {
@@ -1055,50 +1056,50 @@ public final class ParseEngine {
     else if (e instanceof OneOrMore) {
       if (!xsp_declared) {
         xsp_declared = true;
-        ostr.println("    Token xsp;");
+        out.println("    Token xsp;");
       }
       OneOrMore e_nrw = (OneOrMore) e;
       Expansion nested_e = e_nrw.expansion;
-      //ostr.println("    if (jj_3" + nested_e.internal_name + "()) " + genReturn(true));
-      ostr.println("    if (" + genjj_3Call(nested_e) + ") " + genReturn(true));
-      //ostr.println("    if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
-      ostr.println("    while (true) {");
-      ostr.println("      xsp = jj_scanpos;");
-      //ostr.println("      if (jj_3" + nested_e.internal_name + "()) { jj_scanpos = xsp; break; }");
-      ostr.println("      if (" + genjj_3Call(nested_e) + ") { jj_scanpos = xsp; break; }");
-      //ostr.println("      if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
-      ostr.println("    }");
+      //out.println("    if (jj_3" + nested_e.internal_name + "()) " + genReturn(true));
+      out.println("    if (" + genjj_3Call(nested_e) + ") " + genReturn(true));
+      //out.println("    if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
+      out.println("    while (true) {");
+      out.println("      xsp = jj_scanpos;");
+      //out.println("      if (jj_3" + nested_e.internal_name + "()) { jj_scanpos = xsp; break; }");
+      out.println("      if (" + genjj_3Call(nested_e) + ") { jj_scanpos = xsp; break; }");
+      //out.println("      if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
+      out.println("    }");
     }
     else if (e instanceof ZeroOrMore) {
       if (!xsp_declared) {
         xsp_declared = true;
-        ostr.println("    Token xsp;");
+        out.println("    Token xsp;");
       }
       ZeroOrMore e_nrw = (ZeroOrMore) e;
       Expansion nested_e = e_nrw.expansion;
-      ostr.println("    while (true) {");
-      ostr.println("      xsp = jj_scanpos;");
-      //ostr.println("      if (jj_3" + nested_e.internal_name + "()) { jj_scanpos = xsp; break; }");
-      ostr.println("      if (" + genjj_3Call(nested_e) + ") { jj_scanpos = xsp; break; }");
-      //ostr.println("      if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
-      ostr.println("    }");
+      out.println("    while (true) {");
+      out.println("      xsp = jj_scanpos;");
+      //out.println("      if (jj_3" + nested_e.internal_name + "()) { jj_scanpos = xsp; break; }");
+      out.println("      if (" + genjj_3Call(nested_e) + ") { jj_scanpos = xsp; break; }");
+      //out.println("      if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
+      out.println("    }");
     }
     else if (e instanceof ZeroOrOne) {
       if (!xsp_declared) {
         xsp_declared = true;
-        ostr.println("    Token xsp;");
+        out.println("    Token xsp;");
       }
       ZeroOrOne e_nrw = (ZeroOrOne) e;
       Expansion nested_e = e_nrw.expansion;
-      ostr.println("    xsp = jj_scanpos;");
-      //ostr.println("    if (jj_3" + nested_e.internal_name + "()) jj_scanpos = xsp;");
-      ostr.println("    if (" + genjj_3Call(nested_e) + ") jj_scanpos = xsp;");
-      //ostr.println("    else if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
+      out.println("    xsp = jj_scanpos;");
+      //out.println("    if (jj_3" + nested_e.internal_name + "()) jj_scanpos = xsp;");
+      out.println("    if (" + genjj_3Call(nested_e) + ") jj_scanpos = xsp;");
+      //out.println("    else if (jj_la == 0 && jj_scanpos == jj_lastpos) " + genReturn(false));
     }
     if (!recursive_call) {
-      ostr.println("    " + genReturn(false));
-      ostr.println("  }");
-      ostr.println("");
+      out.println("    " + genReturn(false));
+      out.println("  }");
+      out.println("");
     }
   }
 
@@ -1189,64 +1190,64 @@ public final class ParseEngine {
     return retval;
   }
 
-  void build(IndentingPrintWriter ps) {
+  void build(IndentingPrintWriter ps) throws IOException {
 
     JavaCodeProduction jp;
 
-    ostr = ps;
+    out = ps;
 
     for (NormalProduction production : JavaCCGlobals.bnfProductions) {
       if (production instanceof JavaCodeProduction) {
         jp = (JavaCodeProduction) production;
         Token t = jp.getReturnTypeTokens().get(0);
-        JavaCCGlobals.printTokenSetup(t);
-        JavaCCGlobals.ccol = 1;
-        JavaCCGlobals.printLeadingComments(t, ostr);
-        ostr.print("  " + (production.getAccessModifier() != null ? production.getAccessModifier() + " " : ""));
-        JavaCCGlobals.cline = t.getBeginLine();
-        JavaCCGlobals.ccol = t.getBeginColumn();
-        JavaCCGlobals.printTokenOnly(t, ostr);
+        TokenPrinter.printTokenSetup(t);
+        TokenPrinter.cCol = 1;
+        TokenPrinter.printLeadingComments(t, out);
+        out.print("  " + (production.getAccessModifier() != null ? production.getAccessModifier() + " " : ""));
+        TokenPrinter.cLine = t.getBeginLine();
+        TokenPrinter.cCol = t.getBeginColumn();
+        TokenPrinter.printTokenOnly(t, out);
         for (int i = 1; i < jp.getReturnTypeTokens().size(); i++) {
           t = jp.getReturnTypeTokens().get(i);
-          JavaCCGlobals.printToken(t, ostr);
+          TokenPrinter.printToken(t, out);
         }
-        JavaCCGlobals.printTrailingComments(t, ostr);
-        ostr.print(" " + jp.getLhs() + "(");
+        TokenPrinter.printTrailingComments(t);
+        out.print(" " + jp.getLhs() + "(");
         if (jp.getParameterListTokens().size() != 0) {
-          JavaCCGlobals.printTokenSetup(jp.getParameterListTokens().get(0));
+          TokenPrinter.printTokenSetup(jp.getParameterListTokens().get(0));
           for (Iterator it = jp.getParameterListTokens().iterator(); it.hasNext(); ) {
             t = (Token) it.next();
-            JavaCCGlobals.printToken(t, ostr);
+            TokenPrinter.printToken(t, out);
           }
-          JavaCCGlobals.printTrailingComments(t, ostr);
+          TokenPrinter.printTrailingComments(t);
         }
-        ostr.print(") throws java.io.IOException, ParseException");
+        out.print(") throws java.io.IOException, ParseException");
         for (List<Token> tokens : jp.getThrowsList()) {
-          ostr.print(", ");
+          out.print(", ");
           for (Token token : tokens) {
             t = token;
-            ostr.print(t.getImage());
+            out.print(t.getImage());
           }
         }
-        ostr.print(" {");
+        out.print(" {");
         if (Options.getDebugParser()) {
-          ostr.println("");
-          ostr.println("    trace_call(\"" + jp.getLhs() + "\");");
-          ostr.print("    try {");
+          out.println("");
+          out.println("    trace_call(\"" + jp.getLhs() + "\");");
+          out.print("    try {");
         }
         if (jp.getCodeTokens().size() != 0) {
-          JavaCCGlobals.printTokenSetup(jp.getCodeTokens().get(0));
-          JavaCCGlobals.cline--;
-          JavaCCGlobals.printTokenList(jp.getCodeTokens(), ostr);
+          TokenPrinter.printTokenSetup(jp.getCodeTokens().get(0));
+          TokenPrinter.cLine--;
+          TokenPrinter.printTokenList(jp.getCodeTokens(), out);
         }
-        ostr.println("");
+        out.println("");
         if (Options.getDebugParser()) {
-          ostr.println("    } finally {");
-          ostr.println("      trace_return(\"" + jp.getLhs() + "\");");
-          ostr.println("    }");
+          out.println("    } finally {");
+          out.println("      trace_return(\"" + jp.getLhs() + "\");");
+          out.println("    }");
         }
-        ostr.println("  }");
-        ostr.println("");
+        out.println("  }");
+        out.println("");
       }
       else {
         buildPhase1Routine((BNFProduction) production);

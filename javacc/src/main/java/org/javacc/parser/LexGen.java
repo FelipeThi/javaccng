@@ -39,7 +39,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /** Generate lexer. */
-final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
+final class LexGen implements FileGenerator, JavaCCParserConstants {
   private File path;
   private String className;
   // Hashtable of vectors
@@ -335,33 +335,35 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
     out.println("}");
   }
 
-  private void printClassHead(IndentingPrintWriter out) {
+  private void printClassHead(IndentingPrintWriter out)
+      throws IOException {
     int i, j;
 
     int l = 0, kind;
     i = 1;
-    for (; ; ) {
-      if (JavaCCGlobals.cuToInsertionPoint1.size() <= l) {
+    List<Token> tokens = JavaCCGlobals.cuToInsertionPoint1;
+    while (true) {
+      if (tokens.size() <= l) {
         break;
       }
 
-      kind = JavaCCGlobals.cuToInsertionPoint1.get(l).getKind();
+      kind = tokens.get(l).getKind();
       if (kind == PACKAGE || kind == IMPORT) {
-        for (; i < JavaCCGlobals.cuToInsertionPoint1.size(); i++) {
-          kind = JavaCCGlobals.cuToInsertionPoint1.get(i).getKind();
-          if (kind == SEMICOLON ||
-              kind == ABSTRACT ||
-              kind == FINAL ||
-              kind == PUBLIC ||
-              kind == CLASS ||
-              kind == INTERFACE) {
-            JavaCCGlobals.cline = JavaCCGlobals.cuToInsertionPoint1.get(l).getBeginLine();
-            JavaCCGlobals.ccol = JavaCCGlobals.cuToInsertionPoint1.get(l).getBeginColumn();
+        for (; i < tokens.size(); i++) {
+          kind = tokens.get(i).getKind();
+          if (kind == SEMICOLON
+              || kind == ABSTRACT
+              || kind == FINAL
+              || kind == PUBLIC
+              || kind == CLASS
+              || kind == INTERFACE) {
+            TokenPrinter.cLine = tokens.get(l).getBeginLine();
+            TokenPrinter.cCol = tokens.get(l).getBeginColumn();
             for (j = l; j < i; j++) {
-              JavaCCGlobals.printToken(JavaCCGlobals.cuToInsertionPoint1.get(j), out);
+              TokenPrinter.printToken(tokens.get(j), out);
             }
             if (kind == SEMICOLON) {
-              JavaCCGlobals.printToken(JavaCCGlobals.cuToInsertionPoint1.get(j), out);
+              TokenPrinter.printToken(tokens.get(j), out);
             }
             out.println();
             break;
@@ -385,8 +387,8 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
       boolean commonTokenActionSeen = false;
       boolean commonTokenActionNeeded = Options.getCommonTokenAction();
 
-      JavaCCGlobals.printTokenSetup(JavaCCGlobals.scannerDeclarations.get(0));
-      JavaCCGlobals.ccol = 1;
+      TokenPrinter.printTokenSetup(JavaCCGlobals.scannerDeclarations.get(0));
+      TokenPrinter.cCol = 1;
 
       for (j = 0; j < JavaCCGlobals.scannerDeclarations.size(); j++) {
         Token t = JavaCCGlobals.scannerDeclarations.get(j);
@@ -396,7 +398,7 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
           commonTokenActionSeen = t.getImage().equals("commonTokenAction");
         }
 
-        JavaCCGlobals.printToken(t, out);
+        TokenPrinter.printToken(t, out);
       }
 
       out.println();
@@ -422,7 +424,7 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
       out.println("private java.io.PrintWriter debugPrinter = new java.io.PrintWriter(System.out);");
       out.println();
       out.println("/** Set debug output. */");
-      out.println("public  void setDebugPrinter(java.io.PrintWriter printer) { debugPrinter = printer; }");
+      out.println("public void setDebugPrinter(java.io.PrintWriter printer) { debugPrinter = printer; }");
       out.println();
     }
 
@@ -435,7 +437,7 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
 
   private void dumpDebugMethods(IndentingPrintWriter out) {
     out.println("   int kindCnt = 0;");
-    out.println("  protected  final String jjKindsForBitVector(int i, long vec) {");
+    out.println("  protected final String jjKindsForBitVector(int i, long vec) {");
     out.println("    String retVal = \"\";");
     out.println("    if (i == 0)");
     out.println("       kindCnt = 0;");
@@ -452,7 +454,7 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
     out.println("  }");
     out.println();
 
-    out.println("  protected  final String jjKindsForStateVector(" +
+    out.println("  protected final String jjKindsForStateVector(" +
         "int lexState, int[] vec, int start, int end) {");
     out.println("    boolean[] kindDone = new boolean[" + maxOrdinal + "];");
     out.println("    String retVal = \"\";");
@@ -1324,7 +1326,8 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
     out.println();
   }
 
-  public void dumpSkipActions(IndentingPrintWriter out) {
+  public void dumpSkipActions(IndentingPrintWriter out)
+      throws IOException {
     Action act;
 
     out.println("void skipLexicalActions(Token matchedToken) {");
@@ -1376,11 +1379,11 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
           }
         }
 
-        JavaCCGlobals.printTokenSetup(act.getActionTokens().get(0));
-        JavaCCGlobals.ccol = 1;
+        TokenPrinter.printTokenSetup(act.getActionTokens().get(0));
+        TokenPrinter.cCol = 1;
 
         for (int j = 0; j < act.getActionTokens().size(); j++) {
-          JavaCCGlobals.printToken(act.getActionTokens().get(j), out);
+          TokenPrinter.printToken(act.getActionTokens().get(j), out);
         }
         out.println();
 
@@ -1396,7 +1399,8 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
     out.println("}");
   }
 
-  public void dumpMoreActions(IndentingPrintWriter out) {
+  public void dumpMoreActions(IndentingPrintWriter out)
+      throws IOException {
     Action act;
 
     out.println("void moreLexicalActions() {");
@@ -1451,11 +1455,11 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
         }
 
         out.println("         jjImageLength = 0;");
-        JavaCCGlobals.printTokenSetup(act.getActionTokens().get(0));
-        JavaCCGlobals.ccol = 1;
+        TokenPrinter.printTokenSetup(act.getActionTokens().get(0));
+        TokenPrinter.cCol = 1;
 
         for (int j = 0; j < act.getActionTokens().size(); j++) {
-          JavaCCGlobals.printToken(act.getActionTokens().get(j), out);
+          TokenPrinter.printToken(act.getActionTokens().get(j), out);
         }
         out.println();
 
@@ -1472,7 +1476,8 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
     out.println("}");
   }
 
-  public void dumpTokenActions(IndentingPrintWriter out) {
+  public void dumpTokenActions(IndentingPrintWriter out)
+      throws IOException {
     Action act;
     int i;
 
@@ -1539,11 +1544,11 @@ final class LexGen implements SingeFileGenerator, JavaCCParserConstants {
           }
         }
 
-        JavaCCGlobals.printTokenSetup(act.getActionTokens().get(0));
-        JavaCCGlobals.ccol = 1;
+        TokenPrinter.printTokenSetup(act.getActionTokens().get(0));
+        TokenPrinter.cCol = 1;
 
         for (int j = 0; j < act.getActionTokens().size(); j++) {
-          JavaCCGlobals.printToken(act.getActionTokens().get(j), out);
+          TokenPrinter.printToken(act.getActionTokens().get(j), out);
         }
         out.println();
 

@@ -687,7 +687,7 @@ void token_manager_decls() :
   t="TOKEN_MGR_DECLS" ":"
   ClassOrInterfaceBody(false, decls)
 	{
-	  add_token_manager_decls(t, decls);
+	  addScannerDeclarations(t, decls);
 	}
 }
 

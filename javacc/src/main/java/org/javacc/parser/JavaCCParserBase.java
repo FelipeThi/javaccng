@@ -100,7 +100,7 @@ abstract class JavaCCParserBase {
   }
 
   private static final String DEFAULT = "DEFAULT";
-  private List<Token> addCuTokenHere = JavaCCGlobals.cuToInsertionPoint1;
+  private List<Token> cuTokens = JavaCCGlobals.cuToInsertionPoint1;
   private Token firstCuToken;
   private boolean insertionPoint1Set = false;
   private boolean insertionPoint2Set = false;
@@ -125,7 +125,7 @@ abstract class JavaCCParserBase {
 
   protected void setInsertionPoint(Token t, int no) {
     do {
-      addCuTokenHere.add(firstCuToken);
+      cuTokens.add(firstCuToken);
       firstCuToken = firstCuToken.next;
     }
     while (firstCuToken != t);
@@ -135,11 +135,11 @@ abstract class JavaCCParserBase {
       }
       else {
         insertionPoint1Set = true;
-        addCuTokenHere = JavaCCGlobals.cuToInsertionPoint2;
+        cuTokens = JavaCCGlobals.cuToInsertionPoint2;
       }
     }
     else {
-      addCuTokenHere = JavaCCGlobals.cuFromInsertionPoint2;
+      cuTokens = JavaCCGlobals.cuFromInsertionPoint2;
       insertionPoint2Set = true;
     }
     firstCuToken = t;
@@ -147,7 +147,7 @@ abstract class JavaCCParserBase {
 
   protected void insertionPointErrors(Token t) {
     while (firstCuToken != t) {
-      addCuTokenHere.add(firstCuToken);
+      cuTokens.add(firstCuToken);
       firstCuToken = firstCuToken.next;
     }
     if (!insertionPoint1Set || !insertionPoint2Set) {
@@ -209,7 +209,7 @@ abstract class JavaCCParserBase {
     }
   }
 
-  protected static void add_token_manager_decls(Token t, List<Token> decls) {
+  protected static void addScannerDeclarations(Token t, List<Token> decls) {
     if (JavaCCGlobals.scannerDeclarations != null) {
       JavaCCErrors.parseError(t, "Multiple occurrence of \"TOKEN_MGR_DECLS\".");
     }
@@ -237,7 +237,7 @@ abstract class JavaCCParserBase {
       JavaCCErrors.parseError(t, "String in character list may contain only one character.");
       return ' ';
     }
-    else if ((int) (left.charAt(0)) > (int) (s.charAt(0))) {
+    else if ((int) left.charAt(0) > (int) s.charAt(0)) {
       JavaCCErrors.parseError(t, "Right end of character range \'" + s +
           "\' has a lower ordinal value than the left end of character range \'" + left + "\'.");
       return left.charAt(0);

@@ -28,22 +28,17 @@
 
 package org.javacc.parser;
 
-import org.javacc.utils.Parsers;
-import org.javacc.utils.io.IndentingPrintWriter;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * This package contains data created as a result of parsing and semanticizing
- * a JavaCC input file.  This data is what is used by the back-ends of JavaCC as
- * well as any other back-end of JavaCC related tools such as JJTree.
+ * Contains data created as a result of parsing and semanticizing a JavaCC input file.
+ * This data is what is used by the back-ends of JavaCC as well as any other back-end
+ * of JavaCC related tools such as JJTree.
  */
 public final class JavaCCGlobals {
-  /** String that identifies the JavaCC generated files. */
-  protected static final String toolName = "JavaCC";
   /** The name of the grammar file being processed. */
   public static String fileName;
   /**
@@ -161,162 +156,6 @@ public final class JavaCCGlobals {
   protected static List maskVals = new ArrayList();
   static Action eofAction;
   static String eofNextState;
-  public static int cline, ccol;
-
-  protected static void printTokenSetup(Token t) {
-    Token tt = t;
-    while (tt.specialToken != null) {
-      tt = tt.specialToken;
-    }
-    cline = tt.getBeginLine();
-    ccol = tt.getBeginColumn();
-  }
-
-  protected static void printTokenOnly(Token t, IndentingPrintWriter ostr) {
-    for (; cline < t.getBeginLine(); cline++) {
-      ostr.println("");
-      ccol = 1;
-    }
-    for (; ccol < t.getBeginColumn(); ccol++) {
-      ostr.print(" ");
-    }
-    if (t.getKind() == JavaCCParserConstants.STRING_LITERAL ||
-        t.getKind() == JavaCCParserConstants.CHARACTER_LITERAL) {
-      ostr.print(Parsers.unicodeEscape(t.getImage()));
-    }
-    else {
-      ostr.print(t.getImage());
-    }
-    cline = t.getEndLine();
-    ccol = t.getEndColumn() + 1;
-    char last = t.getImage().charAt(t.getImage().length() - 1);
-    if (last == '\n' || last == '\r') {
-      cline++;
-      ccol = 1;
-    }
-  }
-
-  protected static void printToken(Token t, IndentingPrintWriter ostr) {
-    Token tt = t.specialToken;
-    if (tt != null) {
-      while (tt.specialToken != null) {
-        tt = tt.specialToken;
-      }
-      while (tt != null) {
-        printTokenOnly(tt, ostr);
-        tt = tt.next;
-      }
-    }
-    printTokenOnly(t, ostr);
-  }
-
-  protected static void printTokenList(List<Token> list, IndentingPrintWriter ostr) {
-    Token t = null;
-
-    for (Token token : list) {
-      printToken(t = token, ostr);
-    }
-
-    if (t != null) {
-      printTrailingComments(t, ostr);
-    }
-  }
-
-  protected static void printLeadingComments(Token t, IndentingPrintWriter ostr) {
-    if (t.specialToken == null) {
-      return;
-    }
-    Token tt = t.specialToken;
-    while (tt.specialToken != null) {
-      tt = tt.specialToken;
-    }
-    while (tt != null) {
-      printTokenOnly(tt, ostr);
-      tt = tt.next;
-    }
-    if (ccol != 1 && cline != t.getBeginLine()) {
-      ostr.println("");
-      cline++;
-      ccol = 1;
-    }
-  }
-
-  protected static void printTrailingComments(Token t, IndentingPrintWriter ostr) {
-    if (t.next == null) {
-      return;
-    }
-    printLeadingComments(t.next);
-  }
-
-  public static String printTokenOnly(Token t) {
-    String result = "";
-    for (; cline < t.getBeginLine(); cline++) {
-      result += "\n";
-      ccol = 1;
-    }
-    for (; ccol < t.getBeginColumn(); ccol++) {
-      result += " ";
-    }
-    if (t.getKind() == JavaCCParserConstants.STRING_LITERAL
-        || t.getKind() == JavaCCParserConstants.CHARACTER_LITERAL) {
-      result += Parsers.unicodeEscape(t.getImage());
-    }
-    else {
-      result += t.getImage();
-    }
-    cline = t.getEndLine();
-    ccol = t.getEndColumn() + 1;
-    char last = t.getImage().charAt(t.getImage().length() - 1);
-    if (last == '\n' || last == '\r') {
-      cline++;
-      ccol = 1;
-    }
-    return result;
-  }
-
-  protected static String printToken(Token t) {
-    String result = "";
-    Token tt = t.specialToken;
-    if (tt != null) {
-      while (tt.specialToken != null) {
-        tt = tt.specialToken;
-      }
-      while (tt != null) {
-        result += printTokenOnly(tt);
-        tt = tt.next;
-      }
-    }
-    result += printTokenOnly(t);
-    return result;
-  }
-
-  protected static String printLeadingComments(Token t) {
-    String result = "";
-    if (t.specialToken == null) {
-      return result;
-    }
-    Token tt = t.specialToken;
-    while (tt.specialToken != null) {
-      tt = tt.specialToken;
-    }
-    while (tt != null) {
-      result += printTokenOnly(tt);
-      tt = tt.next;
-    }
-    if (ccol != 1 && cline != t.getBeginLine()) {
-      result += "\n";
-      cline++;
-      ccol = 1;
-    }
-    return result;
-  }
-
-  protected static String printTrailingComments(Token t) {
-    if (t.next == null) {
-      return "";
-    }
-    return printLeadingComments(t.next);
-  }
 
   @Deprecated
   public static void reInit() {
@@ -341,8 +180,8 @@ public final class JavaCCGlobals {
     maskIndex = 0;
     jj2index = 0;
     maskVals = new ArrayList();
-    cline = 0;
-    ccol = 0;
+    TokenPrinter.cLine = 0;
+    TokenPrinter.cCol = 0;
     eofAction = null;
     eofNextState = null;
   }
