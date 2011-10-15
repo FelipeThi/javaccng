@@ -59,8 +59,8 @@ public class TokenPrinter {
     for (; cCol < t.getBeginColumn(); cCol++) {
       out.write(" ");
     }
-    if (t.getKind() == JavaCCParserConstants.STRING_LITERAL
-        || t.getKind() == JavaCCParserConstants.CHARACTER_LITERAL) {
+    if (t.getKind() == JavaCCConstants.STRING_LITERAL
+        || t.getKind() == JavaCCConstants.CHARACTER_LITERAL) {
       out.write(Parsers.unicodeEscape(t.getImage()));
     }
     else {
@@ -84,8 +84,8 @@ public class TokenPrinter {
     for (; cCol < t.getBeginColumn(); cCol++) {
       result += " ";
     }
-    if (t.getKind() == JavaCCParserConstants.STRING_LITERAL
-        || t.getKind() == JavaCCParserConstants.CHARACTER_LITERAL) {
+    if (t.getKind() == JavaCCConstants.STRING_LITERAL
+        || t.getKind() == JavaCCConstants.CHARACTER_LITERAL) {
       result += Parsers.unicodeEscape(t.getImage());
     }
     else {
@@ -163,9 +163,9 @@ public class TokenPrinter {
   static void packageDeclaration(List<Token> tokens, Writer out)
       throws IOException {
     if (tokens.size() != 0
-        && tokens.get(0).getKind() == JavaCCParserConstants.PACKAGE) {
+        && tokens.get(0).getKind() == JavaCCConstants.PACKAGE) {
       for (int i = 1; i < tokens.size(); i++) {
-        if (tokens.get(i).getKind() == JavaCCParserConstants.SEMICOLON) {
+        if (tokens.get(i).getKind() == JavaCCConstants.SEMICOLON) {
           cLine = tokens.get(0).getBeginLine();
           cCol = tokens.get(0).getBeginColumn();
           for (int j = 0; j <= i; j++) {

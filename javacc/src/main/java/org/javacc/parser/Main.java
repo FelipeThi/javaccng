@@ -92,7 +92,7 @@ public final class Main {
               new FileInputStream(path),
               Options.getGrammarEncoding()));
       parser = new JavaCCParser(
-          new JavaCCParserScanner(
+          new JavaCCScanner(
               new JavaCharStream(reader)));
     }
     catch (SecurityException ex) {
@@ -106,7 +106,7 @@ public final class Main {
 
     try {
       System.out.println("Reading from file " + path + " . . .");
-      JavaCCGlobals.fileName = JavaCCGlobals.origFileName = path;
+      JavaCCGlobals.fileName = path;
 
       parser.javacc_input();
 

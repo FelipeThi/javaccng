@@ -41,11 +41,6 @@ import java.util.Map;
 public final class JavaCCGlobals {
   /** The name of the grammar file being processed. */
   public static String fileName;
-  /**
-   * The name of the original file (before processing by JJTree).
-   * Currently this is the same as fileName.
-   */
-  public static String origFileName;
   /** The name of the parser class (what appears in PARSER_BEGIN and PARSER_END). */
   public static String cuName;
   /**
@@ -150,17 +145,36 @@ public final class JavaCCGlobals {
    * maskIndex, jj2index, maskVals are variables that are shared between
    * ParseEngine and ParseGen.
    */
-  protected static int maskIndex = 0;
-  protected static int jj2index = 0;
+  static int maskIndex = 0;
+  static int jj2index = 0;
   public static boolean lookaheadNeeded;
-  protected static List maskVals = new ArrayList();
+  static List maskVals = new ArrayList();
   static Action eofAction;
   static String eofNextState;
+
+  public static String constantsClass() {
+    String name = cuName;
+    if (name.endsWith("Parser")) {
+      name = name.substring(0, name.length() - "Parser".length());
+    }
+    return name + "Constants";
+  }
+
+  public static String scannerClass() {
+    String name = cuName;
+    if (name.endsWith("Parser")) {
+      name = name.substring(0, name.length() - "Parser".length());
+    }
+    return name + "Scanner";
+  }
+
+  public static String parserClass() {
+    return cuName;
+  }
 
   @Deprecated
   public static void reInit() {
     fileName = null;
-    origFileName = null;
     cuName = null;
     cuToInsertionPoint1 = new ArrayList<Token>();
     cuToInsertionPoint2 = new ArrayList<Token>();

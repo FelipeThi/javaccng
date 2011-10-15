@@ -38,7 +38,7 @@ public class SPL {
       System.out.println("Stupid Programming Language Interpreter Version 0.1:  Reading from file " + args[0] + " . . .");
       try {
         parser = new SPLParser(
-            new SPLParserScanner(
+            new SPLScanner(
                 new SimpleCharStream(
                     new InputStreamReader(
                         new FileInputStream(args[0])))));

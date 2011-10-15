@@ -498,7 +498,7 @@ public final class ParseEngine {
     Token t;
     t = p.getReturnTypeTokens().get(0);
     boolean voidReturn = false;
-    if (t.getKind() == JavaCCParserConstants.VOID) {
+    if (t.getKind() == JavaCCConstants.VOID) {
       voidReturn = true;
     }
     TokenPrinter.printTokenSetup(t);

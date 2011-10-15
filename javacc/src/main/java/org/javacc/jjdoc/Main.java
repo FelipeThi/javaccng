@@ -30,7 +30,7 @@ package org.javacc.jjdoc;
 
 import org.javacc.parser.JavaCCErrors;
 import org.javacc.parser.JavaCCParser;
-import org.javacc.parser.JavaCCParserScanner;
+import org.javacc.parser.JavaCCScanner;
 import org.javacc.parser.JavaCharStream;
 import org.javacc.parser.MetaParseException;
 import org.javacc.parser.ParseException;
@@ -78,7 +78,10 @@ public final class Main {
 
     if (args[args.length - 1].equals("-")) {
       JJDocGlobals.info("Reading from standard input . . .");
-      parser = new JavaCCParser(new JavaCCParserScanner(new JavaCharStream(new InputStreamReader(System.in))));
+      parser = new JavaCCParser(
+          new JavaCCScanner(
+              new JavaCharStream(
+                  new InputStreamReader(System.in))));
       JJDocGlobals.inputFile = "standard input";
       JJDocGlobals.outputFile = "standard output";
     }
@@ -99,7 +102,7 @@ public final class Main {
             new InputStreamReader(
                 new FileInputStream(args[args.length - 1]),
                 JJDocOptions.getGrammarEncoding()));
-        parser = new JavaCCParser(new JavaCCParserScanner(new JavaCharStream(reader)));
+        parser = new JavaCCParser(new JavaCCScanner(new JavaCharStream(reader)));
       }
       catch (SecurityException se) {
         JJDocGlobals.error("Security violation while trying to open " + args[args.length - 1]);

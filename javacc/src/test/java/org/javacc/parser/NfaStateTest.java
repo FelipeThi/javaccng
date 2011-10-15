@@ -33,9 +33,9 @@ public class NfaStateTest extends JavaCCTestCase {
     BufferedReader reader = new BufferedReader(
         new InputStreamReader(
             new FileInputStream(path), Options.getGrammarEncoding()));
-    JavaCCParser parser = new JavaCCParser(new JavaCCParserScanner(new JavaCharStream(reader)));
+    JavaCCParser parser = new JavaCCParser(new JavaCCScanner(new JavaCharStream(reader)));
     parser.javacc_input();
-    JavaCCGlobals.fileName = JavaCCGlobals.origFileName = path;
+    JavaCCGlobals.fileName = path;
     Semanticize semanticize = new Semanticize();
     semanticize.start();
     lexGen.start();

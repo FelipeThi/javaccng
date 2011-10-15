@@ -48,7 +48,7 @@ public class ToyParser {
       System.out.println("Toy Preprocessor:  Reading from file " + args[0] + " . . .");
       try {
         parser = new ToyParser(
-            new ToyParserScanner(
+            new ToyScanner(
                 new JavaCharStream(
                     new InputStreamReader(
                         new FileInputStream(args[0])))));

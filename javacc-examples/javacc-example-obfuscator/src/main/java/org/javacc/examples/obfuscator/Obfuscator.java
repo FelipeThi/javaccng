@@ -110,7 +110,7 @@ public class Obfuscator extends Globals {
       Token first;
       try {
         parser = new JavaParser(
-            new JavaParserScanner(
+            new JavaScanner(
                 new JavaCharStream(
                     new InputStreamReader(
                         new FileInputStream(dirFile[dirStackSize])))));
@@ -169,7 +169,7 @@ public class Obfuscator extends Globals {
       out.print(" ");
     }
     while (true) {
-      if (t.getKind() == JavaParserConstants.IDENTIFIER) {
+      if (t.getKind() == JavaConstants.IDENTIFIER) {
         t.setImage(map(t.getImage()));
       }
       out.print(addUnicodeEscapes(t.getImage()));

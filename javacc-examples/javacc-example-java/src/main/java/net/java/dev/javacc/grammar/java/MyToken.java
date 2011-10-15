@@ -1,7 +1,7 @@
 package net.java.dev.javacc.grammar.java;
 
 public class MyToken extends Token {
-  int realKind = JavaParserConstants.GT;
+  int realKind = JavaConstants.GT;
 
   public MyToken(int kind) {
     super(kind);

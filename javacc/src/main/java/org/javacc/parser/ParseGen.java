@@ -36,12 +36,10 @@ import java.util.Iterator;
 import java.util.List;
 
 /** Generate the parser. */
-final class ParseGen implements FileGenerator, JavaCCParserConstants {
+final class ParseGen implements FileGenerator, JavaCCConstants {
   private final Semanticize semanticize;
-  private File path;
-  private String className;
 
-  public ParseGen(Semanticize semanticize) {
+  ParseGen(Semanticize semanticize) {
     this.semanticize = semanticize;
   }
 
@@ -55,8 +53,7 @@ final class ParseGen implements FileGenerator, JavaCCParserConstants {
       return;
     }
 
-    className = JavaCCGlobals.cuName;
-    path = new File(Options.getOutputDirectory(), JavaCCGlobals.cuName + ".java");
+    File path = new File(Options.getOutputDirectory(), JavaCCGlobals.parserClass() + ".java");
     OutputFile outputFile = new OutputFile(path);
     IndentingPrintWriter out = outputFile.getPrintWriter();
     try {
@@ -90,7 +87,7 @@ final class ParseGen implements FileGenerator, JavaCCParserConstants {
     else {
       out.print(" implements ");
     }
-    out.print(JavaCCGlobals.cuName + "Constants ");
+    out.print(JavaCCGlobals.constantsClass() + " ");
     if (JavaCCGlobals.cuToInsertionPoint2.size() != 0) {
       TokenPrinter.printTokenSetup(JavaCCGlobals.cuToInsertionPoint2.get(0));
       for (Token t : JavaCCGlobals.cuToInsertionPoint2) {
@@ -171,7 +168,7 @@ final class ParseGen implements FileGenerator, JavaCCParserConstants {
     out.println();
 
     out.println("  /** Constructor with either generated or user provided Token Manager. */");
-    out.println("  public " + JavaCCGlobals.cuName + "(Scanner s) throws java.io.IOException, ParseException {");
+    out.println("  public " + JavaCCGlobals.parserClass() + "(Scanner s) throws java.io.IOException, ParseException {");
     out.println("    scanner = s;");
     out.println("    token = new Token();");
     if (Options.getCacheTokens()) {

@@ -39,9 +39,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /** Generate lexer. */
-final class LexGen implements FileGenerator, JavaCCParserConstants {
-  private File path;
-  private String className;
+final class LexGen implements FileGenerator, JavaCCConstants {
   // Hashtable of vectors
   Hashtable allTpsForState = new Hashtable();
   int lexStateIndex;
@@ -98,8 +96,7 @@ final class LexGen implements FileGenerator, JavaCCParserConstants {
       return;
     }
 
-    className = JavaCCGlobals.cuName + "Scanner";
-    path = new File(Options.getOutputDirectory(), className + ".java");
+    File path = new File(Options.getOutputDirectory(), JavaCCGlobals.scannerClass() + ".java");
     OutputFile outputFile = new OutputFile(path);
     IndentingPrintWriter out = outputFile.getPrintWriter();
     try {
@@ -378,9 +375,8 @@ final class LexGen implements FileGenerator, JavaCCParserConstants {
 
     out.println();
     out.println("@SuppressWarnings(\"unused\")");
-    out.print("public class " + className + " implements Scanner, " +
-        JavaCCGlobals.cuName + "Constants");
-    out.println("{"); // }
+    out.print("public class " + JavaCCGlobals.scannerClass() + " implements Scanner, " +
+        JavaCCGlobals.constantsClass() + " {");
 
     if (JavaCCGlobals.scannerDeclarations != null
         && JavaCCGlobals.scannerDeclarations.size() > 0) {
@@ -431,7 +427,7 @@ final class LexGen implements FileGenerator, JavaCCParserConstants {
     if (Options.getScannerUsesParser()) {
       out.println();
       out.println("/** The parser. */");
-      out.println("public " + JavaCCGlobals.cuName + " parser = null;");
+      out.println("public " + JavaCCGlobals.parserClass() + " parser = null;");
     }
   }
 
@@ -756,12 +752,12 @@ final class LexGen implements FileGenerator, JavaCCParserConstants {
     if (Options.getScannerUsesParser()) {
       out.println();
       out.println("/** Constructor with parser. */");
-      out.println("public " + className + "(" + JavaCCGlobals.cuName + " parserArg, CharStream stream) {");
+      out.println("public " + JavaCCGlobals.scannerClass() + "(" + JavaCCGlobals.parserClass() + " parserArg, CharStream stream) {");
       out.println("   parser = parserArg;");
     }
     else {
       out.println("/** Constructor. */");
-      out.println("public " + className + "(CharStream stream) {");
+      out.println("public " + JavaCCGlobals.scannerClass() + "(CharStream stream) {");
     }
 
     out.println("   charStream = stream;");
@@ -771,13 +767,13 @@ final class LexGen implements FileGenerator, JavaCCParserConstants {
     if (Options.getScannerUsesParser()) {
       out.println();
       out.println("/** Constructor with parser. */");
-      out.println("public " + className + "(" + JavaCCGlobals.cuName + " parserArg, CharStream stream, int lexState) {");
+      out.println("public " + JavaCCGlobals.scannerClass() + "(" + JavaCCGlobals.parserClass() + " parserArg, CharStream stream, int lexState) {");
       out.println("   this(parserArg, stream);");
     }
     else {
       out.println();
       out.println("/** Constructor. */");
-      out.println("public " + className + "(CharStream stream, int lexState) {");
+      out.println("public " + JavaCCGlobals.scannerClass() + "(CharStream stream, int lexState) {");
       out.println("   this(stream);");
     }
     out.println("   switchTo(lexState);");

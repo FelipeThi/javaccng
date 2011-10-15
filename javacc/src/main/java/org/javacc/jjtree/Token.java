@@ -173,9 +173,9 @@ public class Token {
     switch (ofKind) {
       default:
         return new Token(ofKind, image);
-      case JJTreeParserConstants.RUNSIGNEDSHIFT:
-      case JJTreeParserConstants.RSIGNEDSHIFT:
-      case JJTreeParserConstants.GT:
+      case JJTreeConstants.RUNSIGNEDSHIFT:
+      case JJTreeConstants.RSIGNEDSHIFT:
+      case JJTreeConstants.GT:
         return new GTToken(ofKind, image);
     }
   }
@@ -190,6 +190,6 @@ public class Token {
       super(kind, image);
     }
 
-    int realKind = JJTreeParserConstants.GT;
+    int realKind = JJTreeConstants.GT;
   }
 }

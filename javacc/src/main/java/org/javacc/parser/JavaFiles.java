@@ -35,7 +35,7 @@ import java.io.File;
 import java.io.IOException;
 
 /** Generate boilerplate java files. */
-public class JavaFiles implements FileGenerator, JavaCCParserConstants {
+public class JavaFiles implements FileGenerator, JavaCCConstants {
   @Override
   public void start() throws IOException {
     generateScanner();

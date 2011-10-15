@@ -29,7 +29,7 @@ package org.javacc.examples.spl;/* Copyright (c) 2006, Sun Microsystems, Inc.
 /* JJT: 0.2.2 */
 
 public class ASTVarDeclaration extends SimpleNode
-    implements SPLParserConstants {
+    implements SPLConstants {
   int type;
   String name;
 
@@ -43,7 +43,7 @@ public class ASTVarDeclaration extends SimpleNode
 
   @Override
   public void interpret() {
-    if (type == SPLParserConstants.BOOL) {
+    if (type == SPLConstants.BOOL) {
       MyNode.symtab.put(name, new Boolean(false));
     }
     else {

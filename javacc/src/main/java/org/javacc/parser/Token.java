@@ -173,9 +173,9 @@ public class Token {
     switch (ofKind) {
       default:
         return new Token(ofKind, image);
-      case JavaCCParserConstants.RUNSIGNEDSHIFT:
-      case JavaCCParserConstants.RSIGNEDSHIFT:
-      case JavaCCParserConstants.GT:
+      case JavaCCConstants.RUNSIGNEDSHIFT:
+      case JavaCCConstants.RSIGNEDSHIFT:
+      case JavaCCConstants.GT:
         return new GTToken(ofKind, image);
     }
   }
@@ -190,6 +190,6 @@ public class Token {
       super(kind, image);
     }
 
-    int realKind = JavaCCParserConstants.GT;
+    int realKind = JavaCCConstants.GT;
   }
 }

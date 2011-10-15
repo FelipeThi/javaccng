@@ -36,7 +36,7 @@ import java.io.IOException;
 import java.util.List;
 
 /** Generates the Constants file. */
-final class OtherFilesGen implements FileGenerator, JavaCCParserConstants {
+final class OtherFilesGen implements FileGenerator, JavaCCConstants {
   private final LexGen lexGen;
 
   OtherFilesGen(LexGen lexGen) {
@@ -49,7 +49,7 @@ final class OtherFilesGen implements FileGenerator, JavaCCParserConstants {
       throw new MetaParseException();
     }
 
-    File path = new File(Options.getOutputDirectory(), JavaCCGlobals.cuName + "Constants.java");
+    File path = new File(Options.getOutputDirectory(), JavaCCGlobals.constantsClass() + ".java");
     OutputFile outputFile = new OutputFile(path);
     IndentingPrintWriter out = outputFile.getPrintWriter();
     try {
@@ -66,7 +66,7 @@ final class OtherFilesGen implements FileGenerator, JavaCCParserConstants {
 
     out.println();
     out.println("/** Token literal values and constants. */");
-    out.print("public interface " + JavaCCGlobals.cuName + "Constants {");
+    out.print("public interface " + JavaCCGlobals.constantsClass() + " {");
     out.println();
 
     out.println("  /** End of File. */");
