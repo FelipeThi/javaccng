@@ -39,7 +39,7 @@ public class IdList {
   }
 }
 
-PARSER_END(IdList)
+PARSER_END
 
 SKIP :
 {

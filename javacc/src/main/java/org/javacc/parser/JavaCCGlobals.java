@@ -49,21 +49,21 @@ public final class JavaCCGlobals {
   /** The name of the parser class (what appears in PARSER_BEGIN and PARSER_END). */
   public static String cuName;
   /**
-   * This is a list of tokens that appear after "PARSER_BEGIN(name)" all the
+   * The list of tokens that appear after "PARSER_BEGIN(name)" all the
    * way until (but not including) the opening brace "{" of the class "name".
    */
   public static List<Token> cuToInsertionPoint1
       = new ArrayList<Token>();
   /**
-   * This is the list of all tokens that appear after the tokens in
+   * The list of all tokens that appear after the tokens in
    * "cu_to_insertion_point_1" and until (but not including) the closing brace "}"
    * of the class "name".
    */
   public static List<Token> cuToInsertionPoint2
       = new ArrayList<Token>();
   /**
-   * This is the list of all tokens that appear after the tokens in
-   * "cu_to_insertion_point_2" and until "PARSER_END(name)".
+   * The list of all tokens that appear after the tokens in
+   * "cu_to_insertion_point_2" and until "PARSER_END".
    */
   public static List<Token> cuFromInsertionPoint2
       = new ArrayList<Token>();

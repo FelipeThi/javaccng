@@ -1,9 +1,9 @@
 /* Copyright (c) 2006, Sun Microsystems, Inc.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright notice,
  *       this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright
@@ -12,7 +12,7 @@
  *     * Neither the name of the Sun Microsystems, Inc. nor the names of its
  *       contributors may be used to endorse or promote products derived from
  *       this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -88,7 +88,7 @@ TOKEN :
 | < _SPECIAL_TOKEN: "SPECIAL_TOKEN" >
 | < _MORE: "MORE" >
 | < _SKIP: "SKIP" >
-| < _TOKEN_MGR_DECLS: "TOKEN_MGR_DECLS" >
+| < _SCANNER_DECLS: "SCANNER_DECLS" >
 | < _EOF: "EOF" >
 }
 
@@ -398,12 +398,12 @@ void option_binding() #OptionBinding :
 	}
    | v=BooleanLiteral()
         {
-	  JJTreeOptions.setInputFileOption(o, v, o.image, 
+	  JJTreeOptions.setInputFileOption(o, v, o.image,
 				     Boolean.valueOf(v.image));
 	  jjtThis.initialize(o.image, v.image);
 	}
    | v=StringLiteral()
-        {	
+        {
 	  String vs = TokenUtils.remove_escapes_and_quotes(v, v.image);
 	  JJTreeOptions.setInputFileOption(o, v, o.image, (Object)vs);
 	  jjtThis.initialize(o.image, vs);
@@ -433,7 +433,7 @@ void production() :
 |
   LOOKAHEAD(1)
   /*
-   * Since TOKEN_MGR_DECLS is both a JavaCC reserved word and a Java identifier,
+   * Since SCANNER_DECLS is both a JavaCC reserved word and a Java identifier,
    * we need to give preference to "token_manager_decls" over
    * "bnf_production".
    */
@@ -566,7 +566,7 @@ void token_manager_decls() #TokenDecls :
 	{
 	}
 {
-  "TOKEN_MGR_DECLS" ":" ClassOrInterfaceBody()
+  "SCANNER_DECLS" ":" ClassOrInterfaceBody()
 }
 
 void regexpr_kind() :
@@ -608,7 +608,7 @@ void expansion(ASTProduction p) #BNFSequence(>1) :
     LOOKAHEAD(1)
     ( "LOOKAHEAD" "(" local_lookahead(p) ")" ) #BNFLookahead
   )?
-  ( 
+  (
    LOOKAHEAD(0, { notTailOfExpansionUnit() } )
    (
      eu=expansion_unit(p)
@@ -701,7 +701,7 @@ JJTreeNode expansion_unit(ASTProduction p) :
     regular_expression() [ "." t=<IDENTIFIER>  ]
   | ( identifier() Arguments() ) #BNFNonTerminal
   )
-	
+
 ) #BNFAssignment(>1)
 |
   t="(" expansion_choices(p) ")"
@@ -822,7 +822,7 @@ Token identifier() :
 
 ASTNodeDescriptor node_descriptor() #NodeDescriptor :
 {
-  Token t = null; 
+  Token t = null;
   String s = null;
 }
 {
@@ -840,7 +840,7 @@ ASTNodeDescriptor node_descriptor() #NodeDescriptor :
   [
    LOOKAHEAD(1)
    "("
-      [ ">" 
+      [ ">"
                    {
 		     jjtThis.isGT = true;
 		   }
@@ -907,12 +907,12 @@ String JavaIdentifier() :
 | "SPECIAL_TOKEN"
 | "MORE"
 | "SKIP"
-| "TOKEN_MGR_DECLS"
+| "SCANNER_DECLS"
 | "EOF"
 )
-                {
-		  return token.image;
-		}
+    {
+      return token.image;
+    }
 }
 
 /*
@@ -1338,7 +1338,7 @@ void Expression() :
 {}
 {
   ConditionalExpression()
-  [ 
+  [
 	LOOKAHEAD(2)
     AssignmentOperator() Expression()
   ]
@@ -1800,7 +1800,7 @@ void ForStatement():
 
   (
       LOOKAHEAD(Modifiers() Type() JavaIdentifier() ":")
-      Modifiers() Type() JavaIdentifier() ":" Expression() 
+      Modifiers() Type() JavaIdentifier() ":" Expression()
     |
      [ ForInit() ] ";" [ Expression() ] ";" [ ForUpdate() ]
   )

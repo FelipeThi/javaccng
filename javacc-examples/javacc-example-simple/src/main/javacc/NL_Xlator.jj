@@ -39,7 +39,7 @@ public class NL_Xlator {
   }
 }
 
-PARSER_END(NL_Xlator)
+PARSER_END
 
 SKIP :
 {

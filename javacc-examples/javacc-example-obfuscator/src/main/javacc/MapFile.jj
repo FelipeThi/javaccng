@@ -37,10 +37,9 @@ package org.javacc.examples.obfuscator;
 
 import java.util.*;
 
-public class MapFile {
-}
+public class MapFile {}
 
-PARSER_END(MapFile)
+PARSER_END
 
 /*
  * Following is the only production in this grammar.  This describes the grammar

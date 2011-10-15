@@ -70,7 +70,7 @@ public class IDLParser {
   }
 }
 
-PARSER_END(IDLParser)
+PARSER_END
 
 
 /*

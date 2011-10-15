@@ -58,7 +58,7 @@ public class Simple1 {
   }
 }
 
-PARSER_END(Simple1)
+PARSER_END
 
 /** Root production. */
 void Input() :

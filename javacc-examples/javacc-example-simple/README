@@ -135,7 +135,7 @@ more of the individual option settings.  The details of the individual
 options is described in the JavaCC documentation in the web pages.
 
 Following this is a Java compilation unit enclosed between
-"PARSER_BEGIN(name)" and "PARSER_END(name)".  This compilation unit
+"PARSER_BEGIN(name)" and "PARSER_END".  This compilation unit
 can be of arbitrary complexity.  The only constraint on this
 compilation unit is that it must define a class called "name" - the
 same as the arguments to PARSER_BEGIN and PARSER_END.  This is the

@@ -50,7 +50,7 @@ public class Eg4 {
     System.out.println("Thank you.");
   }
 }
-PARSER_END(Eg4)
+PARSER_END
 
 
 SKIP :

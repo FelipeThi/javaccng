@@ -47,7 +47,7 @@ public class SPLParser {
   }
 }
 
-PARSER_END(SPLParser)
+PARSER_END
 
 
 SKIP : /* WHITE SPACE */

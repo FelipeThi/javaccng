@@ -42,14 +42,14 @@ public class Parser {
     TokenManager tokenManager = new ParserTokenManager(charStream);
     Parser t = new Parser(tokenManager);
     t.CompilationUnit();
-    System.out.println("Parser ran sucessfully");
+    System.out.println("Parser ran successfully");
   }
 }
 
 PARSER_END(Parser)
 
-TOKEN_MGR_DECLS : {
- Map map = new HashMap();
+SCANNER_DECLS : {
+  Map map = new HashMap();
 }
 
 TOKEN :

@@ -40,7 +40,7 @@ public class Simple3 {
   }
 }
 
-PARSER_END(Simple3)
+PARSER_END
 
 SKIP :
 {

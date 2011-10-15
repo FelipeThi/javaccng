@@ -44,7 +44,7 @@ public class Example8 {
 
 }
 
-PARSER_END(Example8)
+PARSER_END
 
 SKIP :
 {

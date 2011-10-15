@@ -48,7 +48,7 @@ public class Parser {
 
 PARSER_END(Parser)
 
-TOKEN_MGR_DECLS : {
+SCANNER_DECLS : {
  Map map = new HashMap();
 }
 

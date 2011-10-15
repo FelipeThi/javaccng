@@ -131,7 +131,7 @@ public class JavaParser
    }
 }
 
-PARSER_END(JavaParser)
+PARSER_END
 
 /* WHITE SPACE */
 

@@ -48,7 +48,7 @@ public class Eg3 {
     System.out.println("Thank you.");
   }
 }
-PARSER_END(Eg3)
+PARSER_END
 
 
 SKIP :

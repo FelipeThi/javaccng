@@ -79,7 +79,7 @@ public class ToyParser {
 
 }
 
-PARSER_END(ToyParser)
+PARSER_END
 
 
 SPECIAL_TOKEN : /* WHITE SPACE */

@@ -100,9 +100,9 @@ public final class JavaCCParser extends JavaCCParserBase {
     return true;
   }
 }
-PARSER_END(JavaCCParser)
+PARSER_END
 
-TOKEN_MGR_DECLS :
+SCANNER_DECLS :
 {
    int beginLine[] = new int[10];
    int beginCol[] = new int[10];
@@ -150,7 +150,7 @@ TOKEN :
 | < _SPECIAL_TOKEN: "SPECIAL_TOKEN" >
 | < _MORE: "MORE" >
 | < _SKIP: "SKIP" >
-| < _TOKEN_MGR_DECLS: "TOKEN_MGR_DECLS" >
+| < _SCANNER_DECLS: "SCANNER_DECLS" >
 | < _EOF: "EOF" >
 }
 
@@ -419,7 +419,7 @@ void javacc_input() :
   javacc_options()
   "PARSER_BEGIN" "(" id1=identifier()
 	{
-	  addCuName(id1);
+	  setCuName(id1);
 	}
   ")"
 	{
@@ -430,11 +430,7 @@ void javacc_input() :
 	{
 	  processingCu = false;
 	}
-  "PARSER_END" "(" id2=identifier()
-	{
-	  compare(getToken(0), id1, id2);
-	}
-  ")"
+  "PARSER_END"
   ( production() )+
   <EOF>
 }
@@ -502,7 +498,7 @@ void production() :
 |
   LOOKAHEAD(1)
   /*
-   * Since TOKEN_MGR_DECLS is both a JavaCC reserved word and a Java identifier,
+   * Since SCANNER_DECLS is both a JavaCC reserved word and a Java identifier,
    * we need to give preference to "token_manager_decls" over
    * "bnf_production".
    */
@@ -684,7 +680,7 @@ void token_manager_decls() :
 	  Token t;
 	}
 {
-  t="TOKEN_MGR_DECLS" ":"
+  t="SCANNER_DECLS" ":"
   ClassOrInterfaceBody(false, decls)
 	{
 	  addScannerDeclarations(t, decls);
@@ -1317,7 +1313,7 @@ Token JavaIdentifier() :
 | "SPECIAL_TOKEN"
 | "MORE"
 | "SKIP"
-| "TOKEN_MGR_DECLS"
+| "SCANNER_DECLS"
 | "EOF"
 )
 	{

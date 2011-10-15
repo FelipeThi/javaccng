@@ -37,10 +37,9 @@ package org.javacc.examples.obfuscator;
 
 import java.util.*;
 
-public class IdsFile {
-}
+public class IdsFile {}
 
-PARSER_END(IdsFile)
+PARSER_END
 
 /*
  * Following is the only production in this grammar.  This describes the grammar

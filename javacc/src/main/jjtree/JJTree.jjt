@@ -62,7 +62,7 @@ public class JJTreeParser {
     return true;
   }
 }
-PARSER_END(JJTreeParser)
+PARSER_END
 
 /**********************************************
  * THE JAVACC TOKEN SPECIFICATION STARTS HERE *
@@ -83,7 +83,7 @@ TOKEN :
 | < _SPECIAL_TOKEN: "SPECIAL_TOKEN" >
 | < _MORE: "MORE" >
 | < _SKIP: "SKIP" >
-| < _TOKEN_MGR_DECLS: "TOKEN_MGR_DECLS" >
+| < _SCANNER_DECLS: "SCANNER_DECLS" >
 | < _EOF: "EOF" >
 }
 
@@ -352,7 +352,7 @@ void javacc_input() #Grammar :
 	  JJTreeGlobals.parserName = t.getImage();
 	}
     CompilationUnit()
-    "PARSER_END" "(" identifier() ")"
+    "PARSER_END"
 	{
 	  if (JJTreeOptions.getNodePackage().equals("")) {
 	    JJTreeGlobals.nodePackageName = JJTreeGlobals.packageName;
@@ -428,7 +428,7 @@ void production() :
 |
   LOOKAHEAD(1)
   /*
-   * Since TOKEN_MGR_DECLS is both a JavaCC reserved word and a Java identifier,
+   * Since SCANNER_DECLS is both a JavaCC reserved word and a Java identifier,
    * we need to give preference to "token_manager_decls" over
    * "bnf_production".
    */
@@ -561,7 +561,7 @@ void token_manager_decls() #TokenDecls :
 	{
 	}
 {
-  "TOKEN_MGR_DECLS" ":" ClassOrInterfaceBody()
+  "SCANNER_DECLS" ":" ClassOrInterfaceBody()
 }
 
 void regexpr_kind() :
@@ -904,7 +904,7 @@ String JavaIdentifier() :
 | "SPECIAL_TOKEN"
 | "MORE"
 | "SKIP"
-| "TOKEN_MGR_DECLS"
+| "SCANNER_DECLS"
 | "EOF"
 )
     {

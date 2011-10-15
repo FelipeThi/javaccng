@@ -113,14 +113,8 @@ abstract class JavaCCParserBase {
         new HashMap<String, RegularExpression>());
   }
 
-  protected static void addCuName(String id) {
-    JavaCCGlobals.cuName = id;
-  }
-
-  protected static void compare(Token t, String id1, String id2) {
-    if (!id2.equals(id1)) {
-      JavaCCErrors.parseError(t, "Name " + id2 + " must be the same as that used at PARSER_BEGIN (" + id1 + ")");
-    }
+  protected static void setCuName(String name) {
+    JavaCCGlobals.cuName = name;
   }
 
   protected void setInsertionPoint(Token t, int no) {
@@ -157,6 +151,19 @@ abstract class JavaCCParserBase {
 
   protected void setInitialCuToken(Token t) {
     firstCuToken = t;
+  }
+
+  protected static void addScannerDeclarations(Token t, List<Token> decls) {
+    if (JavaCCGlobals.scannerDeclarations != null) {
+      JavaCCErrors.parseError(t, "Multiple occurrence of \"SCANNER_DECLS\".");
+    }
+    else {
+      JavaCCGlobals.scannerDeclarations = decls;
+      if (Options.getUserScanner()) {
+        JavaCCErrors.warning(t, "Ignoring declarations in \"SCANNER_DECLS\" since option " +
+            "USER_SCANNER has been set to true.");
+      }
+    }
   }
 
   protected void addProduction(NormalProduction p) {
@@ -206,19 +213,6 @@ abstract class JavaCCParserBase {
       res.nsToken = null;
       p.reSpecs.add(res);
       JavaCCGlobals.regExpList.add(p);
-    }
-  }
-
-  protected static void addScannerDeclarations(Token t, List<Token> decls) {
-    if (JavaCCGlobals.scannerDeclarations != null) {
-      JavaCCErrors.parseError(t, "Multiple occurrence of \"TOKEN_MGR_DECLS\".");
-    }
-    else {
-      JavaCCGlobals.scannerDeclarations = decls;
-      if (Options.getUserScanner()) {
-        JavaCCErrors.warning(t, "Ignoring declarations in \"TOKEN_MGR_DECLS\" since option " +
-            "USER_SCANNER has been set to true.");
-      }
     }
   }
 
