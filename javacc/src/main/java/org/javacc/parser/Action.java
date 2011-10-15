@@ -43,7 +43,6 @@ public final class Action extends Expansion {
    */
   private final List<Token> actionTokens = new ArrayList<Token>();
 
-  /** @return the action_tokens */
   public List<Token> getActionTokens() {
     return actionTokens;
   }

@@ -141,14 +141,6 @@ public final class JavaCCGlobals {
    */
   public static Map<String, Map<String, RegularExpression>> simpleTokensTable
       = new HashMap<String, Map<String, RegularExpression>>();
-  /**
-   * maskIndex, jj2index, maskVals are variables that are shared between
-   * ParseEngine and ParseGen.
-   */
-  static int maskIndex = 0;
-  static int jj2index = 0;
-  public static boolean lookaheadNeeded;
-  static List maskVals = new ArrayList();
   static Action eofAction;
   static String eofNextState;
 
@@ -191,9 +183,6 @@ public final class JavaCCGlobals {
     namesOfTokens = new HashMap<Integer, String>();
     regExpsOfTokens = new HashMap<Integer, RegularExpression>();
     simpleTokensTable = new HashMap<String, Map<String, RegularExpression>>();
-    maskIndex = 0;
-    jj2index = 0;
-    maskVals = new ArrayList();
     TokenPrinter.cLine = 0;
     TokenPrinter.cCol = 0;
     eofAction = null;

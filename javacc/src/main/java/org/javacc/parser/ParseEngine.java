@@ -35,14 +35,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 public final class ParseEngine {
+  /**
+   * maskIndex, jj2index, maskValues are variables that are shared between
+   * ParseEngine and ParseGen.
+   */
+  int maskIndex;
+  int jj2index;
+  boolean lookaheadNeeded;
+  List<int[]> maskValues = new ArrayList<int[]>();
   private final Semanticize semanticize;
-  private IndentingPrintWriter out;
-  private int gensymindex = 0;
+  private int genSymIndex = 0;
   private int indentamt;
   private boolean jj2LA;
   /**
@@ -220,6 +226,82 @@ public final class ParseEngine {
   static final int OPENIF = 1;
   static final int OPENSWITCH = 2;
 
+  void build(IndentingPrintWriter out) throws IOException {
+    for (NormalProduction production : JavaCCGlobals.bnfProductions) {
+      if (production instanceof JavaCodeProduction) {
+        JavaCodeProduction jp = (JavaCodeProduction) production;
+        Token t = jp.getReturnTypeTokens().get(0);
+        TokenPrinter.printTokenSetup(t);
+        TokenPrinter.cCol = 1;
+        TokenPrinter.printLeadingComments(t, out);
+        out.print("  " + (production.getAccessModifier() != null ? production.getAccessModifier() + " " : ""));
+        TokenPrinter.cLine = t.getBeginLine();
+        TokenPrinter.cCol = t.getBeginColumn();
+        TokenPrinter.printTokenOnly(t, out);
+        for (int i = 1; i < jp.getReturnTypeTokens().size(); i++) {
+          t = jp.getReturnTypeTokens().get(i);
+          TokenPrinter.printToken(t, out);
+        }
+        TokenPrinter.printTrailingComments(t);
+        out.print(" " + jp.getLhs() + "(");
+        if (jp.getParameterListTokens().size() != 0) {
+          TokenPrinter.printTokenSetup(jp.getParameterListTokens().get(0));
+          for (Token token : jp.getParameterListTokens()) {
+            t = token;
+            TokenPrinter.printToken(t, out);
+          }
+          TokenPrinter.printTrailingComments(t);
+        }
+        out.print(") throws java.io.IOException, ParseException");
+        for (List<Token> tokens : jp.getThrowsList()) {
+          out.print(", ");
+          for (Token token : tokens) {
+            t = token;
+            out.print(t.getImage());
+          }
+        }
+        out.print(" {");
+        if (Options.getDebugParser()) {
+          out.println();
+          out.println("    trace_call(\"" + jp.getLhs() + "\");");
+          out.print("    try {");
+        }
+        if (jp.getCodeTokens().size() != 0) {
+          TokenPrinter.printTokenSetup(jp.getCodeTokens().get(0));
+          TokenPrinter.cLine--;
+          TokenPrinter.printTokenList(jp.getCodeTokens(), out);
+        }
+        out.println();
+        if (Options.getDebugParser()) {
+          out.println("    } finally {");
+          out.println("      trace_return(\"" + jp.getLhs() + "\");");
+          out.println("    }");
+        }
+        out.println("  }");
+        out.println();
+      }
+      else {
+        buildPhase1Routine((BNFProduction) production, out);
+      }
+    }
+
+    for (Lookahead aPhase2list : phase2list) {
+      buildPhase2Routine(aPhase2list, out);
+    }
+
+    int phase3index = 0;
+
+    while (phase3index < phase3list.size()) {
+      for (; phase3index < phase3list.size(); phase3index++) {
+        setupPhase3Builds(phase3list.get(phase3index));
+      }
+    }
+
+    for (Phase3Data phase3Data : phase3table.values()) {
+      buildPhase3Routine(phase3Data, false, out);
+    }
+  }
+
   private void dumpLookaheads(Lookahead[] conds, String[] actions) {
     for (int i = 0; i < conds.length; i++) {
       System.err.println("Lookahead: " + i);
@@ -294,10 +376,10 @@ public final class ParseEngine {
             case OPENSWITCH:
               retval += "\u0002\n" + "default:" + "\u0001";
               if (Options.getErrorReporting()) {
-                retval += "\njj_la1[" + JavaCCGlobals.maskIndex + "] = jj_gen;";
-                JavaCCGlobals.maskIndex++;
+                retval += "\njj_la1[" + maskIndex + "] = jj_gen;";
+                maskIndex++;
               }
-              JavaCCGlobals.maskVals.add(tokenMask);
+              maskValues.add(tokenMask);
               retval += "\n" + "if (";
               indentAmt++;
           }
@@ -399,16 +481,16 @@ public final class ParseEngine {
           case OPENSWITCH:
             retval += "\u0002\n" + "default:" + "\u0001";
             if (Options.getErrorReporting()) {
-              retval += "\njj_la1[" + JavaCCGlobals.maskIndex + "] = jj_gen;";
-              JavaCCGlobals.maskIndex++;
+              retval += "\njj_la1[" + maskIndex + "] = jj_gen;";
+              maskIndex++;
             }
-            JavaCCGlobals.maskVals.add(tokenMask);
+            maskValues.add(tokenMask);
             retval += "\n" + "if (";
             indentAmt++;
         }
-        JavaCCGlobals.jj2index++;
+        jj2index++;
         // At this point, la.la_expansion.internal_name must be "".
-        la.getLaExpansion().internalName = "_" + JavaCCGlobals.jj2index;
+        la.getLaExpansion().internalName = "_" + jj2index;
         phase2list.add(la);
         retval += "jj_2" + la.getLaExpansion().internalName + "(" + la.getAmount() + ")";
         if (la.getActionTokens().size() != 0) {
@@ -444,9 +526,9 @@ public final class ParseEngine {
       case OPENSWITCH:
         retval += "\u0002\n" + "default:" + "\u0001";
         if (Options.getErrorReporting()) {
-          retval += "\njj_la1[" + JavaCCGlobals.maskIndex + "] = jj_gen;";
-          JavaCCGlobals.maskVals.add(tokenMask);
-          JavaCCGlobals.maskIndex++;
+          retval += "\njj_la1[" + maskIndex + "] = jj_gen;";
+          maskValues.add(tokenMask);
+          maskIndex++;
         }
         retval += actions[index];
     }
@@ -457,7 +539,7 @@ public final class ParseEngine {
     return retval;
   }
 
-  void dumpFormattedString(String str) {
+  void dumpFormattedString(String str, IndentingPrintWriter out) {
     char ch = ' ';
     char prevChar;
     boolean indentOn = true;
@@ -470,7 +552,7 @@ public final class ParseEngine {
       }
       else if (ch == '\n' || ch == '\r') {
         if (indentOn) {
-          phase1NewLine();
+          phase1NewLine(out);
         }
         else {
           out.println();
@@ -494,7 +576,7 @@ public final class ParseEngine {
     }
   }
 
-  void buildPhase1Routine(BNFProduction p) throws IOException {
+  void buildPhase1Routine(BNFProduction p, IndentingPrintWriter out) throws IOException {
     Token t;
     t = p.getReturnTypeTokens().get(0);
     boolean voidReturn = false;
@@ -548,7 +630,7 @@ public final class ParseEngine {
       TokenPrinter.printTrailingComments(t);
     }
     String code = phase1ExpansionGen(p.getExpansion());
-    dumpFormattedString(code);
+    dumpFormattedString(code, out);
     out.println();
     if (p.isJumpPatched() && !voidReturn) {
       out.println("    throw new Error(\"Missing return statement in function\");");
@@ -562,7 +644,7 @@ public final class ParseEngine {
     out.println();
   }
 
-  void phase1NewLine() {
+  void phase1NewLine(IndentingPrintWriter out) {
     out.println();
     for (int i = 0; i < indentamt; i++) {
       out.print(" ");
@@ -647,9 +729,9 @@ public final class ParseEngine {
       // thrown first.
       Sequence nestedSeq;
       for (int i = 0; i < e_nrw.getChoices().size(); i++) {
-        nestedSeq = (Sequence) (e_nrw.getChoices().get(i));
+        nestedSeq = (Sequence) e_nrw.getChoices().get(i);
         actions[i] = phase1ExpansionGen(nestedSeq);
-        conds[i] = (Lookahead) (nestedSeq.units.get(0));
+        conds[i] = (Lookahead) nestedSeq.units.get(0);
       }
       retval = buildLookaheadChecker(conds, actions);
     }
@@ -674,7 +756,7 @@ public final class ParseEngine {
         la.setLaExpansion(nested_e);
       }
       retval += "\n";
-      int labelIndex = ++gensymindex;
+      int labelIndex = ++genSymIndex;
       retval += "label_" + labelIndex + ":\n";
       retval += "while (true) {\u0001";
       retval += phase1ExpansionGen(nested_e);
@@ -699,7 +781,7 @@ public final class ParseEngine {
         la.setLaExpansion(nested_e);
       }
       retval += "\n";
-      int labelIndex = ++gensymindex;
+      int labelIndex = ++genSymIndex;
       retval += "label_" + labelIndex + ":\n";
       retval += "while (true) {\u0001";
       conds = new Lookahead[1];
@@ -784,7 +866,7 @@ public final class ParseEngine {
     return retval;
   }
 
-  void buildPhase2Routine(Lookahead la) {
+  void buildPhase2Routine(Lookahead la, IndentingPrintWriter out) {
     Expansion e = la.getLaExpansion();
     out.println("  private boolean jj_2" + e.internalName + "(int xla) throws java.io.IOException {");
     out.println("    jj_la = xla; jj_lastPos = jj_scanPos = token;");
@@ -845,13 +927,13 @@ public final class ParseEngine {
         return;
       }
 
-      gensymindex++;
-//    if (gensymindex == 100)
+      genSymIndex++;
+//    if (genSymIndex == 100)
 //    {
 //    new Error().printStackTrace();
 //    System.out.println(" ***** seq: " + seq.internal_name + "; size: " + ((Sequence)seq).units.size());
 //    }
-      e.internalName = "R_" + gensymindex;
+      e.internalName = "R_" + genSymIndex;
     }
     Phase3Data p3d = phase3table.get(e);
     if (p3d == null || p3d.count < inf.count) {
@@ -929,7 +1011,7 @@ public final class ParseEngine {
 
   Hashtable generated = new Hashtable();
 
-  void buildPhase3Routine(Phase3Data inf, boolean recursive_call) throws IOException {
+  void buildPhase3Routine(Phase3Data inf, boolean recursive_call, IndentingPrintWriter out) throws IOException {
     Expansion e = inf.exp;
     Token t = null;
     if (e.internalName.startsWith("jj_scan_token")) {
@@ -999,7 +1081,7 @@ public final class ParseEngine {
         Lookahead la = (Lookahead) nested_seq.units.get(0);
         if (la.getActionTokens().size() != 0) {
           // We have semantic lookahead that must be evaluated.
-          JavaCCGlobals.lookaheadNeeded = true;
+          lookaheadNeeded = true;
           out.println("    jj_lookingAhead = true;");
           out.print("    jj_semLA = ");
           TokenPrinter.printTokenSetup(la.getActionTokens().get(0));
@@ -1038,7 +1120,7 @@ public final class ParseEngine {
       int cnt = inf.count;
       for (int i = 1; i < e_nrw.units.size(); i++) {
         Expansion eseq = e_nrw.units.get(i);
-        buildPhase3Routine(new Phase3Data(eseq, cnt), true);
+        buildPhase3Routine(new Phase3Data(eseq, cnt), true, out);
 
 //      System.out.println("minimumSize: line: " + eseq.line + ", column: " + eseq.column + ": " +
 //      minimumSize(eseq));//Test Code
@@ -1051,7 +1133,7 @@ public final class ParseEngine {
     }
     else if (e instanceof TryBlock) {
       TryBlock e_nrw = (TryBlock) e;
-      buildPhase3Routine(new Phase3Data(e_nrw.expansion, inf.count), true);
+      buildPhase3Routine(new Phase3Data(e_nrw.expansion, inf.count), true, out);
     }
     else if (e instanceof OneOrMore) {
       if (!xsp_declared) {
@@ -1188,87 +1270,6 @@ public final class ParseEngine {
     }
     e.inMinimumSize = false;
     return retval;
-  }
-
-  void build(IndentingPrintWriter ps) throws IOException {
-
-    JavaCodeProduction jp;
-
-    out = ps;
-
-    for (NormalProduction production : JavaCCGlobals.bnfProductions) {
-      if (production instanceof JavaCodeProduction) {
-        jp = (JavaCodeProduction) production;
-        Token t = jp.getReturnTypeTokens().get(0);
-        TokenPrinter.printTokenSetup(t);
-        TokenPrinter.cCol = 1;
-        TokenPrinter.printLeadingComments(t, out);
-        out.print("  " + (production.getAccessModifier() != null ? production.getAccessModifier() + " " : ""));
-        TokenPrinter.cLine = t.getBeginLine();
-        TokenPrinter.cCol = t.getBeginColumn();
-        TokenPrinter.printTokenOnly(t, out);
-        for (int i = 1; i < jp.getReturnTypeTokens().size(); i++) {
-          t = jp.getReturnTypeTokens().get(i);
-          TokenPrinter.printToken(t, out);
-        }
-        TokenPrinter.printTrailingComments(t);
-        out.print(" " + jp.getLhs() + "(");
-        if (jp.getParameterListTokens().size() != 0) {
-          TokenPrinter.printTokenSetup(jp.getParameterListTokens().get(0));
-          for (Iterator it = jp.getParameterListTokens().iterator(); it.hasNext(); ) {
-            t = (Token) it.next();
-            TokenPrinter.printToken(t, out);
-          }
-          TokenPrinter.printTrailingComments(t);
-        }
-        out.print(") throws java.io.IOException, ParseException");
-        for (List<Token> tokens : jp.getThrowsList()) {
-          out.print(", ");
-          for (Token token : tokens) {
-            t = token;
-            out.print(t.getImage());
-          }
-        }
-        out.print(" {");
-        if (Options.getDebugParser()) {
-          out.println();
-          out.println("    trace_call(\"" + jp.getLhs() + "\");");
-          out.print("    try {");
-        }
-        if (jp.getCodeTokens().size() != 0) {
-          TokenPrinter.printTokenSetup(jp.getCodeTokens().get(0));
-          TokenPrinter.cLine--;
-          TokenPrinter.printTokenList(jp.getCodeTokens(), out);
-        }
-        out.println();
-        if (Options.getDebugParser()) {
-          out.println("    } finally {");
-          out.println("      trace_return(\"" + jp.getLhs() + "\");");
-          out.println("    }");
-        }
-        out.println("  }");
-        out.println();
-      }
-      else {
-        buildPhase1Routine((BNFProduction) production);
-      }
-    }
-
-    for (Lookahead aPhase2list : phase2list) {
-      buildPhase2Routine(aPhase2list);
-    }
-
-    int phase3index = 0;
-
-    while (phase3index < phase3list.size()) {
-      for (; phase3index < phase3list.size(); phase3index++) {
-        setupPhase3Builds(phase3list.get(phase3index));
-      }
-    }
-
-    for (Phase3Data phase3Data : phase3table.values()) {
-      buildPhase3Routine(phase3Data, false);
-    }
   }
 }
 

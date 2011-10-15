@@ -378,43 +378,12 @@ final class LexGen implements FileGenerator, JavaCCConstants {
     out.print("public class " + JavaCCGlobals.scannerClass() + " implements Scanner, " +
         JavaCCGlobals.constantsClass() + " {");
 
-    if (JavaCCGlobals.scannerDeclarations != null
-        && JavaCCGlobals.scannerDeclarations.size() > 0) {
-      boolean commonTokenActionSeen = false;
-      boolean commonTokenActionNeeded = Options.getCommonTokenAction();
-
-      TokenPrinter.printTokenSetup(JavaCCGlobals.scannerDeclarations.get(0));
-      TokenPrinter.cCol = 1;
-
-      for (j = 0; j < JavaCCGlobals.scannerDeclarations.size(); j++) {
-        Token t = JavaCCGlobals.scannerDeclarations.get(j);
-        if (t.getKind() == IDENTIFIER &&
-            commonTokenActionNeeded &&
-            !commonTokenActionSeen) {
-          commonTokenActionSeen = t.getImage().equals("commonTokenAction");
-        }
-
-        TokenPrinter.printToken(t, out);
-      }
-
-      out.println();
-      if (commonTokenActionNeeded && !commonTokenActionSeen) {
-        JavaCCErrors.warning("You have the COMMON_TOKEN_ACTION option set. " +
-            "But it appears you have not defined the method :\n" +
-            "      void commonTokenAction(Token t)\n" +
-            "in your SCANNER_DECLS. The generated token manager will not compile.");
-      }
-    }
-    else if (Options.getCommonTokenAction()) {
-      JavaCCErrors.warning("You have the COMMON_TOKEN_ACTION option set. " +
-          "But you have not defined the method :\n" +
-          "      void commonTokenAction(Token t)\n" +
-          "in your SCANNER_DECLS. The generated token manager will not compile.");
-    }
+    writeScannerDeclarations(out);
 
     out.indent();
 
     out.println();
+
     if (Options.getDebugScanner()) {
       out.println("/** Debug output. */");
       out.println("private java.io.PrintWriter debugPrinter = new java.io.PrintWriter(System.out);");
@@ -428,6 +397,43 @@ final class LexGen implements FileGenerator, JavaCCConstants {
       out.println();
       out.println("/** The parser. */");
       out.println("public " + JavaCCGlobals.parserClass() + " parser = null;");
+    }
+  }
+
+  private void writeScannerDeclarations(IndentingPrintWriter out)
+      throws IOException {
+    List<Token> tokens = JavaCCGlobals.scannerDeclarations;
+    if (tokens != null
+        && tokens.size() > 0) {
+      boolean commonTokenActionSeen = false;
+
+      TokenPrinter.printTokenSetup(tokens.get(0));
+      TokenPrinter.cCol = 1;
+
+      for (Token t : tokens) {
+        if (t.getKind() == IDENTIFIER
+            && Options.getCommonTokenAction()
+            && !commonTokenActionSeen) {
+          commonTokenActionSeen = t.getImage().equals("commonTokenAction");
+        }
+
+        TokenPrinter.printToken(t, out);
+      }
+
+      out.println();
+
+      if (Options.getCommonTokenAction() && !commonTokenActionSeen) {
+        JavaCCErrors.warning("You have the COMMON_TOKEN_ACTION option set. " +
+            "But it appears you have not defined the method :\n" +
+            "      void commonTokenAction(Token t)\n" +
+            "in your SCANNER_DECLS. The generated token manager will not compile.");
+      }
+    }
+    else if (Options.getCommonTokenAction()) {
+      JavaCCErrors.warning("You have the COMMON_TOKEN_ACTION option set. " +
+          "But you have not defined the method :\n" +
+          "      void commonTokenAction(Token t)\n" +
+          "in your SCANNER_DECLS. The generated token manager will not compile.");
     }
   }
 

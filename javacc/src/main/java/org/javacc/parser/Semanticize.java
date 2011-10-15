@@ -36,7 +36,7 @@ import java.util.Map;
 
 public final class Semanticize {
   LookaheadCalc lookaheadCalc = new LookaheadCalc();
-  List removeList = new ArrayList();
+  List<List> removeList = new ArrayList<List>();
   List itemList = new ArrayList();
 
   void prepareToRemove(List vec, Object item) {
@@ -46,7 +46,7 @@ public final class Semanticize {
 
   void removePreparedItems() {
     for (int i = 0; i < removeList.size(); i++) {
-      List list = (List) (removeList.get(i));
+      List list = removeList.get(i);
       list.remove(itemList.get(i));
     }
     removeList.clear();
