@@ -40,11 +40,11 @@ public interface Node {
 
   Node jjtGetParent();
 
-  void jjtAddChild(Node n, int i);
+  void jjtSetChild(Node n, int i);
 
   Node jjtGetChild(int i);
 
-  int jjtGetNumChildren();
+  int jjtGetChildCount();
 
   void interpret();
 }

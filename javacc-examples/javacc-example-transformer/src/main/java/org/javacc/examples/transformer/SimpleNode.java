@@ -54,7 +54,7 @@ public class SimpleNode implements Node {
   public Node jjtGetParent() { return parent; }
 
   @Override
-  public void jjtAddChild(Node n, int i) {
+  public void jjtSetChild(Node n, int i) {
     if (children == null) {
       children = new Node[i + 1];
     }
@@ -72,7 +72,7 @@ public class SimpleNode implements Node {
   }
 
   @Override
-  public int jjtGetNumChildren() {
+  public int jjtGetChildCount() {
     return children == null ? 0 : children.length;
   }
 

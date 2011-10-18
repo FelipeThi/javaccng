@@ -35,17 +35,9 @@ public class JJTreeNode extends SimpleNode {
     super(id);
   }
 
-  public JJTreeNode(JJTreeParser p, int i) {
-    this(i);
-  }
-
-  public static Node jjtCreate(int id) {
-    return new JJTreeNode(id);
-  }
-
   @Override
-  public void jjtAddChild(Node n, int i) {
-    super.jjtAddChild(n, i);
+  public void jjtSetChild(Node n, int i) {
+    super.jjtSetChild(n, i);
     ((JJTreeNode) n).setOrdinal(i);
   }
 
@@ -89,7 +81,7 @@ public class JJTreeNode extends SimpleNode {
     Token t = new Token();
     t.next = getFirstToken();
     JJTreeNode node;
-    for (int n = 0; n < jjtGetNumChildren(); n++) {
+    for (int n = 0; n < jjtGetChildCount(); n++) {
       node = (JJTreeNode) jjtGetChild(n);
       while (true) {
         t = t.next;

@@ -134,7 +134,7 @@ final class TreeStateFile implements FileGenerator {
     out.println("    while (num-- > 0) {");
     out.println("      Node c = popNode();");
     out.println("      c.jjtSetParent(n);");
-    out.println("      n.jjtAddChild(c, num);");
+    out.println("      n.jjtSetChild(c, num);");
     out.println("    }");
     out.println("    n.jjtClose();");
     out.println("    pushNode(n);");
@@ -153,7 +153,7 @@ final class TreeStateFile implements FileGenerator {
     out.println("      while (a-- > 0) {");
     out.println("        Node c = popNode();");
     out.println("        c.jjtSetParent(n);");
-    out.println("        n.jjtAddChild(c, a);");
+    out.println("        n.jjtSetChild(c, a);");
     out.println("      }");
     out.println("      n.jjtClose();");
     out.println("      pushNode(n);");

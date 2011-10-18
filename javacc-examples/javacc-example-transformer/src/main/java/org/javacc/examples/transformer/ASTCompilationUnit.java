@@ -41,7 +41,7 @@ public class ASTCompilationUnit extends SimpleNode {
   public void process(PrintWriter out) {
     Token t = begin;
     ASTSpecialBlock block;
-    for (int i = 0; i < jjtGetNumChildren(); i++) {
+    for (int i = 0; i < jjtGetChildCount(); i++) {
       block = (ASTSpecialBlock) jjtGetChild(i);
       do {
         print(t, out);

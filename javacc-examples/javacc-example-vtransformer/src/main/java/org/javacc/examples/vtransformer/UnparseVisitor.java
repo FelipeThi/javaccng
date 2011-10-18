@@ -43,7 +43,7 @@ public class UnparseVisitor implements JavaVisitor {
     t.next = t1;
 
     SimpleNode n;
-    for (int ord = 0; ord < node.jjtGetNumChildren(); ord++) {
+    for (int ord = 0; ord < node.jjtGetChildCount(); ord++) {
       n = (SimpleNode) node.jjtGetChild(ord);
       while (true) {
         t = t.next;

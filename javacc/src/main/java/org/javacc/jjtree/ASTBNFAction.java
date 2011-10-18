@@ -50,7 +50,7 @@ public class ASTBNFAction extends JJTreeNode {
       while (true) {
         Node p = n.jjtGetParent();
         if (p instanceof ASTBNFSequence || p instanceof ASTBNFTryBlock) {
-          if (n.getOrdinal() != p.jjtGetNumChildren() - 1) {
+          if (n.getOrdinal() != p.jjtGetChildCount() - 1) {
             /* We're not the final unit in the sequence. */
             needClose = false;
             break;

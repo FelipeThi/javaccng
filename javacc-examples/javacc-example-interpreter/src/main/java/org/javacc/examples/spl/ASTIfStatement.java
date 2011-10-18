@@ -38,7 +38,7 @@ public class ASTIfStatement extends SimpleNode {
     if (((Boolean) MyNode.stack[MyNode.top--]).booleanValue()) {
       jjtGetChild(1).interpret();
     }
-    else if (jjtGetNumChildren() == 3) {
+    else if (jjtGetChildCount() == 3) {
       jjtGetChild(2).interpret();
     }
   }

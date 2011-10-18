@@ -23,7 +23,7 @@ public interface Node {
    * This method tells the node to add its argument to the node's
    * list of children.
    */
-  void jjtAddChild(Node n, int i);
+  void jjtSetChild(Node n, int i);
 
   /**
    * This method returns a child node.  The children are numbered
@@ -34,7 +34,7 @@ public interface Node {
   /**
    * Return the number of children the node has.
    */
-  int jjtGetNumChildren();
+  int jjtGetChildCount();
 #if VISITOR
 
 #if VISITOR_EXCEPTION

@@ -218,7 +218,7 @@ public class NodeScope {
         }
       }
     }
-    for (int i = 0; i < expansionUnit.jjtGetNumChildren(); ++i) {
+    for (int i = 0; i < expansionUnit.jjtGetChildCount(); ++i) {
       JJTreeNode n = (JJTreeNode) expansionUnit.jjtGetChild(i);
       findThrown(thrownSet, n);
     }

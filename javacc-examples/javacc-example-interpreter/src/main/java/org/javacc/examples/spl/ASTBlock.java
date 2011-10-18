@@ -33,7 +33,7 @@ public class ASTBlock extends SimpleNode {
 
   @Override
   public void interpret() {
-    int i, k = jjtGetNumChildren();
+    int i, k = jjtGetChildCount();
 
     for (i = 0; i < k; i++) {
       jjtGetChild(i).interpret();
