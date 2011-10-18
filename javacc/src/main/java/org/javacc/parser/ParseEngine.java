@@ -37,10 +37,15 @@ import java.util.List;
 import java.util.Map;
 
 public final class ParseEngine {
+  /** Constants used in the following method "buildLookaheadChecker". */
+  private static final int NO_OPEN_STM = 0;
+  private static final int OPEN_IF = 1;
+  private static final int OPEN_SWITCH = 2;
+
   /** This class stores information to pass from phase 2 to phase 3. */
   private static class Phase3Data {
     /** This is the expansion to generate the jj3 method for. */
-    final Expansion exp;
+    final Expansion expansion;
     /**
      * This is the number of tokens that can still be consumed.  This
      * number is used to limit the number of jj3 methods generated.
@@ -48,12 +53,13 @@ public final class ParseEngine {
     final int count;
 
     Phase3Data(Expansion e, int c) {
-      exp = e;
+      expansion = e;
       count = c;
     }
   }
 
   private final JavaCCState state;
+  private final Semanticize semanticize;
   /**
    * maskIndex, jj2index, maskValues are variables that are shared between
    * ParseEngine and ParseGen.
@@ -62,9 +68,7 @@ public final class ParseEngine {
   int jj2index;
   boolean lookaheadNeeded;
   List<int[]> maskValues = new ArrayList<int[]>();
-  private final Semanticize semanticize;
   private int genSymIndex;
-  private int indentamt;
   private boolean jj2LA;
   /**
    * These lists are used to maintain expansions for which code generation
@@ -94,80 +98,89 @@ public final class ParseEngine {
     this.semanticize = semanticize;
   }
 
-  /*
-   * The phase 1 routines generates their output into String's and dumps
-   * these String's once for each method.  These String's contain the
-   * special characters '\u0001' to indicate a positive indent, and '\u0002'
-   * to indicate a negative indent.  '\n' is used to indicate a line terminator.
-   * The characters '\u0003' and '\u0004' are used to delineate portions of
-   * text where '\n's should not be followed by an indentation.
-   */
+  void build(IndentingPrintWriter out) throws IOException {
+    for (NormalProduction production : state.bnfProductions) {
+      if (production instanceof JavaCodeProduction) {
+        buildJavaCodeProduction(production, out);
+      }
+      else {
+        buildPhase1Routine((BNFProduction) production, out);
+      }
+    }
+
+    for (Lookahead lookahead : phase2list) {
+      buildPhase2Routine(lookahead, out);
+    }
+
+    int index = 0;
+    while (index < phase3list.size()) {
+      for (; index < phase3list.size(); index++) {
+        setupPhase3Builds(phase3list.get(index));
+      }
+    }
+
+    for (Phase3Data phase3Data : phase3table.values()) {
+      buildPhase3Routine(phase3Data, false, out);
+    }
+  }
 
   /**
-   * Returns true if there is a JAVACODE production that the argument expansion
-   * may directly expand to (without consuming tokens or encountering lookahead).
+   * @return true if there is a JAVACODE production that the argument expansion
+   *         may directly expand to (without consuming tokens or encountering lookahead).
    */
   private boolean javaCodeCheck(Expansion expansion) {
     if (expansion instanceof RegularExpression) {
       return false;
     }
-
     else if (expansion instanceof NonTerminal) {
       NormalProduction production = ((NonTerminal) expansion).getProd();
-      return production instanceof JavaCodeProduction || javaCodeCheck(production.getExpansion());
+      return production instanceof JavaCodeProduction
+          || javaCodeCheck(production.getExpansion());
     }
-
-    if (expansion instanceof Choice) {
-      Choice choice = (Choice) expansion;
-      for (int i = 0; i < choice.getChoices().size(); i++) {
-        if (javaCodeCheck(choice.getChoices().get(i))) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    if (expansion instanceof Sequence) {
+    else if (expansion instanceof Sequence) {
       Sequence sequence = (Sequence) expansion;
       for (int i = 0; i < sequence.units.size(); i++) {
         Expansion[] units = sequence.units.toArray(new Expansion[sequence.units.size()]);
-        if (units[i] instanceof Lookahead && ((Lookahead) units[i]).isExplicit()) {
+        Expansion nested = units[i];
+        if (nested instanceof Lookahead && ((Lookahead) nested).isExplicit()) {
           // An explicit lookahead (rather than one generated implicitly). Assume
           // the user knows what he / she is doing, e.g.
           //    "A" ( "B" | LOOKAHEAD("X") jcode() | "C" )* "D"
           return false;
         }
-        else if (javaCodeCheck(units[i])) {
+        if (javaCodeCheck(nested)) {
           return true;
         }
-        else if (!semanticize.emptyExpansionExists(units[i])) {
+        if (!semanticize.emptyExpansionExists(nested)) {
           return false;
         }
       }
       return false;
     }
-
-    if (expansion instanceof ZeroOrOne) {
-      ZeroOrOne zeroOrOne = (ZeroOrOne) expansion;
-      return javaCodeCheck(zeroOrOne.expansion);
+    else if (expansion instanceof Choice) {
+      Choice choice = (Choice) expansion;
+      for (Expansion nested : choice.getChoices()) {
+        if (javaCodeCheck(nested)) {
+          return true;
+        }
+      }
+      return false;
     }
-
-    if (expansion instanceof ZeroOrMore) {
-      ZeroOrMore zeroOrMore = (ZeroOrMore) expansion;
-      return javaCodeCheck(zeroOrMore.expansion);
+    else if (expansion instanceof ZeroOrOne) {
+      return javaCodeCheck(((ZeroOrOne) expansion).expansion);
     }
-
-    if (expansion instanceof OneOrMore) {
-      OneOrMore oneOrMore = (OneOrMore) expansion;
-      return javaCodeCheck(oneOrMore.expansion);
+    else if (expansion instanceof ZeroOrMore) {
+      return javaCodeCheck(((ZeroOrMore) expansion).expansion);
     }
-
-    if (expansion instanceof TryBlock) {
-      TryBlock tryBlock = (TryBlock) expansion;
-      return javaCodeCheck(tryBlock.expansion);
+    else if (expansion instanceof OneOrMore) {
+      return javaCodeCheck(((OneOrMore) expansion).expansion);
     }
-
-    return false;
+    else if (expansion instanceof TryBlock) {
+      return javaCodeCheck(((TryBlock) expansion).expansion);
+    }
+    else {
+      return false;
+    }
   }
 
   /**
@@ -181,93 +194,58 @@ public final class ParseEngine {
    * passed to it.  Since this is a recursive function, it assumes that
    * "firstSet" has been reset before the first call.
    */
-  private void genFirstSet(Expansion exp) {
-    if (exp instanceof RegularExpression) {
-      firstSet[((RegularExpression) exp).ordinal] = true;
+  private void genFirstSet(Expansion expansion) {
+    if (expansion instanceof RegularExpression) {
+      firstSet[((RegularExpression) expansion).ordinal] = true;
     }
-    else if (exp instanceof NonTerminal) {
-      if (!(((NonTerminal) exp).getProd() instanceof JavaCodeProduction)) {
-        genFirstSet(((NonTerminal) exp).getProd().getExpansion());
+    else if (expansion instanceof NonTerminal) {
+      if (!(((NonTerminal) expansion).getProd() instanceof JavaCodeProduction)) {
+        genFirstSet(((NonTerminal) expansion).getProd().getExpansion());
       }
     }
-    else if (exp instanceof Choice) {
-      Choice ch = (Choice) exp;
-      for (int i = 0; i < ch.getChoices().size(); i++) {
-        genFirstSet(ch.getChoices().get(i));
+    else if (expansion instanceof Choice) {
+      Choice choice = (Choice) expansion;
+      for (int i = 0; i < choice.getChoices().size(); i++) {
+        genFirstSet(choice.getChoices().get(i));
       }
     }
-    else if (exp instanceof Sequence) {
-      Sequence seq = (Sequence) exp;
-      Expansion obj = seq.units.get(0);
-      if (obj instanceof Lookahead && ((Lookahead) obj).getActionTokens().size() != 0) {
+    else if (expansion instanceof Sequence) {
+      Sequence sequence = (Sequence) expansion;
+      Expansion unit = sequence.units.get(0);
+      if (unit instanceof Lookahead && ((Lookahead) unit).getActionTokens().size() != 0) {
         jj2LA = true;
       }
-      for (int i = 0; i < seq.units.size(); i++) {
-        Expansion unit = seq.units.get(i);
+      for (int i = 0; i < sequence.units.size(); i++) {
+        unit = sequence.units.get(i);
         // Javacode productions can not have FIRST sets. Instead we generate the FIRST set
         // for the preceding LOOKAHEAD (the semantic checks should have made sure that
         // the LOOKAHEAD is suitable).
-        if (unit instanceof NonTerminal && ((NonTerminal) unit).getProd() instanceof JavaCodeProduction) {
-          if (i > 0 && seq.units.get(i - 1) instanceof Lookahead) {
-            Lookahead la = (Lookahead) seq.units.get(i - 1);
+        if (unit instanceof NonTerminal
+            && ((NonTerminal) unit).getProd() instanceof JavaCodeProduction) {
+          if (i > 0 && sequence.units.get(i - 1) instanceof Lookahead) {
+            Lookahead la = (Lookahead) sequence.units.get(i - 1);
             genFirstSet(la.getLaExpansion());
           }
         }
         else {
-          genFirstSet(seq.units.get(i));
+          genFirstSet(sequence.units.get(i));
         }
-        if (!semanticize.emptyExpansionExists(seq.units.get(i))) {
+        if (!semanticize.emptyExpansionExists(sequence.units.get(i))) {
           break;
         }
       }
     }
-    else if (exp instanceof OneOrMore) {
-      OneOrMore om = (OneOrMore) exp;
-      genFirstSet(om.expansion);
+    else if (expansion instanceof ZeroOrOne) {
+      genFirstSet(((ZeroOrOne) expansion).expansion);
     }
-    else if (exp instanceof ZeroOrMore) {
-      ZeroOrMore zm = (ZeroOrMore) exp;
-      genFirstSet(zm.expansion);
+    else if (expansion instanceof ZeroOrMore) {
+      genFirstSet(((ZeroOrMore) expansion).expansion);
     }
-    else if (exp instanceof ZeroOrOne) {
-      ZeroOrOne zo = (ZeroOrOne) exp;
-      genFirstSet(zo.expansion);
+    else if (expansion instanceof OneOrMore) {
+      genFirstSet(((OneOrMore) expansion).expansion);
     }
-    else if (exp instanceof TryBlock) {
-      TryBlock tb = (TryBlock) exp;
-      genFirstSet(tb.expansion);
-    }
-  }
-
-  /** Constants used in the following method "buildLookaheadChecker". */
-  static final int NOOPENSTM = 0;
-  static final int OPENIF = 1;
-  static final int OPENSWITCH = 2;
-
-  void build(IndentingPrintWriter out) throws IOException {
-    for (NormalProduction production : state.bnfProductions) {
-      if (production instanceof JavaCodeProduction) {
-        buildJavaCodeProduction(production, out);
-      }
-      else {
-        buildPhase1Routine((BNFProduction) production, out);
-      }
-    }
-
-    for (Lookahead aPhase2list : phase2list) {
-      buildPhase2Routine(aPhase2list, out);
-    }
-
-    int phase3index = 0;
-
-    while (phase3index < phase3list.size()) {
-      for (; phase3index < phase3list.size(); phase3index++) {
-        setupPhase3Builds(phase3list.get(phase3index));
-      }
-    }
-
-    for (Phase3Data phase3Data : phase3table.values()) {
-      buildPhase3Routine(phase3Data, false, out);
+    else if (expansion instanceof TryBlock) {
+      genFirstSet(((TryBlock) expansion).expansion);
     }
   }
 
@@ -327,42 +305,40 @@ public final class ParseEngine {
 
   /**
    * This method takes two parameters - an array of Lookahead's
-   * "conds", and an array of String's "actions".  "actions" contains
-   * exactly one element more than "conds".  "actions" are Java source
-   * code, and "conds" translate to conditions - so lets say
-   * "f(conds[i])" is true if the lookahead required by "conds[i]" is
+   * "lookaheads", and an array of String's "actions".  "actions" contains
+   * exactly one element more than "lookaheads".  "actions" are Java source
+   * code, and "lookaheads" translate to conditions - so lets say
+   * "f(lookaheads[i])" is true if the lookahead required by "lookaheads[i]" is
    * indeed the case.  This method returns a string corresponding to
    * the Java code for:
    *
-   * if (f(conds[0]) actions[0]
-   * else if (f(conds[1]) actions[1]
+   * if (f(lookaheads[0]) actions[0]
+   * else if (f(lookaheads[1]) actions[1]
    * . . .
    * else actions[action.length-1]
    *
    * A particular action entry ("actions[i]") can be null, in which
    * case, a noop is generated for that action.
    */
-  private String buildLookaheadChecker(Lookahead[] conds, String[] actions) {
+  private String buildLookaheadChecker(Lookahead[] lookaheads, String[] actions) {
     // The state variables.
-    int state = NOOPENSTM;
+    int state = NO_OPEN_STM;
     int indentAmt = 0;
     boolean[] casedValues = new boolean[this.state.tokenCount];
     String retval = "";
-    Lookahead la;
-    Token t = null;
+
     int tokenMaskSize = (this.state.tokenCount - 1) / 32 + 1;
     int[] tokenMask = null;
 
     // Iterate over all the conditions.
     int index = 0;
-    while (index < conds.length) {
-
-      la = conds[index];
+    while (index < lookaheads.length) {
+      Lookahead la = lookaheads[index];
       jj2LA = false;
 
-      if (la.getAmount() == 0 ||
-          semanticize.emptyExpansionExists(la.getLaExpansion()) ||
-          javaCodeCheck(la.getLaExpansion())) {
+      if (la.getAmount() == 0
+          || semanticize.emptyExpansionExists(la.getLaExpansion())
+          || javaCodeCheck(la.getLaExpansion())) {
         // This handles the following cases:
         // . If syntactic lookahead is not wanted (and hence explicitly specified
         //   as 0).
@@ -381,15 +357,15 @@ public final class ParseEngine {
           // (without any preceding syntactic lookahead).  In this
           // case, an "if" statement is generated.
           switch (state) {
-            case NOOPENSTM:
+            case NO_OPEN_STM:
               retval += "\n" + "if (";
               indentAmt++;
               break;
-            case OPENIF:
-              retval += "\u0002\n" + "} else if (";
+            case OPEN_IF:
+              retval += "\n" + "} else if (";
               break;
-            case OPENSWITCH:
-              retval += "\u0002\n" + "default:" + "\u0001";
+            case OPEN_SWITCH:
+              retval += "\n" + "default:";
               if (Options.getErrorReporting()) {
                 retval += "\njj_la1[" + maskIndex + "] = jj_gen;";
                 maskIndex++;
@@ -399,13 +375,14 @@ public final class ParseEngine {
               indentAmt++;
           }
           TokenPrinter.printTokenSetup(la.getActionTokens().get(0));
+          Token t = null;
           for (Token token : la.getActionTokens()) {
             t = token;
             retval += TokenPrinter.printToken(t);
           }
           retval += TokenPrinter.printTrailingComments(t);
-          retval += ") {\u0001" + actions[index];
-          state = OPENIF;
+          retval += ") {" + actions[index];
+          state = OPEN_IF;
         }
       }
       else if (la.getAmount() == 1 && la.getActionTokens().size() == 0) {
@@ -429,16 +406,16 @@ public final class ParseEngine {
           // This case is if there is no applicable semantic lookahead and the lookahead
           // is one (excluding the earlier cases such as JAVACODE, etc.).
           switch (state) {
-            case OPENIF:
-              retval += "\u0002\n" + "} else {\u0001";
+            case OPEN_IF:
+              retval += "\n" + "} else {";
               // Control flows through to next case.
-            case NOOPENSTM:
+            case NO_OPEN_STM:
               retval += "\n" + "switch (";
               if (Options.getCacheTokens()) {
-                retval += "jj_nt.getKind()) {\u0001";
+                retval += "jj_nt.getKind()) {";
               }
               else {
-                retval += "(jj_ntk==-1)?jj_ntk():jj_ntk) {\u0001";
+                retval += "(jj_ntk==-1)?jj_ntk():jj_ntk) {";
               }
               for (int i = 0; i < this.state.tokenCount; i++) {
                 casedValues[i] = false;
@@ -448,13 +425,13 @@ public final class ParseEngine {
               for (int i = 0; i < tokenMaskSize; i++) {
                 tokenMask[i] = 0;
               }
-              // Don't need to do anything if state is OPENSWITCH.
+              // Don't need to do anything if state is OPEN_SWITCH.
           }
           for (int i = 0; i < this.state.tokenCount; i++) {
             if (firstSet[i]) {
               if (!casedValues[i]) {
                 casedValues[i] = true;
-                retval += "\u0002\ncase ";
+                retval += "\ncase ";
                 int j1 = i / 32;
                 int j2 = i % 32;
                 tokenMask[j1] |= 1 << j2;
@@ -465,13 +442,13 @@ public final class ParseEngine {
                 else {
                   retval += s;
                 }
-                retval += ":\u0001";
+                retval += ":";
               }
             }
           }
           retval += actions[index];
           retval += "\nbreak;";
-          state = OPENSWITCH;
+          state = OPEN_SWITCH;
         }
       }
       else {
@@ -486,15 +463,15 @@ public final class ParseEngine {
         // In this case lookahead is determined by the jj2 methods.
 
         switch (state) {
-          case NOOPENSTM:
+          case NO_OPEN_STM:
             retval += "\n" + "if (";
             indentAmt++;
             break;
-          case OPENIF:
-            retval += "\u0002\n" + "} else if (";
+          case OPEN_IF:
+            retval += "\n" + "} else if (";
             break;
-          case OPENSWITCH:
-            retval += "\u0002\n" + "default:" + "\u0001";
+          case OPEN_SWITCH:
+            retval += "\n" + "default:";
             if (Options.getErrorReporting()) {
               retval += "\njj_la1[" + maskIndex + "] = jj_gen;";
               maskIndex++;
@@ -513,6 +490,7 @@ public final class ParseEngine {
           // the semantic check with the syntactic one.
           retval += " && (";
           TokenPrinter.printTokenSetup(la.getActionTokens().get(0));
+          Token t = null;
           for (Token token : la.getActionTokens()) {
             t = token;
             retval += TokenPrinter.printToken(t);
@@ -520,8 +498,8 @@ public final class ParseEngine {
           retval += TokenPrinter.printTrailingComments(t);
           retval += ")";
         }
-        retval += ") {\u0001" + actions[index];
-        state = OPENIF;
+        retval += ") {" + actions[index];
+        state = OPEN_IF;
       }
 
       index++;
@@ -532,14 +510,14 @@ public final class ParseEngine {
     // statically determined to be always "true".
 
     switch (state) {
-      case NOOPENSTM:
+      case NO_OPEN_STM:
         retval += actions[index];
         break;
-      case OPENIF:
-        retval += "\u0002\n" + "} else {\u0001" + actions[index];
+      case OPEN_IF:
+        retval += "\n" + "} else {" + actions[index];
         break;
-      case OPENSWITCH:
-        retval += "\u0002\n" + "default:" + "\u0001";
+      case OPEN_SWITCH:
+        retval += "\n" + "default:" + "";
         if (Options.getErrorReporting()) {
           retval += "\njj_la1[" + maskIndex + "] = jj_gen;";
           maskValues.add(tokenMask);
@@ -548,47 +526,10 @@ public final class ParseEngine {
         retval += actions[index];
     }
     for (int i = 0; i < indentAmt; i++) {
-      retval += "\u0002\n}";
+      retval += "\n}";
     }
 
     return retval;
-  }
-
-  private void dumpFormattedString(String str, IndentingPrintWriter out) {
-    char ch = ' ';
-    char prevChar;
-    boolean indentOn = true;
-    for (int i = 0; i < str.length(); i++) {
-      prevChar = ch;
-      ch = str.charAt(i);
-      if (ch == '\n' && prevChar == '\r') {
-        // do nothing - we've already printed a new line for the '\r'
-        // during the previous iteration.
-      }
-      else if (ch == '\n' || ch == '\r') {
-        if (indentOn) {
-          phase1NewLine(out);
-        }
-        else {
-          out.println();
-        }
-      }
-      else if (ch == '\u0001') {
-        indentamt += 2;
-      }
-      else if (ch == '\u0002') {
-        indentamt -= 2;
-      }
-      else if (ch == '\u0003') {
-        indentOn = false;
-      }
-      else if (ch == '\u0004') {
-        indentOn = true;
-      }
-      else {
-        out.print(ch);
-      }
-    }
   }
 
   private void buildPhase1Routine(BNFProduction p, IndentingPrintWriter out)
@@ -625,13 +566,13 @@ public final class ParseEngine {
       }
     }
     out.print(" {");
-    indentamt = 4;
+
     if (Options.getDebugParser()) {
       out.println();
       out.println("    trace_call(\"" + p.getLhs() + "\");");
       out.print("    try {");
-      indentamt = 6;
     }
+
     if (p.getTokens().size() != 0) {
       TokenPrinter.printTokenSetup(p.getTokens().get(0));
       TokenPrinter.cLine--;
@@ -641,12 +582,17 @@ public final class ParseEngine {
       }
       TokenPrinter.printTrailingComments(t);
     }
+
     String code = phase1ExpansionGen(p.getExpansion());
-    dumpFormattedString(code, out);
+
+    out.println(code);
+
     out.println();
+
     if (p.isJumpPatched() && !voidReturn) {
       out.println("    throw new Error(\"Missing return statement in function\");");
     }
+
     if (Options.getDebugParser()) {
       out.println("    } finally {");
       out.println("      trace_return(\"" + p.getLhs() + "\");");
@@ -656,51 +602,78 @@ public final class ParseEngine {
     out.println();
   }
 
-  private void phase1NewLine(IndentingPrintWriter out) {
-    out.println();
-    for (int i = 0; i < indentamt; i++) {
-      out.print(" ");
-    }
-  }
-
   private String phase1ExpansionGen(Expansion expansion) {
-    if (expansion instanceof RegularExpression) {
-      return phase1_RegularExpression((RegularExpression) expansion);
-    }
-
     if (expansion instanceof NonTerminal) {
       return phase1_NonTerminal((NonTerminal) expansion);
     }
-
-    if (expansion instanceof Action) {
+    else if (expansion instanceof Action) {
       return phase1_Action((Action) expansion);
     }
-
-    if (expansion instanceof Choice) {
-      return phase1_Choice((Choice) expansion);
+    else if (expansion instanceof RegularExpression) {
+      return phase1_RegularExpression((RegularExpression) expansion);
     }
-
-    if (expansion instanceof Sequence) {
+    else if (expansion instanceof Sequence) {
       return phase1_Sequence((Sequence) expansion);
     }
-
+    else if (expansion instanceof Choice) {
+      return phase1_Choice((Choice) expansion);
+    }
     if (expansion instanceof ZeroOrOne) {
       return phase1_ZeroOrOne((ZeroOrOne) expansion);
     }
-
-    if (expansion instanceof ZeroOrMore) {
+    else if (expansion instanceof ZeroOrMore) {
       return phase1_ZeroOrMore((ZeroOrMore) expansion);
     }
-
-    if (expansion instanceof OneOrMore) {
+    else if (expansion instanceof OneOrMore) {
       return phase1_OneOrMore((OneOrMore) expansion);
     }
-
-    if (expansion instanceof TryBlock) {
+    else if (expansion instanceof TryBlock) {
       return phase1_TryBlock((TryBlock) expansion);
     }
+    else {
+      throw new IllegalStateException("unreachable");
+    }
+  }
 
-    throw new IllegalStateException("unreachable");
+  private String phase1_NonTerminal(NonTerminal expansion) {
+    String s = "\n";
+    if (expansion.getLhsTokens().size() != 0) {
+      TokenPrinter.printTokenSetup(expansion.getLhsTokens().get(0));
+      Token t = null;
+      for (Token token : expansion.getLhsTokens()) {
+        t = token;
+        s += TokenPrinter.printToken(t);
+      }
+      s += TokenPrinter.printTrailingComments(t);
+      s += " = ";
+    }
+    s += expansion.getName() + "(";
+    if (expansion.getArgumentTokens().size() != 0) {
+      TokenPrinter.printTokenSetup(expansion.getArgumentTokens().get(0));
+      Token t = null;
+      for (Token token : expansion.getArgumentTokens()) {
+        t = token;
+        s += TokenPrinter.printToken(t);
+      }
+      s += TokenPrinter.printTrailingComments(t);
+    }
+    s += ");";
+    return s;
+  }
+
+  private String phase1_Action(Action expansion) {
+    String s = "\n";
+    if (expansion.getActionTokens().size() != 0) {
+      TokenPrinter.printTokenSetup(expansion.getActionTokens().get(0));
+      TokenPrinter.cCol = 1;
+      Token t = null;
+      for (Token token : expansion.getActionTokens()) {
+        t = token;
+        s += TokenPrinter.printToken(t);
+      }
+      s += TokenPrinter.printTrailingComments(t);
+    }
+    return s;
   }
 
   private String phase1_RegularExpression(RegularExpression expansion) {
@@ -731,45 +704,13 @@ public final class ParseEngine {
     return s;
   }
 
-  private String phase1_NonTerminal(NonTerminal expansion) {
-    String s = "\n";
-    if (expansion.getLhsTokens().size() != 0) {
-      TokenPrinter.printTokenSetup(expansion.getLhsTokens().get(0));
-      Token t = null;
-      for (Token token : expansion.getLhsTokens()) {
-        t = token;
-        s += TokenPrinter.printToken(t);
-      }
-      s += TokenPrinter.printTrailingComments(t);
-      s += " = ";
+  private String phase1_Sequence(Sequence expansion) {
+    // We skip the first element in the following iteration since it is the
+    // Lookahead object.
+    String s = "";
+    for (int i = 1; i < expansion.units.size(); i++) {
+      s += phase1ExpansionGen(expansion.units.get(i));
     }
-    s += expansion.getName() + "(";
-    if (expansion.getArgumentTokens().size() != 0) {
-      TokenPrinter.printTokenSetup(expansion.getArgumentTokens().get(0));
-      Token t = null;
-      for (Token token : expansion.getArgumentTokens()) {
-        t = token;
-        s += TokenPrinter.printToken(t);
-      }
-      s += TokenPrinter.printTrailingComments(t);
-    }
-    s += ");";
-    return s;
-  }
-
-  private String phase1_Action(Action expansion) {
-    String s = "\u0003\n";
-    if (expansion.getActionTokens().size() != 0) {
-      TokenPrinter.printTokenSetup(expansion.getActionTokens().get(0));
-      TokenPrinter.cCol = 1;
-      Token t = null;
-      for (Token token : expansion.getActionTokens()) {
-        t = token;
-        s += TokenPrinter.printToken(t);
-      }
-      s += TokenPrinter.printTrailingComments(t);
-    }
-    s += "\u0004";
     return s;
   }
 
@@ -787,16 +728,6 @@ public final class ParseEngine {
       conds[i] = (Lookahead) nestedSeq.units.get(0);
     }
     return buildLookaheadChecker(conds, actions);
-  }
-
-  private String phase1_Sequence(Sequence expansion) {
-    // We skip the first element in the following iteration since it is the
-    // Lookahead object.
-    String s = "";
-    for (int i = 1; i < expansion.units.size(); i++) {
-      s += phase1ExpansionGen(expansion.units.get(i));
-    }
-    return s;
   }
 
   private String phase1_ZeroOrOne(ZeroOrOne expansion) {
@@ -832,7 +763,7 @@ public final class ParseEngine {
     String s = "\n";
     int labelIndex = ++genSymIndex;
     s += "label_" + labelIndex + ":\n";
-    s += "while (true) {\u0001";
+    s += "while (true) {";
     Lookahead[] conds = new Lookahead[1];
     conds[0] = la;
     String[] actions = new String[2];
@@ -840,7 +771,7 @@ public final class ParseEngine {
     actions[1] = "\nbreak label_" + labelIndex + ";";
     s += buildLookaheadChecker(conds, actions);
     s += phase1ExpansionGen(nested);
-    s += "\u0002\n" + "}";
+    s += "\n" + "}";
     return s;
   }
 
@@ -858,7 +789,7 @@ public final class ParseEngine {
     String s = "\n";
     int labelIndex = ++genSymIndex;
     s += "label_" + labelIndex + ":\n";
-    s += "while (true) {\u0001";
+    s += "while (true) {";
     s += phase1ExpansionGen(nested);
     Lookahead[] conds = new Lookahead[1];
     conds[0] = la;
@@ -866,18 +797,18 @@ public final class ParseEngine {
     actions[0] = "\n;";
     actions[1] = "\nbreak label_" + labelIndex + ";";
     s += buildLookaheadChecker(conds, actions);
-    s += "\u0002\n" + "}";
+    s += "\n" + "}";
     return s;
   }
 
   private String phase1_TryBlock(TryBlock expansion) {
     String s = "\n";
-    s += "try {\u0001";
+    s += "try {";
     s += phase1ExpansionGen(expansion.expansion);
-    s += "\u0002\n" + "}";
+    s += "\n" + "}";
     for (int i = 0; i < expansion.catchBlocks.size(); i++) {
       s += " catch (";
-      List<Token> list = (List<Token>) expansion.types.get(i);
+      List<Token> list = expansion.types.get(i);
       Token t = null;
       if (list.size() != 0) {
         TokenPrinter.printTokenSetup(list.get(0));
@@ -889,12 +820,12 @@ public final class ParseEngine {
         s += TokenPrinter.printTrailingComments(t);
       }
       s += " ";
-      t = (Token) expansion.ids.get(i);
+      t = expansion.ids.get(i);
       TokenPrinter.printTokenSetup(t);
       s += TokenPrinter.printToken(t);
       s += TokenPrinter.printTrailingComments(t);
-      s += ") {\u0003\n";
-      list = (List<Token>) (expansion.catchBlocks.get(i));
+      s += ") {\n";
+      list = expansion.catchBlocks.get(i);
       if (list.size() != 0) {
         TokenPrinter.printTokenSetup(list.get(0));
         TokenPrinter.cCol = 1;
@@ -904,35 +835,37 @@ public final class ParseEngine {
         }
         s += TokenPrinter.printTrailingComments(t);
       }
-      s += "\u0004\n" + "}";
+      s += "\n" + "}";
     }
     if (expansion.finallyBlocks != null) {
-      s += " finally {\u0003\n";
+      s += " finally {\n";
       if (expansion.finallyBlocks.size() != 0) {
-        TokenPrinter.printTokenSetup((Token) (expansion.finallyBlocks.get(0)));
+        TokenPrinter.printTokenSetup(expansion.finallyBlocks.get(0));
         TokenPrinter.cCol = 1;
         Token t = null;
-        for (Token token : (Iterable<Token>) expansion.finallyBlocks) {
+        for (Token token : expansion.finallyBlocks) {
           t = token;
           s += TokenPrinter.printToken(t);
         }
         s += TokenPrinter.printTrailingComments(t);
       }
-      s += "\u0004\n" + "}";
+      s += "\n" + "}";
     }
     return s;
   }
 
   private void buildPhase2Routine(Lookahead la, IndentingPrintWriter out) {
     Expansion e = la.getLaExpansion();
-    out.println("  private boolean jj_2" + e.internalName + "(int xla) throws java.io.IOException {");
-    out.println("    jj_la = xla; jj_lastPos = jj_scanPos = token;");
-    out.println("    try { return !jj_3" + e.internalName + "(); }");
-    out.println("    catch(LookaheadSuccess ls) { return true; }");
+    out.println("private boolean jj_2" + e.internalName + "(int xla) throws java.io.IOException {");
+    out.indent();
+    out.println("jj_la = xla; jj_lastPos = jj_scanPos = token;");
+    out.println("try { return !jj_3" + e.internalName + "(); }");
+    out.println("catch(LookaheadSuccess ls) { return true; }");
     if (Options.getErrorReporting()) {
-      out.println("    finally { jj_save(" + (Integer.parseInt(e.internalName.substring(1)) - 1) + ", xla); }");
+      out.println("finally { jj_save(" + (Integer.parseInt(e.internalName.substring(1)) - 1) + ", xla); }");
     }
-    out.println("  }");
+    out.unindent();
+    out.println("}");
     out.println();
     Phase3Data p3d = new Phase3Data(e, la.getAmount());
     phase3list.add(p3d);
@@ -997,16 +930,13 @@ public final class ParseEngine {
   }
 
   private void setupPhase3Builds(Phase3Data inf) {
-    Expansion e = inf.exp;
-    if (e instanceof RegularExpression) {
-      // nothing to here
-    }
-    else if (e instanceof NonTerminal) {
+    Expansion expansion = inf.expansion;
+    if (expansion instanceof NonTerminal) {
       // All expansions of non-terminals have the "name" fields set.  So
       // there's no need to check it below for "e_nrw" and "ntexp".  In
       // fact, we rely here on the fact that the "name" fields of both these
       // variables are the same.
-      NonTerminal e_nrw = (NonTerminal) e;
+      NonTerminal e_nrw = (NonTerminal) expansion;
       NormalProduction production = state.productionTable.get(e_nrw.getName());
       if (production instanceof JavaCodeProduction) {
         // nothing to do here
@@ -1015,41 +945,40 @@ public final class ParseEngine {
         generate3R(production.getExpansion(), inf);
       }
     }
-    else if (e instanceof Choice) {
-      Choice e_nrw = (Choice) e;
-      for (int i = 0; i < e_nrw.getChoices().size(); i++) {
-        generate3R(e_nrw.getChoices().get(i), inf);
-      }
+    else if (expansion instanceof RegularExpression) {
+      // nothing to here
     }
-    else if (e instanceof Sequence) {
-      Sequence e_nrw = (Sequence) e;
+    else if (expansion instanceof Sequence) {
+      Sequence sequence = (Sequence) expansion;
       // We skip the first element in the following iteration since it is the
       // Lookahead object.
       int cnt = inf.count;
-      for (int i = 1; i < e_nrw.units.size(); i++) {
-        Expansion eseq = e_nrw.units.get(i);
-        setupPhase3Builds(new Phase3Data(eseq, cnt));
-        cnt -= minimumSize(eseq);
+      for (int i = 1; i < sequence.units.size(); i++) {
+        Expansion unit = sequence.units.get(i);
+        setupPhase3Builds(new Phase3Data(unit, cnt));
+        cnt -= minimumSize(unit);
         if (cnt <= 0) {
           break;
         }
       }
     }
-    else if (e instanceof TryBlock) {
-      TryBlock e_nrw = (TryBlock) e;
-      setupPhase3Builds(new Phase3Data(e_nrw.expansion, inf.count));
+    else if (expansion instanceof Choice) {
+      Choice choice = (Choice) expansion;
+      for (int i = 0; i < choice.getChoices().size(); i++) {
+        generate3R(choice.getChoices().get(i), inf);
+      }
     }
-    else if (e instanceof OneOrMore) {
-      OneOrMore e_nrw = (OneOrMore) e;
-      generate3R(e_nrw.expansion, inf);
+    else if (expansion instanceof ZeroOrOne) {
+      generate3R(((ZeroOrOne) expansion).expansion, inf);
     }
-    else if (e instanceof ZeroOrMore) {
-      ZeroOrMore e_nrw = (ZeroOrMore) e;
-      generate3R(e_nrw.expansion, inf);
+    else if (expansion instanceof ZeroOrMore) {
+      generate3R(((ZeroOrMore) expansion).expansion, inf);
     }
-    else if (e instanceof ZeroOrOne) {
-      ZeroOrOne e_nrw = (ZeroOrOne) e;
-      generate3R(e_nrw.expansion, inf);
+    else if (expansion instanceof OneOrMore) {
+      generate3R(((OneOrMore) expansion).expansion, inf);
+    }
+    else if (expansion instanceof TryBlock) {
+      setupPhase3Builds(new Phase3Data(((TryBlock) expansion).expansion, inf.count));
     }
   }
 
@@ -1062,183 +991,202 @@ public final class ParseEngine {
     }
   }
 
-  private void buildPhase3Routine(Phase3Data inf, boolean recursive_call, IndentingPrintWriter out)
+  private void buildPhase3Routine(Phase3Data inf, boolean recursive, IndentingPrintWriter out)
       throws IOException {
-    Expansion e = inf.exp;
-    Token t = null;
-    if (e.internalName.startsWith("jj_scan_token")) {
+    Expansion expansion = inf.expansion;
+    if (expansion.internalName.startsWith("jj_scan_token")) {
       return;
     }
 
-    if (!recursive_call) {
-      out.println("  private boolean jj_3" + e.internalName + "() throws java.io.IOException {");
+    if (!recursive) {
+      out.println("  private boolean jj_3" + expansion.internalName + "() throws java.io.IOException {");
       xsp_declared = false;
-      if (Options.getDebugLookahead() && e.parent instanceof NormalProduction) {
+      if (Options.getDebugLookahead() && expansion.parent instanceof NormalProduction) {
         out.print("    ");
         if (Options.getErrorReporting()) {
           out.print("if (!jj_rescan) ");
         }
-        out.println("trace_call(\"" + ((NormalProduction) e.parent).getLhs() + "(LOOKING AHEAD...)\");");
-        jj3_expansion = e;
+        out.println("trace_call(\"" + ((NormalProduction) expansion.parent).getLhs() + "(LOOKING AHEAD...)\");");
+        jj3_expansion = expansion;
       }
       else {
         jj3_expansion = null;
       }
     }
-    if (e instanceof RegularExpression) {
-      RegularExpression e_nrw = (RegularExpression) e;
-      if (e_nrw.label.equals("")) {
-        String label = state.namesOfTokens.get(e_nrw.ordinal);
-        if (label != null) {
-          out.println("    if (jj_scan_token(" + label + ")) " + genReturn(true));
-        }
-        else {
-          out.println("    if (jj_scan_token(" + e_nrw.ordinal + ")) " + genReturn(true));
-        }
-      }
-      else {
-        out.println("    if (jj_scan_token(" + e_nrw.label + ")) " + genReturn(true));
-      }
-      //out.println("    if (jj_la == 0 && jj_scanPos == jj_lastPos) " + genReturn(false));
-    }
-    else if (e instanceof NonTerminal) {
-      // All expansions of non-terminals have the "name" fields set.  So
-      // there's no need to check it below for "e_nrw" and "ntexp".  In
-      // fact, we rely here on the fact that the "name" fields of both these
-      // variables are the same.
-      NonTerminal e_nrw = (NonTerminal) e;
-      NormalProduction ntprod = state.productionTable.get(e_nrw.getName());
-      if (ntprod instanceof JavaCodeProduction) {
-        out.println("    if (true) { jj_la = 0; jj_scanPos = jj_lastPos; " + genReturn(false) + "}");
-      }
-      else {
-        Expansion ntexp = ntprod.getExpansion();
-        //out.println("    if (jj_3" + ntexp.internal_name + "()) " + genReturn(true));
-        out.println("    if (" + genjj_3Call(ntexp) + ") " + genReturn(true));
-        //out.println("    if (jj_la == 0 && jj_scanPos == jj_lastPos) " + genReturn(false));
-      }
-    }
-    else if (e instanceof Choice) {
-      Sequence nested_seq;
-      Choice e_nrw = (Choice) e;
-      if (e_nrw.getChoices().size() != 1) {
-        if (!xsp_declared) {
-          xsp_declared = true;
-          out.println("    Token xsp;");
-        }
-        out.println("    xsp = jj_scanPos;");
-      }
-      for (int i = 0; i < e_nrw.getChoices().size(); i++) {
-        nested_seq = (Sequence) e_nrw.getChoices().get(i);
-        Lookahead la = (Lookahead) nested_seq.units.get(0);
-        if (la.getActionTokens().size() != 0) {
-          // We have semantic lookahead that must be evaluated.
-          lookaheadNeeded = true;
-          out.println("    jj_lookingAhead = true;");
-          out.print("    jj_semLA = ");
-          TokenPrinter.printTokenSetup(la.getActionTokens().get(0));
-          for (Token token : la.getActionTokens()) {
-            t = token;
-            TokenPrinter.printToken(t, out);
-          }
-          TokenPrinter.printTrailingComments(t);
-          out.println(";");
-          out.println("    jj_lookingAhead = false;");
-        }
-        out.print("    if (");
-        if (la.getActionTokens().size() != 0) {
-          out.print("!jj_semLA || ");
-        }
-        if (i != e_nrw.getChoices().size() - 1) {
-          //out.println("jj_3" + nested_seq.internal_name + "()) {");
-          out.println(genjj_3Call(nested_seq) + ") {");
-          out.println("    jj_scanPos = xsp;");
-        }
-        else {
-          //out.println("jj_3" + nested_seq.internal_name + "()) " + genReturn(true));
-          out.println(genjj_3Call(nested_seq) + ") " + genReturn(true));
-          //out.println("    if (jj_la == 0 && jj_scanPos == jj_lastPos) " + genReturn(false));
-        }
-      }
-      for (int i = 1; i < e_nrw.getChoices().size(); i++) {
-        //out.println("    } else if (jj_la == 0 && jj_scanPos == jj_lastPos) " + genReturn(false));
-        out.println("    }");
-      }
-    }
-    else if (e instanceof Sequence) {
-      Sequence e_nrw = (Sequence) e;
-      // We skip the first element in the following iteration since it is the
-      // Lookahead object.
-      int cnt = inf.count;
-      for (int i = 1; i < e_nrw.units.size(); i++) {
-        Expansion eseq = e_nrw.units.get(i);
-        buildPhase3Routine(new Phase3Data(eseq, cnt), true, out);
 
-//      System.out.println("minimumSize: line: " + eseq.line + ", column: " + eseq.column + ": " +
-//      minimumSize(eseq));//Test Code
+    if (expansion instanceof NonTerminal) {
+      phase3_NonTerminal((NonTerminal) expansion, out);
+    }
+    else if (expansion instanceof RegularExpression) {
+      phase3_RegularExpression((RegularExpression) expansion, out);
+    }
+    else if (expansion instanceof Sequence) {
+      phase3_Sequence((Sequence) expansion, inf, out);
+    }
+    else if (expansion instanceof Choice) {
+      phase3_Choice((Choice) expansion, out);
+    }
+    else if (expansion instanceof ZeroOrOne) {
+      phase3_ZeroOrOne((ZeroOrOne) expansion, out);
+    }
+    else if (expansion instanceof ZeroOrMore) {
+      phase3_ZeroOrMore((ZeroOrMore) expansion, out);
+    }
+    else if (expansion instanceof OneOrMore) {
+      phase3_OneOrMore((OneOrMore) expansion, out);
+    }
+    else if (expansion instanceof TryBlock) {
+      buildPhase3Routine(new Phase3Data(((TryBlock) expansion).expansion, inf.count), true, out);
+    }
 
-        cnt -= minimumSize(eseq);
-        if (cnt <= 0) {
-          break;
-        }
-      }
-    }
-    else if (e instanceof TryBlock) {
-      TryBlock e_nrw = (TryBlock) e;
-      buildPhase3Routine(new Phase3Data(e_nrw.expansion, inf.count), true, out);
-    }
-    else if (e instanceof OneOrMore) {
-      if (!xsp_declared) {
-        xsp_declared = true;
-        out.println("    Token xsp;");
-      }
-      OneOrMore e_nrw = (OneOrMore) e;
-      Expansion nested_e = e_nrw.expansion;
-      //out.println("    if (jj_3" + nested_e.internal_name + "()) " + genReturn(true));
-      out.println("    if (" + genjj_3Call(nested_e) + ") " + genReturn(true));
-      //out.println("    if (jj_la == 0 && jj_scanPos == jj_lastPos) " + genReturn(false));
-      out.println("    while (true) {");
-      out.println("      xsp = jj_scanPos;");
-      //out.println("      if (jj_3" + nested_e.internal_name + "()) { jj_scanPos = xsp; break; }");
-      out.println("      if (" + genjj_3Call(nested_e) + ") { jj_scanPos = xsp; break; }");
-      //out.println("      if (jj_la == 0 && jj_scanPos == jj_lastPos) " + genReturn(false));
-      out.println("    }");
-    }
-    else if (e instanceof ZeroOrMore) {
-      if (!xsp_declared) {
-        xsp_declared = true;
-        out.println("    Token xsp;");
-      }
-      ZeroOrMore e_nrw = (ZeroOrMore) e;
-      Expansion nested_e = e_nrw.expansion;
-      out.println("    while (true) {");
-      out.println("      xsp = jj_scanPos;");
-      //out.println("      if (jj_3" + nested_e.internal_name + "()) { jj_scanPos = xsp; break; }");
-      out.println("      if (" + genjj_3Call(nested_e) + ") { jj_scanPos = xsp; break; }");
-      //out.println("      if (jj_la == 0 && jj_scanPos == jj_lastPos) " + genReturn(false));
-      out.println("    }");
-    }
-    else if (e instanceof ZeroOrOne) {
-      if (!xsp_declared) {
-        xsp_declared = true;
-        out.println("    Token xsp;");
-      }
-      ZeroOrOne e_nrw = (ZeroOrOne) e;
-      Expansion nested_e = e_nrw.expansion;
-      out.println("    xsp = jj_scanPos;");
-      //out.println("    if (jj_3" + nested_e.internal_name + "()) jj_scanPos = xsp;");
-      out.println("    if (" + genjj_3Call(nested_e) + ") jj_scanPos = xsp;");
-      //out.println("    else if (jj_la == 0 && jj_scanPos == jj_lastPos) " + genReturn(false));
-    }
-    if (!recursive_call) {
+    if (!recursive) {
       out.println("    " + genReturn(false));
       out.println("  }");
       out.println();
     }
   }
 
-  private int minimumSize(Expansion e) {
-    return minimumSize(e, Integer.MAX_VALUE);
+  private void phase3_NonTerminal(NonTerminal expansion, IndentingPrintWriter out) {
+    // All expansions of non-terminals have the "name" fields set.  So
+    // there's no need to check it below for "e_nrw" and "ntexp".  In
+    // fact, we rely here on the fact that the "name" fields of both these
+    // variables are the same.
+    NormalProduction production = state.productionTable.get(expansion.getName());
+    if (production instanceof JavaCodeProduction) {
+      out.println("    if (true) { jj_la = 0; jj_scanPos = jj_lastPos; " + genReturn(false) + "}");
+    }
+    else {
+      Expansion nested = production.getExpansion();
+      //out.println("    if (jj_3" + nested.internal_name + "()) " + genReturn(true));
+      out.println("    if (" + genjj_3Call(nested) + ") " + genReturn(true));
+      //out.println("    if (jj_la == 0 && jj_scanPos == jj_lastPos) " + genReturn(false));
+    }
+  }
+
+  private void phase3_RegularExpression(RegularExpression expansion, IndentingPrintWriter out) {
+    if (expansion.label.equals("")) {
+      String label = state.namesOfTokens.get(expansion.ordinal);
+      if (label != null) {
+        out.println("    if (jj_scan_token(" + label + ")) " + genReturn(true));
+      }
+      else {
+        out.println("    if (jj_scan_token(" + expansion.ordinal + ")) " + genReturn(true));
+      }
+    }
+    else {
+      out.println("    if (jj_scan_token(" + expansion.label + ")) " + genReturn(true));
+    }
+    //out.println("    if (jj_la == 0 && jj_scanPos == jj_lastPos) " + genReturn(false));
+  }
+
+  private void phase3_Sequence(Sequence expansion, Phase3Data inf, IndentingPrintWriter out)
+      throws IOException {
+    // We skip the first element in the following iteration since it is the
+    // Lookahead object.
+    int cnt = inf.count;
+    for (int i = 1; i < expansion.units.size(); i++) {
+      Expansion unit = expansion.units.get(i);
+      buildPhase3Routine(new Phase3Data(unit, cnt), true, out);
+      cnt -= minimumSize(unit);
+      if (cnt <= 0) {
+        break;
+      }
+    }
+  }
+
+  private void phase3_Choice(Choice expansion, IndentingPrintWriter out)
+      throws IOException {
+    if (expansion.getChoices().size() != 1) {
+      if (!xsp_declared) {
+        xsp_declared = true;
+        out.println("    Token xsp;");
+      }
+      out.println("    xsp = jj_scanPos;");
+    }
+    for (int i = 0; i < expansion.getChoices().size(); i++) {
+      Sequence nested = (Sequence) expansion.getChoices().get(i);
+      Lookahead la = (Lookahead) nested.units.get(0);
+      if (la.getActionTokens().size() != 0) {
+        // We have semantic lookahead that must be evaluated.
+        lookaheadNeeded = true;
+        out.println("    jj_lookingAhead = true;");
+        out.print("    jj_semLA = ");
+        TokenPrinter.printTokenSetup(la.getActionTokens().get(0));
+        Token t = null;
+        for (Token token : la.getActionTokens()) {
+          t = token;
+          TokenPrinter.printToken(t, out);
+        }
+        TokenPrinter.printTrailingComments(t);
+        out.println(";");
+        out.println("    jj_lookingAhead = false;");
+      }
+      out.print("    if (");
+      if (la.getActionTokens().size() != 0) {
+        out.print("!jj_semLA || ");
+      }
+      if (i != expansion.getChoices().size() - 1) {
+        //out.println("jj_3" + nested.internal_name + "()) {");
+        out.println(genjj_3Call(nested) + ") {");
+        out.println("    jj_scanPos = xsp;");
+      }
+      else {
+        //out.println("jj_3" + nested.internal_name + "()) " + genReturn(true));
+        out.println(genjj_3Call(nested) + ") " + genReturn(true));
+        //out.println("    if (jj_la == 0 && jj_scanPos == jj_lastPos) " + genReturn(false));
+      }
+    }
+    for (int i = 1; i < expansion.getChoices().size(); i++) {
+      //out.println("    } else if (jj_la == 0 && jj_scanPos == jj_lastPos) " + genReturn(false));
+      out.println("    }");
+    }
+  }
+
+  private void phase3_ZeroOrOne(ZeroOrOne expansion, IndentingPrintWriter out) {
+    if (!xsp_declared) {
+      xsp_declared = true;
+      out.println("    Token xsp;");
+    }
+    Expansion nested = expansion.expansion;
+    out.println("    xsp = jj_scanPos;");
+    //out.println("    if (jj_3" + nested.internal_name + "()) jj_scanPos = xsp;");
+    out.println("    if (" + genjj_3Call(nested) + ") jj_scanPos = xsp;");
+    //out.println("    else if (jj_la == 0 && jj_scanPos == jj_lastPos) " + genReturn(false));
+  }
+
+  private void phase3_ZeroOrMore(ZeroOrMore expansion, IndentingPrintWriter out) {
+    if (!xsp_declared) {
+      xsp_declared = true;
+      out.println("    Token xsp;");
+    }
+    Expansion nested = expansion.expansion;
+    out.println("    while (true) {");
+    out.println("      xsp = jj_scanPos;");
+    //out.println("      if (jj_3" + nested.internal_name + "()) { jj_scanPos = xsp; break; }");
+    out.println("      if (" + genjj_3Call(nested) + ") { jj_scanPos = xsp; break; }");
+    //out.println("      if (jj_la == 0 && jj_scanPos == jj_lastPos) " + genReturn(false));
+    out.println("    }");
+  }
+
+  private void phase3_OneOrMore(OneOrMore expansion, IndentingPrintWriter out) {
+    if (!xsp_declared) {
+      xsp_declared = true;
+      out.println("    Token xsp;");
+    }
+    Expansion nested = expansion.expansion;
+    //out.println("    if (jj_3" + nested.internal_name + "()) " + genReturn(true));
+    out.println("    if (" + genjj_3Call(nested) + ") " + genReturn(true));
+    //out.println("    if (jj_la == 0 && jj_scanPos == jj_lastPos) " + genReturn(false));
+    out.println("    while (true) {");
+    out.println("      xsp = jj_scanPos;");
+    //out.println("      if (jj_3" + nested.internal_name + "()) { jj_scanPos = xsp; break; }");
+    out.println("      if (" + genjj_3Call(nested) + ") { jj_scanPos = xsp; break; }");
+    //out.println("      if (jj_la == 0 && jj_scanPos == jj_lastPos) " + genReturn(false));
+    out.println("    }");
+  }
+
+  private int minimumSize(Expansion expansion) {
+    return minimumSize(expansion, Integer.MAX_VALUE);
   }
 
   /** Returns the minimum number of tokens that can parse to this expansion. */
@@ -1249,10 +1197,7 @@ public final class ParseEngine {
     }
     expansion.inMinimumSize = true;
     int size = 0;
-    if (expansion instanceof RegularExpression) {
-      size = 1;
-    }
-    else if (expansion instanceof NonTerminal) {
+    if (expansion instanceof NonTerminal) {
       NonTerminal nonTerminal = (NonTerminal) expansion;
       NormalProduction production = state.productionTable.get(nonTerminal.getName());
       if (production instanceof JavaCodeProduction) {
@@ -1265,17 +1210,8 @@ public final class ParseEngine {
         size = minimumSize(ntexp);
       }
     }
-    else if (expansion instanceof Choice) {
-      int min = oldMin;
-      Choice choice = (Choice) expansion;
-      for (int i = 0; min > 1 && i < choice.getChoices().size(); i++) {
-        Expansion nested = choice.getChoices().get(i);
-        int min1 = minimumSize(nested, min);
-        if (min > min1) {
-          min = min1;
-        }
-      }
-      size = min;
+    else if (expansion instanceof RegularExpression) {
+      size = 1;
     }
     else if (expansion instanceof Sequence) {
       int min = 0;
@@ -1293,6 +1229,18 @@ public final class ParseEngine {
           if (min > oldMin) {
             break;
           }
+        }
+      }
+      size = min;
+    }
+    else if (expansion instanceof Choice) {
+      int min = oldMin;
+      Choice choice = (Choice) expansion;
+      for (int i = 0; min > 1 && i < choice.getChoices().size(); i++) {
+        Expansion nested = choice.getChoices().get(i);
+        int min1 = minimumSize(nested, min);
+        if (min > min1) {
+          min = min1;
         }
       }
       size = min;
