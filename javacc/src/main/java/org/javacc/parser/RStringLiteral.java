@@ -29,7 +29,6 @@
 package org.javacc.parser;
 
 import java.util.Hashtable;
-import java.util.Set;
 
 /** Describes string literals. */
 public final class RStringLiteral extends RegularExpression {
@@ -179,11 +178,6 @@ public final class RStringLiteral extends RegularExpression {
     lexGen.stringLiterals.maxLenForActive[ordinal / 64]
         = Math.max(lexGen.stringLiterals.maxLenForActive[ordinal / 64], len - 1);
     lexGen.stringLiterals.allImages[ordinal] = image;
-  }
-
-  @Override
-  public StringBuilder dump(int indent, Set alreadyDumped) {
-    return super.dump(indent, alreadyDumped).append(' ').append(image);
   }
 
   public String toString() {

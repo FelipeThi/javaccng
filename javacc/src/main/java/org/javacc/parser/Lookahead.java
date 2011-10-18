@@ -30,7 +30,6 @@ package org.javacc.parser;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Describes lookahead rule for a particular expansion or expansion
@@ -91,16 +90,5 @@ public final class Lookahead extends Expansion {
 
   public boolean isExplicit() {
     return isExplicit;
-  }
-
-  @Override
-  public StringBuilder dump(int indent, Set alreadyDumped) {
-    StringBuilder sb = super.dump(indent, alreadyDumped).append(isExplicit ? " explicit" : " implicit");
-    if (alreadyDumped.contains(this)) {
-      return sb;
-    }
-    alreadyDumped.add(this);
-    sb.append("\n").append(laExpansion.dump(indent + 1, alreadyDumped));
-    return sb;
   }
 }

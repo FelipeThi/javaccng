@@ -30,7 +30,6 @@ package org.javacc.parser;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /** Describes non terminals. */
 public final class NonTerminal extends Expansion {
@@ -43,7 +42,7 @@ public final class NonTerminal extends Expansion {
   /** The name of the non-terminal. */
   private String name;
   /** The list of all tokens in the argument list. */
-  private List<Token> argumentTokens = new ArrayList<Token>();
+  private final List<Token> argumentTokens = new ArrayList<Token>();
   /** The production this non-terminal corresponds to. */
   private NormalProduction prod;
 
@@ -73,10 +72,5 @@ public final class NonTerminal extends Expansion {
 
   public NormalProduction getProd() {
     return prod;
-  }
-
-  @Override
-  public StringBuilder dump(int indent, Set alreadyDumped) {
-    return super.dump(indent, alreadyDumped).append(' ').append(name);
   }
 }

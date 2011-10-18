@@ -28,28 +28,15 @@
 
 package org.javacc.parser;
 
-import java.util.Set;
-
 /** Describes zero-or-one expansions (e.g., [foo], foo?). */
 public final class ZeroOrOne extends Expansion {
   /** The expansion which is repeated zero or one times. */
-  public Expansion expansion;
+  public final Expansion expansion;
 
   public ZeroOrOne(Token t, Expansion e) {
     setLine(t.getBeginLine());
     setColumn(t.getBeginColumn());
     expansion = e;
     expansion.parent = this;
-  }
-
-  @Override
-  public StringBuilder dump(int indent, Set alreadyDumped) {
-    StringBuilder sb = super.dump(indent, alreadyDumped);
-    if (alreadyDumped.contains(this)) {
-      return sb;
-    }
-    alreadyDumped.add(this);
-    sb.append("\n").append(expansion.dump(indent + 1, alreadyDumped));
-    return sb;
   }
 }

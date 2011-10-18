@@ -29,9 +29,7 @@
 package org.javacc.parser;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Describes expansions where one of many choices
@@ -59,19 +57,5 @@ public final class Choice extends Expansion {
 
   public List<Expansion> getChoices() {
     return choices;
-  }
-
-  @Override
-  public StringBuilder dump(int indent, Set alreadyDumped) {
-    StringBuilder sb = super.dump(indent, alreadyDumped);
-    if (alreadyDumped.contains(this)) {
-      return sb;
-    }
-    alreadyDumped.add(this);
-    for (Iterator it = getChoices().iterator(); it.hasNext(); ) {
-      Expansion next = (Expansion) it.next();
-      sb.append("\n").append(next.dump(indent + 1, alreadyDumped));
-    }
-    return sb;
   }
 }

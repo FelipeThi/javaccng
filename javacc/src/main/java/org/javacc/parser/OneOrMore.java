@@ -28,28 +28,15 @@
 
 package org.javacc.parser;
 
-import java.util.Set;
-
 /** Describes one-or-more expansions (e.g., foo+). */
 public final class OneOrMore extends Expansion {
   /** The expansion which is repeated one or more times. */
-  public Expansion expansion;
+  public final Expansion expansion;
 
   public OneOrMore(Token t, Expansion e) {
     setLine(t.getBeginLine());
     setColumn(t.getBeginColumn());
     expansion = e;
     expansion.parent = this;
-  }
-
-  @Override
-  public StringBuilder dump(int indent, Set alreadyDumped) {
-    StringBuilder sb = super.dump(indent, alreadyDumped);
-    if (alreadyDumped.contains(this)) {
-      return sb;
-    }
-    alreadyDumped.add(this);
-    sb.append("\n").append(expansion.dump(indent + 1, alreadyDumped));
-    return sb;
   }
 }

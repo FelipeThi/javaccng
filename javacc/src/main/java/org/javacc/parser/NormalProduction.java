@@ -30,7 +30,6 @@ package org.javacc.parser;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /** Describes JavaCC productions. */
 public abstract class NormalProduction {
@@ -182,27 +181,5 @@ public abstract class NormalProduction {
 
   public Token getLastToken() {
     return lastToken;
-  }
-
-  protected StringBuilder dumpPrefix(int indent) {
-    StringBuilder sb = new StringBuilder(128);
-    for (int i = 0; i < indent; i++) { sb.append("  "); }
-    return sb;
-  }
-
-  protected String getSimpleName() {
-    String name = getClass().getName();
-    return name.substring(name.lastIndexOf(".") + 1);
-  }
-
-  public StringBuilder dump(int indent, Set alreadyDumped) {
-    StringBuilder sb = dumpPrefix(indent).append(System.identityHashCode(this)).append(' ').append(getSimpleName()).append(' ').append(getLhs());
-    if (!alreadyDumped.contains(this)) {
-      alreadyDumped.add(this);
-      if (getExpansion() != null) {
-        sb.append("\n").append(getExpansion().dump(indent + 1, alreadyDumped));
-      }
-    }
-    return sb;
   }
 }

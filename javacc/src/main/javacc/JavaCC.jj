@@ -1063,7 +1063,7 @@ void regular_expression(Container<Expansion> c) :
 	  RegularExpression re;
 	  if (c.member instanceof RJustName) {
 	    RSequence seq = new RSequence();
-	    seq.units.add(c.member);
+	    seq.units.add((RegularExpression) c.member);
 	    re = seq;
 	  }
 	  else {
@@ -1139,11 +1139,11 @@ void complex_regular_expression(Container<Expansion> c1) :
 	    seq = new RSequence();
 	    seq.setLine(((RegularExpression)c1.member).getLine());
 	    seq.setColumn(((RegularExpression)c1.member).getColumn());
-	    seq.units.add(c1.member);
-	    seq.units.add(c2.member);
+	    seq.units.add((RegularExpression) c1.member);
+	    seq.units.add((RegularExpression) c2.member);
 	  }
 	  else {
-	    seq.units.add(c2.member);
+	    seq.units.add((RegularExpression) c2.member);
 	  }
 	}
   )+

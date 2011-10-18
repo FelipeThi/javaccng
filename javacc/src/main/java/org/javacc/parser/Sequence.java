@@ -29,9 +29,7 @@
 package org.javacc.parser;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Describes expansions that are sequences of expansion
@@ -50,19 +48,5 @@ public final class Sequence extends Expansion {
     setLine(t.getBeginLine());
     setColumn(t.getBeginColumn());
     units.add(la);
-  }
-
-  @Override
-  public StringBuilder dump(int indent, Set alreadyDumped) {
-    if (alreadyDumped.contains(this)) {
-      return super.dump(0, alreadyDumped).insert(0, '[').append(']').insert(0, dumpPrefix(indent));
-    }
-    alreadyDumped.add(this);
-    final StringBuilder sb = super.dump(indent, alreadyDumped);
-    for (Iterator it = units.iterator(); it.hasNext(); ) {
-      Expansion next = (Expansion) it.next();
-      sb.append("\n").append(next.dump(indent + 1, alreadyDumped));
-    }
-    return sb;
   }
 }

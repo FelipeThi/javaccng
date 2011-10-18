@@ -37,8 +37,8 @@ import java.util.Map;
 public final class Semanticize {
   private final JavaCCState state;
   private final LookaheadCalc lookaheadCalc = new LookaheadCalc();
-  final List<List> removeList = new ArrayList<List>();
-  final List itemList = new ArrayList();
+  private final List<List> removeList = new ArrayList<List>();
+  private final List itemList = new ArrayList();
 
   public Semanticize(JavaCCState state) {
     this.state = state;
@@ -58,7 +58,7 @@ public final class Semanticize {
     itemList.clear();
   }
 
-  public void start() throws MetaParseException {
+  void start() throws MetaParseException {
     if (JavaCCErrors.getErrorCount() != 0) {
       throw new MetaParseException();
     }
@@ -97,16 +97,48 @@ public final class Semanticize {
           new ProductionDefinedChecker());
     }
 
-    /*
-     * The following loop ensures that all target lexical states are
-     * defined.  Also piggybacking on this loop is the detection of
-     * <EOF> and <name> in token productions.  After reporting an
-     * error, these entries are removed.  Also checked are definitions
-     * on inline private regular expressions.
-     * This loop works slightly differently when USER_SCANNER
-     * is set to true.  In this case, <name> occurrences are OK, while
-     * regular expression specs generate a warning.
-     */
+    step93();
+
+    removePreparedItems();
+
+    step94();
+
+    step95();
+
+    removePreparedItems();
+
+    step96();
+
+    removePreparedItems();
+
+    step97();
+
+    removePreparedItems();
+
+    step98();
+
+    if (JavaCCErrors.getErrorCount() != 0) {
+      throw new MetaParseException();
+    }
+
+    step99();
+
+    step100();
+
+    if (JavaCCErrors.getErrorCount() != 0) {
+      throw new MetaParseException();
+    }
+  }
+
+  private void step93() {
+    // The following loop ensures that all target lexical states are
+    // defined.  Also piggybacking on this loop is the detection of
+    // <EOF> and <name> in token productions.  After reporting an
+    // error, these entries are removed.  Also checked are definitions
+    // on inline private regular expressions.
+    // This loop works slightly differently when USER_SCANNER
+    // is set to true.  In this case, <name> occurrences are OK, while
+    // regular expression specs generate a warning.
     for (TokenProduction tp : state.regExpList) {
       List<RegExpSpec> reSpecs = tp.reSpecs;
       for (RegExpSpec reSpec : reSpecs) {
@@ -149,14 +181,12 @@ public final class Semanticize {
         }
       }
     }
+  }
 
-    removePreparedItems();
-
-    /*
-     * The following loop inserts all names of regular expressions into
-     * "named_tokens_table" and "ordered_named_tokens".
-     * Duplications are flagged as errors.
-     */
+  private void step94() {
+    // The following loop inserts all names of regular expressions into
+    // "named_tokens_table" and "ordered_named_tokens".
+    // Duplications are flagged as errors.
     for (TokenProduction tp : state.regExpList) {
       List<RegExpSpec> reSpecs = tp.reSpecs;
       for (RegExpSpec reSpec : reSpecs) {
@@ -176,17 +206,17 @@ public final class Semanticize {
         }
       }
     }
+  }
 
-    /*
-     * The following code merges multiple uses of the same string in the same
-     * lexical state and produces error messages when there are multiple
-     * explicit occurrences (outside the BNF) of the string in the same
-     * lexical state, or when within BNF occurrences of a string are duplicates
-     * of those that occur as non-TOKEN's (SKIP, MORE, SPECIAL_TOKEN) or private
-     * regular expressions.  While doing this, this code also numbers all
-     * regular expressions (by setting their ordinal values), and populates the
-     * table "names_of_tokens".
-     */
+  private void step95() {
+    // The following code merges multiple uses of the same string in the same
+    // lexical state and produces error messages when there are multiple
+    // explicit occurrences (outside the BNF) of the string in the same
+    // lexical state, or when within BNF occurrences of a string are duplicates
+    // of those that occur as non-TOKEN's (SKIP, MORE, SPECIAL_TOKEN) or private
+    // regular expressions.  While doing this, this code also numbers all
+    // regular expressions (by setting their ordinal values), and populates the
+    // table "names_of_tokens".
 
     state.tokenCount = 1;
     for (TokenProduction tp : state.regExpList) {
@@ -219,7 +249,8 @@ public final class Semanticize {
               table2.put(sl.image, sl);
               table[i].put(sl.image.toUpperCase(), table2);
             }
-            else if (hasIgnoreCase(table2, sl.image)) { // hasIgnoreCase sets "other" if it is found.
+            else if (hasIgnoreCase(table2, sl.image)) {
+              // hasIgnoreCase sets "other" if it is found.
               // Since IGNORE_CASE version exists, current one is useless and bad.
               if (!sl.tpContext.explicit) {
                 // inline BNF string is used earlier with an IGNORE_CASE.
@@ -310,19 +341,16 @@ public final class Semanticize {
         }
       }
     }
+  }
 
-    removePreparedItems();
-
-    /*
-     * The following code performs a tree walk on all regular expressions
-     * attaching links to "RJustName"s.  Error messages are given if
-     * undeclared names are used, or if "RJustNames" refer to private
-     * regular expressions or to regular expressions of any kind other
-     * than TOKEN.  In addition, this loop also removes top level
-     * "RJustName"s from "rexprlist".
-     * This code is not executed if Options.getUserScanner() is set to
-     * true.  Instead the following block of code is executed.
-     */
+  private void step96() {// The following code performs a tree walk on all regular expressions
+    // attaching links to "RJustName"s.  Error messages are given if
+    // undeclared names are used, or if "RJustNames" refer to private
+    // regular expressions or to regular expressions of any kind other
+    // than TOKEN.  In addition, this loop also removes top level
+    // "RJustName"s from "rexprlist".
+    // This code is not executed if Options.getUserScanner() is set to
+    // true.  Instead the following block of code is executed.
 
     if (!Options.getUserScanner()) {
       FixRJustNames frjn = new FixRJustNames();
@@ -337,19 +365,17 @@ public final class Semanticize {
         }
       }
     }
+  }
 
-    removePreparedItems();
-
-    /*
-     * The following code is executed only if Options.getUserScanner() is
-     * set to true.  This code visits all top-level "RJustName"s (ignores
-     * "RJustName"s nested within regular expressions).  Since regular expressions
-     * are optional in this case, "RJustName"s without corresponding regular
-     * expressions are given ordinal values here.  If "RJustName"s refer to
-     * a named regular expression, their ordinal values are set to reflect this.
-     * All but one "RJustName" node is removed from the lists by the end of
-     * execution of this code.
-     */
+  private void step97() {
+    // The following code is executed only if Options.getUserScanner() is
+    // set to true.  This code visits all top-level "RJustName"s (ignores
+    // "RJustName"s nested within regular expressions).  Since regular expressions
+    // are optional in this case, "RJustName"s without corresponding regular
+    // expressions are given ordinal values here.  If "RJustName"s refer to
+    // a named regular expression, their ordinal values are set to reflect this.
+    // All but one "RJustName" node is removed from the lists by the end of
+    // execution of this code.
 
     if (Options.getUserScanner()) {
       for (TokenProduction tp : state.regExpList) {
@@ -372,16 +398,14 @@ public final class Semanticize {
         }
       }
     }
+  }
 
-    removePreparedItems();
-
-    /*
-     * The following code is executed only if Options.getUserScanner() is
-     * set to true.  This loop labels any unlabeled regular expression and
-     * prints a warning that it is doing so.  These labels are added to
-     * "ordered_named_tokens" so that they may be generated into the ...Constants
-     * file.
-     */
+  private void step98() {
+    // The following code is executed only if Options.getUserScanner() is
+    // set to true.  This loop labels any unlabeled regular expression and
+    // prints a warning that it is doing so.  These labels are added to
+    // "ordered_named_tokens" so that they may be generated into the ...Constants
+    // file.
     if (Options.getUserScanner()) {
       for (TokenProduction tp : state.regExpList) {
         List<RegExpSpec> reSpecs = tp.reSpecs;
@@ -394,11 +418,9 @@ public final class Semanticize {
         }
       }
     }
+  }
 
-    if (JavaCCErrors.getErrorCount() != 0) {
-      throw new MetaParseException();
-    }
-
+  private void step99() {
     // The following code sets the value of the "emptyPossible" field of NormalProduction
     // nodes.  This field is initialized to false, and then the entire list of
     // productions is processed.  This is repeated as long as at least one item
@@ -414,7 +436,9 @@ public final class Semanticize {
         }
       }
     }
+  }
 
+  private void step100() {
     if (Options.getSanityCheck() && JavaCCErrors.getErrorCount() == 0) {
       // The following code checks that all ZeroOrMore, ZeroOrOne, and OneOrMore nodes
       // do not contain expansions that can expand to the empty token list.
@@ -450,7 +474,7 @@ public final class Semanticize {
             RegularExpression regExp = reSpec.regExp;
             if (regExp.walkStatus == 0) {
               regExp.walkStatus = -1;
-              if (rexpWalk(regExp)) {
+              if (regExpWalk(regExp)) {
                 loopString = "..." + regExp.label + "... --> " + loopString;
                 JavaCCErrors.semanticError(regExp, "Loop in regular expression detected: \"" + loopString + "\"");
               }
@@ -469,10 +493,6 @@ public final class Semanticize {
               new LookaheadChecker());
         }
       }
-    } // matches "if (Options.getSanityCheck()) {"
-
-    if (JavaCCErrors.getErrorCount() != 0) {
-      throw new MetaParseException();
     }
   }
 
@@ -624,9 +644,9 @@ public final class Semanticize {
 
   // Returns true to indicate an unraveling of a detected loop,
   // and returns false otherwise.
-  private boolean rexpWalk(RegularExpression rexp) {
-    if (rexp instanceof RJustName) {
-      RJustName jn = (RJustName) rexp;
+  private boolean regExpWalk(RegularExpression re) {
+    if (re instanceof RJustName) {
+      RJustName jn = (RJustName) re;
       if (jn.regExp.walkStatus == -1) {
         jn.regExp.walkStatus = -2;
         loopString = "..." + jn.regExp.label + "...";
@@ -637,7 +657,7 @@ public final class Semanticize {
       }
       else if (jn.regExp.walkStatus == 0) {
         jn.regExp.walkStatus = -1;
-        if (rexpWalk(jn.regExp)) {
+        if (regExpWalk(jn.regExp)) {
           loopString = "..." + jn.regExp.label + "... --> " + loopString;
           if (jn.regExp.walkStatus == -2) {
             jn.regExp.walkStatus = 1;
@@ -655,33 +675,33 @@ public final class Semanticize {
         }
       }
     }
-    else if (rexp instanceof RChoice) {
-      for (Iterator it = ((RChoice) rexp).getChoices().iterator(); it.hasNext(); ) {
-        if (rexpWalk((RegularExpression) it.next())) {
+    else if (re instanceof RSequence) {
+      for (RegularExpression unit : ((RSequence) re).units) {
+        if (regExpWalk(unit)) {
           return true;
         }
       }
       return false;
     }
-    else if (rexp instanceof RSequence) {
-      for (Iterator it = ((RSequence) rexp).units.iterator(); it.hasNext(); ) {
-        if (rexpWalk((RegularExpression) it.next())) {
+    else if (re instanceof RChoice) {
+      for (RegularExpression unit : ((RChoice) re).getChoices()) {
+        if (regExpWalk(unit)) {
           return true;
         }
       }
       return false;
     }
-    else if (rexp instanceof ROneOrMore) {
-      return rexpWalk(((ROneOrMore) rexp).regExp);
+    else if (re instanceof RZeroOrOne) {
+      return regExpWalk(((RZeroOrOne) re).regExp);
     }
-    else if (rexp instanceof RZeroOrMore) {
-      return rexpWalk(((RZeroOrMore) rexp).regExp);
+    else if (re instanceof RZeroOrMore) {
+      return regExpWalk(((RZeroOrMore) re).regExp);
     }
-    else if (rexp instanceof RZeroOrOne) {
-      return rexpWalk(((RZeroOrOne) rexp).regExp);
+    else if (re instanceof ROneOrMore) {
+      return regExpWalk(((ROneOrMore) re).regExp);
     }
-    else if (rexp instanceof RRepetitionRange) {
-      return rexpWalk(((RRepetitionRange) rexp).regExp);
+    else if (re instanceof RRepetitionRange) {
+      return regExpWalk(((RRepetitionRange) re).regExp);
     }
     return false;
   }
@@ -693,10 +713,12 @@ public final class Semanticize {
   class FixRJustNames implements TreeWalkerOp {
     public RegularExpression root;
 
+    @Override
     public boolean goDeeper(Expansion e) {
       return true;
     }
 
+    @Override
     public void action(Expansion e) {
       if (e instanceof RJustName) {
         RJustName jn = (RJustName) e;
@@ -721,6 +743,7 @@ public final class Semanticize {
   }
 
   class LookaheadFixer implements TreeWalkerOp {
+    @Override
     public boolean goDeeper(Expansion e) {
       if (e instanceof RegularExpression) {
         return false;
@@ -730,6 +753,7 @@ public final class Semanticize {
       }
     }
 
+    @Override
     public void action(Expansion e) {
       if (e instanceof Sequence) {
         if (e.parent instanceof Choice || e.parent instanceof ZeroOrMore ||
@@ -784,6 +808,7 @@ public final class Semanticize {
   }
 
   class ProductionDefinedChecker implements TreeWalkerOp {
+    @Override
     public boolean goDeeper(Expansion e) {
       if (e instanceof RegularExpression) {
         return false;
@@ -793,6 +818,7 @@ public final class Semanticize {
       }
     }
 
+    @Override
     public void action(Expansion exp) {
       if (exp instanceof NonTerminal) {
         NonTerminal nt = (NonTerminal) exp;
@@ -807,6 +833,7 @@ public final class Semanticize {
   }
 
   class EmptyChecker implements TreeWalkerOp {
+    @Override
     public boolean goDeeper(Expansion e) {
       if (e instanceof RegularExpression) {
         return false;
@@ -816,6 +843,7 @@ public final class Semanticize {
       }
     }
 
+    @Override
     public void action(Expansion e) {
       if (e instanceof OneOrMore) {
         if (emptyExpansionExists(((OneOrMore) e).expansion)) {
@@ -836,6 +864,7 @@ public final class Semanticize {
   }
 
   class LookaheadChecker implements TreeWalkerOp {
+    @Override
     public boolean goDeeper(Expansion e) {
       if (e instanceof RegularExpression) {
         return false;
@@ -848,6 +877,7 @@ public final class Semanticize {
       }
     }
 
+    @Override
     public void action(Expansion e) {
       if (e instanceof Choice) {
         if (Options.getLookahead() == 1 || Options.getForceLaCheck()) {

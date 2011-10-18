@@ -28,8 +28,6 @@
 
 package org.javacc.parser;
 
-import java.util.Set;
-
 /**
  * Describes expansions - entities that may occur on the
  * right hand sides of productions.  This is the base class of
@@ -55,12 +53,12 @@ public abstract class Expansion {
   public Object parent;
   /** The ordinal of this node with respect to its parent. */
   int ordinal;
-  public long myGeneration = 0;
+  public long myGeneration;
   /**
    * This flag is used for bookkeeping by the minimumSize method in class
    * ParseEngine.
    */
-  public boolean inMinimumSize = false;
+  public boolean inMinimumSize;
 
   void setColumn(int column) {
     this.column = column;
@@ -85,17 +83,7 @@ public abstract class Expansion {
 
   @Override
   public String toString() {
-    return "[" + getLine() + "," + getColumn() + " " + System.identityHashCode(this) + " " + getSimpleName() + "]";
-  }
-
-  protected StringBuilder dumpPrefix(int indent) {
-    StringBuilder sb = new StringBuilder(128);
-    for (int i = 0; i < indent; i++) { sb.append("  "); }
-    return sb;
-  }
-
-  public StringBuilder dump(int indent, Set alreadyDumped) {
-    return dumpPrefix(indent).append(System.identityHashCode(this)).append(" ").append(getSimpleName());
+    return "[" + getLine() + "," + getColumn() + " " + getSimpleName() + "]";
   }
 
   /**
