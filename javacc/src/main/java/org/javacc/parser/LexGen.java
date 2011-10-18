@@ -431,14 +431,14 @@ final class LexGen implements FileGenerator, JavaCCConstants {
         JavaCCErrors.warning("You have the COMMON_TOKEN_ACTION option set. " +
             "But it appears you have not defined the method :\n" +
             "      void commonTokenAction(Token t)\n" +
-            "in your SCANNER_DECLS. The generated token manager will not compile.");
+            "in your SCANNER_DECLS. The generated scanner will not compile.");
       }
     }
     else if (Options.getCommonTokenAction()) {
       JavaCCErrors.warning("You have the COMMON_TOKEN_ACTION option set. " +
           "But you have not defined the method :\n" +
           "      void commonTokenAction(Token t)\n" +
-          "in your SCANNER_DECLS. The generated token manager will not compile.");
+          "in your SCANNER_DECLS. The generated scanner will not compile.");
     }
   }
 

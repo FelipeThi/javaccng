@@ -389,7 +389,7 @@ public final class Semanticize {
           Integer ii = reSpec.regExp.ordinal;
           if (state.namesOfTokens.get(ii) == null) {
             JavaCCErrors.warning(reSpec.regExp, "Unlabeled regular expression cannot be referred to by " +
-                "user generated token manager.");
+                "user generated scanner.");
           }
         }
       }

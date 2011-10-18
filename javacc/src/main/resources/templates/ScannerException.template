@@ -1,13 +1,8 @@
-/**
- * If you have designed your tokens well, the token manager
- * is never expected to throw this exception.
- * Therefore it extends Error rather than Exception.
- */
 public class ScannerException extends RuntimeException {
   /** Lexical error occurred. */
   public static final int LEXICAL_ERROR = 0;
 
-  /** Detected (and bailed out of) an infinite loop in the token manager. */
+  /** Detected (and bailed out of) an infinite loop in the scanner. */
   public static final int LOOP_DETECTED = 1;
 
   private final int errorCode;
@@ -104,8 +99,8 @@ public class ScannerException extends RuntimeException {
   }
 
   /**
-   * Returns a detailed message for the Error when it is thrown by the
-   * token manager to indicate a lexical error.
+   * Returns a detailed message for the exception when it is thrown by the
+   * scanner to indicate a lexical error.
    *
    * @param lexState Lexical state in which this error occurred.
 #if KEEP_LINE_COLUMN

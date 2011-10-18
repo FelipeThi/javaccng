@@ -278,7 +278,7 @@ Then type:
 	javac Simple2*.java
 	java Simple2
 
-Note that token manager debugging produces a lot of diagnostic
+Note that scanner debugging produces a lot of diagnostic
 information and it is typically used to look at debug traces a single
 token at a time.
 

@@ -132,7 +132,7 @@ final class ParseGen implements FileGenerator, JavaCCConstants {
   }
 
   private void printBoilerplate(ParseEngine parseEngine, IndentingPrintWriter out) {
-    out.println("  /** Either generated or user defined Token Manager. */");
+    out.println("  /** Either generated or user defined scanner. */");
     out.println("  public final Scanner scanner;");
     out.println("  /** Current token. */");
     out.println("  public Token token;");
@@ -179,7 +179,6 @@ final class ParseGen implements FileGenerator, JavaCCConstants {
     }
     out.println();
 
-    out.println("  /** Constructor with either generated or user provided Token Manager. */");
     out.println("  public " + state.parserClass() + "(Scanner s) throws java.io.IOException, ParseException {");
     out.println("    scanner = s;");
     out.println("    token = new Token();");

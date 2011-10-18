@@ -427,18 +427,18 @@ public class Options {
   }
 
   /**
-   * Find the build token manager value.
+   * Find the build scanner value.
    *
-   * @return The requested build token manager value.
+   * @return The requested build scanner value.
    */
   public static boolean getBuildScanner() {
     return booleanValue("BUILD_SCANNER");
   }
 
   /**
-   * Find the token manager uses parser value.
+   * Find the scanner uses parser value.
    *
-   * @return The requested token manager uses parser value;
+   * @return The requested scanner uses parser value;
    */
   public static boolean getScannerUsesParser() {
     return booleanValue("SCANNER_USES_PARSER");
