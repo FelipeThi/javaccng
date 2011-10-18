@@ -34,8 +34,6 @@ public class ASTGrammar extends JJTreeNode {
   }
 
   void generate(IO io) {
-    io.println("/*@bgen(jjtree) JJTree */");
-    io.print("/*@egen*/");
     print(io);
   }
 }
