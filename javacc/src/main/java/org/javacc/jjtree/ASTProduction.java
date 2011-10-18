@@ -40,11 +40,11 @@ public class ASTProduction extends JJTreeNode {
 
   String name;
   List<String> throwsList = new ArrayList<String>();
-  private Map scopes = new HashMap();
+  private final Map<NodeScope, Integer> scopes = new HashMap<NodeScope, Integer>();
   private int nextNodeScopeNumber = 0;
 
   int getNodeScopeNumber(NodeScope s) {
-    Integer i = (Integer) scopes.get(s);
+    Integer i = scopes.get(s);
     if (i == null) {
       i = nextNodeScopeNumber++;
       scopes.put(s, i);

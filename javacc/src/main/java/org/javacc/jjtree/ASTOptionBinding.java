@@ -33,7 +33,7 @@ public class ASTOptionBinding extends JJTreeNode {
     super(id);
   }
 
-  private boolean suppressed = false;
+  private boolean suppressed;
   private String name;
 
   void initialize(String n, String v) {
