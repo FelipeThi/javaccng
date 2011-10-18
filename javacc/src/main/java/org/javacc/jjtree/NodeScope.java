@@ -161,10 +161,10 @@ public class NodeScope {
 
       if (usesCloseNodeVar()) {
         io.println(indent + "  if (" + closedVar + ") {");
-        io.println(indent + "    jjtree.clearNodeScope(" + nodeVar + ");");
+        io.println(indent + "    jjTree.clearNodeScope(" + nodeVar + ");");
         io.println(indent + "    " + closedVar + " = false;");
         io.println(indent + "  } else {");
-        io.println(indent + "    jjtree.popNode();");
+        io.println(indent + "    jjTree.popNode();");
         io.println(indent + "  }");
       }
 

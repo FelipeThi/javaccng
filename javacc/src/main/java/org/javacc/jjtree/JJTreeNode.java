@@ -151,7 +151,7 @@ public class JJTreeNode extends SimpleNode {
        1) we rename all references to `jjtThis' to be references to
        the actual node variable.
 
-       2) we replace all calls to `jjtree.currentNode()' with
+       2) we replace all calls to `jjTree.currentNode()' with
        references to the node variable. */
 
     NodeScope s = NodeScope.getEnclosingNodeScope(this);
@@ -166,12 +166,12 @@ public class JJTreeNode extends SimpleNode {
       io.print(s.getNodeVariable());
       return;
     }
-    else if (t.getImage().equals("jjtree")) {
+    else if (t.getImage().equals("jjTree")) {
       if (t.next.getImage().equals(".")) {
         if (t.next.next.getImage().equals("currentNode")) {
           if (t.next.next.next.getImage().equals("(")) {
             if (t.next.next.next.next.getImage().equals(")")) {
-              /* Found `jjtree.currentNode()' so go into white out
+              /* Found `jjTree.currentNode()' so go into white out
                  mode.  We'll stay in this mode until we find the
                  closing parenthesis. */
               whitingOut = true;
@@ -181,7 +181,7 @@ public class JJTreeNode extends SimpleNode {
       }
     }
     if (whitingOut) {
-      if (t.getImage().equals("jjtree")) {
+      if (t.getImage().equals("jjTree")) {
         io.print(s.getNodeVariable());
         io.print(" ");
       }

@@ -29,15 +29,16 @@
 package org.javacc.jjtree;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ASTNodeDescriptor extends JJTreeNode {
   ASTNodeDescriptor(int id) {
     super(id);
   }
 
-  private boolean faked = false;
+  private boolean faked;
 
   static ASTNodeDescriptor indefinite(String s) {
     ASTNodeDescriptor nd = new ASTNodeDescriptor(JJTreeParserTreeConstants.JJTNODEDESCRIPTOR);
@@ -49,7 +50,7 @@ public class ASTNodeDescriptor extends JJTreeNode {
 
   static List<String> nodeIds = new ArrayList<String>();
   static List<String> nodeNames = new ArrayList<String>();
-  static Hashtable<String, String> nodeSeen = new Hashtable<String, String>();
+  static Map<String, String> nodeSeen = new HashMap<String, String>();
 
   static List<String> getNodeIds() {
     return nodeIds;
@@ -80,21 +81,12 @@ public class ASTNodeDescriptor extends JJTreeNode {
     return name.equals("void");
   }
 
-  public String toString() {
-    if (faked) {
-      return "(faked) " + name;
-    }
-    else {
-      return super.toString() + ": " + name;
-    }
-  }
-
   String getDescriptor() {
     if (expression == null) {
       return name;
     }
     else {
-      return "#" + name + "(" + (isGT ? ">" : "") + expression_text() + ")";
+      return "#" + name + "(" + (isGT ? ">" : "") + expressionText() + ")";
     }
   }
 
@@ -112,12 +104,12 @@ public class ASTNodeDescriptor extends JJTreeNode {
   }
 
   String openNode(String nodeVar) {
-    return "jjtree.openNodeScope(" + nodeVar + ");";
+    return "jjTree.openNodeScope(" + nodeVar + ");";
   }
 
-  private String expression_text() {
-    if (expression.getFirstToken().getImage().equals(")") &&
-        expression.getLastToken().getImage().equals("(")) {
+  private String expressionText() {
+    if (expression.getFirstToken().getImage().equals(")")
+        && expression.getLastToken().getImage().equals("(")) {
       return "true";
     }
 
@@ -135,20 +127,29 @@ public class ASTNodeDescriptor extends JJTreeNode {
 
   String closeNode(String nodeVar) {
     if (expression == null) {
-      return "jjtree.closeNodeScope(" + nodeVar + ", true);";
+      return "jjTree.closeNodeScope(" + nodeVar + ", true);";
     }
     else if (isGT) {
-      return "jjtree.closeNodeScope(" + nodeVar + ", jjtree.nodeArity() >" +
-          expression_text() + ");";
+      return "jjTree.closeNodeScope(" + nodeVar + ", jjTree.nodeArity() >" +
+          expressionText() + ");";
     }
     else {
-      return "jjtree.closeNodeScope(" + nodeVar + ", " +
-          expression_text() + ");";
+      return "jjTree.closeNodeScope(" + nodeVar + ", " +
+          expressionText() + ");";
     }
   }
 
   @Override
   String translateImage(Token t) {
     return whiteOut(t);
+  }
+
+  public String toString() {
+    if (faked) {
+      return "(faked) " + name;
+    }
+    else {
+      return super.toString() + ": " + name;
+    }
   }
 }

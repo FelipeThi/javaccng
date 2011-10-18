@@ -588,7 +588,7 @@ JJTreeNode expansion_choices(ASTProduction p) #BNFChoice(>1) :
 {
   expansion(p) ( "|" expansion(p) )*
     {
-	  return (JJTreeNode) jjtree.peekNode();
+	  return (JJTreeNode) jjTree.peekNode();
 	}
 }
 
@@ -608,7 +608,7 @@ void expansion(ASTProduction p) #BNFSequence(>1) :
      eu=expansion_unit(p)
      [ nd=node_descriptor() ]
     {
-	  if (jjtree.nodeCreated()) {
+	  if (jjTree.nodeCreated()) {
 	    jjtThis.nodeScope = new NodeScope(p, nd);
 	    jjtThis.expansionUnit = eu;
 	  }
@@ -713,11 +713,11 @@ JJTreeNode expansion_unit(ASTProduction p) :
       #BNFParenthesized(1)
   )
 	{
-	  ((JJTreeNode) jjtree.peekNode()).setFirstToken(t);
+	  ((JJTreeNode) jjTree.peekNode()).setFirstToken(t);
 	}
 )
     {
-	  return (JJTreeNode) jjtree.peekNode();
+	  return (JJTreeNode) jjTree.peekNode();
 	}
 }
 
@@ -782,7 +782,7 @@ void complex_regular_expression_unit() :
       #REParenthesized(1)
   )
 	{
-	  ((JJTreeNode) jjtree.peekNode()).setFirstToken(t);
+	  ((JJTreeNode) jjTree.peekNode()).setFirstToken(t);
 	}
 }
 
@@ -841,7 +841,7 @@ ASTNodeDescriptor node_descriptor() #NodeDescriptor :
       node_descriptor_expression()
            {
 		      jjtThis.expression =
-		        (ASTNodeDescriptorExpression)jjtree.peekNode();
+		        (ASTNodeDescriptorExpression)jjTree.peekNode();
 		   }
    ")"
   ]

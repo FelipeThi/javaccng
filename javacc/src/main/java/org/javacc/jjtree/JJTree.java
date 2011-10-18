@@ -105,7 +105,7 @@ public final class JJTree {
               new JavaCharStream(io.getIn())));
       parser.javacc_input();
 
-      ASTGrammar root = (ASTGrammar) parser.jjtree.rootNode();
+      ASTGrammar root = (ASTGrammar) parser.jjTree.rootNode();
 
       if (Boolean.getBoolean("jjtree-dump")) {
         root.dump(" ");

@@ -45,8 +45,8 @@ final class TreeStateFile implements FileGenerator {
 
   static void insertParserMembers(IO io) {
     io.println();
-    io.println("  protected " + JJTreeGlobals.treeStateClass() +
-        " jjtree = new " + JJTreeGlobals.treeStateClass() + "();");
+    io.println("  protected final " + JJTreeGlobals.treeStateClass() +
+        " jjTree = new " + JJTreeGlobals.treeStateClass() + "();");
     io.println();
   }
 

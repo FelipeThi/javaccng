@@ -43,7 +43,7 @@ public class SPLParser {
    * @return the root node
    */
   public Node rootNode() {
-    return jjtree.rootNode();
+    return jjTree.rootNode();
   }
 }
 

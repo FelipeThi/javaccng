@@ -55,7 +55,7 @@ public class SPL {
     }
     try {
       parser.CompilationUnit();
-      parser.jjtree.rootNode().interpret();
+      parser.jjTree.rootNode().interpret();
     }
     catch (ParseException e) {
       System.out.println("Stupid Programming Language Interpreter Version 0.1:  Encountered errors during parse.");

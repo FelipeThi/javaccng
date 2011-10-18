@@ -31,7 +31,7 @@ public class SPLTest {
                 new InputStreamReader(
                     open(name)))));
     parser.CompilationUnit();
-    parser.jjtree.rootNode().interpret();
+    parser.jjTree.rootNode().interpret();
   }
 
   private static InputStream open(String name) {
