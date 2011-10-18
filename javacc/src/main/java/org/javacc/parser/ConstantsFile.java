@@ -36,11 +36,11 @@ import java.io.IOException;
 import java.util.List;
 
 /** Generates the Constants file. */
-final class OtherFilesGen implements FileGenerator, JavaCCConstants {
+final class ConstantsFile implements FileGenerator, JavaCCConstants {
   private final JavaCCState state;
   private final LexGen lexGen;
 
-  OtherFilesGen(JavaCCState state, LexGen lexGen) {
+  ConstantsFile(JavaCCState state, LexGen lexGen) {
     this.state = state;
     this.lexGen = lexGen;
   }

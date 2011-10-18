@@ -28,6 +28,8 @@
 
 package org.javacc.jjtree;
 
+import org.javacc.parser.FileGenerator;
+import org.javacc.parser.MetaParseException;
 import org.javacc.parser.Options;
 import org.javacc.parser.OutputFile;
 import org.javacc.utils.JavaFileGenerator;
@@ -41,37 +43,42 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-final class NodeFiles {
+final class NodeFiles implements FileGenerator {
   static Set<String> nodesGenerated = new HashSet<String>();
 
-  static void ensure(IO io, String nodeType) throws IOException {
-    File file = new File(JJTreeOptions.getJJTreeOutputDirectory(), nodeType + ".java");
+  @Override
+  public void start() throws MetaParseException, IOException {
+    //
+  }
 
+  static void ensure(String nodeType) throws IOException {
     if ("Node".equals(nodeType)) {}
     else if ("SimpleNode".equals(nodeType)) {
-      ensure(io, "Node");
+      ensure("Node");
     }
     else {
-      ensure(io, "SimpleNode");
+      ensure("SimpleNode");
     }
 
     /* Only build the node file if we're dealing with Node.java, or
        the NODE_BUILD_FILES option is set. */
-    if (!(nodeType.equals("Node") || JJTreeOptions.getBuildNodeFiles())) {
+    if (!("Node".equals(nodeType) || JJTreeOptions.getBuildNodeFiles())) {
       return;
     }
 
-    if (file.exists() && nodesGenerated.contains(file.getName())) {
+    File path = new File(JJTreeOptions.getJJTreeOutputDirectory(), nodeType + ".java");
+
+    if (path.exists() && nodesGenerated.contains(path.getName())) {
       return;
     }
 
-    nodesGenerated.add(file.getName());
+    nodesGenerated.add(path.getName());
 
-    OutputFile outputFile = new OutputFile(file);
-    if (nodeType.equals("Node")) {
+    OutputFile outputFile = new OutputFile(path);
+    if ("Node".equals(nodeType)) {
       generateNode_java(outputFile);
     }
-    else if (nodeType.equals("SimpleNode")) {
+    else if ("SimpleNode".equals(nodeType)) {
       generateSimpleNode_java(outputFile);
     }
     else {
@@ -85,7 +92,7 @@ final class NodeFiles {
     // will default to the parser's package name.
     // If the package names are different we will need to import classes
     // from the parser's package.
-    if (!JJTreeGlobals.nodePackageName.equals("")) {
+    if (!"".equals(JJTreeGlobals.nodePackageName)) {
       out.println("package " + JJTreeGlobals.nodePackageName + ";");
       out.println();
       if (!JJTreeGlobals.nodePackageName.equals(JJTreeGlobals.packageName)) {
@@ -95,14 +102,8 @@ final class NodeFiles {
     }
   }
 
-  static String nodeConstants() {
-    return JJTreeGlobals.parserName + "TreeConstants";
-  }
-
   static void generateTreeConstants_java() throws IOException {
-    String name = nodeConstants();
-    File path = new File(JJTreeOptions.getJJTreeOutputDirectory(), name + ".java");
-
+    File path = new File(JJTreeOptions.getJJTreeOutputDirectory(), JJTreeGlobals.treeConstantsClass() + ".java");
     OutputFile outputFile = new OutputFile(path);
     IndentingPrintWriter out = outputFile.getPrintWriter();
 
@@ -111,7 +112,7 @@ final class NodeFiles {
 
     generatePrologue(out);
 
-    out.println("public interface " + name + " {");
+    out.println("public interface " + JJTreeGlobals.treeConstantsClass() + " {");
 
     for (int i = 0; i < nodeIds.size(); i++) {
       String n = nodeIds.get(i);
@@ -119,11 +120,9 @@ final class NodeFiles {
     }
 
     out.println();
-    out.println();
 
     out.println("  String[] jjtNodeName = {");
-    for (int i = 0; i < nodeNames.size(); i++) {
-      String n = nodeNames.get(i);
+    for (String n : nodeNames) {
       out.println("    \"" + n + "\",");
     }
     out.println("  };");
@@ -132,31 +131,25 @@ final class NodeFiles {
     out.close();
   }
 
-  static String visitorClass() {
-    return JJTreeGlobals.parserName + "Visitor";
-  }
-
   static void generateVisitor_java() throws IOException {
     if (!JJTreeOptions.getVisitor()) {
       return;
     }
 
-    String name = visitorClass();
-    File file = new File(JJTreeOptions.getJJTreeOutputDirectory(), name + ".java");
-
-    OutputFile outputFile = new OutputFile(file);
+    File path = new File(JJTreeOptions.getJJTreeOutputDirectory(), JJTreeGlobals.visitorClass() + ".java");
+    OutputFile outputFile = new OutputFile(path);
     IndentingPrintWriter out = outputFile.getPrintWriter();
     try {
       List<String> nodeNames = ASTNodeDescriptor.getNodeNames();
 
       generatePrologue(out);
 
-      out.println("public interface " + name + " {");
+      out.println("public interface " + JJTreeGlobals.visitorClass() + " {");
 
       String ve = mergeVisitorException();
 
       String argumentType = "Object";
-      if (!JJTreeOptions.getVisitorDataType().equals("")) {
+      if (!"".equals(JJTreeOptions.getVisitorDataType())) {
         argumentType = JJTreeOptions.getVisitorDataType();
       }
 
@@ -164,7 +157,7 @@ final class NodeFiles {
           ve + ";");
       if (JJTreeOptions.getMulti()) {
         for (String nodeName : nodeNames) {
-          if (nodeName.equals("void")) {
+          if ("void".equals(nodeName)) {
             continue;
           }
           String nodeType = JJTreeOptions.getNodePrefix() + nodeName;
@@ -190,15 +183,12 @@ final class NodeFiles {
   private static void generateNode_java(OutputFile outputFile) throws IOException {
     IndentingPrintWriter out = outputFile.getPrintWriter();
     try {
-      generatePrologue(out);
-
-      Map options = new HashMap(Options.getOptions());
+      Map<String, Object> options = new HashMap<String, Object>(Options.getOptions());
       options.put("PARSER_NAME",
           JJTreeGlobals.parserName);
-
       JavaFileGenerator generator = new JavaFileGenerator(
           "/templates/Node.template", options);
-
+      generatePrologue(out);
       generator.generate(out);
     }
     finally {
@@ -209,7 +199,6 @@ final class NodeFiles {
   private static void generateSimpleNode_java(OutputFile outputFile) throws IOException {
     IndentingPrintWriter out = outputFile.getPrintWriter();
     try {
-      generatePrologue(out);
       Map<String, Object> options = new HashMap<String, Object>(Options.getOptions());
       options.put("PARSER_NAME",
           JJTreeGlobals.parserName);
@@ -217,6 +206,7 @@ final class NodeFiles {
           "void".equals(JJTreeOptions.getVisitorReturnType()));
       JavaFileGenerator generator = new JavaFileGenerator(
           "/templates/SimpleNode.template", options);
+      generatePrologue(out);
       generator.generate(out);
     }
     finally {
@@ -228,7 +218,6 @@ final class NodeFiles {
       throws IOException {
     IndentingPrintWriter out = outputFile.getPrintWriter();
     try {
-      generatePrologue(out);
       Map<String, Object> options = new HashMap<String, Object>(Options.getOptions());
       options.put("PARSER_NAME",
           JJTreeGlobals.parserName);
@@ -238,6 +227,7 @@ final class NodeFiles {
           "void".equals(JJTreeOptions.getVisitorReturnType()));
       JavaFileGenerator generator = new JavaFileGenerator(
           "/templates/MultiNode.template", options);
+      generatePrologue(out);
       generator.generate(out);
     }
     finally {

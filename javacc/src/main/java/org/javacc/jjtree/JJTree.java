@@ -123,7 +123,9 @@ public final class JJTree {
 
       NodeFiles.generateTreeConstants_java();
       NodeFiles.generateVisitor_java();
-      JJTreeState.generateTreeState_java();
+
+      TreeStateFile treeStateFile = new TreeStateFile();
+      treeStateFile.start();
 
       p("Annotated grammar generated successfully in " +
           io.getOutputFileName());
@@ -134,7 +136,6 @@ public final class JJTree {
     }
     catch (Exception ex) {
       p("Error parsing input: " + ex.toString());
-      ex.printStackTrace(io.getMsg());
       return 1;
     }
 

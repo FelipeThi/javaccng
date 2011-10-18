@@ -109,6 +109,18 @@ class JJTreeGlobals {
   public static Token parserImports;
   /** The mapping from production names to ASTProduction objects. */
   static Map<String, ASTProduction> productions = new HashMap<String, ASTProduction>();
+
+  static String treeStateClass() {
+    return "JJT" + parserName + "State";
+  }
+
+  static String treeConstantsClass() {
+    return parserName + "TreeConstants";
+  }
+
+  static String visitorClass() {
+    return parserName + "Visitor";
+  }
 }
 
 

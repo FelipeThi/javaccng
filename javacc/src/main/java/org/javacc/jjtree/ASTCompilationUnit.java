@@ -53,13 +53,13 @@ public class ASTCompilationUnit extends JJTreeNode {
         if (t.getImage().equals("implements")) {
           print(t, io);
           openJJTreeComment(io, null);
-          io.getOut().print(" " + NodeFiles.nodeConstants() + ", ");
+          io.getOut().print(" " + JJTreeGlobals.treeConstantsClass() + ", ");
           closeJJTreeComment(io);
         }
         else {
           // t is pointing at the opening brace of the class body.
           openJJTreeComment(io, null);
-          io.getOut().print("implements " + NodeFiles.nodeConstants());
+          io.getOut().print("implements " + JJTreeGlobals.treeConstantsClass());
           closeJJTreeComment(io);
           print(t, io);
         }
@@ -70,7 +70,7 @@ public class ASTCompilationUnit extends JJTreeNode {
 
       if (t == JJTreeGlobals.parserClassBodyStart) {
         openJJTreeComment(io, null);
-        JJTreeState.insertParserMembers(io);
+        TreeStateFile.insertParserMembers(io);
         closeJJTreeComment(io);
       }
 

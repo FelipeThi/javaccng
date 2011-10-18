@@ -130,8 +130,8 @@ public final class Main {
       }
       lexGen.start();
 
-      OtherFilesGen otherFilesGen = new OtherFilesGen(state, lexGen);
-      otherFilesGen.start();
+      ConstantsFile constantsFile = new ConstantsFile(state, lexGen);
+      constantsFile.start();
 
       JavaFiles javaFiles = new JavaFiles(state);
       javaFiles.start();

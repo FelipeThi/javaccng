@@ -34,12 +34,12 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class NodeScope {
-  private ASTProduction production;
-  private ASTNodeDescriptor nodeDescriptor;
-  private String closedVar;
-  private String exceptionVar;
-  private String nodeVar;
-  private int scopeNumber;
+  private final ASTProduction production;
+  private final ASTNodeDescriptor nodeDescriptor;
+  private final String closedVar;
+  private final String exceptionVar;
+  private final String nodeVar;
+  private final int scopeNumber;
 
   NodeScope(ASTProduction p, ASTNodeDescriptor n) {
     production = p;
@@ -97,7 +97,7 @@ public class NodeScope {
     }
 
     // Ensure that there is a template definition file for the node type.
-    NodeFiles.ensure(io, type);
+    NodeFiles.ensure(type);
 
     io.print(indent + nodeClass + " " + nodeVar + " = ");
     String parserArg = JJTreeOptions.getNodeUsesParser() ? "this, " : "";

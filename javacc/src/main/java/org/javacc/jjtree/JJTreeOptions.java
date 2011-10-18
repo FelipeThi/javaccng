@@ -246,16 +246,13 @@ class JJTreeOptions extends Options {
    * @return The requested JJTree output directory
    */
   public static File getJJTreeOutputDirectory() {
-    final String dirName = stringValue("JJTREE_OUTPUT_DIRECTORY");
-    File dir = null;
+    String dirName = stringValue("JJTREE_OUTPUT_DIRECTORY");
 
     if ("".equals(dirName)) {
-      dir = getOutputDirectory();
+      return getOutputDirectory();
     }
     else {
-      dir = new File(dirName);
+      return new File(dirName);
     }
-
-    return dir;
   }
 }
