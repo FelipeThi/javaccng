@@ -34,7 +34,7 @@ import java.util.List;
 /** Describes BNF productions. */
 public final class BNFProduction extends NormalProduction {
   /** The declarations of this production. */
-  private List<Token> tokens = new ArrayList<Token>();
+  private final List<Token> tokens = new ArrayList<Token>();
   /**
    * This flag keeps track of whether or not return and throw
    * statements have been patched within this production's actions to

@@ -91,53 +91,36 @@ public class SimpleNode implements Node {
    * special tokens (essentially, white space and comments).
    */
   protected void print(Token t, PrintWriter out) {
-    Token tt = t.specialToken;
-    if (tt != null) {
-      while (tt.specialToken != null) {
-        tt = tt.specialToken;
+    Token st = t.specialToken;
+    if (st != null) {
+      while (st.specialToken != null) {
+        st = st.specialToken;
       }
-      while (tt != null) {
-        out.print(addUnicodeEscapes(tt.getImage()));
-        tt = tt.next;
+      while (st != null) {
+        out.print(escape(st.getImage()));
+        st = st.next;
       }
     }
-    out.print(addUnicodeEscapes(t.getImage()));
+    out.print(escape(t.getImage()));
   }
 
-  private String addUnicodeEscapes(String str) {
-    String retval = "";
-    char ch;
+  private String escape(String str) {
+    String r = "";
     for (int i = 0; i < str.length(); i++) {
-      ch = str.charAt(i);
+      char ch = str.charAt(i);
       if ((ch < 0x20 || ch > 0x7e) && ch != '\t' && ch != '\n' && ch != '\r' && ch != '\f') {
         String s = "0000" + Integer.toString(ch, 16);
-        retval += "\\u" + s.substring(s.length() - 4, s.length());
+        r += "\\u" + s.substring(s.length() - 4, s.length());
       }
       else {
-        retval += ch;
+        r += ch;
       }
     }
-    return retval;
+    return r;
   }
 
   public String toString() {
     return ToyTreeConstants.jjtNodeName[id];
-  }
-
-  public String toString(String prefix) {
-    return prefix + toString();
-  }
-
-  public void dump(String prefix) {
-    System.out.println(toString(prefix));
-    if (children != null) {
-      for (Node child : children) {
-        SimpleNode n = (SimpleNode) child;
-        if (n != null) {
-          n.dump(prefix + " ");
-        }
-      }
-    }
   }
 }
 

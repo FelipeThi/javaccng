@@ -37,21 +37,19 @@ public class AddAcceptVisitor extends UnparseVisitor {
 
   @Override
   public Object visit(ASTClassBodyDeclaration node, Object data) {
-    /* Are we the first child of our parent? */
+    // Are we the first child of our parent?
     if (node == node.jjtGetParent().jjtGetChild(0)) {
-
-      /** Attempt to make the new code match the indentation of the
-       node. */
-      StringBuffer pre = new StringBuffer("");
+      // Attempt to make the new code match the indentation of the node.
+      StringBuilder s = new StringBuilder();
       for (int i = 1; i < node.getFirstToken().getBeginColumn(); ++i) {
-        pre.append(' ');
+        s.append(' ');
       }
 
-      out.println(pre + "");
-      out.println(pre + "/** Accept the visitor. **/");
-      out.println(pre + "public Object jjtAccept(JavaParserVisitor visitor, Object data) {");
-      out.println(pre + "  return visitor.visit(this, data);");
-      out.println(pre + "}");
+      out.println(s + "");
+      out.println(s + "/** Accept the visitor. **/");
+      out.println(s + "public Object jjtAccept(JavaParserVisitor visitor, Object data) {");
+      out.println(s + "  return visitor.visit(this, data);");
+      out.println(s + "}");
     }
     return super.visit(node, data);
   }

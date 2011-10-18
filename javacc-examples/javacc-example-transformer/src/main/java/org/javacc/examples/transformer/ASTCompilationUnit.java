@@ -40,9 +40,8 @@ public class ASTCompilationUnit extends SimpleNode {
   @Override
   public void process(PrintWriter out) {
     Token t = begin;
-    ASTSpecialBlock block;
     for (int i = 0; i < jjtGetChildCount(); i++) {
-      block = (ASTSpecialBlock) jjtGetChild(i);
+      ASTSpecialBlock block = (ASTSpecialBlock) jjtGetChild(i);
       do {
         print(t, out);
         t = t.next;

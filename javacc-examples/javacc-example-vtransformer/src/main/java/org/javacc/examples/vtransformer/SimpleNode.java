@@ -50,6 +50,7 @@ public class SimpleNode implements Node {
     return new SimpleNode(p, id);
   }
 
+  @Override
   public void jjtOpen() {
     try {
       first = parser.getToken(1);
@@ -59,6 +60,7 @@ public class SimpleNode implements Node {
     }
   }
 
+  @Override
   public void jjtClose() {
     try {
       last = parser.getToken(0);
@@ -72,10 +74,13 @@ public class SimpleNode implements Node {
 
   public Token getLastToken() { return last; }
 
+  @Override
   public void jjtSetParent(Node n) { parent = n; }
 
+  @Override
   public Node jjtGetParent() { return parent; }
 
+  @Override
   public void jjtSetChild(Node n, int i) {
     if (children == null) {
       children = new Node[i + 1];
@@ -88,14 +93,17 @@ public class SimpleNode implements Node {
     children[i] = n;
   }
 
+  @Override
   public Node jjtGetChild(int i) {
     return children[i];
   }
 
+  @Override
   public int jjtGetChildCount() {
     return children == null ? 0 : children.length;
   }
 
+  @Override
   public Object jjtAccept(JavaVisitor visitor, Object data) {
     return visitor.visit(this, data);
   }
