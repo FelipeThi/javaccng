@@ -65,50 +65,53 @@ final class ConstantsFile implements FileGenerator, JavaCCConstants {
   private void generate(LexGen lexGen, IndentingPrintWriter out)
       throws IOException {
     TokenPrinter.packageDeclaration(state.cuToInsertionPoint1, out);
-
     out.println();
     out.println("/** Token literal values and constants. */");
-    out.print("public interface " + state.constantsClass() + " {");
-    out.println();
-
-    out.println("  /** End of File. */");
-    out.println("  int EOF = 0;");
+    out.println("public interface " + state.constantsClass() + " {");
+    out.indent();
+    out.println("/** End of File. */");
+    out.println("int EOF = 0;");
     for (RegularExpression re : state.orderedNamedTokens) {
-      out.println("  /** RegularExpression Id. */");
-      out.println("  int " + re.label + " = " + re.ordinal + ";");
+      out.println("/** The '" + re.label + "' token id. */");
+      out.println("int " + re.label + " = " + re.ordinal + ";");
     }
-    out.println();
     if (!Options.getUserScanner() && Options.getBuildScanner()) {
       for (int i = 0; i < lexGen.lexStateName.length; i++) {
-        out.println("  /** Lexical state. */");
-        out.println("  int " + lexGen.lexStateName[i] + " = " + i + ";");
+        out.println("/** Lexical state. */");
+        out.println("int " + lexGen.lexStateName[i] + " = " + i + ";");
       }
-      out.println();
     }
-    out.println("  /** Literal token values. */");
-    out.println("  String[] tokenImage = {");
-    out.println("    \"<EOF>\",");
-
+    out.println("/** Literal token values. */");
+    out.println("String[] tokenImage = {");
+    out.indent();
+    out.println("\"<EOF>\",");
     for (TokenProduction tp : state.regExpList) {
       List<RegExpSpec> reSpecs = tp.reSpecs;
       for (RegExpSpec reSpec : reSpecs) {
         RegularExpression re = reSpec.regExp;
         if (re instanceof RStringLiteral) {
-          out.println("    \"\\\"" + Parsers.escape(Parsers.escape(((RStringLiteral) re).image)) + "\\\"\",");
+          out.print("\"\\\"");
+          out.print(Parsers.escape(Parsers.escape(((RStringLiteral) re).image)));
+          out.print("\\\"\",");
+          if (re.label != null && !re.label.isEmpty()) {
+            out.print(" // Literal image of token '" + re.label + "'");
+          }
+          out.println();
         }
         else if (!"".equals(re.label)) {
-          out.println("    \"<" + re.label + ">\",");
+          out.println("\"<" + re.label + ">\",");
         }
         else {
           if (re.tpContext.kind == TokenProduction.TOKEN) {
             JavaCCErrors.warning(re, "Consider giving this non-string token a label for better error reporting.");
           }
-          out.println("    \"<token of kind " + re.ordinal + ">\",");
+          out.println("\"<token of kind " + re.ordinal + ">\",");
         }
       }
     }
-    out.println("  };");
-    out.println();
+    out.unindent();
+    out.println("};");
+    out.unindent();
     out.println("}");
   }
 }
