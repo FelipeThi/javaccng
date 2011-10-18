@@ -33,7 +33,7 @@ PARSER_BEGIN(Eg1)
 public class Eg1 {
 
   /** Main entry point. */
-  public static void main(String args[]) {
+  public static void main(String[] args) {
     System.out.println("Reading from standard input...");
     Eg1 t = new Eg1(System.in);
     try {

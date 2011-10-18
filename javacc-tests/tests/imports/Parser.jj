@@ -36,7 +36,7 @@ import java.util.HashMap;
 
 public class Parser {
 
-  public static void main(String args[]) throws Exception {
+  public static void main(String[] args) throws Exception {
     java.io.Reader reader = new java.io.StringReader(args[0]);
     CharStream charStream = new SimpleCharStream(reader);
     TokenManager tokenManager = new ParserTokenManager(charStream);

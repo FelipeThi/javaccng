@@ -30,7 +30,7 @@ PARSER_BEGIN(IdList)
 package org.javacc.examples.idlist;
 
 public class IdList {
-  public static void main(String args[]) throws ParseException, java.io.IOException {
+  public static void main(String[] args) throws ParseException, java.io.IOException {
     IdList parser = new IdList(
         new IdListScanner(
             new SimpleCharStream(

@@ -31,7 +31,7 @@ PARSER_BEGIN(Simple2)
 package org.javacc.examples.simple2;
 
 public class Simple2 {
-  public static void main(String args[]) throws ParseException, java.io.IOException {
+  public static void main(String[] args) throws ParseException, java.io.IOException {
     Simple2 parser = new Simple2(
         new Simple2Scanner(
             new SimpleCharStream(

@@ -32,7 +32,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class Main {
-  public static void main(String args[]) throws IOException, ParseException {
+  public static void main(String[] args) throws IOException, ParseException {
     System.err.println("Reading from standard input...");
     JavaParser parser = new JavaParser(
         new JavaScanner(

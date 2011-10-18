@@ -30,7 +30,7 @@ PARSER_BEGIN(IDLParser)
 package org.javacc.examples.idl;
 
 public class IDLParser {
- public static void main(String args[]) throws java.io.IOException, ParseException {
+ public static void main(String[] args) throws java.io.IOException, ParseException {
     IDLParser parser;
     if (args.length == 0) {
       System.out.println("IDL Parser Version 0.1:  Reading from standard input . . .");

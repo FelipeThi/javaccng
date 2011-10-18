@@ -33,7 +33,7 @@ package org.javacc.examples.lookahead;
 
 public class Example2 {
 
-  public static void main(String args[]) throws ParseException, java.io.IOException {
+  public static void main(String[] args) throws ParseException, java.io.IOException {
     Example2 parser = new Example2(System.in);
     parser.basic_expr();
   }

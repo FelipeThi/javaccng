@@ -41,7 +41,7 @@ import java.io.*;
 
 public class ToyParser {
 
-  public static void main(String args[]) throws Exception {
+  public static void main(String[] args) throws Exception {
     ToyParser parser;
     ASTCompilationUnit node;
     if (args.length == 2) {

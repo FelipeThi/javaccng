@@ -31,7 +31,7 @@ PARSER_BEGIN(Simple3)
 package org.javacc.examples.simple3;
 
 public class Simple3 {
-  public static void main(String args[]) throws ParseException, java.io.IOException {
+  public static void main(String[] args) throws ParseException, java.io.IOException {
     Simple3 parser = new Simple3(
         new Simple3Scanner(
             new SimpleCharStream(
