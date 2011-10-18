@@ -86,7 +86,7 @@ TOKEN : /* IDENTIFIERS */
 }
 
 /** Main production. */
-ASTStart Start() : {}
+public ASTStart Start() : {}
 {
   Expression() ";"
   { return jjtThis; }

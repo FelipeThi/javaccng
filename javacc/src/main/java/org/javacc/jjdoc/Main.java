@@ -119,7 +119,7 @@ public final class Main {
 
       parser.setState(state);
 
-      parser.javacc_input();
+      parser.start();
 
       JJDoc doc = new JJDoc(state);
       doc.start();

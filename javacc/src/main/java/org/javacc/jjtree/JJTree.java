@@ -103,7 +103,7 @@ public final class JJTree {
       JJTreeParser parser = new JJTreeParser(
           new JJTreeScanner(
               new JavaCharStream(io.getIn())));
-      parser.javacc_input();
+      parser.start();
 
       ASTGrammar root = (ASTGrammar) parser.jjTree.rootNode();
 

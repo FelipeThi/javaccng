@@ -48,7 +48,7 @@ PARSER_END
  * in Globals.java.
  */
 
-void input(boolean noChangeIds, String fileName) :
+public void input(boolean noChangeIds, String fileName) :
 	{
 	  Token t;
 	  Object obj;

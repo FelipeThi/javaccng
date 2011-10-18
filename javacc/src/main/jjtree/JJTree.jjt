@@ -340,7 +340,7 @@ TOKEN :
  * THE JAVACC GRAMMAR SPECIFICATION STARTS HERE *
  ************************************************/
 
-void javacc_input() #Grammar :
+public void start() #Grammar :
 	{
 	  Token t;
 	}

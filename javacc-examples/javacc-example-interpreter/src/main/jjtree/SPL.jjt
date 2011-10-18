@@ -106,7 +106,7 @@ MORE :
  */
 
 /** Compilation unit. */
-void CompilationUnit() :
+public void CompilationUnit() :
 {
    String name;
 }

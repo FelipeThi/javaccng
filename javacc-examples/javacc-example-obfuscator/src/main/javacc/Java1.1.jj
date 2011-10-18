@@ -318,7 +318,7 @@ TOKEN :
  * Program structuring syntax follows.
  */
 
-Token CompilationUnit(String file) :
+public Token CompilationUnit(String file) :
 	{
 	  Token retval = getToken(1);
 	  fileName = file;

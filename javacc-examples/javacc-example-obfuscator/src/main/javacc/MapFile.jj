@@ -48,7 +48,7 @@ PARSER_END
  * appropriate Hashtable's in Globals.java.
  */
 
-void input() :
+public void input() :
 	{
 	  Token t1, t2;
 	}

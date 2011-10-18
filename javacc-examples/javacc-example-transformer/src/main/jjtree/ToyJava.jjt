@@ -308,7 +308,7 @@ TOKEN : /* OPERATORS */
  * Program structuring syntax follows.
  */
 
-ASTCompilationUnit CompilationUnit() #CompilationUnit :
+public ASTCompilationUnit CompilationUnit() #CompilationUnit :
 {}
 {
 		{

@@ -231,56 +231,7 @@ public final class ParseEngine {
   void build(IndentingPrintWriter out) throws IOException {
     for (NormalProduction production : state.bnfProductions) {
       if (production instanceof JavaCodeProduction) {
-        JavaCodeProduction jp = (JavaCodeProduction) production;
-        Token t = jp.getReturnTypeTokens().get(0);
-        TokenPrinter.printTokenSetup(t);
-        TokenPrinter.cCol = 1;
-        TokenPrinter.printLeadingComments(t, out);
-        out.print("  " + (production.getAccessModifier() != null ? production.getAccessModifier() + " " : ""));
-        TokenPrinter.cLine = t.getBeginLine();
-        TokenPrinter.cCol = t.getBeginColumn();
-        TokenPrinter.printTokenOnly(t, out);
-        for (int i = 1; i < jp.getReturnTypeTokens().size(); i++) {
-          t = jp.getReturnTypeTokens().get(i);
-          TokenPrinter.printToken(t, out);
-        }
-        TokenPrinter.printTrailingComments(t);
-        out.print(" " + jp.getLhs() + "(");
-        if (jp.getParameterListTokens().size() != 0) {
-          TokenPrinter.printTokenSetup(jp.getParameterListTokens().get(0));
-          for (Token token : jp.getParameterListTokens()) {
-            t = token;
-            TokenPrinter.printToken(t, out);
-          }
-          TokenPrinter.printTrailingComments(t);
-        }
-        out.print(") throws java.io.IOException, ParseException");
-        for (List<Token> tokens : jp.getThrowsList()) {
-          out.print(", ");
-          for (Token token : tokens) {
-            t = token;
-            out.print(t.getImage());
-          }
-        }
-        out.print(" {");
-        if (Options.getDebugParser()) {
-          out.println();
-          out.println("    trace_call(\"" + jp.getLhs() + "\");");
-          out.print("    try {");
-        }
-        if (jp.getCodeTokens().size() != 0) {
-          TokenPrinter.printTokenSetup(jp.getCodeTokens().get(0));
-          TokenPrinter.cLine--;
-          TokenPrinter.printTokenList(jp.getCodeTokens(), out);
-        }
-        out.println();
-        if (Options.getDebugParser()) {
-          out.println("    } finally {");
-          out.println("      trace_return(\"" + jp.getLhs() + "\");");
-          out.println("    }");
-        }
-        out.println("  }");
-        out.println();
+        buildJavaCodeProduction(production, out);
       }
       else {
         buildPhase1Routine((BNFProduction) production, out);
@@ -302,6 +253,60 @@ public final class ParseEngine {
     for (Phase3Data phase3Data : phase3table.values()) {
       buildPhase3Routine(phase3Data, false, out);
     }
+  }
+
+  private void buildJavaCodeProduction(NormalProduction production, IndentingPrintWriter out)
+      throws IOException {
+    JavaCodeProduction jp = (JavaCodeProduction) production;
+    Token t = jp.getReturnTypeTokens().get(0);
+    TokenPrinter.printTokenSetup(t);
+    TokenPrinter.cCol = 1;
+    TokenPrinter.printLeadingComments(t, out);
+    out.print("  " + (production.getAccessModifier() != null ? production.getAccessModifier() + " " : ""));
+    TokenPrinter.cLine = t.getBeginLine();
+    TokenPrinter.cCol = t.getBeginColumn();
+    TokenPrinter.printTokenOnly(t, out);
+    for (int i = 1; i < jp.getReturnTypeTokens().size(); i++) {
+      t = jp.getReturnTypeTokens().get(i);
+      TokenPrinter.printToken(t, out);
+    }
+    TokenPrinter.printTrailingComments(t);
+    out.print(" " + jp.getLhs() + "(");
+    if (jp.getParameterListTokens().size() != 0) {
+      TokenPrinter.printTokenSetup(jp.getParameterListTokens().get(0));
+      for (Token token : jp.getParameterListTokens()) {
+        t = token;
+        TokenPrinter.printToken(t, out);
+      }
+      TokenPrinter.printTrailingComments(t);
+    }
+    out.print(") throws java.io.IOException, ParseException");
+    for (List<Token> tokens : jp.getThrowsList()) {
+      out.print(", ");
+      for (Token token : tokens) {
+        t = token;
+        out.print(t.getImage());
+      }
+    }
+    out.print(" {");
+    if (Options.getDebugParser()) {
+      out.println();
+      out.println("    trace_call(\"" + jp.getLhs() + "\");");
+      out.print("    try {");
+    }
+    if (jp.getCodeTokens().size() != 0) {
+      TokenPrinter.printTokenSetup(jp.getCodeTokens().get(0));
+      TokenPrinter.cLine--;
+      TokenPrinter.printTokenList(jp.getCodeTokens(), out);
+    }
+    out.println();
+    if (Options.getDebugParser()) {
+      out.println("    } finally {");
+      out.println("      trace_return(\"" + jp.getLhs() + "\");");
+      out.println("    }");
+    }
+    out.println("  }");
+    out.println();
   }
 
   private void dumpLookaheads(Lookahead[] conds, String[] actions) {
@@ -579,16 +584,12 @@ public final class ParseEngine {
   }
 
   void buildPhase1Routine(BNFProduction p, IndentingPrintWriter out) throws IOException {
-    Token t;
-    t = p.getReturnTypeTokens().get(0);
-    boolean voidReturn = false;
-    if (t.getKind() == JavaCCConstants.VOID) {
-      voidReturn = true;
-    }
+    Token t = p.getReturnTypeTokens().get(0);
+    boolean voidReturn = t.getKind() == JavaCCConstants.VOID;
     TokenPrinter.printTokenSetup(t);
     TokenPrinter.cCol = 1;
     TokenPrinter.printLeadingComments(t, out);
-    out.print("  final " + (p.getAccessModifier() != null ? p.getAccessModifier() : "public") + " ");
+    out.print("  " + (p.getAccessModifier() != null ? p.getAccessModifier() : "private") + " final ");
     TokenPrinter.cLine = t.getBeginLine();
     TokenPrinter.cCol = t.getBeginColumn();
     TokenPrinter.printTokenOnly(t, out);

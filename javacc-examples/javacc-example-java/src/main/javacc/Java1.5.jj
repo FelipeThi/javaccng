@@ -1037,7 +1037,7 @@ TOKEN :
  * Program structuring syntax follows.
  */
 
-void CompilationUnit():
+public void CompilationUnit():
 {}
 {
   [ LOOKAHEAD( ( Annotation() )* "package" ) PackageDeclaration() ]

@@ -311,16 +311,16 @@ TOKEN :
  * Program structuring syntax follows.
  */
 
-ASTCompilationUnit CompilationUnit() :
+public ASTCompilationUnit CompilationUnit() :
 {}
 {
   [ PackageDeclaration() ]
   ( ImportDeclaration() )*
   ( TypeDeclaration() )*
   <EOF>
-                {
-		  return jjtThis;
-		}
+  {
+    return jjtThis;
+  }
 }
 
 void PackageDeclaration() :
