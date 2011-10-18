@@ -111,6 +111,10 @@ public final class OutputFile implements Closeable {
   }
 
   private class ByteArrayOutputStream extends java.io.ByteArrayOutputStream {
+    ByteArrayOutputStream() {
+      super(16384);
+    }
+
     void commit(File path) throws IOException {
       File tmpPath = new File(path.getCanonicalPath() + ".tmp");
       try {
@@ -152,7 +156,7 @@ public final class OutputFile implements Closeable {
   }
 
   private class AutoClosePrintWriter extends IndentingPrintWriter {
-    public AutoClosePrintWriter(OutputStream os) {
+    private AutoClosePrintWriter(OutputStream os) {
       super(new OutputStreamWriter(os));
     }
 
