@@ -242,7 +242,11 @@ final class ParseGen implements FileGenerator, JavaCCConstants {
     out.println();
     if (parseEngine.jj2index != 0) {
       out.println("  @SuppressWarnings(\"serial\")");
-      out.println("  private static final class LookaheadSuccess extends Error {}");
+      out.println("  private static final class LookaheadSuccess extends Error {");
+      out.println("    public Throwable fillInStackTrace() { return null; }");
+      out.println("    public StackTraceElement[] getStackTrace() { return null; }");
+      out.println("    public void setStackTrace(StackTraceElement[] stackTrace) {}");
+      out.println("  }");
       out.println("  private final LookaheadSuccess jj_ls = new LookaheadSuccess();");
       out.println("  private boolean jj_scan_token(int kind) throws java.io.IOException {");
       out.println("    if (jj_scanPos == jj_lastPos) {");
@@ -276,7 +280,7 @@ final class ParseGen implements FileGenerator, JavaCCConstants {
       out.println();
     }
     out.println();
-    out.println("/** Get the next Token. */");
+    out.println("  /** Get the next Token. */");
     out.println("  final public Token getNextToken() throws java.io.IOException {");
     if (Options.getCacheTokens()) {
       out.println("    if ((token = jj_nt).next != null) jj_nt = jj_nt.next;");
@@ -296,7 +300,7 @@ final class ParseGen implements FileGenerator, JavaCCConstants {
     out.println("    return token;");
     out.println("  }");
     out.println();
-    out.println("/** Get the specific Token. */");
+    out.println("  /** Get the specific Token. */");
     out.println("  final public Token getToken(int index) throws java.io.IOException {");
     if (parseEngine.lookaheadNeeded) {
       out.println("    Token t = jj_lookingAhead ? jj_scanPos : token;");
