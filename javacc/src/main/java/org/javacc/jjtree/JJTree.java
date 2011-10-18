@@ -106,9 +106,11 @@ public final class JJTree {
       parser.javacc_input();
 
       ASTGrammar root = (ASTGrammar) parser.jjtree.rootNode();
+
       if (Boolean.getBoolean("jjtree-dump")) {
         root.dump(" ");
       }
+
       try {
         io.setOutput();
       }
@@ -121,8 +123,8 @@ public final class JJTree {
 
       io.getOut().close();
 
-      NodeFiles.generateTreeConstants_java();
-      NodeFiles.generateVisitor_java();
+      NodeFiles.generateTreeConstantsClass();
+      NodeFiles.generateVisitorClass();
 
       TreeStateFile treeStateFile = new TreeStateFile();
       treeStateFile.start();

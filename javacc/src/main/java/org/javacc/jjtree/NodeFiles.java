@@ -76,13 +76,13 @@ final class NodeFiles implements FileGenerator {
 
     OutputFile outputFile = new OutputFile(path);
     if ("Node".equals(nodeType)) {
-      generateNode_java(outputFile);
+      generateNodeClass(outputFile);
     }
     else if ("SimpleNode".equals(nodeType)) {
-      generateSimpleNode_java(outputFile);
+      generateSimpleNodeClass(outputFile);
     }
     else {
-      generateMultiNode_java(outputFile, nodeType);
+      generateMultiNodeClass(outputFile, nodeType);
     }
   }
 
@@ -102,7 +102,7 @@ final class NodeFiles implements FileGenerator {
     }
   }
 
-  static void generateTreeConstants_java() throws IOException {
+  static void generateTreeConstantsClass() throws IOException {
     File path = new File(JJTreeOptions.getJJTreeOutputDirectory(), JJTreeGlobals.treeConstantsClass() + ".java");
     OutputFile outputFile = new OutputFile(path);
     IndentingPrintWriter out = outputFile.getPrintWriter();
@@ -131,7 +131,7 @@ final class NodeFiles implements FileGenerator {
     out.close();
   }
 
-  static void generateVisitor_java() throws IOException {
+  static void generateVisitorClass() throws IOException {
     if (!JJTreeOptions.getVisitor()) {
       return;
     }
@@ -180,7 +180,7 @@ final class NodeFiles implements FileGenerator {
     return ve;
   }
 
-  private static void generateNode_java(OutputFile outputFile) throws IOException {
+  private static void generateNodeClass(OutputFile outputFile) throws IOException {
     IndentingPrintWriter out = outputFile.getPrintWriter();
     try {
       Map<String, Object> options = new HashMap<String, Object>(Options.getOptions());
@@ -196,7 +196,7 @@ final class NodeFiles implements FileGenerator {
     }
   }
 
-  private static void generateSimpleNode_java(OutputFile outputFile) throws IOException {
+  private static void generateSimpleNodeClass(OutputFile outputFile) throws IOException {
     IndentingPrintWriter out = outputFile.getPrintWriter();
     try {
       Map<String, Object> options = new HashMap<String, Object>(Options.getOptions());
@@ -214,7 +214,7 @@ final class NodeFiles implements FileGenerator {
     }
   }
 
-  private static void generateMultiNode_java(OutputFile outputFile, String nodeType)
+  private static void generateMultiNodeClass(OutputFile outputFile, String nodeType)
       throws IOException {
     IndentingPrintWriter out = outputFile.getPrintWriter();
     try {

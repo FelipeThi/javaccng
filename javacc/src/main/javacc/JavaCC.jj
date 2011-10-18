@@ -453,7 +453,7 @@ void option_binding() :
 	  Token t = getToken(1);
 	}
 {
-  ( <IDENTIFIER> | "LOOKAHEAD" | "IGNORE_CASE" | "static" )
+  ( <IDENTIFIER> | "LOOKAHEAD" | "IGNORE_CASE" )
 	{
 	  option_name = t.getImage();
 	}
@@ -499,10 +499,10 @@ void production() :
   LOOKAHEAD(1)
   /*
    * Since SCANNER_DECLS is both a JavaCC reserved word and a Java identifier,
-   * we need to give preference to "token_manager_decls" over
+   * we need to give preference to "scanner_decls" over
    * "bnf_production".
    */
-  token_manager_decls()
+  scanner_decls()
 |
   bnf_production()
 }
@@ -674,7 +674,7 @@ void regular_expr_production() :
 	}
 }
 
-void token_manager_decls() :
+void scanner_decls() :
 	{
 	  List decls = new ArrayList();
 	  Token t;

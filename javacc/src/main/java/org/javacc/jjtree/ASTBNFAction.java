@@ -33,22 +33,6 @@ public class ASTBNFAction extends JJTreeNode {
     super(id);
   }
 
-  private Node getScopingParent(NodeScope ns) {
-    for (Node n = jjtGetParent(); n != null; n = n.jjtGetParent()) {
-      if (n instanceof ASTBNFNodeScope) {
-        if (((ASTBNFNodeScope) n).nodeScope == ns) {
-          return n;
-        }
-      }
-      else if (n instanceof ASTExpansionNodeScope) {
-        if (((ASTExpansionNodeScope) n).nodeScope == ns) {
-          return n;
-        }
-      }
-    }
-    return null;
-  }
-
   @Override
   public void print(IO io) {
     /* Assume that this action requires an early node close, and then
@@ -91,6 +75,22 @@ public class ASTBNFAction extends JJTreeNode {
       }
     }
     super.print(io);
+  }
+
+  private Node getScopingParent(NodeScope ns) {
+    for (Node n = jjtGetParent(); n != null; n = n.jjtGetParent()) {
+      if (n instanceof ASTBNFNodeScope) {
+        if (((ASTBNFNodeScope) n).nodeScope == ns) {
+          return n;
+        }
+      }
+      else if (n instanceof ASTExpansionNodeScope) {
+        if (((ASTExpansionNodeScope) n).nodeScope == ns) {
+          return n;
+        }
+      }
+    }
+    return null;
   }
 }
 

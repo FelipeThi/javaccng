@@ -29,7 +29,7 @@
 package org.javacc.jjtree;
 
 public class JJTreeNode extends SimpleNode {
-  private int myOrdinal;
+  private int ordinal;
 
   public JJTreeNode(int id) {
     super(id);
@@ -50,22 +50,18 @@ public class JJTreeNode extends SimpleNode {
   }
 
   public int getOrdinal() {
-    return myOrdinal;
+    return ordinal;
   }
 
   public void setOrdinal(int o) {
-    myOrdinal = o;
+    ordinal = o;
   }
 
   /**
-   * **************************************************************
-   *
    * The following is added manually to enhance all tree nodes with
    * attributes that store the first and last tokens corresponding to
    * each node, as well as to print the tokens back to the specified
    * output stream.
-   *
-   * ***************************************************************
    */
   private Token first, last;
 
@@ -77,35 +73,37 @@ public class JJTreeNode extends SimpleNode {
 
   public void setLastToken(Token t) { last = t; }
 
-  /* This method prints the tokens corresponding to this node
-     recursively calling the print methods of its children.
-     Overriding this print method in appropriate nodes gives the
-     output the added stuff not in the input.  */
-
+  /**
+   * This method prints the tokens corresponding to this node
+   * recursively calling the print methods of its children.
+   * Overriding this print method in appropriate nodes gives the
+   * output the added stuff not in the input.
+   */
   public void print(IO io) {
     /* Some productions do not consume any tokens.  In that case their
        first and last tokens are a bit strange. */
-    if (getLastToken().next == getFirstToken()) {
+    if (!TokenUtils.hasTokens(this)) {
       return;
     }
 
-    Token t1 = getFirstToken();
     Token t = new Token();
-    t.next = t1;
-    JJTreeNode n;
-    for (int ord = 0; ord < jjtGetNumChildren(); ord++) {
-      n = (JJTreeNode) jjtGetChild(ord);
+    t.next = getFirstToken();
+    JJTreeNode node;
+    for (int n = 0; n < jjtGetNumChildren(); n++) {
+      node = (JJTreeNode) jjtGetChild(n);
       while (true) {
         t = t.next;
-        if (t == n.getFirstToken()) { break; }
-        print(t, io);
+        if (t == node.getFirstToken()) {
+          break;
+        }
+        print(io, t);
       }
-      n.print(io);
-      t = n.getLastToken();
+      node.print(io);
+      t = node.getLastToken();
     }
     while (t != getLastToken()) {
       t = t.next;
-      print(t, io);
+      print(io, t);
     }
   }
 
@@ -129,17 +127,21 @@ public class JJTreeNode extends SimpleNode {
     return sb.toString();
   }
 
-  /* Indicates whether the token should be replaced by white space or
-replaced with the actual node variable. */
-  private boolean whitingOut = false;
+  /**
+   * Indicates whether the token should be replaced by white space or
+   * replaced with the actual node variable.
+   */
+  private boolean whitingOut;
 
-  protected void print(Token t, IO io) {
-    Token tt = t.specialToken;
-    if (tt != null) {
-      while (tt.specialToken != null) { tt = tt.specialToken; }
-      while (tt != null) {
-        io.print(TokenUtils.addUnicodeEscapes(translateImage(tt)));
-        tt = tt.next;
+  protected void print(IO io, Token t) {
+    Token st = t.specialToken;
+    if (st != null) {
+      while (st.specialToken != null) {
+        st = st.specialToken;
+      }
+      while (st != null) {
+        io.print(TokenUtils.escape(translateImage(st)));
+        st = st.next;
       }
     }
 
@@ -156,7 +158,7 @@ replaced with the actual node variable. */
     if (s == null) {
       /* Not within a node scope so we don't need to modify the
          source. */
-      io.print(TokenUtils.addUnicodeEscapes(translateImage(t)));
+      io.print(TokenUtils.escape(translateImage(t)));
       return;
     }
 
@@ -195,7 +197,7 @@ replaced with the actual node variable. */
       return;
     }
 
-    io.print(TokenUtils.addUnicodeEscapes(translateImage(t)));
+    io.print(TokenUtils.escape(translateImage(t)));
   }
 
   static void openJJTreeComment(IO io, String arg) {

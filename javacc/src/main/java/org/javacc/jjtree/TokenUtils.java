@@ -34,27 +34,33 @@ import org.javacc.parser.JavaCCErrors;
 public final class TokenUtils {
   private TokenUtils() {}
 
+  static boolean hasTokens(JJTreeNode n) {
+    return n.getLastToken().next != n.getFirstToken();
+  }
+
   static void print(Token t, IO io, String in, String out) {
-    Token tt = t.specialToken;
-    if (tt != null) {
-      while (tt.specialToken != null) { tt = tt.specialToken; }
-      while (tt != null) {
-        io.print(addUnicodeEscapes(tt.getImage()));
-        tt = tt.next;
+    Token st = t.specialToken;
+    if (st != null) {
+      while (st.specialToken != null) {
+        st = st.specialToken;
+      }
+      while (st != null) {
+        io.print(escape(st.getImage()));
+        st = st.next;
       }
     }
-    String i = t.getImage();
-    if (in != null && i.equals(in)) {
-      i = out;
+    String image = t.getImage();
+    if (in != null && image.equals(in)) {
+      image = out;
     }
-    io.print(addUnicodeEscapes(i));
+    io.print(escape(image));
   }
 
   static void print(Token t, IO io) {
     print(t, io, null, null);
   }
 
-  static String addUnicodeEscapes(String str) {
+  static String escape(String str) {
     StringBuilder buff = new StringBuilder(str.length());
     char ch;
     for (int i = 0; i < str.length(); i++) {
@@ -70,16 +76,7 @@ public final class TokenUtils {
     return buff.toString();
   }
 
-  static boolean hasTokens(JJTreeNode n) {
-    if (n.getLastToken().next == n.getFirstToken()) {
-      return false;
-    }
-    else {
-      return true;
-    }
-  }
-
-  static String remove_escapes_and_quotes(Token t, String str) {
+  static String unescape(Token t, String str) {
     String retval = "";
     int index = 1;
     char ch, ch1;

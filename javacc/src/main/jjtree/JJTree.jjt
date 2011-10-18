@@ -383,24 +383,23 @@ void option_binding() #OptionBinding :
 	  Token o, v;
 	}
 {
-  ( o=<IDENTIFIER> | o="LOOKAHEAD" | o="IGNORE_CASE" | o="static" )
+  ( o=<IDENTIFIER> | o="LOOKAHEAD" | o="IGNORE_CASE" )
   "="
   (
      v=IntegerLiteral()
-        {
+    {
 	  JJTreeOptions.setInputFileOption(o, v, o.getImage(), new Integer(v.getImage()));
 	  jjtThis.initialize(o.getImage(), v.getImage());
 	}
    | v=BooleanLiteral()
-        {
-	  JJTreeOptions.setInputFileOption(o, v, o.getImage(),
-				     Boolean.valueOf(v.getImage()));
+    {
+	  JJTreeOptions.setInputFileOption(o, v, o.getImage(), Boolean.valueOf(v.getImage()));
 	  jjtThis.initialize(o.getImage(), v.getImage());
 	}
    | v=StringLiteral()
-        {
-	  String vs = TokenUtils.remove_escapes_and_quotes(v, v.getImage());
-	  JJTreeOptions.setInputFileOption(o, v, o.getImage(), (Object)vs);
+    {
+	  String vs = TokenUtils.unescape(v, v.getImage());
+	  JJTreeOptions.setInputFileOption(o, v, o.getImage(), (Object) vs);
 	  jjtThis.initialize(o.getImage(), vs);
 	}
   ) ";"
@@ -429,10 +428,10 @@ void production() :
   LOOKAHEAD(1)
   /*
    * Since SCANNER_DECLS is both a JavaCC reserved word and a Java identifier,
-   * we need to give preference to "token_manager_decls" over
+   * we need to give preference to "scanner_decls" over
    * "bnf_production".
    */
-  token_manager_decls()
+  scanner_decls()
 |
   bnf_production()
 }
@@ -465,18 +464,18 @@ void javacode_production() #Javacode :
 
     // This is really a Block()
     t2="{"
-        {
+    {
 	  prod.name = t1.getImage();
 	  prod.stmBeginLoc = t2;
 	}
     (
       ( BlockStatement() )*
-        {
+    {
 	  jjtThis.nodeScope = new NodeScope(prod, nd);
 	}
     ) #JavacodeBody
     "}"
-        {
+    {
 	  JJTreeGlobals.productions.put(prod.name, prod);
 	}
 }
@@ -491,17 +490,17 @@ void bnf_production() #BNF :
 	  String n;
 	}
 {
-        {
+    {
 	  prod = jjtThis;
 	}
   AccessModifier() ResultType() t1=identifier() FormalParameters()
   [
     "throws" n=Name()
-        {
+    {
 	  prod.throwsList.add(n);
 	}
     ( "," n=Name()
-        {
+    {
 	  prod.throwsList.add(n);
 	}
     )*
@@ -511,14 +510,14 @@ void bnf_production() #BNF :
 
   // This is really a Block()
   t2="{"
-        {
+    {
 	  prod.name = t1.getImage();
 	  prod.declBeginLoc = t2;
 	  ns = new NodeScope(prod, nd);
 	}
   (
     ( BlockStatement() )*
-        {
+    {
 	  jjtThis.nodeScope = ns;
 	}
   ) #BNFDeclaration
@@ -527,13 +526,13 @@ void bnf_production() #BNF :
   "{"
   (
     eu=expansion_choices(prod)
-        {
+    {
 	  jjtThis.nodeScope = ns;
 	  jjtThis.expansionUnit = eu;
 	}
   ) #BNFNodeScope
  "}"
-        {
+    {
 	  JJTreeGlobals.productions.put(prod.name, prod);
 	}
 }
@@ -557,7 +556,7 @@ void regular_expr_production() #RE :
   "{" regexpr_spec() ( "|" regexpr_spec() )* "}"
 }
 
-void token_manager_decls() #TokenDecls :
+void scanner_decls() #TokenDecls :
 	{
 	}
 {
@@ -589,7 +588,7 @@ JJTreeNode expansion_choices(ASTProduction p) #BNFChoice(>1) :
 {
   expansion(p) ( "|" expansion(p) )*
     {
-	  return (JJTreeNode)jjtree.peekNode();
+	  return (JJTreeNode) jjtree.peekNode();
 	}
 }
 
@@ -714,11 +713,11 @@ JJTreeNode expansion_unit(ASTProduction p) :
       #BNFParenthesized(1)
   )
 	{
-	  ((JJTreeNode)jjtree.peekNode()).setFirstToken(t);
+	  ((JJTreeNode) jjtree.peekNode()).setFirstToken(t);
 	}
 )
-        {
-	  return (JJTreeNode)jjtree.peekNode();
+    {
+	  return (JJTreeNode) jjtree.peekNode();
 	}
 }
 
@@ -783,7 +782,7 @@ void complex_regular_expression_unit() :
       #REParenthesized(1)
   )
 	{
-	  ((JJTreeNode)jjtree.peekNode()).setFirstToken(t);
+	  ((JJTreeNode) jjtree.peekNode()).setFirstToken(t);
 	}
 }
 
@@ -810,7 +809,6 @@ Token identifier() :
       }
 }
 
-
 /**********************************************
  * THE JJTREE PRODUCTIONS START HERE          *
  **********************************************/
@@ -857,23 +855,23 @@ ASTNodeDescriptor node_descriptor() #NodeDescriptor :
 JAVACODE
 void node_descriptor_expression() #NodeDescriptorExpression
 {
-  Token tok;
   int nesting = 1;
+  Token t;
   while (true) {
-    tok = getToken(1);
-    if (tok.getKind() == 0) {
+    t = getToken(1);
+    if (t.getKind() == 0) {
       throw new ParseException("Premature end of file");
     }
-    if (tok.getKind() == LPAREN) {
+    if (t.getKind() == LPAREN) {
       nesting++;
     }
-    if (tok.getKind() == RPAREN) {
+    if (t.getKind() == RPAREN) {
       nesting--;
       if (nesting == 0) {
         break;
       }
     }
-    tok = getNextToken();
+    t = getNextToken();
   }
 }
 

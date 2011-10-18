@@ -51,7 +51,7 @@ public class ASTCompilationUnit extends JJTreeNode {
 
       if (t == JJTreeGlobals.parserImplements) {
         if (t.getImage().equals("implements")) {
-          print(t, io);
+          print(io, t);
           openJJTreeComment(io, null);
           io.getOut().print(" " + JJTreeGlobals.treeConstantsClass() + ", ");
           closeJJTreeComment(io);
@@ -61,11 +61,11 @@ public class ASTCompilationUnit extends JJTreeNode {
           openJJTreeComment(io, null);
           io.getOut().print("implements " + JJTreeGlobals.treeConstantsClass());
           closeJJTreeComment(io);
-          print(t, io);
+          print(io, t);
         }
       }
       else {
-        print(t, io);
+        print(io, t);
       }
 
       if (t == JJTreeGlobals.parserClassBodyStart) {
