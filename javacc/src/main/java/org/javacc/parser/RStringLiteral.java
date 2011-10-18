@@ -42,13 +42,13 @@ public final class RStringLiteral extends RegularExpression {
   }
 
   @Override
-  public Nfa generateNfa(LexGen lexGen, boolean ignoreCase) {
+  public Nfa generateNfa(ScannerGen scannerGen, boolean ignoreCase) {
     if (image.length() == 1) {
       RCharacterList temp = new RCharacterList(image.charAt(0));
-      return temp.generateNfa(lexGen, ignoreCase);
+      return temp.generateNfa(scannerGen, ignoreCase);
     }
 
-    NfaState state = new NfaState(lexGen);
+    NfaState state = new NfaState(scannerGen);
 
     if (image.length() == 0) {
       return new Nfa(state, state);
@@ -58,7 +58,7 @@ public final class RStringLiteral extends RegularExpression {
     NfaState finalState = null;
 
     for (int i = 0; i < image.length(); i++) {
-      finalState = new NfaState(lexGen);
+      finalState = new NfaState(scannerGen);
       state.charMoves = new char[1];
       state.addChar(image.charAt(i));
 
@@ -75,14 +75,14 @@ public final class RStringLiteral extends RegularExpression {
   }
 
   /** Used for top level string literals. */
-  public void generateDfa(LexGen lexGen) {
-    if (lexGen.stringLiterals.maxStrKind <= ordinal) {
-      lexGen.stringLiterals.maxStrKind = ordinal + 1;
+  public void generateDfa(ScannerGen scannerGen) {
+    if (scannerGen.stringLiterals.maxStrKind <= ordinal) {
+      scannerGen.stringLiterals.maxStrKind = ordinal + 1;
     }
 
     int len;
-    if ((len = image.length()) > lexGen.stringLiterals.maxLen) {
-      lexGen.stringLiterals.maxLen = len;
+    if ((len = image.length()) > scannerGen.stringLiterals.maxLen) {
+      scannerGen.stringLiterals.maxLen = len;
     }
 
     for (int i = 0; i < len; i++) {
@@ -95,27 +95,27 @@ public final class RStringLiteral extends RegularExpression {
         s = "" + (c = image.charAt(i));
       }
 
-      if (!lexGen.nfaStates.unicodeWarningGiven && c > 0xff
+      if (!scannerGen.nfaStates.unicodeWarningGiven && c > 0xff
           && !Options.getJavaUnicodeEscape()
           && !Options.getUserCharStream()) {
-        lexGen.nfaStates.unicodeWarningGiven = true;
-        JavaCCErrors.warning(lexGen.curRE, "Non-ASCII characters used in regular expression." +
+        scannerGen.nfaStates.unicodeWarningGiven = true;
+        JavaCCErrors.warning(scannerGen.curRE, "Non-ASCII characters used in regular expression." +
             "Please make sure you use the correct Reader when you create the parser, " +
             "one that can handle your character set.");
       }
 
       Hashtable temp;
-      if (i >= lexGen.stringLiterals.charPosKind.size()) {
+      if (i >= scannerGen.stringLiterals.charPosKind.size()) {
         // Kludge, but OK
-        lexGen.stringLiterals.charPosKind.add(temp = new Hashtable());
+        scannerGen.stringLiterals.charPosKind.add(temp = new Hashtable());
       }
       else {
-        temp = (Hashtable) lexGen.stringLiterals.charPosKind.get(i);
+        temp = (Hashtable) scannerGen.stringLiterals.charPosKind.get(i);
       }
 
       KindInfo info;
       if ((info = (KindInfo) temp.get(s)) == null) {
-        temp.put(s, info = new KindInfo(lexGen.maxOrdinal));
+        temp.put(s, info = new KindInfo(scannerGen.maxOrdinal));
       }
 
       if (i + 1 == len) {
@@ -125,20 +125,20 @@ public final class RStringLiteral extends RegularExpression {
         info.InsertValidKind(ordinal);
       }
 
-      if (!Options.getIgnoreCase() && lexGen.ignoreCase[ordinal]
+      if (!Options.getIgnoreCase() && scannerGen.ignoreCase[ordinal]
           && c != Character.toLowerCase(c)) {
         s = ("" + image.charAt(i)).toLowerCase();
 
-        if (i >= lexGen.stringLiterals.charPosKind.size()) {
+        if (i >= scannerGen.stringLiterals.charPosKind.size()) {
           // Kludge, but OK
-          lexGen.stringLiterals.charPosKind.add(temp = new Hashtable());
+          scannerGen.stringLiterals.charPosKind.add(temp = new Hashtable());
         }
         else {
-          temp = (Hashtable) lexGen.stringLiterals.charPosKind.get(i);
+          temp = (Hashtable) scannerGen.stringLiterals.charPosKind.get(i);
         }
 
         if ((info = (KindInfo) temp.get(s)) == null) {
-          temp.put(s, info = new KindInfo(lexGen.maxOrdinal));
+          temp.put(s, info = new KindInfo(scannerGen.maxOrdinal));
         }
 
         if (i + 1 == len) {
@@ -150,20 +150,20 @@ public final class RStringLiteral extends RegularExpression {
       }
 
       if (!Options.getIgnoreCase()
-          && lexGen.ignoreCase[ordinal]
+          && scannerGen.ignoreCase[ordinal]
           && c != Character.toUpperCase(c)) {
         s = ("" + image.charAt(i)).toUpperCase();
 
-        if (i >= lexGen.stringLiterals.charPosKind.size()) {
+        if (i >= scannerGen.stringLiterals.charPosKind.size()) {
           // Kludge, but OK
-          lexGen.stringLiterals.charPosKind.add(temp = new Hashtable());
+          scannerGen.stringLiterals.charPosKind.add(temp = new Hashtable());
         }
         else {
-          temp = (Hashtable) lexGen.stringLiterals.charPosKind.get(i);
+          temp = (Hashtable) scannerGen.stringLiterals.charPosKind.get(i);
         }
 
         if ((info = (KindInfo) temp.get(s)) == null) {
-          temp.put(s, info = new KindInfo(lexGen.maxOrdinal));
+          temp.put(s, info = new KindInfo(scannerGen.maxOrdinal));
         }
 
         if (i + 1 == len) {
@@ -175,9 +175,9 @@ public final class RStringLiteral extends RegularExpression {
       }
     }
 
-    lexGen.stringLiterals.maxLenForActive[ordinal / 64]
-        = Math.max(lexGen.stringLiterals.maxLenForActive[ordinal / 64], len - 1);
-    lexGen.stringLiterals.allImages[ordinal] = image;
+    scannerGen.stringLiterals.maxLenForActive[ordinal / 64]
+        = Math.max(scannerGen.stringLiterals.maxLenForActive[ordinal / 64], len - 1);
+    scannerGen.stringLiterals.allImages[ordinal] = image;
   }
 
   public String toString() {

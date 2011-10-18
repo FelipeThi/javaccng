@@ -39,7 +39,7 @@ public final class RRepetitionRange extends RegularExpression {
   public boolean hasMax;
 
   @Override
-  public Nfa generateNfa(LexGen lexGen, boolean ignoreCase) {
+  public Nfa generateNfa(ScannerGen scannerGen, boolean ignoreCase) {
     ArrayList<RegularExpression> units = new ArrayList<RegularExpression>();
 
     int i;
@@ -61,6 +61,6 @@ public final class RRepetitionRange extends RegularExpression {
     }
 
     RSequence seq = new RSequence(units);
-    return seq.generateNfa(lexGen, ignoreCase);
+    return seq.generateNfa(scannerGen, ignoreCase);
   }
 }

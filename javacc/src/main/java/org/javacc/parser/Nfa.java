@@ -33,9 +33,9 @@ public final class Nfa {
   final NfaState start;
   final NfaState end;
 
-  public Nfa(LexGen lexGen) {
-    start = new NfaState(lexGen);
-    end = new NfaState(lexGen);
+  public Nfa(ScannerGen scannerGen) {
+    start = new NfaState(scannerGen);
+    end = new NfaState(scannerGen);
   }
 
   public Nfa(NfaState start, NfaState end) {

@@ -44,7 +44,7 @@ public final class RJustName extends RegularExpression {
   }
 
   @Override
-  public Nfa generateNfa(LexGen lexGen, boolean ignoreCase) {
-    return regExp.generateNfa(lexGen, ignoreCase);
+  public Nfa generateNfa(ScannerGen scannerGen, boolean ignoreCase) {
+    return regExp.generateNfa(scannerGen, ignoreCase);
   }
 }

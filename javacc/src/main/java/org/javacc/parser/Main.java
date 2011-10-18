@@ -119,18 +119,18 @@ public final class Main {
       Semanticize semanticize = new Semanticize(state);
       semanticize.start();
 
-      ParseGen parseGen = new ParseGen(state, semanticize);
-      parseGen.start();
+      ParserGen parserGen = new ParserGen(state, semanticize);
+      parserGen.start();
 
-      LexGen lexGen = new LexGen(state);
+      ScannerGen scannerGen = new ScannerGen(state);
       if (Options.getUnicodeInput()) {
-        lexGen.nfaStates.unicodeWarningGiven = true;
+        scannerGen.nfaStates.unicodeWarningGiven = true;
         System.out.println("Note: UNICODE_INPUT option is specified. " +
             "Please make sure you create the parser/lexer using a Reader with the correct character encoding.");
       }
-      lexGen.start();
+      scannerGen.start();
 
-      ConstantsFile constantsFile = new ConstantsFile(state, lexGen);
+      ConstantsFile constantsFile = new ConstantsFile(state, scannerGen);
       constantsFile.start();
 
       JavaFiles javaFiles = new JavaFiles(state);

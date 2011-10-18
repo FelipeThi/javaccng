@@ -515,44 +515,44 @@ public final class Semanticize {
     return false;
   }
 
-  // returns true if "exp" can expand to the empty string, returns false otherwise.
-  public boolean emptyExpansionExists(Expansion exp) {
-    if (exp instanceof NonTerminal) {
-      return ((NonTerminal) exp).getProd().isEmptyPossible();
+  // Returns true if "expansion" can expand to the empty string, returns false otherwise.
+  public boolean emptyExpansionExists(Expansion expansion) {
+    if (expansion instanceof NonTerminal) {
+      return ((NonTerminal) expansion).getProd().isEmptyPossible();
     }
-    else if (exp instanceof Action) {
+    else if (expansion instanceof Action) {
       return true;
     }
-    else if (exp instanceof RegularExpression) {
+    else if (expansion instanceof RegularExpression) {
       return false;
     }
-    else if (exp instanceof OneOrMore) {
-      return emptyExpansionExists(((OneOrMore) exp).expansion);
+    else if (expansion instanceof OneOrMore) {
+      return emptyExpansionExists(((OneOrMore) expansion).expansion);
     }
-    else if (exp instanceof ZeroOrMore || exp instanceof ZeroOrOne) {
+    else if (expansion instanceof ZeroOrMore || expansion instanceof ZeroOrOne) {
       return true;
     }
-    else if (exp instanceof Lookahead) {
+    else if (expansion instanceof Lookahead) {
       return true;
     }
-    else if (exp instanceof Choice) {
-      for (Iterator it = ((Choice) exp).getChoices().iterator(); it.hasNext(); ) {
-        if (emptyExpansionExists((Expansion) it.next())) {
+    else if (expansion instanceof Choice) {
+      for (Expansion unit : ((Choice) expansion).getChoices()) {
+        if (emptyExpansionExists(unit)) {
           return true;
         }
       }
       return false;
     }
-    else if (exp instanceof Sequence) {
-      for (Iterator it = ((Sequence) exp).units.iterator(); it.hasNext(); ) {
-        if (!emptyExpansionExists((Expansion) it.next())) {
+    else if (expansion instanceof Sequence) {
+      for (Expansion unit : ((Sequence) expansion).units) {
+        if (!emptyExpansionExists(unit)) {
           return false;
         }
       }
       return true;
     }
-    else if (exp instanceof TryBlock) {
-      return emptyExpansionExists(((TryBlock) exp).expansion);
+    else if (expansion instanceof TryBlock) {
+      return emptyExpansionExists(((TryBlock) expansion).expansion);
     }
     else {
       return false; // This should be dead code.

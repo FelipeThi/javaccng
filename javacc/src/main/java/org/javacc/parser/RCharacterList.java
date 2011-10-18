@@ -183,7 +183,7 @@ public final class RCharacterList extends RegularExpression {
   }
 
   @Override
-  public Nfa generateNfa(LexGen lexGen, boolean ignoreCase) {
+  public Nfa generateNfa(ScannerGen scannerGen, boolean ignoreCase) {
     if (!transformed) {
       if (Options.getIgnoreCase() || ignoreCase) {
 /*
@@ -236,18 +236,18 @@ public final class RCharacterList extends RegularExpression {
       }
 
       if (negatedList) {
-        removeNegation(lexGen);  // This also sorts the list
+        removeNegation(scannerGen);  // This also sorts the list
       }
       else { sortDescriptors(); }
     }
 
     if (descriptors.size() == 0 && !negatedList) {
       JavaCCErrors.semanticError(this, "Empty character set is not allowed as it will not match any character.");
-      return new Nfa(lexGen);
+      return new Nfa(scannerGen);
     }
 
     transformed = true;
-    Nfa retVal = new Nfa(lexGen);
+    Nfa retVal = new Nfa(scannerGen);
     NfaState startState = retVal.start;
     NfaState finalState = retVal.end;
     int i;
@@ -352,7 +352,7 @@ public final class RCharacterList extends RegularExpression {
     descriptors = newDesc;
   }
 
-  void removeNegation(LexGen lexGen) {
+  void removeNegation(ScannerGen scannerGen) {
     int i;
 
     sortDescriptors();
@@ -410,7 +410,7 @@ public final class RCharacterList extends RegularExpression {
     }
 
     //System.out.println("lastRem : " + (int)lastRemoved);
-    if (lexGen.nfaStates.unicodeWarningGiven || Options.getJavaUnicodeEscape()) {
+    if (scannerGen.nfaStates.unicodeWarningGiven || Options.getJavaUnicodeEscape()) {
       if (lastRemoved < (char) 0xffff) {
         newDescriptors.add(new CharacterRange((char) (lastRemoved + 1),
             (char) 0xffff));

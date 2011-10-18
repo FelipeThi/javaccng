@@ -46,7 +46,7 @@ final class StringLiterals {
     statesForPos = null;
   }
 
-  void DumpStrLiteralImages(LexGen lexGen, IndentingPrintWriter ostr) {
+  void DumpStrLiteralImages(ScannerGen scannerGen, IndentingPrintWriter ostr) {
     String image;
     int i;
     charCnt = 0; // Set to zero in reInit() but just to be sure
@@ -63,13 +63,13 @@ final class StringLiterals {
     allImages[0] = "";
     for (i = 0; i < allImages.length; i++) {
       if ((image = allImages[i]) == null ||
-          ((lexGen.toSkip[i / 64] & (1L << (i % 64))) == 0L &&
-              (lexGen.toMore[i / 64] & (1L << (i % 64))) == 0L &&
-              (lexGen.toToken[i / 64] & (1L << (i % 64))) == 0L) ||
-          (lexGen.toSkip[i / 64] & (1L << (i % 64))) != 0L ||
-          (lexGen.toMore[i / 64] & (1L << (i % 64))) != 0L ||
-          lexGen.canReachOnMore[lexGen.lexStates[i]] ||
-          ((Options.getIgnoreCase() || lexGen.ignoreCase[i]) &&
+          ((scannerGen.toSkip[i / 64] & (1L << (i % 64))) == 0L &&
+              (scannerGen.toMore[i / 64] & (1L << (i % 64))) == 0L &&
+              (scannerGen.toToken[i / 64] & (1L << (i % 64))) == 0L) ||
+          (scannerGen.toSkip[i / 64] & (1L << (i % 64))) != 0L ||
+          (scannerGen.toMore[i / 64] & (1L << (i % 64))) != 0L ||
+          scannerGen.canReachOnMore[scannerGen.lexStates[i]] ||
+          ((Options.getIgnoreCase() || scannerGen.ignoreCase[i]) &&
               (!image.equals(image.toLowerCase()) ||
                   !image.equals(image.toUpperCase())))) {
         allImages[i] = null;
@@ -92,7 +92,7 @@ final class StringLiterals {
       ostr.print(toPrint);
     }
 
-    while (++i < lexGen.maxOrdinal) {
+    while (++i < scannerGen.maxOrdinal) {
       if ((charCnt += 6) > 80) {
         ostr.println("");
         charCnt = 0;
@@ -105,11 +105,11 @@ final class StringLiterals {
     ostr.println("};");
   }
 
-  void DumpNullStrLiterals(LexGen lexGen, IndentingPrintWriter ostr) {
+  void DumpNullStrLiterals(ScannerGen scannerGen, IndentingPrintWriter ostr) {
     ostr.println("{");
     ostr.indent();
-    if (lexGen.nfaStates.generatedStates != 0) {
-      ostr.println("return jjMoveNfa" + lexGen.lexStateSuffix + "(" + lexGen.nfaStates.initStateName(lexGen) + ", 0);");
+    if (scannerGen.nfaStates.generatedStates != 0) {
+      ostr.println("return jjMoveNfa" + scannerGen.lexStateSuffix + "(" + scannerGen.nfaStates.initStateName(scannerGen) + ", 0);");
     }
     else { ostr.println("return 1;"); }
 
@@ -117,8 +117,8 @@ final class StringLiterals {
     ostr.println("}");
   }
 
-  private int GetStateSetForKind(LexGen lexGen, int pos, int kind) {
-    if (lexGen.mixed[lexGen.lexStateIndex] || lexGen.nfaStates.generatedStates == 0) { return -1; }
+  private int GetStateSetForKind(ScannerGen scannerGen, int pos, int kind) {
+    if (scannerGen.mixed[scannerGen.lexStateIndex] || scannerGen.nfaStates.generatedStates == 0) { return -1; }
 
     Hashtable allStateSets = statesForPos[pos];
 
@@ -137,15 +137,15 @@ final class StringLiterals {
 
       if (actives != null &&
           (actives[kind / 64] & (1L << (kind % 64))) != 0L) {
-        return lexGen.nfaStates.addStartStateSet(s);
+        return scannerGen.nfaStates.addStartStateSet(s);
       }
     }
 
     return -1;
   }
 
-  String GetLabel(LexGen lexGen, int kind) {
-    RegularExpression re = lexGen.rexprs[kind];
+  String GetLabel(ScannerGen scannerGen, int kind) {
+    RegularExpression re = scannerGen.rexprs[kind];
 
     if (re instanceof RStringLiteral) {
       return " \"" + Parsers.escape(((RStringLiteral) re).image) + "\"";
@@ -158,12 +158,12 @@ final class StringLiterals {
     }
   }
 
-  int GetLine(LexGen lexGen, int kind) {
-    return lexGen.rexprs[kind].getLine();
+  int GetLine(ScannerGen scannerGen, int kind) {
+    return scannerGen.rexprs[kind].getLine();
   }
 
-  int GetColumn(LexGen lexGen, int kind) {
-    return lexGen.rexprs[kind].getColumn();
+  int GetColumn(ScannerGen scannerGen, int kind) {
+    return scannerGen.rexprs[kind].getColumn();
   }
 
   /** Returns true if s1 starts with s2 (ignoring case for each character). */
@@ -180,7 +180,7 @@ final class StringLiterals {
     return true;
   }
 
-  void FillSubString(LexGen lexGen) {
+  void FillSubString(ScannerGen scannerGen) {
     String image;
     subString = new boolean[maxStrKind + 1];
     subStringAtPos = new boolean[maxLen];
@@ -189,9 +189,9 @@ final class StringLiterals {
       subString[i] = false;
 
       if ((image = allImages[i]) == null ||
-          lexGen.lexStates[i] != lexGen.lexStateIndex) { continue; }
+          scannerGen.lexStates[i] != scannerGen.lexStateIndex) { continue; }
 
-      if (lexGen.mixed[lexGen.lexStateIndex]) {
+      if (scannerGen.mixed[scannerGen.lexStateIndex]) {
         // We will not optimize for mixed case
         subString[i] = true;
         subStringAtPos[image.length() - 1] = true;
@@ -199,7 +199,7 @@ final class StringLiterals {
       }
 
       for (int j = 0; j < maxStrKind; j++) {
-        if (j != i && lexGen.lexStates[j] == lexGen.lexStateIndex &&
+        if (j != i && scannerGen.lexStates[j] == scannerGen.lexStateIndex &&
             allImages[j] != null) {
           if (allImages[j].indexOf(image) == 0) {
             subString[i] = true;
@@ -217,9 +217,9 @@ final class StringLiterals {
     }
   }
 
-  void DumpStartWithStates(LexGen lexGen, IndentingPrintWriter ostr) {
+  void DumpStartWithStates(ScannerGen scannerGen, IndentingPrintWriter ostr) {
     ostr.println("private int " +
-        "jjStartNfaWithStates" + lexGen.lexStateSuffix + "(int pos, int kind, int state) throws java.io.IOException");
+        "jjStartNfaWithStates" + scannerGen.lexStateSuffix + "(int pos, int kind, int state) throws java.io.IOException");
     ostr.println("{");
     ostr.indent();
     ostr.println("jjMatchedKind = kind;");
@@ -236,13 +236,13 @@ final class StringLiterals {
 
     if (Options.getDebugScanner()) {
       ostr.println("debugPrinter.println(" +
-          (lexGen.maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
+          (scannerGen.maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
           "\"Current character : \" + " +
           "ScannerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
           "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
     }
 
-    ostr.println("return jjMoveNfa" + lexGen.lexStateSuffix + "(state, pos + 1);");
+    ostr.println("return jjMoveNfa" + scannerGen.lexStateSuffix + "(state, pos + 1);");
     ostr.unindent();
     ostr.println("}");
     ostr.println();
@@ -289,20 +289,20 @@ final class StringLiterals {
     return ret;
   }
 
-  void DumpDfaCode(LexGen lexGen, IndentingPrintWriter ostr) {
+  void DumpDfaCode(ScannerGen scannerGen, IndentingPrintWriter ostr) {
     Hashtable tab;
     String key;
     KindInfo info;
     int maxLongsReqd = maxStrKind / 64 + 1;
     int i, j, k;
     boolean ifGenerated;
-    lexGen.maxLongsReqd[lexGen.lexStateIndex] = maxLongsReqd;
+    scannerGen.maxLongsReqd[scannerGen.lexStateIndex] = maxLongsReqd;
 
     if (maxLen == 0) {
       ostr.println("private int " +
-          "jjMoveStringLiteralDfa0" + lexGen.lexStateSuffix + "() throws java.io.IOException");
+          "jjMoveStringLiteralDfa0" + scannerGen.lexStateSuffix + "() throws java.io.IOException");
 
-      DumpNullStrLiterals(lexGen, ostr);
+      DumpNullStrLiterals(scannerGen, ostr);
       ostr.println();
       return;
     }
@@ -321,7 +321,7 @@ final class StringLiterals {
       String[] keys = ReArrange(tab);
 
       ostr.print("private int " +
-          "jjMoveStringLiteralDfa" + i + lexGen.lexStateSuffix + "(");
+          "jjMoveStringLiteralDfa" + i + scannerGen.lexStateSuffix + "(");
 
       if (i != 0) {
         if (i == 1) {
@@ -376,8 +376,8 @@ final class StringLiterals {
 
           ostr.println(") == 0L)");
           ostr.indent();
-          if (!lexGen.mixed[lexGen.lexStateIndex] && lexGen.nfaStates.generatedStates != 0) {
-            ostr.print("return jjStartNfa" + lexGen.lexStateSuffix +
+          if (!scannerGen.mixed[scannerGen.lexStateIndex] && scannerGen.nfaStates.generatedStates != 0) {
+            ostr.print("return jjStartNfa" + scannerGen.lexStateSuffix +
                 "(" + (i - 2) + ", ");
             for (j = 0; j < maxLongsReqd - 1; j++) {
               if (i <= maxLenForActive[j] + 1) { ostr.print("old" + j + ", "); }
@@ -386,9 +386,9 @@ final class StringLiterals {
             if (i <= maxLenForActive[j] + 1) { ostr.println("old" + j + ");"); }
             else { ostr.println("0L);"); }
           }
-          else if (lexGen.nfaStates.generatedStates != 0) {
-            ostr.println("return jjMoveNfa" + lexGen.lexStateSuffix +
-                "(" + lexGen.nfaStates.initStateName(lexGen) + ", " + (i - 1) + ");");
+          else if (scannerGen.nfaStates.generatedStates != 0) {
+            ostr.println("return jjMoveNfa" + scannerGen.lexStateSuffix +
+                "(" + scannerGen.nfaStates.initStateName(scannerGen) + ", " + (i - 1) + ");");
           }
           else { ostr.println("return " + i + ";"); }
           ostr.unindent();
@@ -419,8 +419,8 @@ final class StringLiterals {
         ostr.println("{");
         ostr.indent();
 
-        if (!lexGen.mixed[lexGen.lexStateIndex] && lexGen.nfaStates.generatedStates != 0) {
-          ostr.print("jjStopStringLiteralDfa" + lexGen.lexStateSuffix + "(" + (i - 1) + ", ");
+        if (!scannerGen.mixed[scannerGen.lexStateIndex] && scannerGen.nfaStates.generatedStates != 0) {
+          ostr.print("jjStopStringLiteralDfa" + scannerGen.lexStateSuffix + "(" + (i - 1) + ", ");
           for (k = 0; k < maxLongsReqd - 1; k++) {
             if (i <= maxLenForActive[k]) { ostr.print("active" + k + ", "); }
             else { ostr.print("0L, "); }
@@ -437,8 +437,8 @@ final class StringLiterals {
           }
           ostr.println("return " + i + ";");
         }
-        else if (lexGen.nfaStates.generatedStates != 0) {
-          ostr.println("return jjMoveNfa" + lexGen.lexStateSuffix + "(" + lexGen.nfaStates.initStateName(lexGen) +
+        else if (scannerGen.nfaStates.generatedStates != 0) {
+          ostr.println("return jjMoveNfa" + scannerGen.lexStateSuffix + "(" + scannerGen.nfaStates.initStateName(scannerGen) +
               ", " + (i - 1) + ");");
         }
         else { ostr.println("return " + i + ";"); }
@@ -449,7 +449,7 @@ final class StringLiterals {
 
       if (i != 0 && Options.getDebugScanner()) {
         ostr.println("debugPrinter.println(" +
-            (lexGen.maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
+            (scannerGen.maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
             "\"Current character : \" + " +
             "ScannerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
             "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
@@ -467,7 +467,7 @@ final class StringLiterals {
         char c = key.charAt(0);
 
         if (i == 0 && c < 128 && info.finalKindCnt != 0 &&
-            (lexGen.nfaStates.generatedStates == 0 || !lexGen.nfaStates.canStartNfaUsingAscii(lexGen, c))) {
+            (scannerGen.nfaStates.generatedStates == 0 || !scannerGen.nfaStates.canStartNfaUsingAscii(scannerGen, c))) {
           int kind;
           for (j = 0; j < maxLongsReqd; j++) { if (info.finalKinds[j] != 0L) { break; } }
 
@@ -479,18 +479,18 @@ final class StringLiterals {
                   intermediateKinds[(j * 64 + k)][i] < (j * 64 + k) &&
                   intermediateMatchedPos != null &&
                   intermediateMatchedPos[(j * 64 + k)][i] == i) ||
-                  (lexGen.canMatchAnyChar[lexGen.lexStateIndex] >= 0 &&
-                      lexGen.canMatchAnyChar[lexGen.lexStateIndex] < (j * 64 + k))) { break; }
-              else if ((lexGen.toSkip[kind / 64] & (1L << (kind % 64))) != 0L &&
-                  (lexGen.toSpecial[kind / 64] & (1L << (kind % 64))) == 0L &&
-                  lexGen.actions[kind] == null &&
-                  lexGen.newLexState[kind] == null) {
-                lexGen.addCharToSkip(c, kind);
+                  (scannerGen.canMatchAnyChar[scannerGen.lexStateIndex] >= 0 &&
+                      scannerGen.canMatchAnyChar[scannerGen.lexStateIndex] < (j * 64 + k))) { break; }
+              else if ((scannerGen.toSkip[kind / 64] & (1L << (kind % 64))) != 0L &&
+                  (scannerGen.toSpecial[kind / 64] & (1L << (kind % 64))) == 0L &&
+                  scannerGen.actions[kind] == null &&
+                  scannerGen.newLexState[kind] == null) {
+                scannerGen.addCharToSkip(c, kind);
 
                 if (Options.getIgnoreCase()) {
-                  if (c != Character.toUpperCase(c)) { lexGen.addCharToSkip(Character.toUpperCase(c), kind); }
+                  if (c != Character.toUpperCase(c)) { scannerGen.addCharToSkip(Character.toUpperCase(c), kind); }
 
-                  if (c != Character.toLowerCase(c)) { lexGen.addCharToSkip(Character.toLowerCase(c), kind); }
+                  if (c != Character.toLowerCase(c)) { scannerGen.addCharToSkip(Character.toLowerCase(c), kind); }
                 }
                 continue CaseLoop;
               }
@@ -538,32 +538,32 @@ final class StringLiterals {
                 JavaCCErrors.warning(" \"" +
                     Parsers.escape(allImages[j * 64 + k]) +
                     "\" cannot be matched as a string literal token " +
-                    "at line " + GetLine(lexGen, j * 64 + k) + ", column " + GetColumn(lexGen, j * 64 + k) +
+                    "at line " + GetLine(scannerGen, j * 64 + k) + ", column " + GetColumn(scannerGen, j * 64 + k) +
                     ". It will be matched as " +
-                    GetLabel(lexGen, intermediateKinds[(j * 64 + k)][i]) + ".");
+                    GetLabel(scannerGen, intermediateKinds[(j * 64 + k)][i]) + ".");
                 kindToPrint = intermediateKinds[(j * 64 + k)][i];
               }
               else if (i == 0 &&
-                  lexGen.canMatchAnyChar[lexGen.lexStateIndex] >= 0 &&
-                  lexGen.canMatchAnyChar[lexGen.lexStateIndex] < (j * 64 + k)) {
+                  scannerGen.canMatchAnyChar[scannerGen.lexStateIndex] >= 0 &&
+                  scannerGen.canMatchAnyChar[scannerGen.lexStateIndex] < (j * 64 + k)) {
                 JavaCCErrors.warning(" \"" +
                     Parsers.escape(allImages[j * 64 + k]) +
                     "\" cannot be matched as a string literal token " +
-                    "at line " + GetLine(lexGen, j * 64 + k) + ", column " + GetColumn(lexGen, j * 64 + k) +
+                    "at line " + GetLine(scannerGen, j * 64 + k) + ", column " + GetColumn(scannerGen, j * 64 + k) +
                     ". It will be matched as " +
-                    GetLabel(lexGen, lexGen.canMatchAnyChar[lexGen.lexStateIndex]) + ".");
-                kindToPrint = lexGen.canMatchAnyChar[lexGen.lexStateIndex];
+                    GetLabel(scannerGen, scannerGen.canMatchAnyChar[scannerGen.lexStateIndex]) + ".");
+                kindToPrint = scannerGen.canMatchAnyChar[scannerGen.lexStateIndex];
               }
               else { kindToPrint = j * 64 + k; }
 
               if (!subString[(j * 64 + k)]) {
-                int stateSetName = GetStateSetForKind(lexGen, i, j * 64 + k);
+                int stateSetName = GetStateSetForKind(scannerGen, i, j * 64 + k);
 
                 if (stateSetName != -1) {
                   createStartNfa = true;
                   ostr.indent();
                   ostr.println("return jjStartNfaWithStates" +
-                      lexGen.lexStateSuffix + "(" + i +
+                      scannerGen.lexStateSuffix + "(" + i +
                       ", " + kindToPrint + ", " + stateSetName + ");");
                   ostr.unindent();
                 }
@@ -574,8 +574,8 @@ final class StringLiterals {
                 }
               }
               else {
-                if ((lexGen.initMatch[lexGen.lexStateIndex] != 0 &&
-                    lexGen.initMatch[lexGen.lexStateIndex] != Integer.MAX_VALUE) ||
+                if ((scannerGen.initMatch[scannerGen.lexStateIndex] != 0 &&
+                    scannerGen.initMatch[scannerGen.lexStateIndex] != Integer.MAX_VALUE) ||
                     i != 0) {
                   ostr.println("{");
                   ostr.indent();
@@ -600,7 +600,7 @@ final class StringLiterals {
           if (i == 0) {
 
             ostr.print("return jjMoveStringLiteralDfa" + (i + 1) +
-                lexGen.lexStateSuffix + "(");
+                scannerGen.lexStateSuffix + "(");
             for (j = 0; j < maxLongsReqd - 1; j++) {
               if ((i + 1) <= maxLenForActive[j]) {
                 if (atLeastOne) { ostr.print(", "); }
@@ -620,7 +620,7 @@ final class StringLiterals {
           }
           else {
             ostr.print("return jjMoveStringLiteralDfa" + (i + 1) +
-                lexGen.lexStateSuffix + "(");
+                scannerGen.lexStateSuffix + "(");
 
             for (j = 0; j < maxLongsReqd - 1; j++) {
               if ((i + 1) <= maxLenForActive[j] + 1) {
@@ -650,11 +650,11 @@ final class StringLiterals {
         }
         else {
           // A very special case.
-          if (i == 0 && lexGen.mixed[lexGen.lexStateIndex]) {
+          if (i == 0 && scannerGen.mixed[scannerGen.lexStateIndex]) {
 
-            if (lexGen.nfaStates.generatedStates != 0) {
-              ostr.println("return jjMoveNfa" + lexGen.lexStateSuffix +
-                  "(" + lexGen.nfaStates.initStateName(lexGen) + ", 0);");
+            if (scannerGen.nfaStates.generatedStates != 0) {
+              ostr.println("return jjMoveNfa" + scannerGen.lexStateSuffix +
+                  "(" + scannerGen.nfaStates.initStateName(scannerGen) + ", 0);");
             }
             else { ostr.println("return 1;"); }
           }
@@ -677,12 +677,12 @@ final class StringLiterals {
         ostr.println("debugPrinter.println(\"   No string literal matches possible.\");");
       }
 
-      if (lexGen.nfaStates.generatedStates != 0) {
+      if (scannerGen.nfaStates.generatedStates != 0) {
         if (i == 0) {
           /* This means no string literal is possible. Just move nfa with
       this guy and return. */
-          ostr.println("return jjMoveNfa" + lexGen.lexStateSuffix +
-              "(" + lexGen.nfaStates.initStateName(lexGen) + ", 0);");
+          ostr.println("return jjMoveNfa" + scannerGen.lexStateSuffix +
+              "(" + scannerGen.nfaStates.initStateName(scannerGen) + ", 0);");
         }
         else {
           ostr.println("break;");
@@ -699,12 +699,12 @@ final class StringLiterals {
 
       if (i != 0) {
         if (startNfaNeeded) {
-          if (!lexGen.mixed[lexGen.lexStateIndex] && lexGen.nfaStates.generatedStates != 0) {
+          if (!scannerGen.mixed[scannerGen.lexStateIndex] && scannerGen.nfaStates.generatedStates != 0) {
             /* Here, a string literal is successfully matched and no more
    string literals are possible. So set the kind and state set
    upto and including this position for the matched string. */
 
-            ostr.print("return jjStartNfa" + lexGen.lexStateSuffix + "(" + (i - 1) + ", ");
+            ostr.print("return jjStartNfa" + scannerGen.lexStateSuffix + "(" + (i - 1) + ", ");
             for (k = 0; k < maxLongsReqd - 1; k++) {
               if (i <= maxLenForActive[k]) { ostr.print("active" + k + ", "); }
               else { ostr.print("0L, "); }
@@ -712,9 +712,9 @@ final class StringLiterals {
             if (i <= maxLenForActive[k]) { ostr.println("active" + k + ");"); }
             else { ostr.println("0L);"); }
           }
-          else if (lexGen.nfaStates.generatedStates != 0) {
-            ostr.println("return jjMoveNfa" + lexGen.lexStateSuffix +
-                "(" + lexGen.nfaStates.initStateName(lexGen) + ", " + i + ");");
+          else if (scannerGen.nfaStates.generatedStates != 0) {
+            ostr.println("return jjMoveNfa" + scannerGen.lexStateSuffix +
+                "(" + scannerGen.nfaStates.initStateName(scannerGen) + ", " + i + ");");
           }
           else { ostr.println("return " + (i + 1) + ";"); }
         }
@@ -725,14 +725,14 @@ final class StringLiterals {
       ostr.println();
     }
 
-    if (!lexGen.mixed[lexGen.lexStateIndex] && lexGen.nfaStates.generatedStates != 0 && createStartNfa) {
-      DumpStartWithStates(lexGen, ostr);
+    if (!scannerGen.mixed[scannerGen.lexStateIndex] && scannerGen.nfaStates.generatedStates != 0 && createStartNfa) {
+      DumpStartWithStates(scannerGen, ostr);
     }
   }
 
-  final int GetStrKind(LexGen lexGen, String str) {
+  final int GetStrKind(ScannerGen scannerGen, String str) {
     for (int i = 0; i < maxStrKind; i++) {
-      if (lexGen.lexStates[i] != lexGen.lexStateIndex) { continue; }
+      if (scannerGen.lexStates[i] != scannerGen.lexStateIndex) { continue; }
 
       String image = allImages[i];
       if (image != null && image.equals(str)) { return i; }
@@ -741,9 +741,9 @@ final class StringLiterals {
     return Integer.MAX_VALUE;
   }
 
-  void GenerateNfaStartStates(LexGen lexGen, IndentingPrintWriter ostr,
+  void GenerateNfaStartStates(ScannerGen scannerGen, IndentingPrintWriter ostr,
                               NfaState initialState) {
-    boolean[] seen = new boolean[lexGen.nfaStates.generatedStates];
+    boolean[] seen = new boolean[scannerGen.nfaStates.generatedStates];
     Hashtable stateSets = new Hashtable();
     String stateSetString = "";
     int i, j, kind, jjMatchedPos = 0;
@@ -757,7 +757,7 @@ final class StringLiterals {
     intermediateMatchedPos = new int[maxStrKind + 1][];
 
     for (i = 0; i < maxStrKind; i++) {
-      if (lexGen.lexStates[i] != lexGen.lexStateIndex) { continue; }
+      if (scannerGen.lexStates[i] != scannerGen.lexStateIndex) { continue; }
 
       String image = allImages[i];
 
@@ -766,7 +766,7 @@ final class StringLiterals {
       try {
         if ((oldStates = (List) initialState.epsilonMoves.clone()) == null ||
             oldStates.size() == 0) {
-          DumpNfaStartStatesCode(lexGen, statesForPos, ostr);
+          DumpNfaStartStatesCode(scannerGen, statesForPos, ostr);
           return;
         }
       }
@@ -786,16 +786,16 @@ final class StringLiterals {
           jjMatchedPos = intermediateMatchedPos[i][j] = intermediateMatchedPos[i][j - 1];
         }
         else {
-          kind = lexGen.nfaStates.moveFromSet(image.charAt(j), oldStates, newStates);
+          kind = scannerGen.nfaStates.moveFromSet(image.charAt(j), oldStates, newStates);
           oldStates.clear();
 
           if (j == 0 && kind != Integer.MAX_VALUE &&
-              lexGen.canMatchAnyChar[lexGen.lexStateIndex] != -1 &&
-              kind > lexGen.canMatchAnyChar[lexGen.lexStateIndex]) {
-            kind = lexGen.canMatchAnyChar[lexGen.lexStateIndex];
+              scannerGen.canMatchAnyChar[scannerGen.lexStateIndex] != -1 &&
+              kind > scannerGen.canMatchAnyChar[scannerGen.lexStateIndex]) {
+            kind = scannerGen.canMatchAnyChar[scannerGen.lexStateIndex];
           }
 
-          if (GetStrKind(lexGen, image.substring(0, j + 1)) < kind) {
+          if (GetStrKind(scannerGen, image.substring(0, j + 1)) < kind) {
             intermediateKinds[i][j] = kind = Integer.MAX_VALUE;
             jjMatchedPos = 0;
           }
@@ -809,7 +809,7 @@ final class StringLiterals {
             jjMatchedPos = intermediateMatchedPos[i][j] = intermediateMatchedPos[i][j - 1];
           }
 
-          stateSetString = lexGen.nfaStates.getStateSetString(newStates);
+          stateSetString = scannerGen.nfaStates.getStateSetString(newStates);
         }
 
         if (kind == Integer.MAX_VALUE &&
@@ -845,10 +845,10 @@ final class StringLiterals {
       }
     }
 
-    DumpNfaStartStatesCode(lexGen, statesForPos, ostr);
+    DumpNfaStartStatesCode(scannerGen, statesForPos, ostr);
   }
 
-  void DumpNfaStartStatesCode(LexGen lexGen, Hashtable[] statesForPos,
+  void DumpNfaStartStatesCode(ScannerGen scannerGen, Hashtable[] statesForPos,
                               IndentingPrintWriter ostr) {
     if (maxStrKind == 0) { // No need to generate this function
       return;
@@ -859,7 +859,7 @@ final class StringLiterals {
     int ind = 0;
 
     ostr.print("private int jjStopStringLiteralDfa" +
-        lexGen.lexStateSuffix + "(int pos, ");
+        scannerGen.lexStateSuffix + "(int pos, ");
     for (i = 0; i < maxKindsReqd - 1; i++) { ostr.print("long active" + i + ", "); }
     ostr.println("long active" + i + ")\n{");
 
@@ -906,8 +906,8 @@ final class StringLiterals {
             if (i == 0) {
               ostr.println("            jjMatchedKind = " + kindStr + ";");
 
-              if ((lexGen.initMatch[lexGen.lexStateIndex] != 0 &&
-                  lexGen.initMatch[lexGen.lexStateIndex] != Integer.MAX_VALUE)) {
+              if ((scannerGen.initMatch[scannerGen.lexStateIndex] != 0 &&
+                  scannerGen.initMatch[scannerGen.lexStateIndex] != Integer.MAX_VALUE)) {
                 ostr.println("            jjMatchedPos = 0;");
               }
             }
@@ -943,7 +943,7 @@ final class StringLiterals {
           if (stateSetString.equals("null;")) { ostr.println("            return -1;"); }
           else {
             ostr.println("            return " +
-                lexGen.nfaStates.addStartStateSet(stateSetString) + ";");
+                scannerGen.nfaStates.addStartStateSet(stateSetString) + ";");
           }
 
           if (!kindStr.equals(String.valueOf(Integer.MAX_VALUE))) { ostr.println("         }"); }
@@ -961,14 +961,14 @@ final class StringLiterals {
 
     ostr.println();
     ostr.print("private int jjStartNfa" +
-        lexGen.lexStateSuffix + "(int pos, ");
+        scannerGen.lexStateSuffix + "(int pos, ");
     for (i = 0; i < maxKindsReqd - 1; i++) { ostr.print("long active" + i + ", "); }
     ostr.println("long active" + i + ") throws java.io.IOException \n{");
 
-    if (lexGen.mixed[lexGen.lexStateIndex]) {
-      if (lexGen.nfaStates.generatedStates != 0) {
-        ostr.println("   return jjMoveNfa" + lexGen.lexStateSuffix +
-            "(" + lexGen.nfaStates.initStateName(lexGen) + ", pos + 1);");
+    if (scannerGen.mixed[scannerGen.lexStateIndex]) {
+      if (scannerGen.nfaStates.generatedStates != 0) {
+        ostr.println("   return jjMoveNfa" + scannerGen.lexStateSuffix +
+            "(" + scannerGen.nfaStates.initStateName(scannerGen) + ", pos + 1);");
       }
       else { ostr.println("   return pos + 1;"); }
 
@@ -976,8 +976,8 @@ final class StringLiterals {
       return;
     }
 
-    ostr.print("   return jjMoveNfa" + lexGen.lexStateSuffix + "(" +
-        "jjStopStringLiteralDfa" + lexGen.lexStateSuffix + "(pos, ");
+    ostr.print("   return jjMoveNfa" + scannerGen.lexStateSuffix + "(" +
+        "jjStopStringLiteralDfa" + scannerGen.lexStateSuffix + "(pos, ");
     for (i = 0; i < maxKindsReqd - 1; i++) { ostr.print("active" + i + ", "); }
     ostr.print("active" + i + ")");
     ostr.println(", pos + 1);");

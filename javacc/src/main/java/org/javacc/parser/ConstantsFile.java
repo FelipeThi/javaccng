@@ -38,11 +38,11 @@ import java.util.List;
 /** Generates the Constants file. */
 final class ConstantsFile implements FileGenerator, JavaCCConstants {
   private final JavaCCState state;
-  private final LexGen lexGen;
+  private final ScannerGen scannerGen;
 
-  ConstantsFile(JavaCCState state, LexGen lexGen) {
+  ConstantsFile(JavaCCState state, ScannerGen scannerGen) {
     this.state = state;
-    this.lexGen = lexGen;
+    this.scannerGen = scannerGen;
   }
 
   @Override
@@ -55,14 +55,14 @@ final class ConstantsFile implements FileGenerator, JavaCCConstants {
     OutputFile outputFile = new OutputFile(path);
     IndentingPrintWriter out = outputFile.getPrintWriter();
     try {
-      generate(lexGen, out);
+      generate(scannerGen, out);
     }
     finally {
       out.close();
     }
   }
 
-  private void generate(LexGen lexGen, IndentingPrintWriter out)
+  private void generate(ScannerGen scannerGen, IndentingPrintWriter out)
       throws IOException {
     TokenPrinter.packageDeclaration(state.cuToInsertionPoint1, out);
     out.println();
@@ -76,9 +76,9 @@ final class ConstantsFile implements FileGenerator, JavaCCConstants {
       out.println("int " + re.label + " = " + re.ordinal + ";");
     }
     if (!Options.getUserScanner() && Options.getBuildScanner()) {
-      for (int i = 0; i < lexGen.lexStateName.length; i++) {
+      for (int i = 0; i < scannerGen.lexStateName.length; i++) {
         out.println("/** Lexical state. */");
-        out.println("int " + lexGen.lexStateName[i] + " = " + i + ";");
+        out.println("int " + scannerGen.lexStateName[i] + " = " + i + ";");
       }
     }
     out.println("/** Literal token values. */");

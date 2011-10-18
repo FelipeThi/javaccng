@@ -47,19 +47,19 @@ public final class RChoice extends RegularExpression {
   }
 
   @Override
-  public Nfa generateNfa(LexGen lexGen, boolean ignoreCase) {
-    compressCharLists(lexGen);
+  public Nfa generateNfa(ScannerGen scannerGen, boolean ignoreCase) {
+    compressCharLists(scannerGen);
 
     if (getChoices().size() == 1) {
-      return getChoices().get(0).generateNfa(lexGen, ignoreCase);
+      return getChoices().get(0).generateNfa(scannerGen, ignoreCase);
     }
 
-    Nfa nfa = new Nfa(lexGen);
+    Nfa nfa = new Nfa(scannerGen);
     NfaState startState = nfa.start;
     NfaState finalState = nfa.end;
 
     for (RegularExpression re : choices) {
-      Nfa tmp = re.generateNfa(lexGen, ignoreCase);
+      Nfa tmp = re.generateNfa(scannerGen, ignoreCase);
       startState.addMove(tmp.start);
       tmp.end.addMove(finalState);
     }
@@ -67,7 +67,7 @@ public final class RChoice extends RegularExpression {
     return nfa;
   }
 
-  private void compressCharLists(LexGen lexGen) {
+  private void compressCharLists(ScannerGen scannerGen) {
     compressChoices(); // Unroll nested choices
 
     RCharacterList cl = null;
@@ -86,7 +86,7 @@ public final class RChoice extends RegularExpression {
 
       if (re instanceof RCharacterList) {
         if (((RCharacterList) re).negatedList) {
-          ((RCharacterList) re).removeNegation(lexGen);
+          ((RCharacterList) re).removeNegation(scannerGen);
         }
 
         List tmp = ((RCharacterList) re).descriptors;
@@ -123,12 +123,12 @@ public final class RChoice extends RegularExpression {
     }
   }
 
-  public void checkUnmatchability(LexGen lexGen) {
+  public void checkUnmatchability(ScannerGen scannerGen) {
     for (int i = 0; i < getChoices().size(); i++) {
       RegularExpression curRE;
       if (!(curRE = getChoices().get(i)).isPrivate
           && curRE.ordinal > 0 && curRE.ordinal < ordinal
-          && lexGen.lexStates[curRE.ordinal] == lexGen.lexStates[ordinal]) {
+          && scannerGen.lexStates[curRE.ordinal] == scannerGen.lexStates[ordinal]) {
         if (label != null) {
           JavaCCErrors.warning(this,
               "Regular Expression choice : " + curRE.label + " can never be matched as : " + label);

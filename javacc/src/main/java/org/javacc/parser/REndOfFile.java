@@ -31,7 +31,7 @@ package org.javacc.parser;
 /** Describes the EOF regular expression */
 public final class REndOfFile extends RegularExpression {
   @Override
-  public Nfa generateNfa(LexGen lexGen, boolean ignoreCase) {
+  public Nfa generateNfa(ScannerGen scannerGen, boolean ignoreCase) {
     return null;
   }
 }

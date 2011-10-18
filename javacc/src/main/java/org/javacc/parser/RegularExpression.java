@@ -78,5 +78,5 @@ public abstract class RegularExpression extends Expansion {
     return false;
   }
 
-  public abstract Nfa generateNfa(LexGen lexGen, boolean ignoreCase);
+  public abstract Nfa generateNfa(ScannerGen scannerGen, boolean ignoreCase);
 }

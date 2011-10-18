@@ -40,12 +40,12 @@ public final class ROneOrMore extends RegularExpression {
   }
 
   @Override
-  public Nfa generateNfa(LexGen lexGen, boolean ignoreCase) {
-    Nfa retVal = new Nfa(lexGen);
+  public Nfa generateNfa(ScannerGen scannerGen, boolean ignoreCase) {
+    Nfa retVal = new Nfa(scannerGen);
     NfaState startState = retVal.start;
     NfaState finalState = retVal.end;
 
-    Nfa temp = regExp.generateNfa(lexGen, ignoreCase);
+    Nfa temp = regExp.generateNfa(scannerGen, ignoreCase);
 
     startState.addMove(temp.start);
     temp.end.addMove(temp.start);

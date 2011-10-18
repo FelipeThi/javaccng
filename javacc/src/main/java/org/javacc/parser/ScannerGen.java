@@ -39,7 +39,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /** Generate lexer. */
-final class LexGen implements FileGenerator, JavaCCConstants {
+final class ScannerGen implements FileGenerator, JavaCCConstants {
   private final JavaCCState state;
   // Hashtable of vectors
   Hashtable allTpsForState = new Hashtable();
@@ -86,7 +86,7 @@ final class LexGen implements FileGenerator, JavaCCConstants {
   final NfaStates nfaStates = new NfaStates();
   final StringLiterals stringLiterals = new StringLiterals();
 
-  LexGen(JavaCCState state) {
+  ScannerGen(JavaCCState state) {
     this.state = state;
   }
 

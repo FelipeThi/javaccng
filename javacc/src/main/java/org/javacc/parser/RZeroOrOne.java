@@ -34,13 +34,13 @@ public final class RZeroOrOne extends RegularExpression {
   public RegularExpression regExp;
 
   @Override
-  public Nfa generateNfa(LexGen lexGen, boolean ignoreCase) {
-    Nfa nfa = new Nfa(lexGen);
+  public Nfa generateNfa(ScannerGen scannerGen, boolean ignoreCase) {
+    Nfa nfa = new Nfa(scannerGen);
 
     NfaState startState = nfa.start;
     NfaState finalState = nfa.end;
 
-    Nfa temp = regExp.generateNfa(lexGen, ignoreCase);
+    Nfa temp = regExp.generateNfa(scannerGen, ignoreCase);
 
     startState.addMove(temp.start);
     startState.addMove(finalState);

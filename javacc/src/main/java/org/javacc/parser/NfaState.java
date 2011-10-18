@@ -38,7 +38,7 @@ import java.util.Vector;
 
 /** The state of a Non-deterministic Finite Automaton. */
 public final class NfaState {
-  final LexGen lexGen;
+  final ScannerGen scannerGen;
   long[] asciiMoves = new long[2];
   char[] charMoves;
   char[] rangeMoves;
@@ -66,16 +66,16 @@ public final class NfaState {
   int onlyChar = 0;
   char matchSingleChar;
 
-  NfaState(LexGen lexGen) {
-    this.lexGen = lexGen;
-    id = lexGen.nfaStates.idCnt++;
-    lexGen.nfaStates.allStates.add(this);
-    lexState = lexGen.lexStateIndex;
-    lookingFor = lexGen.curKind;
+  NfaState(ScannerGen scannerGen) {
+    this.scannerGen = scannerGen;
+    id = scannerGen.nfaStates.idCnt++;
+    scannerGen.nfaStates.allStates.add(this);
+    lexState = scannerGen.lexStateIndex;
+    lookingFor = scannerGen.curKind;
   }
 
   NfaState copy() {
-    NfaState retVal = new NfaState(lexGen);
+    NfaState retVal = new NfaState(scannerGen);
 
     retVal.isFinal = isFinal;
     retVal.kind = kind;
@@ -90,7 +90,7 @@ public final class NfaState {
 
   void addMove(NfaState newState) {
     if (!epsilonMoves.contains(newState)) {
-      lexGen.nfaStates.insertInOrder(epsilonMoves, newState);
+      scannerGen.nfaStates.insertInOrder(epsilonMoves, newState);
     }
   }
 
@@ -116,17 +116,17 @@ public final class NfaState {
     int len = charMoves.length;
 
     if (charMoves[len - 1] != 0) {
-      charMoves = lexGen.nfaStates.expandCharArr(charMoves, 10);
+      charMoves = scannerGen.nfaStates.expandCharArr(charMoves, 10);
       len += 10;
     }
 
     for (i = 0; i < len; i++) { if (charMoves[i] == 0 || charMoves[i] > c) { break; } }
 
-    if (!lexGen.nfaStates.unicodeWarningGiven && c > 0xff &&
+    if (!scannerGen.nfaStates.unicodeWarningGiven && c > 0xff &&
         !Options.getJavaUnicodeEscape() &&
         !Options.getUserCharStream()) {
-      lexGen.nfaStates.unicodeWarningGiven = true;
-      JavaCCErrors.warning(lexGen.curRE, "Non-ASCII characters used in regular expression.\n" +
+      scannerGen.nfaStates.unicodeWarningGiven = true;
+      JavaCCErrors.warning(scannerGen.curRE, "Non-ASCII characters used in regular expression.\n" +
           "Please make sure you use the correct Reader when you create the parser, " +
           "one that can handle your character set.");
     }
@@ -158,11 +158,11 @@ public final class NfaState {
       for (; left < 128; left++) { addASCIIMove(left); }
     }
 
-    if (!lexGen.nfaStates.unicodeWarningGiven && (left > 0xff || right > 0xff) &&
+    if (!scannerGen.nfaStates.unicodeWarningGiven && (left > 0xff || right > 0xff) &&
         !Options.getJavaUnicodeEscape() &&
         !Options.getUserCharStream()) {
-      lexGen.nfaStates.unicodeWarningGiven = true;
-      JavaCCErrors.warning(lexGen.curRE, "Non-ASCII characters used in regular expression.\n" +
+      scannerGen.nfaStates.unicodeWarningGiven = true;
+      JavaCCErrors.warning(scannerGen.curRE, "Non-ASCII characters used in regular expression.\n" +
           "Please make sure you use the correct Reader when you create the parser, " +
           "one that can handle your character set.");
     }
@@ -172,7 +172,7 @@ public final class NfaState {
     int len = rangeMoves.length;
 
     if (rangeMoves[len - 1] != 0) {
-      rangeMoves = lexGen.nfaStates.expandCharArr(rangeMoves, 20);
+      rangeMoves = scannerGen.nfaStates.expandCharArr(rangeMoves, 20);
       len += 20;
     }
 
@@ -211,9 +211,9 @@ public final class NfaState {
   void epsilonClosure() {
     int i = 0;
 
-    if (closureDone || lexGen.nfaStates.mark[id]) { return; }
+    if (closureDone || scannerGen.nfaStates.mark[id]) { return; }
 
-    lexGen.nfaStates.mark[id] = true;
+    scannerGen.nfaStates.mark[id] = true;
 
     // Recursively do closure
     for (i = 0; i < epsilonMoves.size(); i++) { ((NfaState) epsilonMoves.get(i)).epsilonClosure(); }
@@ -226,15 +226,15 @@ public final class NfaState {
       for (i = 0; i < tmp.epsilonMoves.size(); i++) {
         NfaState tmp1 = (NfaState) tmp.epsilonMoves.get(i);
         if (tmp1.usefulState() && !epsilonMoves.contains(tmp1)) {
-          lexGen.nfaStates.insertInOrder(epsilonMoves, tmp1);
-          lexGen.nfaStates.done = false;
+          scannerGen.nfaStates.insertInOrder(epsilonMoves, tmp1);
+          scannerGen.nfaStates.done = false;
         }
       }
 
       if (kind > tmp.kind) { kind = tmp.kind; }
     }
 
-    if (hasTransitions() && !epsilonMoves.contains(this)) { lexGen.nfaStates.insertInOrder(epsilonMoves, this); }
+    if (hasTransitions() && !epsilonMoves.contains(this)) { scannerGen.nfaStates.insertInOrder(epsilonMoves, this); }
   }
 
   boolean usefulState() {
@@ -296,9 +296,9 @@ public final class NfaState {
   NfaState createEquivState(List states) {
     NfaState newState = ((NfaState) states.get(0)).copy();
 
-    newState.next = new NfaState(lexGen);
+    newState.next = new NfaState(scannerGen);
 
-    lexGen.nfaStates.insertInOrder(newState.next.epsilonMoves,
+    scannerGen.nfaStates.insertInOrder(newState.next.epsilonMoves,
         ((NfaState) states.get(0)).next);
 
     for (int i = 1; i < states.size(); i++) {
@@ -310,7 +310,7 @@ public final class NfaState {
 
       newState.isFinal |= tmp2.isFinal;
 
-      lexGen.nfaStates.insertInOrder(newState.next.epsilonMoves, tmp2.next);
+      scannerGen.nfaStates.insertInOrder(newState.next.epsilonMoves, tmp2.next);
     }
 
     return newState;
@@ -318,15 +318,15 @@ public final class NfaState {
 
   NfaState getEquivalentRunTimeState() {
     Outer:
-    for (int i = lexGen.nfaStates.allStates.size(); i-- > 0; ) {
-      NfaState other = (NfaState) lexGen.nfaStates.allStates.get(i);
+    for (int i = scannerGen.nfaStates.allStates.size(); i-- > 0; ) {
+      NfaState other = (NfaState) scannerGen.nfaStates.allStates.get(i);
 
       if (this != other && other.stateName != -1 &&
           kindToPrint == other.kindToPrint &&
           asciiMoves[0] == other.asciiMoves[0] &&
           asciiMoves[1] == other.asciiMoves[1] &&
-          lexGen.nfaStates.equalCharArr(charMoves, other.charMoves) &&
-          lexGen.nfaStates.equalCharArr(rangeMoves, other.rangeMoves)) {
+          scannerGen.nfaStates.equalCharArr(charMoves, other.charMoves) &&
+          scannerGen.nfaStates.equalCharArr(rangeMoves, other.rangeMoves)) {
         if (next == other.next) { return other; }
         else if (next != null && other.next != null) {
           if (next.epsilonMoves.size() == other.next.epsilonMoves.size()) {
@@ -367,8 +367,8 @@ public final class NfaState {
         return;
       }
 
-      stateName = lexGen.nfaStates.generatedStates++;
-      lexGen.nfaStates.indexedAllStates.add(this);
+      stateName = scannerGen.nfaStates.generatedStates++;
+      scannerGen.nfaStates.indexedAllStates.add(this);
       generateNextStatesCode();
     }
   }
@@ -377,22 +377,22 @@ public final class NfaState {
     int i;
 
     // First do epsilon closure
-    lexGen.nfaStates.done = false;
-    while (!lexGen.nfaStates.done) {
-      if (lexGen.nfaStates.mark == null
-          || lexGen.nfaStates.mark.length < lexGen.nfaStates.allStates.size()) {
-        lexGen.nfaStates.mark = new boolean[lexGen.nfaStates.allStates.size()];
+    scannerGen.nfaStates.done = false;
+    while (!scannerGen.nfaStates.done) {
+      if (scannerGen.nfaStates.mark == null
+          || scannerGen.nfaStates.mark.length < scannerGen.nfaStates.allStates.size()) {
+        scannerGen.nfaStates.mark = new boolean[scannerGen.nfaStates.allStates.size()];
       }
 
-      for (i = lexGen.nfaStates.allStates.size(); i-- > 0; ) { lexGen.nfaStates.mark[i] = false; }
+      for (i = scannerGen.nfaStates.allStates.size(); i-- > 0; ) { scannerGen.nfaStates.mark[i] = false; }
 
-      lexGen.nfaStates.done = true;
+      scannerGen.nfaStates.done = true;
       epsilonClosure();
     }
 
-    for (i = lexGen.nfaStates.allStates.size(); i-- > 0; ) {
-      ((NfaState) lexGen.nfaStates.allStates.get(i)).closureDone =
-          lexGen.nfaStates.mark[((NfaState) lexGen.nfaStates.allStates.get(i)).id];
+    for (i = scannerGen.nfaStates.allStates.size(); i-- > 0; ) {
+      ((NfaState) scannerGen.nfaStates.allStates.get(i)).closureDone =
+          scannerGen.nfaStates.mark[((NfaState) scannerGen.nfaStates.allStates.get(i)).id];
     }
 
     // Warning : The following piece of code is just an optimization.
@@ -414,14 +414,14 @@ public final class NfaState {
                 hasTransitions() &&
                 (tmp1.asciiMoves[0] == tmp2.asciiMoves[0] &&
                     tmp1.asciiMoves[1] == tmp2.asciiMoves[1] &&
-                    lexGen.nfaStates.equalCharArr(tmp1.charMoves, tmp2.charMoves) &&
-                    lexGen.nfaStates.equalCharArr(tmp1.rangeMoves, tmp2.rangeMoves))) {
+                    scannerGen.nfaStates.equalCharArr(tmp1.charMoves, tmp2.charMoves) &&
+                    scannerGen.nfaStates.equalCharArr(tmp1.rangeMoves, tmp2.rangeMoves))) {
               if (equivStates == null) {
                 equivStates = new ArrayList();
                 equivStates.add(tmp1);
               }
 
-              lexGen.nfaStates.insertInOrder(equivStates, tmp2);
+              scannerGen.nfaStates.insertInOrder(equivStates, tmp2);
               epsilonMoves.removeElementAt(j--);
             }
           }
@@ -435,9 +435,9 @@ public final class NfaState {
                 ((NfaState) equivStates.get(l)).id) + ", ";
           }
 
-          if ((newState = (NfaState) lexGen.nfaStates.equivStatesTable.get(tmp)) == null) {
+          if ((newState = (NfaState) scannerGen.nfaStates.equivStatesTable.get(tmp)) == null) {
             newState = createEquivState(equivStates);
-            lexGen.nfaStates.equivStatesTable.put(tmp, newState);
+            scannerGen.nfaStates.equivStatesTable.put(tmp, newState);
           }
 
           epsilonMoves.removeElementAt(i--);
@@ -513,7 +513,7 @@ public final class NfaState {
             tempState.generateCode();
           }
 
-          ((NfaState) lexGen.nfaStates.indexedAllStates.get(tempState.stateName)).inNextOf++;
+          ((NfaState) scannerGen.nfaStates.indexedAllStates.get(tempState.stateName)).inNextOf++;
           stateNames[cnt] = tempState.stateName;
           epsilonMovesString += tempState.stateName + ", ";
           if (cnt++ > 0 && cnt % 16 == 0) { epsilonMovesString += "\n"; }
@@ -525,11 +525,11 @@ public final class NfaState {
 
     usefulEpsilonMoves = cnt;
     if (epsilonMovesString != null &&
-        lexGen.nfaStates.allNextStates.get(epsilonMovesString) == null) {
+        scannerGen.nfaStates.allNextStates.get(epsilonMovesString) == null) {
       int[] statesToPut = new int[usefulEpsilonMoves];
 
       System.arraycopy(stateNames, 0, statesToPut, 0, cnt);
-      lexGen.nfaStates.allNextStates.put(epsilonMovesString, statesToPut);
+      scannerGen.nfaStates.allNextStates.put(epsilonMovesString, statesToPut);
     }
 
     return epsilonMovesString;
@@ -581,7 +581,7 @@ public final class NfaState {
   public int moveFrom(char c, List newStates) {
     if (canMoveUsingChar(c)) {
       for (int i = next.epsilonMoves.size(); i-- > 0; ) {
-        lexGen.nfaStates.insertInOrder(newStates, (NfaState) next.epsilonMoves.get(i));
+        scannerGen.nfaStates.insertInOrder(newStates, (NfaState) next.epsilonMoves.get(i));
       }
 
       return kindToPrint;
@@ -681,38 +681,38 @@ It also generates code to match a char with the common bit vectors.
             "0x" + Long.toHexString(common[1]) + "L, " +
             "0x" + Long.toHexString(common[2]) + "L, " +
             "0x" + Long.toHexString(common[3]) + "L\n};";
-        if ((ind = (Integer) lexGen.nfaStates.lohiByteTab.get(tmp)) == null) {
-          lexGen.nfaStates.allBitVectors.add(tmp);
+        if ((ind = (Integer) scannerGen.nfaStates.lohiByteTab.get(tmp)) == null) {
+          scannerGen.nfaStates.allBitVectors.add(tmp);
 
-          if (!lexGen.nfaStates.allBitsSet(tmp)) {
-            out.println("static final long[] jjbitVec" + lexGen.nfaStates.lohiByteCnt + " = " + tmp);
+          if (!scannerGen.nfaStates.allBitsSet(tmp)) {
+            out.println("static final long[] jjbitVec" + scannerGen.nfaStates.lohiByteCnt + " = " + tmp);
           }
-          lexGen.nfaStates.lohiByteTab.put(tmp, ind = new Integer(lexGen.nfaStates.lohiByteCnt++));
+          scannerGen.nfaStates.lohiByteTab.put(tmp, ind = new Integer(scannerGen.nfaStates.lohiByteCnt++));
         }
 
-        lexGen.nfaStates.tmpIndices[cnt++] = ind.intValue();
+        scannerGen.nfaStates.tmpIndices[cnt++] = ind.intValue();
 
         tmp = "{\n   0x" + Long.toHexString(loBytes[i][0]) + "L, " +
             "0x" + Long.toHexString(loBytes[i][1]) + "L, " +
             "0x" + Long.toHexString(loBytes[i][2]) + "L, " +
             "0x" + Long.toHexString(loBytes[i][3]) + "L\n};";
-        if ((ind = (Integer) lexGen.nfaStates.lohiByteTab.get(tmp)) == null) {
-          lexGen.nfaStates.allBitVectors.add(tmp);
+        if ((ind = (Integer) scannerGen.nfaStates.lohiByteTab.get(tmp)) == null) {
+          scannerGen.nfaStates.allBitVectors.add(tmp);
 
-          if (!lexGen.nfaStates.allBitsSet(tmp)) {
-            out.println("static final long[] jjbitVec" + lexGen.nfaStates.lohiByteCnt + " = " + tmp);
+          if (!scannerGen.nfaStates.allBitsSet(tmp)) {
+            out.println("static final long[] jjbitVec" + scannerGen.nfaStates.lohiByteCnt + " = " + tmp);
           }
-          lexGen.nfaStates.lohiByteTab.put(tmp, ind = new Integer(lexGen.nfaStates.lohiByteCnt++));
+          scannerGen.nfaStates.lohiByteTab.put(tmp, ind = new Integer(scannerGen.nfaStates.lohiByteCnt++));
         }
 
-        lexGen.nfaStates.tmpIndices[cnt++] = ind.intValue();
+        scannerGen.nfaStates.tmpIndices[cnt++] = ind.intValue();
 
         common = null;
       }
     }
 
     nonAsciiMoveIndices = new int[cnt];
-    System.arraycopy(lexGen.nfaStates.tmpIndices, 0, nonAsciiMoveIndices, 0, cnt);
+    System.arraycopy(scannerGen.nfaStates.tmpIndices, 0, nonAsciiMoveIndices, 0, cnt);
 
 /*
       System.out.println("state : " + stateName + " cnt : " + cnt);
@@ -736,13 +736,13 @@ It also generates code to match a char with the common bit vectors.
             "0x" + Long.toHexString(loBytes[i][2]) + "L, " +
             "0x" + Long.toHexString(loBytes[i][3]) + "L\n};";
 
-        if ((ind = (Integer) lexGen.nfaStates.lohiByteTab.get(tmp)) == null) {
-          lexGen.nfaStates.allBitVectors.add(tmp);
+        if ((ind = (Integer) scannerGen.nfaStates.lohiByteTab.get(tmp)) == null) {
+          scannerGen.nfaStates.allBitVectors.add(tmp);
 
-          if (!lexGen.nfaStates.allBitsSet(tmp)) {
-            out.println("static final long[] jjbitVec" + lexGen.nfaStates.lohiByteCnt + " = " + tmp);
+          if (!scannerGen.nfaStates.allBitsSet(tmp)) {
+            out.println("static final long[] jjbitVec" + scannerGen.nfaStates.lohiByteCnt + " = " + tmp);
           }
-          lexGen.nfaStates.lohiByteTab.put(tmp, ind = new Integer(lexGen.nfaStates.lohiByteCnt++));
+          scannerGen.nfaStates.lohiByteTab.put(tmp, ind = new Integer(scannerGen.nfaStates.lohiByteCnt++));
         }
 
         if (loByteVec == null) { loByteVec = new Vector(); }
@@ -756,17 +756,17 @@ It also generates code to match a char with the common bit vectors.
   }
 
   void updateDuplicateNonAsciiMoves() {
-    for (int i = 0; i < lexGen.nfaStates.nonAsciiTableForMethod.size(); i++) {
-      NfaState tmp = (NfaState) lexGen.nfaStates.nonAsciiTableForMethod.get(i);
-      if (lexGen.nfaStates.equalLoByteVectors(loByteVec, tmp.loByteVec) &&
-          lexGen.nfaStates.equalNonAsciiMoveIndices(nonAsciiMoveIndices, tmp.nonAsciiMoveIndices)) {
+    for (int i = 0; i < scannerGen.nfaStates.nonAsciiTableForMethod.size(); i++) {
+      NfaState tmp = (NfaState) scannerGen.nfaStates.nonAsciiTableForMethod.get(i);
+      if (scannerGen.nfaStates.equalLoByteVectors(loByteVec, tmp.loByteVec) &&
+          scannerGen.nfaStates.equalNonAsciiMoveIndices(nonAsciiMoveIndices, tmp.nonAsciiMoveIndices)) {
         nonAsciiMethod = i;
         return;
       }
     }
 
-    nonAsciiMethod = lexGen.nfaStates.nonAsciiTableForMethod.size();
-    lexGen.nfaStates.nonAsciiTableForMethod.add(this);
+    nonAsciiMethod = scannerGen.nfaStates.nonAsciiTableForMethod.size();
+    scannerGen.nfaStates.nonAsciiTableForMethod.add(this);
   }
 
   public void generateInitMoves(IndentingPrintWriter out) {
@@ -774,46 +774,46 @@ It also generates code to match a char with the common bit vectors.
 
     if (epsilonMovesString == null) { epsilonMovesString = "null;"; }
 
-    lexGen.nfaStates.addStartStateSet(epsilonMovesString);
+    scannerGen.nfaStates.addStartStateSet(epsilonMovesString);
   }
 
   boolean findCommonBlocks() {
     if (next == null || next.usefulEpsilonMoves <= 1) { return false; }
 
-    if (lexGen.nfaStates.stateDone == null) {
-      lexGen.nfaStates.stateDone = new boolean[lexGen.nfaStates.generatedStates];
+    if (scannerGen.nfaStates.stateDone == null) {
+      scannerGen.nfaStates.stateDone = new boolean[scannerGen.nfaStates.generatedStates];
     }
 
     String set = next.epsilonMovesString;
 
-    int[] nameSet = (int[]) lexGen.nfaStates.allNextStates.get(set);
+    int[] nameSet = (int[]) scannerGen.nfaStates.allNextStates.get(set);
 
-    if (nameSet.length <= 2 || lexGen.nfaStates.compositeStateTable.get(set) != null) { return false; }
+    if (nameSet.length <= 2 || scannerGen.nfaStates.compositeStateTable.get(set) != null) { return false; }
 
     int i;
     int[] freq = new int[nameSet.length];
     boolean[] live = new boolean[nameSet.length];
-    int[] count = new int[lexGen.nfaStates.allNextStates.size()];
+    int[] count = new int[scannerGen.nfaStates.allNextStates.size()];
 
     for (i = 0; i < nameSet.length; i++) {
       if (nameSet[i] != -1) {
-        if (live[i] = !lexGen.nfaStates.stateDone[nameSet[i]]) { count[0]++; }
+        if (live[i] = !scannerGen.nfaStates.stateDone[nameSet[i]]) { count[0]++; }
       }
     }
 
     int j, blockLen = 0, commonFreq = 0;
-    Enumeration e = lexGen.nfaStates.allNextStates.keys();
+    Enumeration e = scannerGen.nfaStates.allNextStates.keys();
     boolean needUpdate;
 
     while (e.hasMoreElements()) {
-      int[] tmpSet = (int[]) lexGen.nfaStates.allNextStates.get(e.nextElement());
+      int[] tmpSet = (int[]) scannerGen.nfaStates.allNextStates.get(e.nextElement());
       if (tmpSet == nameSet) { continue; }
 
       needUpdate = false;
       for (j = 0; j < nameSet.length; j++) {
         if (nameSet[j] == -1) { continue; }
 
-        if (live[j] && lexGen.nfaStates.elemOccurs(nameSet[j], tmpSet) >= 0) {
+        if (live[j] && scannerGen.nfaStates.elemOccurs(nameSet[j], tmpSet) >= 0) {
           if (!needUpdate) {
             needUpdate = true;
             commonFreq++;
@@ -854,9 +854,9 @@ It also generates code to match a char with the common bit vectors.
     //System.out.println("Common Block for " + set + " :");
     for (i = 0; i < nameSet.length; i++) {
       if (live[i]) {
-        if (((NfaState) lexGen.nfaStates.indexedAllStates.get(nameSet[i])).isComposite) { return false; }
+        if (((NfaState) scannerGen.nfaStates.indexedAllStates.get(nameSet[i])).isComposite) { return false; }
 
-        lexGen.nfaStates.stateDone[nameSet[i]] = true;
+        scannerGen.nfaStates.stateDone[nameSet[i]] = true;
         commonBlock[cnt++] = nameSet[i];
         //System.out.print(nameSet[i] + ", ");
       }
@@ -864,33 +864,33 @@ It also generates code to match a char with the common bit vectors.
 
     //System.out.println("");
 
-    String s = lexGen.nfaStates.getStateSetString(commonBlock);
-    e = lexGen.nfaStates.allNextStates.keys();
+    String s = scannerGen.nfaStates.getStateSetString(commonBlock);
+    e = scannerGen.nfaStates.allNextStates.keys();
 
     Outer:
     while (e.hasMoreElements()) {
       int at;
       boolean firstOne = true;
       String stringToFix;
-      int[] setToFix = (int[]) lexGen.nfaStates.allNextStates.get(stringToFix = (String) e.nextElement());
+      int[] setToFix = (int[]) scannerGen.nfaStates.allNextStates.get(stringToFix = (String) e.nextElement());
 
       if (setToFix == commonBlock) { continue; }
 
       for (int k = 0; k < cnt; k++) {
-        if ((at = lexGen.nfaStates.elemOccurs(commonBlock[k], setToFix)) >= 0) {
+        if ((at = scannerGen.nfaStates.elemOccurs(commonBlock[k], setToFix)) >= 0) {
           if (!firstOne) { setToFix[at] = -1; }
           firstOne = false;
         }
         else { continue Outer; }
       }
 
-      if (lexGen.nfaStates.stateSetsToFix.get(stringToFix) == null) {
-        lexGen.nfaStates.stateSetsToFix.put(stringToFix, setToFix);
+      if (scannerGen.nfaStates.stateSetsToFix.get(stringToFix) == null) {
+        scannerGen.nfaStates.stateSetsToFix.put(stringToFix, setToFix);
       }
     }
 
     next.usefulEpsilonMoves -= blockLen - 1;
-    lexGen.nfaStates.addCompositeStateSet(s, false);
+    scannerGen.nfaStates.addCompositeStateSet(s, false);
     return true;
   }
 
@@ -899,32 +899,32 @@ It also generates code to match a char with the common bit vectors.
 
     String set = next.epsilonMovesString;
 
-    int[] nameSet = (int[]) lexGen.nfaStates.allNextStates.get(set);
+    int[] nameSet = (int[]) scannerGen.nfaStates.allNextStates.get(set);
 
-    if (nameSet.length == 1 || lexGen.nfaStates.compositeStateTable.get(set) != null ||
-        lexGen.nfaStates.stateSetsToFix.get(set) != null) { return false; }
+    if (nameSet.length == 1 || scannerGen.nfaStates.compositeStateTable.get(set) != null ||
+        scannerGen.nfaStates.stateSetsToFix.get(set) != null) { return false; }
 
     int i;
     Hashtable occursIn = new Hashtable();
-    NfaState tmp = (NfaState) lexGen.nfaStates.allStates.get(nameSet[0]);
+    NfaState tmp = (NfaState) scannerGen.nfaStates.allStates.get(nameSet[0]);
 
     for (i = 1; i < nameSet.length; i++) {
-      NfaState tmp1 = (NfaState) lexGen.nfaStates.allStates.get(nameSet[i]);
+      NfaState tmp1 = (NfaState) scannerGen.nfaStates.allStates.get(nameSet[i]);
 
       if (tmp.inNextOf != tmp1.inNextOf) { return false; }
     }
 
     int isPresent, j;
-    Enumeration e = lexGen.nfaStates.allNextStates.keys();
+    Enumeration e = scannerGen.nfaStates.allNextStates.keys();
     while (e.hasMoreElements()) {
       String s;
-      int[] tmpSet = (int[]) lexGen.nfaStates.allNextStates.get(s = (String) e.nextElement());
+      int[] tmpSet = (int[]) scannerGen.nfaStates.allNextStates.get(s = (String) e.nextElement());
 
       if (tmpSet == nameSet) { continue; }
 
       isPresent = 0;
       for (j = 0; j < nameSet.length; j++) {
-        if (lexGen.nfaStates.elemOccurs(nameSet[j], tmpSet) >= 0) { isPresent++; }
+        if (scannerGen.nfaStates.elemOccurs(nameSet[j], tmpSet) >= 0) { isPresent++; }
         else if (isPresent > 0) { return false; }
       }
 
@@ -932,8 +932,8 @@ It also generates code to match a char with the common bit vectors.
         if (tmpSet.length > nameSet.length) { occursIn.put(s, tmpSet); }
 
         //May not need. But safe.
-        if (lexGen.nfaStates.compositeStateTable.get(s) != null ||
-            lexGen.nfaStates.stateSetsToFix.get(s) != null) { return false; }
+        if (scannerGen.nfaStates.compositeStateTable.get(s) != null ||
+            scannerGen.nfaStates.stateSetsToFix.get(s) != null) { return false; }
       }
       else if (isPresent != 0) { return false; }
     }
@@ -943,16 +943,16 @@ It also generates code to match a char with the common bit vectors.
       String s;
       int[] setToFix = (int[]) occursIn.get(s = (String) e.nextElement());
 
-      if (lexGen.nfaStates.stateSetsToFix.get(s) == null) { lexGen.nfaStates.stateSetsToFix.put(s, setToFix); }
+      if (scannerGen.nfaStates.stateSetsToFix.get(s) == null) { scannerGen.nfaStates.stateSetsToFix.put(s, setToFix); }
 
       for (int k = 0; k < setToFix.length; k++) {
-        if (lexGen.nfaStates.elemOccurs(setToFix[k], nameSet) > 0)  // Not >= since need the first one (0)
+        if (scannerGen.nfaStates.elemOccurs(setToFix[k], nameSet) > 0)  // Not >= since need the first one (0)
         { setToFix[k] = -1; }
       }
     }
 
     next.usefulEpsilonMoves = 1;
-    lexGen.nfaStates.addCompositeStateSet(next.epsilonMovesString, false);
+    scannerGen.nfaStates.addCompositeStateSet(next.epsilonMovesString, false);
     return true;
   }
 
@@ -985,20 +985,20 @@ It also generates code to match a char with the common bit vectors.
   boolean selfLoop() {
     if (next == null || next.epsilonMovesString == null) { return false; }
 
-    int[] set = (int[]) lexGen.nfaStates.allNextStates.get(next.epsilonMovesString);
-    return lexGen.nfaStates.elemOccurs(stateName, set) >= 0;
+    int[] set = (int[]) scannerGen.nfaStates.allNextStates.get(next.epsilonMovesString);
+    return scannerGen.nfaStates.elemOccurs(stateName, set) >= 0;
   }
 
   void dumpAsciiMoveForCompositeState(IndentingPrintWriter out, int byteNum, boolean elseNeeded) {
     boolean nextIntersects = selfLoop();
 
-    for (int j = 0; j < lexGen.nfaStates.allStates.size(); j++) {
-      NfaState temp1 = (NfaState) lexGen.nfaStates.allStates.get(j);
+    for (int j = 0; j < scannerGen.nfaStates.allStates.size(); j++) {
+      NfaState temp1 = (NfaState) scannerGen.nfaStates.allStates.get(j);
 
       if (this == temp1 || temp1.stateName == -1 || temp1.dummy ||
           stateName == temp1.stateName || temp1.asciiMoves[byteNum] == 0L) { continue; }
 
-      if (!nextIntersects && lexGen.nfaStates.entersect(temp1.next.epsilonMovesString,
+      if (!nextIntersects && scannerGen.nfaStates.entersect(temp1.next.epsilonMovesString,
           next.epsilonMovesString)) {
         nextIntersects = true;
         break;
@@ -1008,7 +1008,7 @@ It also generates code to match a char with the common bit vectors.
     //System.out.println(stateName + " \'s nextIntersects : " + nextIntersects);
     String prefix = "";
     if (asciiMoves[byteNum] != 0xffffffffffffffffL) {
-      int oneBit = lexGen.nfaStates.onlyOneBitSet(asciiMoves[byteNum]);
+      int oneBit = scannerGen.nfaStates.onlyOneBitSet(asciiMoves[byteNum]);
 
       if (oneBit != -1) {
         out.println("                  " + (elseNeeded ? "else " : "") + "if (jjChar == " +
@@ -1031,7 +1031,7 @@ It also generates code to match a char with the common bit vectors.
     }
 
     if (next != null && next.usefulEpsilonMoves > 0) {
-      int[] stateNames = (int[]) lexGen.nfaStates.allNextStates.get(
+      int[] stateNames = (int[]) scannerGen.nfaStates.allNextStates.get(
           next.epsilonMovesString);
       if (next.usefulEpsilonMoves == 1) {
         int name = stateNames[0];
@@ -1048,17 +1048,17 @@ It also generates code to match a char with the common bit vectors.
             stateNames[0] + ", " + stateNames[1] + ");");
       }
       else {
-        int[] indices = lexGen.nfaStates.getStateSetIndicesForUse(next.epsilonMovesString);
+        int[] indices = scannerGen.nfaStates.getStateSetIndicesForUse(next.epsilonMovesString);
         boolean notTwo = (indices[0] + 1 != indices[1]);
 
         if (nextIntersects) {
           out.print("                  jjCheckNAddStates(" + indices[0]);
           if (notTwo) {
-            lexGen.nfaStates.jjCheckNAddStatesDualNeeded = true;
+            scannerGen.nfaStates.jjCheckNAddStatesDualNeeded = true;
             out.print(", " + indices[1]);
           }
           else {
-            lexGen.nfaStates.jjCheckNAddStatesUnaryNeeded = true;
+            scannerGen.nfaStates.jjCheckNAddStatesUnaryNeeded = true;
           }
           out.println(");");
         }
@@ -1078,15 +1078,15 @@ It also generates code to match a char with the common bit vectors.
     boolean nextIntersects = selfLoop() && isComposite;
     boolean onlyState = true;
 
-    for (int j = 0; j < lexGen.nfaStates.allStates.size(); j++) {
-      NfaState temp1 = (NfaState) lexGen.nfaStates.allStates.get(j);
+    for (int j = 0; j < scannerGen.nfaStates.allStates.size(); j++) {
+      NfaState temp1 = (NfaState) scannerGen.nfaStates.allStates.get(j);
 
       if (this == temp1 || temp1.stateName == -1 || temp1.dummy ||
           stateName == temp1.stateName || temp1.asciiMoves[byteNum] == 0L) { continue; }
 
       if (onlyState && (asciiMoves[byteNum] & temp1.asciiMoves[byteNum]) != 0L) { onlyState = false; }
 
-      if (!nextIntersects && lexGen.nfaStates.entersect(temp1.next.epsilonMovesString,
+      if (!nextIntersects && scannerGen.nfaStates.entersect(temp1.next.epsilonMovesString,
           next.epsilonMovesString)) { nextIntersects = true; }
 
       if (!dumped[temp1.stateName] && !temp1.isComposite &&
@@ -1105,7 +1105,7 @@ It also generates code to match a char with the common bit vectors.
     //if (onlyState)
     //nextIntersects = false;
 
-    int oneBit = lexGen.nfaStates.onlyOneBitSet(asciiMoves[byteNum]);
+    int oneBit = scannerGen.nfaStates.onlyOneBitSet(asciiMoves[byteNum]);
     if (asciiMoves[byteNum] != 0xffffffffffffffffL) {
       if ((next == null || next.usefulEpsilonMoves == 0) &&
           kindToPrint != Integer.MAX_VALUE) {
@@ -1166,7 +1166,7 @@ It also generates code to match a char with the common bit vectors.
     }
 
     if (next != null && next.usefulEpsilonMoves > 0) {
-      int[] stateNames = (int[]) lexGen.nfaStates.allNextStates.get(
+      int[] stateNames = (int[]) scannerGen.nfaStates.allNextStates.get(
           next.epsilonMovesString);
       if (next.usefulEpsilonMoves == 1) {
         int name = stateNames[0];
@@ -1178,17 +1178,17 @@ It also generates code to match a char with the common bit vectors.
             stateNames[0] + ", " + stateNames[1] + ");");
       }
       else {
-        int[] indices = lexGen.nfaStates.getStateSetIndicesForUse(next.epsilonMovesString);
+        int[] indices = scannerGen.nfaStates.getStateSetIndicesForUse(next.epsilonMovesString);
         boolean notTwo = (indices[0] + 1 != indices[1]);
 
         if (nextIntersects) {
           out.print("                  jjCheckNAddStates(" + indices[0]);
           if (notTwo) {
-            lexGen.nfaStates.jjCheckNAddStatesDualNeeded = true;
+            scannerGen.nfaStates.jjCheckNAddStatesDualNeeded = true;
             out.print(", " + indices[1]);
           }
           else {
-            lexGen.nfaStates.jjCheckNAddStatesUnaryNeeded = true;
+            scannerGen.nfaStates.jjCheckNAddStatesUnaryNeeded = true;
           }
           out.println(");");
         }
@@ -1205,20 +1205,20 @@ It also generates code to match a char with the common bit vectors.
 
   void dumpNonAsciiMoveForCompositeState(IndentingPrintWriter out) {
     boolean nextIntersects = selfLoop();
-    for (int j = 0; j < lexGen.nfaStates.allStates.size(); j++) {
-      NfaState temp1 = (NfaState) lexGen.nfaStates.allStates.get(j);
+    for (int j = 0; j < scannerGen.nfaStates.allStates.size(); j++) {
+      NfaState temp1 = (NfaState) scannerGen.nfaStates.allStates.get(j);
 
       if (this == temp1 || temp1.stateName == -1 || temp1.dummy ||
           stateName == temp1.stateName || (temp1.nonAsciiMethod == -1)) { continue; }
 
-      if (!nextIntersects && lexGen.nfaStates.entersect(temp1.next.epsilonMovesString,
+      if (!nextIntersects && scannerGen.nfaStates.entersect(temp1.next.epsilonMovesString,
           next.epsilonMovesString)) {
         nextIntersects = true;
         break;
       }
     }
 
-    if (!Options.getJavaUnicodeEscape() && !lexGen.nfaStates.unicodeWarningGiven) {
+    if (!Options.getJavaUnicodeEscape() && !scannerGen.nfaStates.unicodeWarningGiven) {
       if (loByteVec != null && loByteVec.size() > 1) {
         out.println("                  if ((jjbitVec" +
             ((Integer) loByteVec.get(1)).intValue() + "[i2" +
@@ -1237,7 +1237,7 @@ It also generates code to match a char with the common bit vectors.
     }
 
     if (next != null && next.usefulEpsilonMoves > 0) {
-      int[] stateNames = (int[]) lexGen.nfaStates.allNextStates.get(
+      int[] stateNames = (int[]) scannerGen.nfaStates.allNextStates.get(
           next.epsilonMovesString);
       if (next.usefulEpsilonMoves == 1) {
         int name = stateNames[0];
@@ -1249,17 +1249,17 @@ It also generates code to match a char with the common bit vectors.
             stateNames[0] + ", " + stateNames[1] + ");");
       }
       else {
-        int[] indices = lexGen.nfaStates.getStateSetIndicesForUse(next.epsilonMovesString);
+        int[] indices = scannerGen.nfaStates.getStateSetIndicesForUse(next.epsilonMovesString);
         boolean notTwo = (indices[0] + 1 != indices[1]);
 
         if (nextIntersects) {
           out.print("                     jjCheckNAddStates(" + indices[0]);
           if (notTwo) {
-            lexGen.nfaStates.jjCheckNAddStatesDualNeeded = true;
+            scannerGen.nfaStates.jjCheckNAddStatesDualNeeded = true;
             out.print(", " + indices[1]);
           }
           else {
-            lexGen.nfaStates.jjCheckNAddStatesUnaryNeeded = true;
+            scannerGen.nfaStates.jjCheckNAddStatesUnaryNeeded = true;
           }
           out.println(");");
         }
@@ -1273,13 +1273,13 @@ It also generates code to match a char with the common bit vectors.
   void dumpNonAsciiMove(IndentingPrintWriter out, boolean[] dumped) {
     boolean nextIntersects = selfLoop() && isComposite;
 
-    for (int j = 0; j < lexGen.nfaStates.allStates.size(); j++) {
-      NfaState temp1 = (NfaState) lexGen.nfaStates.allStates.get(j);
+    for (int j = 0; j < scannerGen.nfaStates.allStates.size(); j++) {
+      NfaState temp1 = (NfaState) scannerGen.nfaStates.allStates.get(j);
 
       if (this == temp1 || temp1.stateName == -1 || temp1.dummy ||
           stateName == temp1.stateName || (temp1.nonAsciiMethod == -1)) { continue; }
 
-      if (!nextIntersects && lexGen.nfaStates.entersect(temp1.next.epsilonMovesString,
+      if (!nextIntersects && scannerGen.nfaStates.entersect(temp1.next.epsilonMovesString,
           next.epsilonMovesString)) { nextIntersects = true; }
 
       if (!dumped[temp1.stateName] && !temp1.isComposite &&
@@ -1297,7 +1297,7 @@ It also generates code to match a char with the common bit vectors.
     if (next == null || next.usefulEpsilonMoves <= 0) {
       String kindCheck = " && kind > " + kindToPrint;
 
-      if (!Options.getJavaUnicodeEscape() && !lexGen.nfaStates.unicodeWarningGiven) {
+      if (!Options.getJavaUnicodeEscape() && !scannerGen.nfaStates.unicodeWarningGiven) {
         if (loByteVec != null && loByteVec.size() > 1) {
           out.println("                  if ((jjbitVec" +
               ((Integer) loByteVec.get(1)).intValue() + "[i2" +
@@ -1315,7 +1315,7 @@ It also generates code to match a char with the common bit vectors.
 
     String prefix = "   ";
     if (kindToPrint != Integer.MAX_VALUE) {
-      if (!Options.getJavaUnicodeEscape() && !lexGen.nfaStates.unicodeWarningGiven) {
+      if (!Options.getJavaUnicodeEscape() && !scannerGen.nfaStates.unicodeWarningGiven) {
         if (loByteVec != null && loByteVec.size() > 1) {
           out.println("                  if ((jjbitVec" +
               ((Integer) loByteVec.get(1)).intValue() + "[i2" +
@@ -1333,7 +1333,7 @@ It also generates code to match a char with the common bit vectors.
       out.println("                     kind = " + kindToPrint + ";");
       prefix = "";
     }
-    else if (!Options.getJavaUnicodeEscape() && !lexGen.nfaStates.unicodeWarningGiven) {
+    else if (!Options.getJavaUnicodeEscape() && !scannerGen.nfaStates.unicodeWarningGiven) {
       if (loByteVec != null && loByteVec.size() > 1) {
         out.println("                  if ((jjbitVec" +
             ((Integer) loByteVec.get(1)).intValue() + "[i2" +
@@ -1346,7 +1346,7 @@ It also generates code to match a char with the common bit vectors.
     }
 
     if (next != null && next.usefulEpsilonMoves > 0) {
-      int[] stateNames = (int[]) lexGen.nfaStates.allNextStates.get(
+      int[] stateNames = (int[]) scannerGen.nfaStates.allNextStates.get(
           next.epsilonMovesString);
       if (next.usefulEpsilonMoves == 1) {
         int name = stateNames[0];
@@ -1358,17 +1358,17 @@ It also generates code to match a char with the common bit vectors.
             stateNames[0] + ", " + stateNames[1] + ");");
       }
       else {
-        int[] indices = lexGen.nfaStates.getStateSetIndicesForUse(next.epsilonMovesString);
+        int[] indices = scannerGen.nfaStates.getStateSetIndicesForUse(next.epsilonMovesString);
         boolean notTwo = (indices[0] + 1 != indices[1]);
 
         if (nextIntersects) {
           out.print("                  jjCheckNAddStates(" + indices[0]);
           if (notTwo) {
-            lexGen.nfaStates.jjCheckNAddStatesDualNeeded = true;
+            scannerGen.nfaStates.jjCheckNAddStatesDualNeeded = true;
             out.print(", " + indices[1]);
           }
           else {
-            lexGen.nfaStates.jjCheckNAddStatesUnaryNeeded = true;
+            scannerGen.nfaStates.jjCheckNAddStatesUnaryNeeded = true;
           }
           out.println(");");
         }
@@ -1391,7 +1391,7 @@ It also generates code to match a char with the common bit vectors.
       for (j = 0; j < loByteVec.size(); j += 2) {
         out.println("      case " +
             ((Integer) loByteVec.get(j)).intValue() + ":");
-        if (!lexGen.nfaStates.allBitsSet((String) lexGen.nfaStates.allBitVectors.get(
+        if (!scannerGen.nfaStates.allBitsSet((String) scannerGen.nfaStates.allBitVectors.get(
             ((Integer) loByteVec.get(j + 1)).intValue()))) {
           out.println("         return ((jjbitVec" +
               ((Integer) loByteVec.get(j + 1)).intValue() + "[i2" +
@@ -1406,12 +1406,12 @@ It also generates code to match a char with the common bit vectors.
     if (nonAsciiMoveIndices != null &&
         (j = nonAsciiMoveIndices.length) > 0) {
       do {
-        if (!lexGen.nfaStates.allBitsSet((String) lexGen.nfaStates.allBitVectors.get(
+        if (!scannerGen.nfaStates.allBitsSet((String) scannerGen.nfaStates.allBitVectors.get(
             nonAsciiMoveIndices[j - 2]))) {
           out.println("         if ((jjbitVec" + nonAsciiMoveIndices[j - 2] +
               "[i1] & l1) != 0L)");
         }
-        if (!lexGen.nfaStates.allBitsSet((String) lexGen.nfaStates.allBitVectors.get(
+        if (!scannerGen.nfaStates.allBitsSet((String) scannerGen.nfaStates.allBitVectors.get(
             nonAsciiMoveIndices[j - 1]))) {
           out.println("            if ((jjbitVec" + nonAsciiMoveIndices[j - 1] +
               "[i2] & l2) == 0L)");

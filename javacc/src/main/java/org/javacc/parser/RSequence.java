@@ -50,12 +50,12 @@ public final class RSequence extends RegularExpression {
   }
 
   @Override
-  public Nfa generateNfa(LexGen lexGen, boolean ignoreCase) {
+  public Nfa generateNfa(ScannerGen scannerGen, boolean ignoreCase) {
     if (units.size() == 1) {
-      return units.get(0).generateNfa(lexGen, ignoreCase);
+      return units.get(0).generateNfa(scannerGen, ignoreCase);
     }
 
-    Nfa nfa = new Nfa(lexGen);
+    Nfa nfa = new Nfa(scannerGen);
 
     NfaState startState = nfa.start;
     NfaState finalState = nfa.end;
@@ -65,13 +65,13 @@ public final class RSequence extends RegularExpression {
     RegularExpression curRE;
 
     curRE = units.get(0);
-    temp1 = curRE.generateNfa(lexGen, ignoreCase);
+    temp1 = curRE.generateNfa(scannerGen, ignoreCase);
     startState.addMove(temp1.start);
 
     for (int i = 1; i < units.size(); i++) {
       curRE = units.get(i);
 
-      temp2 = curRE.generateNfa(lexGen, ignoreCase);
+      temp2 = curRE.generateNfa(scannerGen, ignoreCase);
       temp1.end.addMove(temp2.start);
       temp1 = temp2;
     }
