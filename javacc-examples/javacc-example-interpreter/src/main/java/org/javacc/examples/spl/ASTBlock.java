@@ -26,15 +26,9 @@ package org.javacc.examples.spl;/* Copyright (c) 2006, Sun Microsystems, Inc.
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* JJT: 0.2.2 */
-
 public class ASTBlock extends SimpleNode {
   public ASTBlock(int id) {
     super(id);
-  }
-
-  public ASTBlock(SPLParser p, int id) {
-    super(p, id);
   }
 
   @Override

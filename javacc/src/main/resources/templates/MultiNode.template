@@ -2,27 +2,30 @@ public class ${NODE_TYPE} extends ${NODE_CLASS:-SimpleNode} {
   public ${NODE_TYPE}(int id) {
     super(id);
   }
+#if NODE_USES_PARSER
 
   public ${NODE_TYPE}(${PARSER_NAME} p, int id) {
     super(p, id);
   }
-
+#fi
 #if NODE_FACTORY
+
   public static Node jjtCreate(int id) {
     return new ${NODE_TYPE}(id);
   }
 
+#if NODE_USES_PARSER
   public static Node jjtCreate(${PARSER_NAME} p, int id) {
     return new ${NODE_TYPE}(p, id);
   }
 #fi
+#fi
 #if VISITOR
 
-  /** Accept the visitor. **/
 #if VISITOR_EXCEPTION
-  public ${VISITOR_RETURN_TYPE} jjtAccept(${PARSER_NAME}Visitor visitor, ${VISITOR_DATA_TYPE:-Object} data) throws ${VISITOR_EXCEPTION} {
+  public ${VISITOR_RETURN_TYPE} jjtAccept(${VISITOR_TYPE} visitor, ${VISITOR_DATA_TYPE:-Object} data) throws ${VISITOR_EXCEPTION} {
 #else
-  public ${VISITOR_RETURN_TYPE} jjtAccept(${PARSER_NAME}Visitor visitor, ${VISITOR_DATA_TYPE:-Object} data) {
+  public ${VISITOR_RETURN_TYPE} jjtAccept(${VISITOR_TYPE} visitor, ${VISITOR_DATA_TYPE:-Object} data) {
 #fi
 #if VISITOR_RETURN_TYPE_VOID
     visitor.visit(this, data);

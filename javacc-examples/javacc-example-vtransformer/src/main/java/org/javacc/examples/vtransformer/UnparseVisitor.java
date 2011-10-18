@@ -30,7 +30,7 @@ package org.javacc.examples.vtransformer;
 
 import java.io.PrintStream;
 
-public class UnparseVisitor implements JavaParserVisitor {
+public class UnparseVisitor implements JavaVisitor {
   protected PrintStream out;
 
   public UnparseVisitor(PrintStream o) {

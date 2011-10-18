@@ -39,7 +39,7 @@ public class Main {
             new JavaCharStream(
                 new InputStreamReader(System.in))));
     ASTCompilationUnit cu = parser.CompilationUnit();
-    JavaParserVisitor visitor = new AddAcceptVisitor(System.out);
+    JavaVisitor visitor = new AddAcceptVisitor(System.out);
     cu.jjtAccept(visitor, null);
   }
 }

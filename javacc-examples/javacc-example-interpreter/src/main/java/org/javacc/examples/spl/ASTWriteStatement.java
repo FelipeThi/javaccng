@@ -26,8 +26,6 @@ package org.javacc.examples.spl;/* Copyright (c) 2006, Sun Microsystems, Inc.
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* JJT: 0.2.2 */
-
 import java.io.IOException;
 
 public class ASTWriteStatement extends SimpleNode {
@@ -35,10 +33,6 @@ public class ASTWriteStatement extends SimpleNode {
 
   public ASTWriteStatement(int id) {
     super(id);
-  }
-
-  public ASTWriteStatement(SPLParser p, int id) {
-    super(p, id);
   }
 
   @Override

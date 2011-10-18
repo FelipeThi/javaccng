@@ -121,7 +121,7 @@ public class SimpleNode implements Node {
   }
 
   public String toString() {
-    return ToyParserTreeConstants.jjtNodeName[id];
+    return ToyTreeConstants.jjtNodeName[id];
   }
 
   public String toString(String prefix) {

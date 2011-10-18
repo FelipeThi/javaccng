@@ -64,9 +64,9 @@ public class ToyParser {
     }
     try {
       node = parser.CompilationUnit();
-      PrintWriter ostr = new PrintWriter(new FileWriter(args[1]));
-      node.process(ostr);
-      ostr.close();
+      PrintWriter out = new PrintWriter(new FileWriter(args[1]));
+      node.process(out);
+      out.close();
       System.out.println("Toy Preprocessor:  Transformation completed successfully.");
     }
     catch (ParseException e) {

@@ -115,11 +115,19 @@ class JJTreeGlobals {
   }
 
   static String treeConstantsClass() {
-    return parserName + "TreeConstants";
+    String name = parserName;
+    if (name.endsWith("Parser")) {
+      name = name.substring(0, name.length() - "Parser".length());
+    }
+    return name + "TreeConstants";
   }
 
   static String visitorClass() {
-    return parserName + "Visitor";
+    String name = parserName;
+    if (name.endsWith("Parser")) {
+      name = name.substring(0, name.length() - "Parser".length());
+    }
+    return name + "Visitor";
   }
 }
 

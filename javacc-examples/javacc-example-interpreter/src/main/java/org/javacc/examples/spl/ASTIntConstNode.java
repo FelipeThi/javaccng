@@ -26,17 +26,11 @@ package org.javacc.examples.spl;/* Copyright (c) 2006, Sun Microsystems, Inc.
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* JJT: 0.2.2 */
-
 public class ASTIntConstNode extends SimpleNode {
   int val;
 
   public ASTIntConstNode(int id) {
     super(id);
-  }
-
-  public ASTIntConstNode(SPLParser p, int id) {
-    super(p, id);
   }
 
   @Override

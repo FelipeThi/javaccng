@@ -26,15 +26,9 @@ package org.javacc.examples.spl;/* Copyright (c) 2006, Sun Microsystems, Inc.
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* JJT: 0.2.2 */
-
 public class ASTAddNode extends SimpleNode {
   public ASTAddNode(int id) {
     super(id);
-  }
-
-  public ASTAddNode(SPLParser p, int id) {
-    super(p, id);
   }
 
   @Override

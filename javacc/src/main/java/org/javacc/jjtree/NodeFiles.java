@@ -186,6 +186,10 @@ final class NodeFiles implements FileGenerator {
       Map<String, Object> options = new HashMap<String, Object>(Options.getOptions());
       options.put("PARSER_NAME",
           JJTreeGlobals.parserName);
+      options.put("VISITOR_TYPE",
+          JJTreeGlobals.visitorClass());
+      options.put("TREE_CONSTANTS_TYPE",
+          JJTreeGlobals.treeConstantsClass());
       JavaFileGenerator generator = new JavaFileGenerator(
           "/templates/Node.template", options);
       generatePrologue(out);
@@ -202,6 +206,10 @@ final class NodeFiles implements FileGenerator {
       Map<String, Object> options = new HashMap<String, Object>(Options.getOptions());
       options.put("PARSER_NAME",
           JJTreeGlobals.parserName);
+      options.put("VISITOR_TYPE",
+          JJTreeGlobals.visitorClass());
+      options.put("TREE_CONSTANTS_TYPE",
+          JJTreeGlobals.treeConstantsClass());
       options.put("VISITOR_RETURN_TYPE_VOID",
           "void".equals(JJTreeOptions.getVisitorReturnType()));
       JavaFileGenerator generator = new JavaFileGenerator(
@@ -221,6 +229,10 @@ final class NodeFiles implements FileGenerator {
       Map<String, Object> options = new HashMap<String, Object>(Options.getOptions());
       options.put("PARSER_NAME",
           JJTreeGlobals.parserName);
+      options.put("VISITOR_TYPE",
+          JJTreeGlobals.visitorClass());
+      options.put("TREE_CONSTANTS_TYPE",
+          JJTreeGlobals.treeConstantsClass());
       options.put("NODE_TYPE",
           nodeType);
       options.put("VISITOR_RETURN_TYPE_VOID",

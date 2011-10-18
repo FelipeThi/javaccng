@@ -107,10 +107,6 @@ public final class JJTree {
 
       ASTGrammar root = (ASTGrammar) parser.jjTree.rootNode();
 
-      if (Boolean.getBoolean("jjtree-dump")) {
-        root.dump(" ");
-      }
-
       try {
         io.setOutput();
       }

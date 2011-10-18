@@ -41,7 +41,7 @@ public class ASTNodeDescriptor extends JJTreeNode {
   private boolean faked;
 
   static ASTNodeDescriptor indefinite(String s) {
-    ASTNodeDescriptor nd = new ASTNodeDescriptor(JJTreeParserTreeConstants.JJTNODEDESCRIPTOR);
+    ASTNodeDescriptor nd = new ASTNodeDescriptor(JJTreeTreeConstants.JJTNODEDESCRIPTOR);
     nd.name = s;
     nd.setNodeIdValue();
     nd.faked = true;
