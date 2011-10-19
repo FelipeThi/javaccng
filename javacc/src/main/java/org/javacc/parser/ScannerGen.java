@@ -308,7 +308,7 @@ final class ScannerGen implements FileGenerator, JavaCCConstants {
     nfaStates.dumpNonAsciiMoveMethods(out);
     stringLiterals.DumpStrLiteralImages(this, out);
     dumpStaticVarDeclarations(out);
-    dumpFillToken(out);
+    dumpMakeToken(out);
     dumpGetNextToken(out);
 
     if (Options.getDebugScanner()) {
@@ -820,64 +820,45 @@ final class ScannerGen implements FileGenerator, JavaCCConstants {
     return 0xffff;
   }
 
-  private void dumpFillToken(IndentingPrintWriter out) {
-    out.println("protected Token jjFillToken() {");
+  private void dumpMakeToken(IndentingPrintWriter out) {
+    out.println("protected Token jjMakeToken() {");
     out.indent();
+
     if (keepImage) {
-      out.println("String curTokenImage;");
+      out.println("String currentImage;");
     }
 
     if (hasEmptyMatch) {
-      out.println("if (jjMatchedPos < 0) {");
       if (keepImage) {
-        out.println("   if (image == null)");
-        out.println("      curTokenImage = \"\";");
-        out.println("   else");
-        out.println("      curTokenImage = image.toString();");
+        out.println("if (jjMatchedPos < 0) {");
+        out.indent();
+        out.println("if (image == null) { currentImage = \"\"; }");
+        out.println("else { currentImage = image.toString(); }");
+        out.unindent();
+        out.println("}");
+        out.println("else {");
+        out.indent();
+        out.println("String literal = jjLiteralImages[jjMatchedKind];");
+        out.println("if (literal == null) { currentImage = charStream.getImage(); }");
+        out.println("else { currentImage = literal; }");
+        out.unindent();
+        out.println("}");
       }
-
-      if (keepLineCol) {
-        out.println("int beginLine = charStream.getBeginLine();");
-        out.println("int beginColumn = charStream.getBeginColumn();");
-        out.println("int endLine = charStream.getBeginLine();");
-        out.println("int endColumn = charStream.getBeginColumn();");
-      }
-
-      out.println("}");
-      out.println("else {");
-      if (keepImage) {
-        out.println("   String literalImage = jjLiteralImages[jjMatchedKind];");
-        out.println("   curTokenImage = literalImage == null ? charStream.getImage() : literalImage;");
-      }
-
-      if (keepLineCol) {
-        out.println("   int beginLine = charStream.getBeginLine();");
-        out.println("   int beginColumn = charStream.getBeginColumn();");
-        out.println("   int endLine = charStream.getEndLine();");
-        out.println("   int endColumn = charStream.getEndColumn();");
-      }
-
-      out.println("}");
     }
     else {
       if (keepImage) {
-        out.println("String literalImage = jjLiteralImages[jjMatchedKind];");
-        out.println("curTokenImage = literalImage == null ? charStream.getImage() : literalImage;");
-      }
-      if (keepLineCol) {
-        out.println("int beginLine = charStream.getBeginLine();");
-        out.println("int beginColumn = charStream.getBeginColumn();");
-        out.println("int endLine = charStream.getEndLine();");
-        out.println("int endColumn = charStream.getEndColumn();");
+        out.println("String literal = jjLiteralImages[jjMatchedKind];");
+        out.println("if (literal == null) { currentImage = charStream.getImage(); }");
+        out.println("else { currentImage = literal; }");
       }
     }
 
     if (keepImage) {
       if (Options.getTokenFactory().length() > 0) {
-        out.println("Token t = " + Options.getTokenFactory() + ".newToken(jjMatchedKind, curTokenImage);");
+        out.println("Token t = " + Options.getTokenFactory() + ".newToken(jjMatchedKind, currentImage);");
       }
       else {
-        out.println("Token t = Token.newToken(jjMatchedKind, curTokenImage);");
+        out.println("Token t = Token.newToken(jjMatchedKind, currentImage);");
       }
     }
     else {
@@ -891,7 +872,21 @@ final class ScannerGen implements FileGenerator, JavaCCConstants {
 
     out.println("t.setOffset(charStream.getBeginOffset(), charStream.getEndOffset());");
     if (keepLineCol) {
-      out.println("t.setLineColumn(beginLine, beginColumn, endLine, endColumn);");
+      if (hasEmptyMatch) {
+        out.println("if (jjMatchedPos < 0) {");
+        out.indent();
+        out.println("t.setLineColumn(charStream.getBeginLine(), charStream.getBeginColumn(), charStream.getBeginLine(), charStream.getBeginColumn());");
+        out.unindent();
+        out.println("}");
+        out.println("else {");
+        out.indent();
+        out.println("t.setLineColumn(charStream.getBeginLine(), charStream.getBeginColumn(), charStream.getEndLine(), charStream.getEndColumn());");
+        out.unindent();
+        out.println("}");
+      }
+      else {
+        out.println("t.setLineColumn(charStream.getBeginLine(), charStream.getBeginColumn(), charStream.getEndLine(), charStream.getEndColumn());");
+      }
     }
 
     out.println("return t;");
@@ -960,7 +955,7 @@ final class ScannerGen implements FileGenerator, JavaCCConstants {
     }
 
     out.println("jjMatchedKind = 0;");
-    out.println("token = jjFillToken();");
+    out.println("token = jjMakeToken();");
 
     if (state.eofNextState != null || state.eofAction != null) {
       out.println("tokenLexicalActions(token);");
@@ -1145,7 +1140,7 @@ final class ScannerGen implements FileGenerator, JavaCCConstants {
         out.indent();
       }
 
-      out.println("token = jjFillToken();");
+      out.println("token = jjMakeToken();");
 
       if (hasTokenActions) {
         out.println("tokenLexicalActions(token);");
@@ -1182,7 +1177,7 @@ final class ScannerGen implements FileGenerator, JavaCCConstants {
           if (hasSpecial) {
             out.println("if (isSpecial(jjMatchedKind)) {");
             out.indent();
-            out.println("token = jjFillToken();");
+            out.println("token = jjMakeToken();");
 
             if (hasSkipActions) {
               out.println("skipLexicalActions(token);");
