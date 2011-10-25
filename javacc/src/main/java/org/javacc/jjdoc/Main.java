@@ -36,6 +36,7 @@ import org.javacc.parser.JavaCharStream;
 import org.javacc.parser.MetaParseException;
 import org.javacc.parser.ParseException;
 import org.javacc.utils.Tools;
+import org.javacc.utils.io.IndentingPrintWriter;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -44,8 +45,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 
 public final class Main {
-  private Main() {}
-
   public static void main(String[] args) throws Exception {
     System.exit(mainProgram(args));
   }
@@ -56,7 +55,6 @@ public final class Main {
 
     Tools.bannerLine("Documentation Generator", "0.1.4");
 
-    JavaCCParser parser;
     if (args.length == 0) {
       usage();
       return 1;
@@ -77,6 +75,7 @@ public final class Main {
       JJDocOptions.setCmdLineOption(args[arg]);
     }
 
+    JavaCCParser parser;
     if (args[args.length - 1].equals("-")) {
       JJDocGlobals.info("Reading from standard input . . .");
       parser = new JavaCCParser(
@@ -103,7 +102,9 @@ public final class Main {
             new InputStreamReader(
                 new FileInputStream(args[args.length - 1]),
                 JJDocOptions.getGrammarEncoding()));
-        parser = new JavaCCParser(new JavaCCScanner(new JavaCharStream(reader)));
+        parser = new JavaCCParser(
+            new JavaCCScanner(
+                new JavaCharStream(reader)));
       }
       catch (SecurityException se) {
         JJDocGlobals.error("Security violation while trying to open " + args[args.length - 1]);
@@ -121,8 +122,14 @@ public final class Main {
 
       parser.start();
 
-      JJDoc doc = new JJDoc(state);
-      doc.start();
+      IndentingPrintWriter out = JJDocGlobals.createOutputStream();
+      try {
+        JJDoc doc = new JJDoc(state, JJDocGlobals.createFormatter(out));
+        doc.start();
+      }
+      finally {
+        out.close();
+      }
 
       if (JavaCCErrors.getErrorCount() == 0) {
         if (JavaCCErrors.getWarningCount() == 0) {
@@ -140,14 +147,14 @@ public final class Main {
         return JavaCCErrors.getErrorCount() == 0 ? 0 : 1;
       }
     }
-    catch (MetaParseException e) {
-      JJDocGlobals.error(e.toString());
+    catch (MetaParseException ex) {
+      JJDocGlobals.error(ex.toString());
       JJDocGlobals.error("Detected " + JavaCCErrors.getErrorCount() + " errors and "
           + JavaCCErrors.getWarningCount() + " warnings.");
       return 1;
     }
-    catch (ParseException e) {
-      JJDocGlobals.error(e.toString());
+    catch (ParseException ex) {
+      JJDocGlobals.error(ex.toString());
       JJDocGlobals.error("Detected " + (JavaCCErrors.getErrorCount() + 1) + " errors and "
           + JavaCCErrors.getWarningCount() + " warnings.");
       return 1;

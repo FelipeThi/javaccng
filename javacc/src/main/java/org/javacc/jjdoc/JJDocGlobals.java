@@ -28,80 +28,66 @@
 
 package org.javacc.jjdoc;
 
+import org.javacc.utils.io.IndentingPrintWriter;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+
 /** Global variables for JJDoc. */
-public final class JJDocGlobals {
+public class JJDocGlobals {
   /** The name of the input file. */
   public static String inputFile;
   /** The name of the output file. */
   public static String outputFile;
-  /** The Generator to create output with. */
-  public static Generator generator;
 
-  /** @param generator The generator to set. */
-  public static void setGenerator(Generator generator) {
-    JJDocGlobals.generator = generator;
+  public static Formatter createFormatter(IndentingPrintWriter out) {
+    if (JJDocOptions.getText()) {
+      return new TextFormatter(out);
+    }
+    if (JJDocOptions.getBNF()) {
+      return new BNFFormatter(out);
+    }
+    return new HTMLFormatter(out);
   }
 
-  /**
-   * The commandline option is either TEXT or not, but the generator might
-   * have been set to some other Generator using the setGenerator method.
-   *
-   * @return the generator configured in options or set by setter.
-   */
-  public static Generator getGenerator() {
-    if (generator == null) {
-      if (JJDocOptions.getText()) {
-        generator = new TextGenerator();
-      }
-      else if (JJDocOptions.getBNF()) {
-        generator = new BNFGenerator();
+  public static IndentingPrintWriter createOutputStream()
+      throws IOException {
+    if (JJDocOptions.getOutputFile().equals("")) {
+      if (JJDocGlobals.inputFile.equals("standard input")) {
+        return new IndentingPrintWriter(
+            new OutputStreamWriter(System.out));
       }
       else {
-        generator = new HTMLGenerator();
+        String ext = ".bnf";
+        int i = JJDocGlobals.inputFile.lastIndexOf('.');
+        if (i == -1) {
+          outputFile = inputFile + ext;
+        }
+        else {
+          String suffix = JJDocGlobals.inputFile.substring(i);
+          if (suffix.equals(ext)) {
+            outputFile = inputFile + ext;
+          }
+          else {
+            outputFile = JJDocGlobals.inputFile.substring(0, i) + ext;
+          }
+        }
       }
     }
     else {
-      if (JJDocOptions.getText()) {
-        if (generator instanceof HTMLGenerator) {
-          generator = new TextGenerator();
-        }
-      }
-      else if (JJDocOptions.getBNF()) {
-        generator = new BNFGenerator();
-      }
-      else {
-        if (generator instanceof TextGenerator) {
-          generator = new HTMLGenerator();
-        }
-      }
+      outputFile = JJDocOptions.getOutputFile();
     }
-    return generator;
+    return new IndentingPrintWriter(
+        new FileWriter(
+            outputFile));
   }
 
-  /**
-   * Log informational messages.
-   *
-   * @param message the message to log
-   */
-  public static void debug(String message) {
-    getGenerator().debug(message);
-  }
-
-  /**
-   * Log informational messages.
-   *
-   * @param message the message to log
-   */
   public static void info(String message) {
-    getGenerator().info(message);
+    System.err.println(message);
   }
 
-  /**
-   * Log error messages.
-   *
-   * @param message the message to log
-   */
   public static void error(String message) {
-    getGenerator().error(message);
+    System.err.println(message);
   }
 }

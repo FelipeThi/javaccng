@@ -34,9 +34,18 @@ import org.javacc.parser.NonTerminal;
 import org.javacc.parser.NormalProduction;
 import org.javacc.parser.RegularExpression;
 import org.javacc.parser.TokenProduction;
+import org.javacc.utils.io.IndentingPrintWriter;
 
 /** A report generator for a grammar. */
-public interface Generator {
+public interface Formatter {
+  abstract class AbstractFormatter implements Formatter {
+    protected final IndentingPrintWriter out;
+
+    protected AbstractFormatter(IndentingPrintWriter out) {
+      this.out = out;
+    }
+  }
+
   /** Output string with entity substitution for brackets and ampersands. */
   void text(String s);
 
@@ -122,32 +131,4 @@ public interface Generator {
    * @param re the RegularExpression being output
    */
   void reEnd(RegularExpression re);
-
-  /**
-   * Log debug messages.
-   *
-   * @param message The string to log
-   */
-  void debug(String message);
-
-  /**
-   * Log informational messages.
-   *
-   * @param message The string to log
-   */
-  void info(String message);
-
-  /**
-   * Log warning messages.
-   *
-   * @param message The string to log
-   */
-  void warn(String message);
-
-  /**
-   * Log error messages.
-   *
-   * @param message The string to log
-   */
-  void error(String message);
 }

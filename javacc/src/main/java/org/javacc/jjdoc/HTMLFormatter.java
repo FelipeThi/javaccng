@@ -34,20 +34,24 @@ import org.javacc.parser.NonTerminal;
 import org.javacc.parser.NormalProduction;
 import org.javacc.parser.RegularExpression;
 import org.javacc.parser.TokenProduction;
+import org.javacc.utils.io.IndentingPrintWriter;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /** Output BNF in HTML 3.2 format. */
-public class HTMLGenerator extends TextGenerator {
-  private Map<String, String> idMap = new HashMap<String, String>();
+public class HTMLFormatter extends TextFormatter {
+  private final Map<String, String> idMap = new HashMap<String, String>();
   private int id = 1;
+
+  public HTMLFormatter(IndentingPrintWriter out) {
+    super(out);
+  }
 
   private String getId(String nt) {
     String i = idMap.get(nt);
     if (i == null) {
-      i = "prod" + id++;
-      idMap.put(nt, i);
+      idMap.put(nt, i = "prod" + id++);
     }
     return i;
   }
@@ -58,22 +62,22 @@ public class HTMLGenerator extends TextGenerator {
 
   @Override
   public void text(String s) {
-    String ss = "";
+    String r = "";
     for (int i = 0; i < s.length(); ++i) {
       if (s.charAt(i) == '<') {
-        ss += "&lt;";
+        r += "&lt;";
       }
       else if (s.charAt(i) == '>') {
-        ss += "&gt;";
+        r += "&gt;";
       }
       else if (s.charAt(i) == '&') {
-        ss += "&amp;";
+        r += "&amp;";
       }
       else {
-        ss += s.charAt(i);
+        r += s.charAt(i);
       }
     }
-    print(ss);
+    print(r);
   }
 
   @Override
@@ -83,7 +87,6 @@ public class HTMLGenerator extends TextGenerator {
 
   @Override
   public void documentStart() {
-    out = createOutputStream();
     println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2//EN\">");
     println("<HTML>");
     println("<HEAD>");
@@ -105,7 +108,6 @@ public class HTMLGenerator extends TextGenerator {
   public void documentEnd() {
     println("</BODY>");
     println("</HTML>");
-    out.close();
   }
 
   @Override
@@ -113,11 +115,11 @@ public class HTMLGenerator extends TextGenerator {
     println(" <!-- Special token -->");
     println(" <TR>");
     println("  <TD>");
-    println("<PRE>");
+    println("   <PRE>");
     print(s);
-    println("</PRE>");
+    println("   </PRE>");
     println("  </TD>");
-    println(" </TR>");
+    println("</TR>");
   }
 
   @Override
@@ -216,10 +218,8 @@ public class HTMLGenerator extends TextGenerator {
   }
 
   @Override
-  public void reStart(RegularExpression r) {
-  }
+  public void reStart(RegularExpression r) {}
 
   @Override
-  public void reEnd(RegularExpression r) {
-  }
+  public void reEnd(RegularExpression r) {}
 }

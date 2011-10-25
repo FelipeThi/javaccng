@@ -33,6 +33,7 @@ import org.javacc.parser.BNFProduction;
 import org.javacc.parser.CharacterRange;
 import org.javacc.parser.Choice;
 import org.javacc.parser.Expansion;
+import org.javacc.parser.FileGenerator;
 import org.javacc.parser.JavaCCState;
 import org.javacc.parser.JavaCodeProduction;
 import org.javacc.parser.Lookahead;
@@ -64,20 +65,21 @@ import org.javacc.utils.Parsers;
 import java.util.Iterator;
 import java.util.List;
 
-/** The main entry point for JJDoc. */
-public class JJDoc {
+public class JJDoc implements FileGenerator {
   private final JavaCCState state;
+  private final Formatter f;
 
-  public JJDoc(JavaCCState state) {
+  public JJDoc(JavaCCState state, Formatter f) {
     this.state = state;
+    this.f = f;
   }
 
-  void start() {
-    Generator generator = JJDocGlobals.getGenerator();
-    generator.documentStart();
-    emitTokenProductions(generator, state.regExpList);
-    emitNormalProductions(generator, state.bnfProductions);
-    generator.documentEnd();
+  @Override
+  public void start() {
+    f.documentStart();
+    emitTokenProductions(state.regExpList);
+    emitNormalProductions(state.bnfProductions);
+    f.documentEnd();
   }
 
   private Token getPrecedingSpecialToken(Token token) {
@@ -88,7 +90,7 @@ public class JJDoc {
     return t != token ? t : null;
   }
 
-  private void emitTopLevelSpecialTokens(Token token, Generator gen) {
+  private void emitTopLevelSpecialTokens(Token token) {
     if (token == null) {
       // Strange ...
       return;
@@ -103,24 +105,16 @@ public class JJDoc {
         token = token.next;
       }
     }
-    if (!"".equals(s)) { gen.specialTokens(s); }
+    if (!"".equals(s)) {
+      f.specialTokens(s);
+    }
   }
 
-  /*
-  private boolean toplevelExpansion(Expansion exp) {
-    return exp.parent != null
-      && ( (exp.parent instanceof NormalProduction)
-         ||
-         (exp.parent instanceof TokenProduction)
-         );
-  }
-  */
-
-  private void emitTokenProductions(Generator gen, List<TokenProduction> prods) {
-    gen.tokensStart();
+  private void emitTokenProductions(List<TokenProduction> prods) {
+    f.tokensStart();
     // FIXME there are many empty productions here
     for (TokenProduction tp : prods) {
-      emitTopLevelSpecialTokens(tp.firstToken, gen);
+      emitTopLevelSpecialTokens(tp.firstToken);
 
       String token = "";
       if (tp.explicit) {
@@ -159,161 +153,158 @@ public class JJDoc {
         token += "}\n\n";
       }
       if (!"".equals(token)) {
-        gen.tokenStart(tp);
-        gen.text(token);
-        gen.tokenEnd(tp);
+        f.tokenStart(tp);
+        f.text(token);
+        f.tokenEnd(tp);
       }
     }
-    gen.tokensEnd();
+    f.tokensEnd();
   }
 
-  private void emitNormalProductions(Generator gen, List<NormalProduction> prods) {
-    gen.nonterminalsStart();
+  private void emitNormalProductions(List<NormalProduction> prods) {
+    f.nonterminalsStart();
     for (NormalProduction np : prods) {
-      emitTopLevelSpecialTokens(np.getFirstToken(), gen);
+      emitTopLevelSpecialTokens(np.getFirstToken());
       if (np instanceof BNFProduction) {
-        gen.productionStart(np);
+        f.productionStart(np);
         if (np.getExpansion() instanceof Choice) {
           boolean first = true;
           Choice c = (Choice) np.getExpansion();
           for (Expansion expansion : c.getChoices()) {
-            gen.expansionStart(expansion, first);
-            emitExpansionTree(expansion, gen);
-            gen.expansionEnd(expansion, first);
+            f.expansionStart(expansion, first);
+            emitExpansionTree(expansion);
+            f.expansionEnd(expansion, first);
             first = false;
           }
         }
         else {
-          gen.expansionStart(np.getExpansion(), true);
-          emitExpansionTree(np.getExpansion(), gen);
-          gen.expansionEnd(np.getExpansion(), true);
+          f.expansionStart(np.getExpansion(), true);
+          emitExpansionTree(np.getExpansion());
+          f.expansionEnd(np.getExpansion(), true);
         }
-        gen.productionEnd(np);
+        f.productionEnd(np);
       }
       else if (np instanceof JavaCodeProduction) {
-        gen.javacode((JavaCodeProduction) np);
+        f.javacode((JavaCodeProduction) np);
       }
     }
-    gen.nonterminalsEnd();
+    f.nonterminalsEnd();
   }
 
-  private void emitExpansionTree(Expansion exp, Generator gen) {
-    //     gen.text("[->" + exp.getClass().getName() + "]");
+  private void emitExpansionTree(Expansion exp) {
     if (exp instanceof Action) {
-      emitExpansionAction((Action) exp, gen);
+      emitExpansionAction((Action) exp);
     }
     else if (exp instanceof Choice) {
-      emitExpansionChoice((Choice) exp, gen);
+      emitExpansionChoice((Choice) exp);
     }
     else if (exp instanceof Lookahead) {
-      emitExpansionLookahead((Lookahead) exp, gen);
+      emitExpansionLookahead((Lookahead) exp);
     }
     else if (exp instanceof NonTerminal) {
-      emitExpansionNonTerminal((NonTerminal) exp, gen);
+      emitExpansionNonTerminal((NonTerminal) exp);
     }
     else if (exp instanceof OneOrMore) {
-      emitExpansionOneOrMore((OneOrMore) exp, gen);
+      emitExpansionOneOrMore((OneOrMore) exp);
     }
     else if (exp instanceof RegularExpression) {
-      emitExpansionRegularExpression((RegularExpression) exp, gen);
+      emitExpansionRegularExpression((RegularExpression) exp);
     }
     else if (exp instanceof Sequence) {
-      emitExpansionSequence((Sequence) exp, gen);
+      emitExpansionSequence((Sequence) exp);
     }
     else if (exp instanceof TryBlock) {
-      emitExpansionTryBlock((TryBlock) exp, gen);
+      emitExpansionTryBlock((TryBlock) exp);
     }
     else if (exp instanceof ZeroOrMore) {
-      emitExpansionZeroOrMore((ZeroOrMore) exp, gen);
+      emitExpansionZeroOrMore((ZeroOrMore) exp);
     }
     else if (exp instanceof ZeroOrOne) {
-      emitExpansionZeroOrOne((ZeroOrOne) exp, gen);
+      emitExpansionZeroOrOne((ZeroOrOne) exp);
     }
     else {
-      JJDocGlobals.error("Oops: Unknown expansion type.");
+      throw new IllegalStateException("Unreachable: unknown expansion type");
     }
-    //     gen.text("[<-" + exp.getClass().getName() + "]");
   }
 
-  private void emitExpansionAction(Action a, Generator gen) {}
+  private void emitExpansionAction(Action a) {}
 
-  private void emitExpansionChoice(Choice c, Generator gen) {
+  private void emitExpansionChoice(Choice c) {
     for (Iterator<Expansion> it = c.getChoices().iterator(); it.hasNext(); ) {
       Expansion e = it.next();
-      emitExpansionTree(e, gen);
+      emitExpansionTree(e);
       if (it.hasNext()) {
-        gen.text(" | ");
+        f.text(" | ");
       }
     }
   }
 
-  private void emitExpansionLookahead(Lookahead l, Generator gen) {}
+  private void emitExpansionLookahead(Lookahead l) {}
 
-  private void emitExpansionNonTerminal(NonTerminal nt, Generator gen) {
-    gen.nonTerminalStart(nt);
-    gen.text(nt.getName());
-    gen.nonTerminalEnd(nt);
+  private void emitExpansionNonTerminal(NonTerminal nt) {
+    f.nonTerminalStart(nt);
+    f.text(nt.getName());
+    f.nonTerminalEnd(nt);
   }
 
-  private void emitExpansionOneOrMore(OneOrMore o, Generator gen) {
-    gen.text("( ");
-    emitExpansionTree(o.expansion, gen);
-    gen.text(" )+");
+  private void emitExpansionOneOrMore(OneOrMore o) {
+    f.text("( ");
+    emitExpansionTree(o.expansion);
+    f.text(" )+");
   }
 
-  private void emitExpansionRegularExpression(RegularExpression r,
-                                              Generator gen) {
+  private void emitExpansionRegularExpression(RegularExpression r) {
     String reRendered = emitRE(r);
     if (!"".equals(reRendered)) {
-      gen.reStart(r);
-      gen.text(reRendered);
-      gen.reEnd(r);
+      f.reStart(r);
+      f.text(reRendered);
+      f.reEnd(r);
     }
   }
 
-  private void emitExpansionSequence(Sequence s, Generator gen) {
+  private void emitExpansionSequence(Sequence s) {
     boolean firstUnit = true;
     for (Expansion expansion : s.units) {
       if (expansion instanceof Lookahead || expansion instanceof Action) {
         continue;
       }
       if (!firstUnit) {
-        gen.text(" ");
+        f.text(" ");
       }
       boolean needParens = expansion instanceof Choice
           || expansion instanceof Sequence;
       if (needParens) {
-        gen.text("( ");
+        f.text("( ");
       }
-      emitExpansionTree(expansion, gen);
+      emitExpansionTree(expansion);
       if (needParens) {
-        gen.text(" )");
+        f.text(" )");
       }
       firstUnit = false;
     }
   }
 
-  private void emitExpansionTryBlock(TryBlock t, Generator gen) {
+  private void emitExpansionTryBlock(TryBlock t) {
     boolean needParens = t.expansion instanceof Choice;
     if (needParens) {
-      gen.text("( ");
+      f.text("( ");
     }
-    emitExpansionTree(t.expansion, gen);
+    emitExpansionTree(t.expansion);
     if (needParens) {
-      gen.text(" )");
+      f.text(" )");
     }
   }
 
-  private void emitExpansionZeroOrMore(ZeroOrMore z, Generator gen) {
-    gen.text("( ");
-    emitExpansionTree(z.expansion, gen);
-    gen.text(" )*");
+  private void emitExpansionZeroOrMore(ZeroOrMore z) {
+    f.text("( ");
+    emitExpansionTree(z.expansion);
+    f.text(" )*");
   }
 
-  private void emitExpansionZeroOrOne(ZeroOrOne z, Generator gen) {
-    gen.text("( ");
-    emitExpansionTree(z.expansion, gen);
-    gen.text(" )?");
+  private void emitExpansionZeroOrOne(ZeroOrOne z) {
+    f.text("( ");
+    emitExpansionTree(z.expansion);
+    f.text(" )?");
   }
 
   private String emitRE(RegularExpression re) {
@@ -361,7 +352,7 @@ public class JJDoc {
           returnString += "\"";
         }
         else {
-          JJDocGlobals.error("Oops: unknown character list element type.");
+          throw new IllegalStateException("Unreachable: unknown character list element type");
         }
         if (it.hasNext()) {
           returnString += ",";
@@ -445,7 +436,7 @@ public class JJDoc {
       returnString += "}";
     }
     else {
-      JJDocGlobals.error("Oops: Unknown regular expression type.");
+      throw new IllegalStateException("Unreachable: unknown regular expression type");
     }
     if (needBrackets) {
       returnString += ">";

@@ -28,6 +28,7 @@
 
 package org.javacc.jjdoc;
 
+import org.javacc.jjdoc.Formatter.AbstractFormatter;
 import org.javacc.parser.Expansion;
 import org.javacc.parser.JavaCodeProduction;
 import org.javacc.parser.NonTerminal;
@@ -38,52 +39,11 @@ import org.javacc.parser.RegularExpression;
 import org.javacc.parser.TokenProduction;
 import org.javacc.utils.io.IndentingPrintWriter;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-
-public class BNFGenerator implements Generator {
-  protected IndentingPrintWriter out;
+public class BNFFormatter extends AbstractFormatter {
   private boolean printing = true;
 
-  protected IndentingPrintWriter createOutputStream() {
-    if (JJDocOptions.getOutputFile().equals("")) {
-      if (JJDocGlobals.inputFile.equals("standard input")) {
-        return new IndentingPrintWriter(
-            new OutputStreamWriter(System.out));
-      }
-      else {
-        String ext = ".bnf";
-        int i = JJDocGlobals.inputFile.lastIndexOf('.');
-        if (i == -1) {
-          JJDocGlobals.outputFile = JJDocGlobals.inputFile + ext;
-        }
-        else {
-          String suffix = JJDocGlobals.inputFile.substring(i);
-          if (suffix.equals(ext)) {
-            JJDocGlobals.outputFile = JJDocGlobals.inputFile + ext;
-          }
-          else {
-            JJDocGlobals.outputFile = JJDocGlobals.inputFile.substring(0, i) + ext;
-          }
-        }
-      }
-    }
-    else {
-      JJDocGlobals.outputFile = JJDocOptions.getOutputFile();
-    }
-    try {
-      out = new IndentingPrintWriter(
-          new FileWriter(
-              JJDocGlobals.outputFile));
-    }
-    catch (IOException ex) {
-      error("JJDoc: can't open output stream on file "
-          + JJDocGlobals.outputFile + ".  Using standard output.");
-      out = new IndentingPrintWriter(new OutputStreamWriter(System.out));
-    }
-
-    return out;
+  public BNFFormatter(IndentingPrintWriter out) {
+    super(out);
   }
 
   private void println(String s) {
@@ -103,18 +63,13 @@ public class BNFGenerator implements Generator {
   }
 
   @Override
-  public void documentStart() {
-    out = createOutputStream();
-  }
+  public void documentStart() {}
 
   @Override
-  public void documentEnd() {
-    out.close();
-  }
+  public void documentEnd() {}
 
   @Override
-  public void specialTokens(String s) {
-  }
+  public void specialTokens(String s) {}
 
   @Override
   public void tokenStart(TokenProduction tp) {
@@ -127,28 +82,28 @@ public class BNFGenerator implements Generator {
   }
 
   @Override
-  public void nonterminalsStart() { }
+  public void nonterminalsStart() {}
 
   @Override
-  public void nonterminalsEnd() { }
+  public void nonterminalsEnd() {}
 
   @Override
-  public void tokensStart() { }
+  public void tokensStart() {}
 
   @Override
-  public void tokensEnd() { }
+  public void tokensEnd() {}
 
   @Override
-  public void javacode(JavaCodeProduction jp) { }
+  public void javacode(JavaCodeProduction jp) {}
 
   @Override
-  public void expansionEnd(Expansion e, boolean first) { }
+  public void expansionEnd(Expansion e, boolean first) {}
 
   @Override
-  public void nonTerminalStart(NonTerminal nt) { }
+  public void nonTerminalStart(NonTerminal nt) {}
 
   @Override
-  public void nonTerminalEnd(NonTerminal nt) { }
+  public void nonTerminalEnd(NonTerminal nt) {}
 
   @Override
   public void productionStart(NormalProduction np) {
@@ -179,16 +134,4 @@ public class BNFGenerator implements Generator {
   public void reEnd(RegularExpression r) {
     printing = true;
   }
-
-  @Override
-  public void debug(String message) { System.err.println(message); }
-
-  @Override
-  public void info(String message) { System.err.println(message); }
-
-  @Override
-  public void warn(String message) { System.err.println(message); }
-
-  @Override
-  public void error(String message) { System.err.println(message); }
 }

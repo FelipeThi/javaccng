@@ -1,5 +1,6 @@
 package org.javacc.utils.io;
 
+import java.io.FilterWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Formatter;
@@ -12,21 +13,20 @@ import java.util.Locale;
  * to platform-dependent characters sequence, such as <code>\r\n</code>
  * on Windows.
  */
-public class IndentingPrintWriter extends Writer {
+public class IndentingPrintWriter extends FilterWriter {
   private final String lineSeparator;
-  private final Writer out;
   private String indentString = "  ";
   private Formatter formatter;
   private int level;
   private boolean indent;
 
-  public IndentingPrintWriter(Writer writer) {
-    out = writer;
+  public IndentingPrintWriter(Writer out) {
+    super(out);
     lineSeparator = System.getProperty("line.separator", "\n");
   }
 
-  public IndentingPrintWriter(Writer writer, String eol) {
-    out = writer;
+  public IndentingPrintWriter(Writer out, String eol) {
+    super(out);
     lineSeparator = eol;
   }
 
@@ -77,7 +77,7 @@ public class IndentingPrintWriter extends Writer {
       }
     }
     catch (IOException ex) {
-      throw new RuntimeException(ex);
+      throw new IllegalStateException(ex);
     }
   }
 
@@ -111,7 +111,7 @@ public class IndentingPrintWriter extends Writer {
       out.flush();
     }
     catch (IOException ex) {
-      throw new RuntimeException(ex);
+      throw new IllegalStateException(ex);
     }
   }
 
@@ -121,7 +121,7 @@ public class IndentingPrintWriter extends Writer {
       out.close();
     }
     catch (IOException ex) {
-      throw new RuntimeException(ex);
+      throw new IllegalStateException(ex);
     }
   }
 
