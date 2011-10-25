@@ -38,10 +38,6 @@ import java.util.Hashtable;
 public final class JJTree {
   private IO io;
 
-  private void p(String s) {
-    io.getMsg().println(s);
-  }
-
   public int main(String[] args) {
     // initialize static state for allowing repeat runs without exiting
     ASTNodeDescriptor.nodeIds = new ArrayList<String>();
@@ -68,9 +64,8 @@ public final class JJTree {
       usage();
       return 1;
     }
-    else {
-      p("(type \"jjtree\" with no arguments for help)");
-    }
+
+    p("(type \"jjtree\" with no arguments for help)");
 
     String fn = args[args.length - 1];
 
@@ -201,5 +196,9 @@ public final class JJTree {
     p("    For more information, see the online JJTree documentation at ");
     p("    https://javacc.dev.java.net/doc/JJTree.html ");
     p("");
+  }
+
+  private void p(String s) {
+    io.getMsg().println(s);
   }
 }

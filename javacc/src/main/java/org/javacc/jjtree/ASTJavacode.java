@@ -32,6 +32,4 @@ public class ASTJavacode extends ASTProduction {
   ASTJavacode(int id) {
     super(id);
   }
-
-  Token stmBeginLoc;
 }

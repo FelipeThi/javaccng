@@ -438,7 +438,7 @@ void production() :
 
 void javacode_production() #Javacode :
 	{
-	  Token t1, t2;
+	  Token t;
 	  ASTJavacode prod;
 	  ASTNodeDescriptor nd = null;
 	  String n;
@@ -448,7 +448,7 @@ void javacode_production() #Javacode :
 	  prod = jjtThis;
 	}
   "JAVACODE"
-  AccessModifier() ResultType() t1=identifier() FormalParameters()
+  AccessModifier() ResultType() t=identifier() FormalParameters()
     [
       "throws" n=Name()
 	{
@@ -463,10 +463,9 @@ void javacode_production() #Javacode :
     [ nd=node_descriptor() ]
 
     // This is really a Block()
-    t2="{"
+    "{"
     {
-	  prod.name = t1.getImage();
-	  prod.stmBeginLoc = t2;
+	  prod.name = t.getImage();
 	}
     (
       ( BlockStatement() )*
@@ -482,7 +481,7 @@ void javacode_production() #Javacode :
 
 void bnf_production() #BNF :
 	{
-	  Token t1, t2;
+	  Token t;
 	  ASTBNF prod;
 	  ASTNodeDescriptor nd = null;
 	  NodeScope ns;
@@ -493,7 +492,7 @@ void bnf_production() #BNF :
     {
 	  prod = jjtThis;
 	}
-  AccessModifier() ResultType() t1=identifier() FormalParameters()
+  AccessModifier() ResultType() t=identifier() FormalParameters()
   [
     "throws" n=Name()
     {
@@ -509,10 +508,9 @@ void bnf_production() #BNF :
   ":"
 
   // This is really a Block()
-  t2="{"
+  "{"
     {
-	  prod.name = t1.getImage();
-	  prod.declBeginLoc = t2;
+	  prod.name = t.getImage();
 	  ns = new NodeScope(prod, nd);
 	}
   (

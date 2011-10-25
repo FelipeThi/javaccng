@@ -35,8 +35,6 @@ public class ASTBNF extends ASTProduction {
     throwsList.add("RuntimeException");
   }
 
-  Token declBeginLoc;
-
   public String toString() {
     return super.toString() + ": " + name;
   }
