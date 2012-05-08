@@ -139,13 +139,15 @@ final class ParserGen implements FileGenerator, JavaCCConstants {
     out.println("/** Either generated or user defined scanner. */");
     out.println("public final Scanner scanner;");
     out.println("/** Current token. */");
-    out.println("public Token token;");
+    out.println("private Token token;");
     out.println("/** Next token. */");
-    out.println("public Token jj_nt;");
+    out.println("private Token jj_nt;");
     if (!Options.getCacheTokens()) {
+      out.println("/** Next token kind. */");
       out.println("private int jj_ntk;");
     }
     if (parseEngine.jj2index != 0) {
+      out.println("/** Lookahead tokens. */");
       out.println("private Token jj_scanPos, jj_lastPos;");
       out.println("private int jj_la;");
       if (parseEngine.lookaheadNeeded) {
@@ -208,13 +210,13 @@ final class ParserGen implements FileGenerator, JavaCCConstants {
     out.println("private Token jj_consume_token(int kind) throws java.io.IOException, ParseException {");
     if (Options.getCacheTokens()) {
       out.println("Token oldToken = token;");
-      out.println("if ((token = jj_nt).next != null) jj_nt = jj_nt.next;");
-      out.println("else jj_nt = jj_nt.next = scanner.getNextToken();");
+      out.println("if ((token = jj_nt).next != null) { jj_nt = jj_nt.next; }");
+      out.println("else { jj_nt = jj_nt.next = scanner.getNextToken(); }");
     }
     else {
-      out.println("Token oldToken;");
-      out.println("if ((oldToken = token).next != null) token = token.next;");
-      out.println("else token = token.next = scanner.getNextToken();");
+      out.println("Token oldToken = token;");
+      out.println("if (token.next != null) { token = token.next; }");
+      out.println("else { token = token.next = scanner.getNextToken(); }");
       out.println("jj_ntk = -1;");
     }
     out.println("if (token.getKind() == kind) {");
@@ -269,9 +271,9 @@ final class ParserGen implements FileGenerator, JavaCCConstants {
       out.println("}");
       if (Options.getErrorReporting()) {
         out.println("if (jj_rescan) {");
-        out.println("int i = 0; Token tok = token;");
-        out.println("while (tok != null && tok != jj_scanPos) { i++; tok = tok.next; }");
-        out.println("if (tok != null) jj_add_error_token(kind, i);");
+        out.println("int i = 0; Token t = token;");
+        out.println("while (t != null && t != jj_scanPos) { i++; t = t.next; }");
+        out.println("if (t != null) jj_add_error_token(kind, i);");
         if (Options.getDebugLookahead()) {
           out.println("} else {");
           out.println("trace_scan(jj_scanPos, kind);");
@@ -289,7 +291,7 @@ final class ParserGen implements FileGenerator, JavaCCConstants {
     }
     out.println();
     out.println("/** Get the next Token. */");
-    out.println("final public Token getNextToken() throws java.io.IOException {");
+    out.println("protected final Token getNextToken() throws java.io.IOException {");
     if (Options.getCacheTokens()) {
       out.println("if ((token = jj_nt).next != null) jj_nt = jj_nt.next;");
       out.println("else jj_nt = jj_nt.next = scanner.getNextToken();");
@@ -309,7 +311,7 @@ final class ParserGen implements FileGenerator, JavaCCConstants {
     out.println("}");
     out.println();
     out.println("/** Get the specific Token. */");
-    out.println("final public Token getToken(int index) throws java.io.IOException {");
+    out.println("protected final Token getToken(int index) throws java.io.IOException {");
     if (parseEngine.lookaheadNeeded) {
       out.println("Token t = jj_lookingAhead ? jj_scanPos : token;");
     }

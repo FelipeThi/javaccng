@@ -124,7 +124,8 @@ public class NodeScope {
     }
 
     if (JJTreeOptions.getTrackTokens()) {
-      io.println(indent + nodeVar + ".jjtSetFirstToken(getToken(1));");
+      io.println(indent + "Token " + nodeVar + "_firstToken = getToken(1);");
+      io.println(indent + "Token " + nodeVar + "_lastToken;");
     }
   }
 
@@ -138,7 +139,11 @@ public class NodeScope {
     }
 
     if (JJTreeOptions.getTrackTokens()) {
-      io.println(indent + nodeVar + ".jjtSetLastToken(getToken(0));");
+      // Make sure that this production has matched at least some tokens.
+      io.println(indent + "" + nodeVar + "_lastToken = getToken(0);");
+      io.println(indent + "if (" + nodeVar + "_lastToken" + ".next != "+ nodeVar + "_firstToken" +") {");
+      io.println(indent + "  " + nodeVar + ".jjtSetTokens(" + nodeVar + "_firstToken" + ", " + nodeVar + "_lastToken" +");");
+      io.println(indent + "}");
     }
   }
 
