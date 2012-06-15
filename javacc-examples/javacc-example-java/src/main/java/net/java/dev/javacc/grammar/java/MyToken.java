@@ -3,22 +3,18 @@ package net.java.dev.javacc.grammar.java;
 public class MyToken extends Token {
   int realKind = JavaConstants.GT;
 
-  public MyToken(int kind) {
-    super(kind);
+  public MyToken(int kind, int begin, int end, String image) {
+    super(kind, begin, end, image);
   }
 
-  public MyToken(int kind, String image) {
-    super(kind, image);
+  public static Token newToken(int kind, int begin, int end) {
+    return newToken(kind, begin, end, null);
   }
 
-  public static Token newToken(int ofKind, String image) {
-    switch (ofKind) {
+  public static Token newToken(int kind, int begin, int end, String image) {
+    switch (kind) {
       default:
-        return new MyToken(ofKind, image);
+        return new MyToken(kind, begin, end, image);
     }
-  }
-
-  public static Token newToken(int ofKind) {
-    return newToken(ofKind, null);
   }
 }

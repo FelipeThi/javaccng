@@ -12,7 +12,7 @@ import java.io.IOException;
 public final class CharSequenceCharStream implements CharStream {
   private final CharSequence chars;
   private int next;
-  private int beginOffset, endOffset;
+  private int begin, end;
 
   public CharSequenceCharStream(final CharSequence chars) {
     if (chars == null) {
@@ -22,7 +22,7 @@ public final class CharSequenceCharStream implements CharStream {
   }
 
   public void beginToken() throws IOException {
-    beginOffset = endOffset;
+    begin = end;
   }
 
   public int readChar() throws IOException {
@@ -31,33 +31,33 @@ public final class CharSequenceCharStream implements CharStream {
     }
     char c = chars.charAt(next);
     next++;
-    endOffset++;
+    end++;
     return c;
   }
 
   public void backup(final int amount) {
     next -= amount;
-    endOffset -= amount;
+    end -= amount;
   }
 
   public String getImage() {
-    return chars.subSequence(beginOffset, endOffset).toString();
+    return chars.subSequence(begin, end).toString();
   }
 
   public char[] getSuffix(final int length) {
     char[] c = new char[length];
     for (int n = 0; n < length; n++) {
-      c[n] = chars.charAt(endOffset - length + n);
+      c[n] = chars.charAt(end - length + n);
     }
     return c;
   }
 
-  public int getBeginOffset() {
-    return beginOffset;
+  public int getBegin() {
+    return begin;
   }
 
-  public int getEndOffset() {
-    return endOffset;
+  public int getEnd() {
+    return end;
   }
 
   public int getBeginLine() {
@@ -78,6 +78,6 @@ public final class CharSequenceCharStream implements CharStream {
 
   public void close() throws IOException {
     next = 0;
-    beginOffset = endOffset = 0;
+    begin = end = 0;
   }
 }

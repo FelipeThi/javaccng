@@ -35,13 +35,13 @@ public class JavaCharStreamTest extends CharStreamBaseTestCase {
       final JavaCharStream cs = new JavaCharStream(new StringReader(s));
       assertEquals('Z', cs.readChar());
       assertEquals("Z", cs.getImage());
-      assertEquals(0, cs.getBeginOffset());
-      assertEquals(7, cs.getEndOffset());
+      assertEquals(0, cs.getBegin());
+      assertEquals(7, cs.getEnd());
       cs.backup(1);
       assertEquals('Z', cs.readChar());
       assertEquals("Z", cs.getImage());
-      assertEquals(0, cs.getBeginOffset());
-      assertEquals(7, cs.getEndOffset());
+      assertEquals(0, cs.getBegin());
+      assertEquals(7, cs.getEnd());
       assertEquals(-1, cs.readChar());
     }
     // case 2
@@ -59,8 +59,8 @@ public class JavaCharStreamTest extends CharStreamBaseTestCase {
       assertEquals('5', cs.readChar());
       assertEquals('a', cs.readChar());
       assertEquals("\\\\uu005a", cs.getImage());
-      assertEquals(0, cs.getBeginOffset());
-      assertEquals(8, cs.getEndOffset());
+      assertEquals(0, cs.getBegin());
+      assertEquals(8, cs.getEnd());
       assertEquals(-1, cs.readChar());
     }
     // case 3
@@ -73,8 +73,8 @@ public class JavaCharStreamTest extends CharStreamBaseTestCase {
       assertEquals('\\', cs.readChar());
       assertEquals('Z', cs.readChar());
       assertEquals("\\\\Z", cs.getImage());
-      assertEquals(0, cs.getBeginOffset());
-      assertEquals(9, cs.getEndOffset());
+      assertEquals(0, cs.getBegin());
+      assertEquals(9, cs.getEnd());
       assertEquals(-1, cs.readChar());
     }
     // case 4
@@ -94,8 +94,8 @@ public class JavaCharStreamTest extends CharStreamBaseTestCase {
       assertEquals('5', cs.readChar());
       assertEquals('a', cs.readChar());
       assertEquals("\\\\\\\\uu005a", cs.getImage());
-      assertEquals(0, cs.getBeginOffset());
-      assertEquals(10, cs.getEndOffset());
+      assertEquals(0, cs.getBegin());
+      assertEquals(10, cs.getEnd());
       assertEquals(-1, cs.readChar());
     }
   }
@@ -141,7 +141,7 @@ public class JavaCharStreamTest extends CharStreamBaseTestCase {
     assertEquals('2', cs.readChar());
     assertEquals('3', cs.readChar());
     assertEquals("23", cs.getImage());
-    assertEquals(1, cs.getBeginOffset());
-    assertEquals(3, cs.getEndOffset());
+    assertEquals(1, cs.getBegin());
+    assertEquals(3, cs.getEnd());
   }
 }

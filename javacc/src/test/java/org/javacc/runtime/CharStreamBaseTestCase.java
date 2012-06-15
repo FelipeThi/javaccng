@@ -21,24 +21,24 @@ public abstract class CharStreamBaseTestCase {
   public void providesValidOffset() throws ParseException, IOException {
     final CharStream cs = makeCharStream("12345");
     cs.beginToken();
-    assertEquals(0, cs.getBeginOffset());
-    assertEquals(0, cs.getEndOffset());
+    assertEquals(0, cs.getBegin());
+    assertEquals(0, cs.getEnd());
     assertEquals('1', cs.readChar());
-    assertEquals(0, cs.getBeginOffset());
-    assertEquals(1, cs.getEndOffset());
+    assertEquals(0, cs.getBegin());
+    assertEquals(1, cs.getEnd());
     assertEquals('2', cs.readChar());
-    assertEquals(0, cs.getBeginOffset());
-    assertEquals(2, cs.getEndOffset());
+    assertEquals(0, cs.getBegin());
+    assertEquals(2, cs.getEnd());
     cs.backup(1);
-    assertEquals(0, cs.getBeginOffset());
-    assertEquals(1, cs.getEndOffset());
+    assertEquals(0, cs.getBegin());
+    assertEquals(1, cs.getEnd());
     cs.beginToken();
     assertEquals('2', cs.readChar());
-    assertEquals(1, cs.getBeginOffset());
-    assertEquals(2, cs.getEndOffset());
+    assertEquals(1, cs.getBegin());
+    assertEquals(2, cs.getEnd());
     assertEquals('3', cs.readChar());
-    assertEquals(1, cs.getBeginOffset());
-    assertEquals(3, cs.getEndOffset());
+    assertEquals(1, cs.getBegin());
+    assertEquals(3, cs.getEnd());
   }
 
   @Test

@@ -190,7 +190,12 @@ final class ParserGen implements FileGenerator, JavaCCConstants {
     out.println("public " + state.parserClass() + "(Scanner s) throws java.io.IOException, ParseException {");
     out.indent();
     out.println("scanner = s;");
-    out.println("token = new Token();");
+    if (Options.getKeepImage()) {
+      out.println("token = new Token(0, 0, 0, null);");
+    }
+    else {
+      out.println("token = new Token(0, 0, 0);");
+    }
     if (Options.getCacheTokens()) {
       out.println("token.next = jj_nt = scanner.getNextToken();");
     }

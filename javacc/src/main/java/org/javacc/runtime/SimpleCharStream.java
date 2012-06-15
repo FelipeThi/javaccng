@@ -14,9 +14,9 @@ public final class SimpleCharStream implements CharStream {
   /** Offset to the next character in the buffer, if backed up. */
   private int offset;
   /** Index of the first character of the current token, inclusive. */
-  private int beginOffset;
+  private int begin;
   /** Index of the last character of the current token, exclusive. */
-  private int endOffset;
+  private int end;
   /** Line number of the first character of the current token. */
   private int line = 1;
   /** Column number of the first character of the current token. */
@@ -50,7 +50,7 @@ public final class SimpleCharStream implements CharStream {
    */
   public SimpleCharStream(java.io.Reader reader, int offset) {
     this(reader);
-    beginOffset = offset;
+    begin = offset;
   }
 
   /**
@@ -76,7 +76,7 @@ public final class SimpleCharStream implements CharStream {
    */
   public SimpleCharStream(java.io.Reader reader, int offset, int startLine, int startColumn) {
     this(reader);
-    beginOffset = offset;
+    begin = offset;
     line = startLine;
     column = startColumn;
   }
@@ -93,7 +93,7 @@ public final class SimpleCharStream implements CharStream {
   }
 
   public void beginToken() throws java.io.IOException {
-    beginOffset = endOffset;
+    begin = end;
     if (offset == length) {
       // No backed up characters.
       length = 0;
@@ -112,7 +112,7 @@ public final class SimpleCharStream implements CharStream {
   public int readChar() throws java.io.IOException {
     if (offset < length) {
       // Read backed up characters.
-      endOffset++;
+      end++;
       return buffer[offset++];
     }
     // Read new character by reader and put it into buffer.
@@ -139,7 +139,7 @@ public final class SimpleCharStream implements CharStream {
    * @param c Character to append.
    */
   private void appendChar(final int c) {
-    endOffset++;
+    end++;
     if (offset == buffer.length) {
       final int newLength = buffer.length * 3 / 2 + 1;
       buffer = java.util.Arrays.copyOf(buffer, newLength);
@@ -163,7 +163,7 @@ public final class SimpleCharStream implements CharStream {
   }
 
   public void backup(int amount) {
-    endOffset -= amount;
+    end -= amount;
     offset -= amount;
   }
 
@@ -225,12 +225,12 @@ public final class SimpleCharStream implements CharStream {
     bufColumn[offset] = column;
   }
 
-  public int getBeginOffset() {
-    return beginOffset;
+  public int getBegin() {
+    return begin;
   }
 
-  public int getEndOffset() {
-    return endOffset;
+  public int getEnd() {
+    return end;
   }
 
   public int getBeginLine() {

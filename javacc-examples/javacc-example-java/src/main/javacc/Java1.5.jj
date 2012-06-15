@@ -1012,18 +1012,18 @@ TOKEN :
   < RUNSIGNEDSHIFT: ">>>" >
   {
      matchedToken.setKind(GT);
-     ((MyToken)matchedToken).realKind = RUNSIGNEDSHIFT;
+     ((MyToken) matchedToken).realKind = RUNSIGNEDSHIFT;
      charStream.backup(2);
      matchedToken.setImage(">");
-     matchedToken.setOffset(matchedToken.getBeginOffset(), matchedToken.getEndOffset() - 2);
+     //matchedToken.setOffset(matchedToken.getBeginOffset(), matchedToken.getEndOffset() - 2);
   }
 | < RSIGNEDSHIFT: ">>" >
   {
      matchedToken.setKind(GT);
-     ((MyToken)matchedToken).realKind = RSIGNEDSHIFT;
+     ((MyToken) matchedToken).realKind = RSIGNEDSHIFT;
      charStream.backup(1);
      matchedToken.setImage(">");
-     matchedToken.setOffset(matchedToken.getBeginOffset(), matchedToken.getEndOffset() - 1);
+     //matchedToken.setOffset(matchedToken.getBeginOffset(), matchedToken.getEndOffset() - 1);
   }
 | < GT: ">" >
 }

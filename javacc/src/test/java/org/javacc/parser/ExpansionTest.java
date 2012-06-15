@@ -39,7 +39,7 @@ public final class ExpansionTest {
 
   @Before
   public void setUp() {
-    t = new Token();
+    t = new Token(0, 0, 0, null);
     t.setLineColumn(3, 2, 0, 0);
     e = new Expansion() {
       //

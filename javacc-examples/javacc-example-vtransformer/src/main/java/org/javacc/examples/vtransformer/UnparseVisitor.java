@@ -38,7 +38,7 @@ public class UnparseVisitor implements JavaVisitor {
   }
 
   public Object print(SimpleNode node, Object data) {
-    Token t = new Token();
+    Token t = new Token(0, 0, 0);
     t.next = node.getFirstToken();
     for (int n = 0; n < node.jjtGetChildCount(); n++) {
       SimpleNode child = (SimpleNode) node.jjtGetChild(n);

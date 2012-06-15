@@ -78,7 +78,7 @@ public class JJTreeNode extends SimpleNode {
       return;
     }
 
-    Token t = new Token();
+    Token t = new Token(0, 0, 0, null);
     t.next = getFirstToken();
     JJTreeNode node;
     for (int n = 0; n < jjtGetChildCount(); n++) {

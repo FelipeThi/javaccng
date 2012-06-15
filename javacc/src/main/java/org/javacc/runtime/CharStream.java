@@ -64,13 +64,13 @@ public interface CharStream extends java.io.Closeable {
    * Returns index of the first character for current token (being
    * matched after the last call to {@link #beginToken beginToken()}).
    */
-  int getBeginOffset();
+  int getBegin();
 
   /**
    * Returns index of the last character for current token (being
    * matched after the last call to {@link #beginToken beginToken()}).
    */
-  int getEndOffset();
+  int getEnd();
 
   /**
    * Returns the line number of the first character for current token (being

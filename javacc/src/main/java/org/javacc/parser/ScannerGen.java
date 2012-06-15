@@ -855,18 +855,18 @@ final class ScannerGen implements FileGenerator, JavaCCConstants {
 
     if (keepImage) {
       if (Options.getTokenFactory().length() > 0) {
-        out.println("Token t = " + Options.getTokenFactory() + ".newToken(jjMatchedKind, charStream.getBeginOffset(), charStream.getEndOffset(), currentImage);");
+        out.println("Token t = " + Options.getTokenFactory() + ".newToken(jjMatchedKind, charStream.getBegin(), charStream.getEnd(), currentImage);");
       }
       else {
-        out.println("Token t = Token.newToken(jjMatchedKind, charStream.getBeginOffset(), charStream.getEndOffset(), currentImage);");
+        out.println("Token t = Token.newToken(jjMatchedKind, charStream.getBegin(), charStream.getEnd(), currentImage);");
       }
     }
     else {
       if (Options.getTokenFactory().length() > 0) {
-        out.println("Token t = " + Options.getTokenFactory() + ".newToken(jjMatchedKind, charStream.getBeginOffset(), charStream.getEndOffset());");
+        out.println("Token t = " + Options.getTokenFactory() + ".newToken(jjMatchedKind, charStream.getBegin(), charStream.getEnd());");
       }
       else {
-        out.println("Token t = Token.newToken(jjMatchedKind, charStream.getBeginOffset(), charStream.getEndOffset());");
+        out.println("Token t = Token.newToken(jjMatchedKind, charStream.getBegin(), charStream.getEnd());");
       }
     }
 
@@ -1453,9 +1453,9 @@ final class ScannerGen implements FileGenerator, JavaCCConstants {
           else {
             out.println("(charStream.getSuffix(jjImageLength));");
           }
+          out.println("         jjImageLength = 0;");
         }
 
-        out.println("         jjImageLength = 0;");
         TokenPrinter.printTokenSetup(act.getActionTokens().get(0));
         TokenPrinter.cCol = 1;
 

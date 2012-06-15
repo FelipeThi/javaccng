@@ -8,9 +8,17 @@ package org.javacc.parser;
 
 /** Describes the input token stream. */
 public class Token {
+  public static class GTToken extends Token {
+    public GTToken(int kind, int begin, int end, String image) {
+      super(kind, begin, end, image);
+    }
+
+    int realKind = JavaCCConstants.GT;
+  }
+
   private int kind;
-  private int beginOffset;
-  private int endOffset;
+  private final int begin;
+  private final int end;
   private int beginLine;
   private int beginColumn;
   private int endLine;
@@ -39,13 +47,11 @@ public class Token {
    */
   public Token specialToken;
 
-  /** No-argument constructor */
-  public Token() {}
-
-  public Token(int kind, int beginOffset, int endOffset, String image) {
+  public Token(int kind, int begin, int end, String image) {
+    if (begin > end) { throw new IllegalArgumentException(); }
     this.kind = kind;
-    this.beginOffset = beginOffset;
-    this.endOffset = endOffset;
+    this.begin = begin;
+    this.end = end;
     this.image = image;
   }
 
@@ -59,7 +65,7 @@ public class Token {
     this.kind = kind;
   }
 
-  /** @return Gets text matched by this token. */
+  /** @return Token image. */
   public String getImage() {
     return image;
   }
@@ -70,13 +76,13 @@ public class Token {
   }
 
   /** @return Index of the first character of the token, inclusive. */
-  public int getBeginOffset() {
-    return beginOffset;
+  public int getBegin() {
+    return begin;
   }
 
   /** @return Index of the last character of the token, exclusive. */
-  public int getEndOffset() {
-    return endOffset;
+  public int getEnd() {
+    return end;
   }
 
   /** @return The line number of the first character of this token. */
@@ -100,6 +106,8 @@ public class Token {
   }
 
   /**
+   * Set token line and column numbers.
+   *
    * @param beginLine   The line number of the first character of this token
    * @param beginColumn The column number of the first character of this token.
    * @param endLine     The line number of the last character of this token.
@@ -117,23 +125,14 @@ public class Token {
     return image;
   }
 
-  public static Token newToken(int ofKind, int begin, int end, String image) {
-    switch (ofKind) {
-      default:
-        return new Token(ofKind, begin, end, image);
+  public static Token newToken(int kind, int begin, int end, String image) {
+    switch (kind) {
       case JavaCCConstants.RUNSIGNEDSHIFT:
       case JavaCCConstants.RSIGNEDSHIFT:
       case JavaCCConstants.GT:
-        return new GTToken(ofKind, begin, end, image);
+        return new GTToken(kind, begin, end, image);
+      default:
+        return new Token(kind, begin, end, image);
     }
-  }
-
-  /** Greater than Token. */
-  public static class GTToken extends Token {
-    public GTToken(int kind, int begin, int end, String image) {
-      super(kind, begin, end, image);
-    }
-
-    int realKind = JavaCCConstants.GT;
   }
 }

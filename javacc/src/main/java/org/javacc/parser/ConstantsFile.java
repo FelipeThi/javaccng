@@ -67,17 +67,17 @@ final class ConstantsFile implements FileGenerator, JavaCCConstants {
     out.println();
     out.println("/** Token literal values and constants. */");
     out.println("public interface " + state.constantsClass() + " {");
-    out.indent();
-    out.println("enum TokenKind {");
-    out.indent();
-    out.println("EOF,");
-    for (RegularExpression re : state.orderedNamedTokens) {
-      out.println("/** The '" + re.label + "' token. */");
-      out.println(re.label + ",");
-    }
-    out.unindent();
-    out.println("}");
-    out.unindent();
+//    out.indent();
+//    out.println("enum TokenKind {");
+//    out.indent();
+//    out.println("EOF,");
+//    for (RegularExpression re : state.orderedNamedTokens) {
+//      out.println("/** The '" + re.label + "' token. */");
+//      out.println(re.label + ",");
+//    }
+//    out.unindent();
+//    out.println("}");
+//    out.unindent();
 
     out.indent();
     out.println("/** End of File. */");
