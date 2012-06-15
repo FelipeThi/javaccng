@@ -491,7 +491,7 @@ final class ScannerGen implements FileGenerator, JavaCCConstants {
   }
 
   private void buildLexStatesTable() {
-    Iterator<TokenProduction> it = state.regExpList.iterator();
+    Iterator<TokenProduction> it = state.tokenProductions.iterator();
     TokenProduction tp;
     int i;
 
@@ -791,7 +791,7 @@ final class ScannerGen implements FileGenerator, JavaCCConstants {
     out.println("}");
 
     // Method to reinitialize the jjRounds array.
-    out.println("private void ReInitRounds() {");
+    out.println("private void reInitRounds() {");
     out.println("   int i;");
     out.println("   jjRound = 0x" + Integer.toHexString(Integer.MIN_VALUE + 1) + ";");
     out.println("   for (i = " + stateSetSize + "; i-- > 0;)");
@@ -855,22 +855,21 @@ final class ScannerGen implements FileGenerator, JavaCCConstants {
 
     if (keepImage) {
       if (Options.getTokenFactory().length() > 0) {
-        out.println("Token t = " + Options.getTokenFactory() + ".newToken(jjMatchedKind, currentImage);");
+        out.println("Token t = " + Options.getTokenFactory() + ".newToken(jjMatchedKind, charStream.getBeginOffset(), charStream.getEndOffset(), currentImage);");
       }
       else {
-        out.println("Token t = Token.newToken(jjMatchedKind, currentImage);");
+        out.println("Token t = Token.newToken(jjMatchedKind, charStream.getBeginOffset(), charStream.getEndOffset(), currentImage);");
       }
     }
     else {
       if (Options.getTokenFactory().length() > 0) {
-        out.println("Token t = " + Options.getTokenFactory() + ".newToken(jjMatchedKind);");
+        out.println("Token t = " + Options.getTokenFactory() + ".newToken(jjMatchedKind, charStream.getBeginOffset(), charStream.getEndOffset());");
       }
       else {
-        out.println("Token t = Token.newToken(jjMatchedKind);");
+        out.println("Token t = Token.newToken(jjMatchedKind, charStream.getBeginOffset(), charStream.getEndOffset());");
       }
     }
 
-    out.println("t.setOffset(charStream.getBeginOffset(), charStream.getEndOffset());");
     if (keepLineCol) {
       if (hasEmptyMatch) {
         out.println("if (jjMatchedPos < 0) {");

@@ -11,7 +11,6 @@ import java.util.List;
 final class StringLiterals {
   int maxStrKind;
   int maxLen;
-  int charCnt;
   List charPosKind; // Elements are hashtables with single char keys;
   int[] maxLenForActive;
   String[] allImages;
@@ -47,10 +46,6 @@ final class StringLiterals {
   }
 
   void DumpStrLiteralImages(ScannerGen scannerGen, IndentingPrintWriter ostr) {
-    String image;
-    int i;
-    charCnt = 0; // Set to zero in reInit() but just to be sure
-
     ostr.println("");
     ostr.println("/** Token literal values. */");
     ostr.println("public static final String[] jjLiteralImages = {");
@@ -61,17 +56,19 @@ final class StringLiterals {
     }
 
     allImages[0] = "";
+    int charCnt = 0;
+    String image;
+    int i;
     for (i = 0; i < allImages.length; i++) {
       if ((image = allImages[i]) == null ||
-          ((scannerGen.toSkip[i / 64] & (1L << (i % 64))) == 0L &&
-              (scannerGen.toMore[i / 64] & (1L << (i % 64))) == 0L &&
-              (scannerGen.toToken[i / 64] & (1L << (i % 64))) == 0L) ||
-          (scannerGen.toSkip[i / 64] & (1L << (i % 64))) != 0L ||
-          (scannerGen.toMore[i / 64] & (1L << (i % 64))) != 0L ||
-          scannerGen.canReachOnMore[scannerGen.lexStates[i]] ||
-          ((Options.getIgnoreCase() || scannerGen.ignoreCase[i]) &&
-              (!image.equals(image.toLowerCase()) ||
-                  !image.equals(image.toUpperCase())))) {
+          ((scannerGen.toSkip[i / 64] & (1L << (i % 64))) == 0L
+              && (scannerGen.toMore[i / 64] & (1L << (i % 64))) == 0L
+              && (scannerGen.toToken[i / 64] & (1L << (i % 64))) == 0L)
+          || (scannerGen.toSkip[i / 64] & (1L << (i % 64))) != 0L
+          || (scannerGen.toMore[i / 64] & (1L << (i % 64))) != 0L
+          || scannerGen.canReachOnMore[scannerGen.lexStates[i]]
+          || ((Options.getIgnoreCase() || scannerGen.ignoreCase[i])
+          && (!image.equals(image.toLowerCase()) || !image.equals(image.toUpperCase())))) {
         allImages[i] = null;
         if ((charCnt += 6) > 80) {
           ostr.println("");
@@ -99,7 +96,6 @@ final class StringLiterals {
       }
 
       ostr.print("null, ");
-      continue;
     }
 
     ostr.println("};");

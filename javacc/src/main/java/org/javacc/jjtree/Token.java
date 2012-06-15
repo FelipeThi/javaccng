@@ -42,52 +42,29 @@ public class Token {
   /** No-argument constructor */
   public Token() {}
 
-  /** Constructs a new token for the specified Image. */
-  public Token(int kind) {
-    this(kind, null);
-  }
-
-  /** Constructs a new token for the specified Image and Kind. */
-  public Token(int kind, String image) {
+  public Token(int kind, int beginOffset, int endOffset, String image) {
     this.kind = kind;
+    this.beginOffset = beginOffset;
+    this.endOffset = endOffset;
     this.image = image;
   }
 
-  /**
-   * Gets an integer that describes the kind of this token.
-   *
-   * This numbering system is determined by JavaCCParser, and a table of these numbers is
-   * stored in the file ...Constants.java.
-   *
-   * @return Token kind.
-   */
+  /** @return Token kind. */
   public int getKind() {
     return kind;
   }
 
-  /**
-   * Change token kind.
-   *
-   * @param kind New token kind.
-   */
+  /** @param kind New token kind. */
   public void setKind(int kind) {
     this.kind = kind;
   }
 
-  /**
-   * Gets text matched by this token.
-   *
-   * @return Token image.
-   */
+  /** @return Gets text matched by this token. */
   public String getImage() {
     return image;
   }
 
-  /**
-   * Change token image.
-   *
-   * @param image New token image.
-   */
+  /** @param image New token image. */
   public void setImage(String image) {
     this.image = image;
   }
@@ -100,17 +77,6 @@ public class Token {
   /** @return Index of the last character of the token, exclusive. */
   public int getEndOffset() {
     return endOffset;
-  }
-
-  /**
-   * Set index of first and last token character.
-   *
-   * @param begin Index of the first character of the token, inclusive.
-   * @param end   Index of the last character of the token, exclusive.
-   */
-  public void setOffset(int begin, int end) {
-    beginOffset = begin;
-    endOffset = end;
   }
 
   /** @return The line number of the first character of this token. */
@@ -134,8 +100,6 @@ public class Token {
   }
 
   /**
-   * Set token line and column numbers.
-   *
    * @param beginLine   The line number of the first character of this token
    * @param beginColumn The column number of the first character of this token.
    * @param endLine     The line number of the last character of this token.
@@ -148,46 +112,26 @@ public class Token {
     this.endColumn = endColumn;
   }
 
-  /** Returns the image. */
+  /** @return The image. */
   public String toString() {
     return image;
   }
 
-  /**
-   * Returns a new Token object, by default. However, if you want, you
-   * can create and return subclass objects based on the value of ofKind.
-   * Simply add the cases to the switch for all those special cases.
-   * For example, if you have a subclass of Token called IDToken that
-   * you want to create if ofKind is ID, simply add something like :
-   *
-   * case MyParserConstants.ID : return new IDToken(ofKind, image);
-   *
-   * to the following switch statement. Then you can cast matchedToken
-   * variable to the appropriate type and use it in your lexical actions.
-   *
-   * @param ofKind Token kind.
-   * @param image  Token image.
-   * @return New token instance.
-   */
-  public static Token newToken(int ofKind, String image) {
+  public static Token newToken(int ofKind, int begin, int end, String image) {
     switch (ofKind) {
       default:
-        return new Token(ofKind, image);
+        return new Token(ofKind, begin, end, image);
       case JJTreeConstants.RUNSIGNEDSHIFT:
       case JJTreeConstants.RSIGNEDSHIFT:
       case JJTreeConstants.GT:
-        return new GTToken(ofKind, image);
+        return new GTToken(ofKind, begin, end, image);
     }
-  }
-
-  public static Token newToken(int ofKind) {
-    return newToken(ofKind, null);
   }
 
   /** Greater than Token. */
   public static class GTToken extends Token {
-    public GTToken(int kind, String image) {
-      super(kind, image);
+    public GTToken(int kind, int begin, int end, String image) {
+      super(kind, begin, end, image);
     }
 
     int realKind = JJTreeConstants.GT;

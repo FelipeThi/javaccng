@@ -466,7 +466,7 @@ public final class ParseEngine {
     }
     String tail = expansion.rhsToken == null ? ");" : ")." + expansion.rhsToken.getImage() + ";";
     if (expansion.label.equals("")) {
-      String label = state.namesOfTokens.get(expansion.ordinal);
+      String label = state.tokenNames.get(expansion.ordinal);
       if (label != null) {
         s += "jj_consume_token(" + label + tail;
       }
@@ -762,7 +762,7 @@ public final class ParseEngine {
                 int j1 = i / 32;
                 int j2 = i % 32;
                 tokenMask[j1] |= 1 << j2;
-                String s = this.state.namesOfTokens.get(i);
+                String s = this.state.tokenNames.get(i);
                 if (s == null) {
                   retval += i;
                 }
@@ -902,7 +902,7 @@ public final class ParseEngine {
         }
         else if (seq instanceof NonTerminal) {
           NonTerminal e_nrw = (NonTerminal) seq;
-          NormalProduction production = state.productionTable.get(e_nrw.getName());
+          NormalProduction production = state.bnfProductionsTable.get(e_nrw.getName());
           if (production instanceof JavaCodeProduction) {
             break; // nothing to do here
           }
@@ -939,7 +939,7 @@ public final class ParseEngine {
       // there's no need to check it below for "e_nrw" and "ntexp".  In
       // fact, we rely here on the fact that the "name" fields of both these
       // variables are the same.
-      NormalProduction production = state.productionTable.get(((NonTerminal) expansion).getName());
+      NormalProduction production = state.bnfProductionsTable.get(((NonTerminal) expansion).getName());
       if (production instanceof JavaCodeProduction) {
         // nothing to do here
       }
@@ -1060,7 +1060,7 @@ public final class ParseEngine {
     // there's no need to check it below for "e_nrw" and "ntexp".  In
     // fact, we rely here on the fact that the "name" fields of both these
     // variables are the same.
-    NormalProduction production = state.productionTable.get(expansion.getName());
+    NormalProduction production = state.bnfProductionsTable.get(expansion.getName());
     if (production instanceof JavaCodeProduction) {
       out.println("if (true) { jj_la = 0; jj_scanPos = jj_lastPos; " + genReturn(false) + "}");
     }
@@ -1074,7 +1074,7 @@ public final class ParseEngine {
 
   private void phase3_RegularExpression(RegularExpression expansion, IndentingPrintWriter out) {
     if (expansion.label.equals("")) {
-      String label = state.namesOfTokens.get(expansion.ordinal);
+      String label = state.tokenNames.get(expansion.ordinal);
       if (label != null) {
         out.println("if (jj_scan_token(" + label + ")) " + genReturn(true));
       }
@@ -1208,7 +1208,7 @@ public final class ParseEngine {
     int size = 0;
     if (expansion instanceof NonTerminal) {
       NonTerminal nonTerminal = (NonTerminal) expansion;
-      NormalProduction production = state.productionTable.get(nonTerminal.getName());
+      NormalProduction production = state.bnfProductionsTable.get(nonTerminal.getName());
       if (production instanceof JavaCodeProduction) {
         size = Integer.MAX_VALUE;
         // Make caller think this is unending (for we do not go beyond JAVACODE during

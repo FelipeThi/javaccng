@@ -33,7 +33,6 @@ import org.javacc.utils.io.IndentingPrintWriter;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 /** Generates the Constants file. */
 final class ConstantsFile implements FileGenerator, JavaCCConstants {
@@ -69,6 +68,18 @@ final class ConstantsFile implements FileGenerator, JavaCCConstants {
     out.println("/** Token literal values and constants. */");
     out.println("public interface " + state.constantsClass() + " {");
     out.indent();
+    out.println("enum TokenKind {");
+    out.indent();
+    out.println("EOF,");
+    for (RegularExpression re : state.orderedNamedTokens) {
+      out.println("/** The '" + re.label + "' token. */");
+      out.println(re.label + ",");
+    }
+    out.unindent();
+    out.println("}");
+    out.unindent();
+
+    out.indent();
     out.println("/** End of File. */");
     out.println("int EOF = 0;");
     for (RegularExpression re : state.orderedNamedTokens) {
@@ -85,9 +96,8 @@ final class ConstantsFile implements FileGenerator, JavaCCConstants {
     out.println("String[] tokenImage = {");
     out.indent();
     out.println("\"<EOF>\",");
-    for (TokenProduction tp : state.regExpList) {
-      List<RegExpSpec> reSpecs = tp.reSpecs;
-      for (RegExpSpec reSpec : reSpecs) {
+    for (TokenProduction tp : state.tokenProductions) {
+      for (RegExpSpec reSpec : tp.reSpecs) {
         RegularExpression re = reSpec.regExp;
         if (re instanceof RStringLiteral) {
           out.print("\"\\\"");

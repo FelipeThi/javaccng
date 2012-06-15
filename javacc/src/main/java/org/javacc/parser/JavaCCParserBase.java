@@ -171,7 +171,7 @@ abstract class JavaCCParserBase {
   }
 
   protected void addRegExp(TokenProduction production) {
-    state.regExpList.add(production);
+    state.tokenProductions.add(production);
     if (Options.getUserScanner()) {
       if (production.lexStates == null
           || production.lexStates.length != 1
@@ -212,7 +212,7 @@ abstract class JavaCCParserBase {
       res.nextState = null;
       res.nsToken = null;
       p.reSpecs.add(res);
-      state.regExpList.add(p);
+      state.tokenProductions.add(p);
     }
   }
 

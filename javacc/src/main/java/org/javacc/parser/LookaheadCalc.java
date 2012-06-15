@@ -80,7 +80,7 @@ public final class LookaheadCalc {
         ret += " <EOF>";
       }
       else {
-        RegularExpression re = state.regExpsOfTokens.get(m.match[i]);
+        RegularExpression re = state.tokenRegExp.get(m.match[i]);
         if (re instanceof RStringLiteral) {
           ret += " \"" + Parsers.escape(((RStringLiteral) re).image) + "\"";
         }

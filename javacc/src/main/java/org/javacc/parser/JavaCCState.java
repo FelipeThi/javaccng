@@ -73,9 +73,8 @@ public final class JavaCCState {
   /**
    * A symbol table of all grammar productions - normal and JAVACODE.  The
    * symbol table is indexed by the name of the left hand side non-terminal.
-   * Its contents are of type "NormalProduction".
    */
-  public Map<String, NormalProduction> productionTable
+  public Map<String, NormalProduction> bnfProductionsTable
       = new HashMap<String, NormalProduction>();
   /**
    * A mapping of lexical state strings to their integer internal representation.
@@ -92,11 +91,11 @@ public final class JavaCCState {
   /** The declarations to be inserted into the Scanner class. */
   public List<Token> scannerDeclarations;
   /**
-   * The list of all TokenProductions from the input file.  This list includes
-   * implicit TokenProductions that are created for uses of regular expressions
+   * The list of all {@link TokenProduction}s from the input file.  This list includes
+   * implicit {@link TokenProduction}s that are created for uses of regular expressions
    * within BNF productions.
    */
-  public List<TokenProduction> regExpList
+  public List<TokenProduction> tokenProductions
       = new ArrayList<TokenProduction>();
   /**
    * The total number of distinct tokens.  This is therefore one more than the
@@ -111,7 +110,7 @@ public final class JavaCCState {
   public Map<String, RegularExpression> namedTokensTable
       = new HashMap<String, RegularExpression>();
   /**
-   * Contains the same entries as "named_tokens_table", but this is an ordered
+   * Contains the same entries as {@link #namedTokensTable}, but this is an ordered
    * list which is ordered by the order of appearance in the input file.
    */
   public List<RegularExpression> orderedNamedTokens
@@ -123,13 +122,13 @@ public final class JavaCCState {
    * If there are multiple labels representing the same ordinal value, then
    * only one label is stored.
    */
-  public Map<Integer, String> namesOfTokens
+  public Map<Integer, String> tokenNames
       = new HashMap<Integer, String>();
   /**
    * A mapping of ordinal values (represented as objects of type "Integer") to
    * the corresponding RegularExpression's.
    */
-  public Map<Integer, RegularExpression> regExpsOfTokens
+  public Map<Integer, RegularExpression> tokenRegExp
       = new HashMap<Integer, RegularExpression>();
   /**
    * This is a three-level symbol table that contains all simple tokens (those

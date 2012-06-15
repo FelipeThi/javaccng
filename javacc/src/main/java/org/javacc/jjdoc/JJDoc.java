@@ -77,7 +77,7 @@ public class JJDoc implements FileGenerator {
   @Override
   public void start() {
     f.documentStart();
-    emitTokenProductions(state.regExpList);
+    emitTokenProductions(state.tokenProductions);
     emitNormalProductions(state.bnfProductions);
     f.documentEnd();
   }

@@ -960,7 +960,7 @@ final class NfaStates {
     out.println("   for (;;)");
     out.println("   {");
     out.println("      if (++jjRound == 0x" + Integer.toHexString(Integer.MAX_VALUE) + ")");
-    out.println("         ReInitRounds();");
+    out.println("         reInitRounds();");
     out.println("      if (jjChar < 64)");
     out.println("      {");
 

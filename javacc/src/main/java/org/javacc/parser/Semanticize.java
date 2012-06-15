@@ -115,7 +115,7 @@ public final class Semanticize {
 
     // The following loop populates "production_table"
     for (NormalProduction production : state.bnfProductions) {
-      if (state.productionTable.put(production.getLhs(), production) != null) {
+      if (state.bnfProductionsTable.put(production.getLhs(), production) != null) {
         JavaCCErrors.semanticError(production, production.getLhs() + " occurs on the left hand side of more than one production.");
       }
     }
@@ -138,7 +138,7 @@ public final class Semanticize {
     // is set to true.  In this case, <name> occurrences are OK, while
     // regular expression specs generate a warning.
 
-    for (TokenProduction tp : state.regExpList) {
+    for (TokenProduction tp : state.tokenProductions) {
       List<RegExpSpec> reSpecs = tp.reSpecs;
       for (RegExpSpec reSpec : reSpecs) {
         if (reSpec.nextState != null) {
@@ -187,7 +187,7 @@ public final class Semanticize {
     // "named_tokens_table" and "ordered_named_tokens".
     // Duplications are flagged as errors.
 
-    for (TokenProduction tp : state.regExpList) {
+    for (TokenProduction tp : state.tokenProductions) {
       List<RegExpSpec> reSpecs = tp.reSpecs;
       for (RegExpSpec reSpec : reSpecs) {
         if (!(reSpec.regExp instanceof RJustName) && !"".equals(reSpec.regExp.label)) {
@@ -219,7 +219,7 @@ public final class Semanticize {
     // table "names_of_tokens".
 
     state.tokenCount = 1;
-    for (TokenProduction tp : state.regExpList) {
+    for (TokenProduction tp : state.tokenProductions) {
       List<RegExpSpec> reSpecs = tp.reSpecs;
       if (tp.lexStates == null) {
         tp.lexStates = new String[state.lexStateI2S.size()];
@@ -334,10 +334,10 @@ public final class Semanticize {
           reSpec.regExp.ordinal = state.tokenCount++;
         }
         if (!(reSpec.regExp instanceof RJustName) && !reSpec.regExp.label.equals("")) {
-          state.namesOfTokens.put(reSpec.regExp.ordinal, reSpec.regExp.label);
+          state.tokenNames.put(reSpec.regExp.ordinal, reSpec.regExp.label);
         }
         if (!(reSpec.regExp instanceof RJustName)) {
-          state.regExpsOfTokens.put(reSpec.regExp.ordinal, reSpec.regExp);
+          state.tokenRegExp.put(reSpec.regExp.ordinal, reSpec.regExp);
         }
       }
     }
@@ -354,7 +354,7 @@ public final class Semanticize {
 
     if (!Options.getUserScanner()) {
       FixRJustNames frjn = new FixRJustNames();
-      for (TokenProduction tp : state.regExpList) {
+      for (TokenProduction tp : state.tokenProductions) {
         List<RegExpSpec> reSpecs = tp.reSpecs;
         for (RegExpSpec reSpec : reSpecs) {
           frjn.root = reSpec.regExp;
@@ -378,7 +378,7 @@ public final class Semanticize {
     // execution of this code.
 
     if (Options.getUserScanner()) {
-      for (TokenProduction tp : state.regExpList) {
+      for (TokenProduction tp : state.tokenProductions) {
         List<RegExpSpec> reSpecs = tp.reSpecs;
         for (RegExpSpec reSpec : reSpecs) {
           if (reSpec.regExp instanceof RJustName) {
@@ -388,7 +388,7 @@ public final class Semanticize {
               jn.ordinal = state.tokenCount++;
               state.namedTokensTable.put(jn.label, jn);
               state.orderedNamedTokens.add(jn);
-              state.namesOfTokens.put(jn.ordinal, jn.label);
+              state.tokenNames.put(jn.ordinal, jn.label);
             }
             else {
               jn.ordinal = regExp.ordinal;
@@ -408,11 +408,11 @@ public final class Semanticize {
     // file.
 
     if (Options.getUserScanner()) {
-      for (TokenProduction tp : state.regExpList) {
+      for (TokenProduction tp : state.tokenProductions) {
         List<RegExpSpec> reSpecs = tp.reSpecs;
         for (RegExpSpec reSpec : reSpecs) {
           Integer ii = reSpec.regExp.ordinal;
-          if (state.namesOfTokens.get(ii) == null) {
+          if (state.tokenNames.get(ii) == null) {
             JavaCCErrors.warning(reSpec.regExp, "Unlabeled regular expression cannot be referred to by " +
                 "user generated scanner.");
           }
@@ -470,7 +470,7 @@ public final class Semanticize {
       // so we only need to do the equivalent of the above walk.
       // This is not done if option USER_SCANNER is set to true.
       if (!Options.getUserScanner()) {
-        for (TokenProduction tp : state.regExpList) {
+        for (TokenProduction tp : state.tokenProductions) {
           List<RegExpSpec> reSpecs = tp.reSpecs;
           for (RegExpSpec reSpec : reSpecs) {
             RegularExpression regExp = reSpec.regExp;
@@ -822,7 +822,7 @@ public final class Semanticize {
     public void action(Expansion exp) {
       if (exp instanceof NonTerminal) {
         NonTerminal nt = (NonTerminal) exp;
-        if (nt.setProd(state.productionTable.get(nt.getName())) == null) {
+        if (nt.setProd(state.bnfProductionsTable.get(nt.getName())) == null) {
           JavaCCErrors.semanticError(exp, "Non-terminal " + nt.getName() + " has not been defined.");
         }
         else {
