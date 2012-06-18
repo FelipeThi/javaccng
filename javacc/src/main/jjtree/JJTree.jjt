@@ -142,6 +142,7 @@ MORE :
 TOKEN :
 {
   < ABSTRACT: "abstract" >
+| < ASSERT: "assert" >
 | < BOOLEAN: "boolean" >
 | < BREAK: "break" >
 | < BYTE: "byte" >
@@ -155,6 +156,7 @@ TOKEN :
 | < DO: "do" >
 | < DOUBLE: "double" >
 | < ELSE: "else" >
+| < ENUM: "enum" >
 | < EXTENDS: "extends" >
 | < FALSE: "false" >
 | < FINAL: "final" >
@@ -179,6 +181,7 @@ TOKEN :
 | < RETURN: "return" >
 | < SHORT: "short" >
 | < STATIC: "static" >
+| < STRICTFP: "strictfp" >
 | < SUPER: "super" >
 | < SWITCH: "switch" >
 | < SYNCHRONIZED: "synchronized" >
@@ -202,35 +205,26 @@ TOKEN :
       | <HEX_LITERAL> (["l","L"])?
       | <OCTAL_LITERAL> (["l","L"])?
   >
-|
-  < #DECIMAL_LITERAL: ["1"-"9"] (["0"-"9"])* >
-|
-  < #HEX_LITERAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ >
-|
-  < #OCTAL_LITERAL: "0" (["0"-"7"])* >
-|
-  < FLOATING_POINT_LITERAL:
+| < #DECIMAL_LITERAL: ["1"-"9"] (["0"-"9"])* >
+| < #HEX_LITERAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ >
+| < #OCTAL_LITERAL: "0" (["0"-"7"])* >
+| < FLOATING_POINT_LITERAL:
         <DECIMAL_FLOATING_POINT_LITERAL>
       | <HEXADECIMAL_FLOATING_POINT_LITERAL>
   >
-|
-  < #DECIMAL_FLOATING_POINT_LITERAL:
+| < #DECIMAL_FLOATING_POINT_LITERAL:
         (["0"-"9"])+ "." (["0"-"9"])* (<DECIMAL_EXPONENT>)? (["f","F","d","D"])?
       | "." (["0"-"9"])+ (<DECIMAL_EXPONENT>)? (["f","F","d","D"])?
       | (["0"-"9"])+ <DECIMAL_EXPONENT> (["f","F","d","D"])?
       | (["0"-"9"])+ (<DECIMAL_EXPONENT>)? ["f","F","d","D"]
   >
-|
-  < #DECIMAL_EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+ >
-|
-  < #HEXADECIMAL_FLOATING_POINT_LITERAL:
+| < #DECIMAL_EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+ >
+| < #HEXADECIMAL_FLOATING_POINT_LITERAL:
         "0" ["x", "X"] (["0"-"9","a"-"f","A"-"F"])+ (".")? <HEXADECIMAL_EXPONENT> (["f","F","d","D"])?
       | "0" ["x", "X"] (["0"-"9","a"-"f","A"-"F"])* "." (["0"-"9","a"-"f","A"-"F"])+ <HEXADECIMAL_EXPONENT> (["f","F","d","D"])?
   >
-|
-  < #HEXADECIMAL_EXPONENT: ["p","P"] (["+","-"])? (["0"-"9"])+ >
-|
-  < CHARACTER_LITERAL:
+| < #HEXADECIMAL_EXPONENT: ["p","P"] (["+","-"])? (["0"-"9"])+ >
+| < CHARACTER_LITERAL:
       "'"
       (   (~["'","\\","\n","\r"])
         | ("\\"
@@ -242,8 +236,7 @@ TOKEN :
       )
       "'"
   >
-|
-  < STRING_LITERAL:
+| < STRING_LITERAL:
       "\""
       (   (~["\"","\\","\n","\r"])
         | ("\\"
@@ -341,9 +334,9 @@ TOKEN :
  ************************************************/
 
 public void start() #Grammar :
-	{
-	  Token t;
-	}
+{
+  Token t;
+}
 {
   javacc_options()
   (
@@ -369,10 +362,9 @@ public void start() #Grammar :
 }
 
 void javacc_options() :
-	{
-	}
+{}
 {
-  [ LOOKAHEAD( { getToken(1).getImage().equals("options") }) ( <IDENTIFIER> "{" ( option_binding() )* "}" ) #Options ]
+  [ LOOKAHEAD({ getToken(1).getImage().equals("options") }) ( <IDENTIFIER> "{" ( option_binding() )* "}" ) #Options ]
 	{
 	  JJTreeOptions.normalize();
 	}
@@ -406,8 +398,7 @@ void option_binding() #OptionBinding :
 }
 
 void production() :
-	{
-	}
+{}
 {
   LOOKAHEAD(1)
   /*
@@ -562,8 +553,7 @@ void scanner_decls() #TokenDecls :
 }
 
 void regexpr_kind() :
-	{
-	}
+{}
 {
   "TOKEN"
 |
@@ -581,8 +571,7 @@ void regexpr_spec() #RESpec :
 }
 
 JJTreeNode expansion_choices(ASTProduction p) #BNFChoice(>1) :
-	{
-	}
+{}
 {
   expansion(p) ( "|" expansion(p) )*
     {
@@ -720,8 +709,7 @@ JJTreeNode expansion_unit(ASTProduction p) :
 }
 
 void regular_expression() :
-	{
-	}
+{}
 {
   StringLiteral() #REStringLiteral
 |
@@ -981,9 +969,7 @@ void Modifiers():
  * Declaration syntax follows.
  */
 void TypeDeclaration():
-{
-   ;
-}
+{}
 {
   ";"
 |
