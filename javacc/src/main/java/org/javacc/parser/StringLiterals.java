@@ -45,54 +45,43 @@ final class StringLiterals {
     statesForPos = null;
   }
 
-  void dumpStrLiteralImages(ScannerGen scannerGen, IndentingPrintWriter ostr) {
-    ostr.println("");
-    ostr.println("/** Token literal values. */");
-    ostr.println("public static final String[] jjLiteralImages = {");
+  void dumpStrLiteralImages(ScannerGen scannerGen, IndentingPrintWriter out) {
+    out.println("");
+    out.println("/** Token literal values. */");
+    out.print("public static final String[] jjLiteralImages = {");
 
     if (allImages == null || allImages.length == 0) {
-      ostr.println("};");
+      out.println("};");
       return;
     }
 
+    out.indent();
+
+    IndentingPrintWriter.ListPrinter list = out.list(", ");
+
     allImages[0] = "";
-    int charCnt = 0;
-    String image;
-    int i;
-    for (i = 0; i < allImages.length; i++) {
-      if ((image = allImages[i]) == null
+    int i = 0;
+    for (; i < allImages.length; i++) {
+      String image = allImages[i];
+      if (image == null
           || scannerGen.isRegExp(i)
           || unnamed(scannerGen, image, i)) {
         allImages[i] = null;
-        if ((charCnt += 6) > 80) {
-          ostr.println();
-          charCnt = 0;
-        }
 
-        ostr.print("null, ");
-        continue;
+        list.item("null");
       }
-
-      String toPrint = "\"" + Parsers.escape(image) + "\", ";
-
-      if ((charCnt += toPrint.length()) >= 80) {
-        ostr.println("");
-        charCnt = 0;
+      else {
+        list.item("\"" + Parsers.escape(image) + "\"");
       }
-
-      ostr.print(toPrint);
     }
 
     while (++i < scannerGen.maxOrdinal) {
-      if ((charCnt += 6) > 80) {
-        ostr.println("");
-        charCnt = 0;
-      }
-
-      ostr.print("null, ");
+      list.item("null");
     }
 
-    ostr.println("};");
+    out.println("};");
+
+    out.unindent();
   }
 
   private boolean unnamed(ScannerGen scannerGen, String image, int i) {
@@ -100,16 +89,16 @@ final class StringLiterals {
         && (!image.equals(image.toLowerCase()) || !image.equals(image.toUpperCase()));
   }
 
-  void dumpNullStrLiterals(ScannerGen scannerGen, IndentingPrintWriter ostr) {
-    ostr.println("{");
-    ostr.indent();
+  void dumpNullStrLiterals(ScannerGen scannerGen, IndentingPrintWriter out) {
+    out.println("{");
+    out.indent();
     if (scannerGen.nfaStates.generatedStates != 0) {
-      ostr.println("return jjMoveNfa" + scannerGen.lexStateSuffix + "(" + scannerGen.nfaStates.initStateName(scannerGen) + ", 0);");
+      out.println("return jjMoveNfa" + scannerGen.lexStateSuffix + "(" + scannerGen.nfaStates.initStateName(scannerGen) + ", 0);");
     }
-    else { ostr.println("return 1;"); }
+    else { out.println("return 1;"); }
 
-    ostr.unindent();
-    ostr.println("}");
+    out.unindent();
+    out.println("}");
   }
 
   private int getStateSetForKind(ScannerGen scannerGen, int pos, int kind) {
@@ -212,55 +201,55 @@ final class StringLiterals {
     }
   }
 
-  void dumpStartWithStates(ScannerGen scannerGen, IndentingPrintWriter ostr) {
-    ostr.println("private int " +
+  void dumpStartWithStates(ScannerGen scannerGen, IndentingPrintWriter out) {
+    out.println("private int " +
         "jjStartNfaWithStates" + scannerGen.lexStateSuffix + "(int pos, int kind, int state) throws java.io.IOException");
-    ostr.println("{");
-    ostr.indent();
-    ostr.println("jjMatchedKind = kind;");
-    ostr.println("jjMatchedPos = pos;");
+    out.println("{");
+    out.indent();
+    out.println("jjMatchedKind = kind;");
+    out.println("jjMatchedPos = pos;");
 
     if (Options.getDebugScanner()) {
-      ostr.println("debugPrinter.println(\"   No more string literal token matches are possible.\");");
-      ostr.println("debugPrinter.println(\"   Currently matched the first \" " +
+      out.println("debugPrinter.println(\"   No more string literal token matches are possible.\");");
+      out.println("debugPrinter.println(\"   Currently matched the first \" " +
           "+ (jjMatchedPos + 1) + \" characters as a \" + tokenImage[jjMatchedKind] + \" token.\");");
     }
 
-    ostr.println("jjChar = charStream.readChar();");
-    ostr.println("if (jjChar == -1) { return pos + 1; }");
+    out.println("jjChar = charStream.readChar();");
+    out.println("if (jjChar == -1) { return pos + 1; }");
 
     if (Options.getDebugScanner()) {
-      ostr.println("debugPrinter.println(" +
+      out.println("debugPrinter.println(" +
           (scannerGen.maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
           "\"Current character : \" + " +
           "ScannerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
           "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
     }
 
-    ostr.println("return jjMoveNfa" + scannerGen.lexStateSuffix + "(state, pos + 1);");
-    ostr.unindent();
-    ostr.println("}");
-    ostr.println();
+    out.println("return jjMoveNfa" + scannerGen.lexStateSuffix + "(state, pos + 1);");
+    out.unindent();
+    out.println("}");
+    out.println();
   }
 
-  void dumpBoilerPlate(IndentingPrintWriter ostr) {
-    ostr.println("private int " +
+  void dumpBoilerPlate(IndentingPrintWriter out) {
+    out.println("private int " +
         "jjStopAtPos(int pos, int kind)");
-    ostr.println("{");
-    ostr.indent();
-    ostr.println("jjMatchedKind = kind;");
-    ostr.println("jjMatchedPos = pos;");
+    out.println("{");
+    out.indent();
+    out.println("jjMatchedKind = kind;");
+    out.println("jjMatchedPos = pos;");
 
     if (Options.getDebugScanner()) {
-      ostr.println("debugPrinter.println(\"   No more string literal token matches are possible.\");");
-      ostr.println("debugPrinter.println(\"   Currently matched the first \" + (jjMatchedPos + 1) + " +
+      out.println("debugPrinter.println(\"   No more string literal token matches are possible.\");");
+      out.println("debugPrinter.println(\"   Currently matched the first \" + (jjMatchedPos + 1) + " +
           "\" characters as a \" + tokenImage[jjMatchedKind] + \" token.\");");
     }
 
-    ostr.println("return pos + 1;");
-    ostr.unindent();
-    ostr.println("}");
-    ostr.println();
+    out.println("return pos + 1;");
+    out.unindent();
+    out.println("}");
+    out.println();
   }
 
   String[] reArrange(Hashtable tab) {
@@ -284,7 +273,7 @@ final class StringLiterals {
     return ret;
   }
 
-  void dumpDfaCode(ScannerGen scannerGen, IndentingPrintWriter ostr) {
+  void dumpDfaCode(ScannerGen scannerGen, IndentingPrintWriter out) {
     Hashtable tab;
     String key;
     KindInfo info;
@@ -294,16 +283,16 @@ final class StringLiterals {
     scannerGen.maxLongsReqd[scannerGen.lexStateIndex] = maxLongsReqd;
 
     if (maxLen == 0) {
-      ostr.println("private int " +
+      out.println("private int " +
           "jjMoveStringLiteralDfa0" + scannerGen.lexStateSuffix + "() throws java.io.IOException");
 
-      dumpNullStrLiterals(scannerGen, ostr);
-      ostr.println();
+      dumpNullStrLiterals(scannerGen, out);
+      out.println();
       return;
     }
 
     if (!boilerPlateDumped) {
-      dumpBoilerPlate(ostr);
+      dumpBoilerPlate(out);
       boilerPlateDumped = true;
     }
 
@@ -314,144 +303,144 @@ final class StringLiterals {
       tab = (Hashtable) charPosKind.get(i);
       String[] keys = reArrange(tab);
 
-      ostr.print("private int " +
+      out.print("private int " +
           "jjMoveStringLiteralDfa" + i + scannerGen.lexStateSuffix + "(");
 
       if (i != 0) {
         if (i == 1) {
           for (j = 0; j < maxLongsReqd - 1; j++) {
             if (i <= maxLenForActive[j]) {
-              if (atLeastOne) { ostr.print(", "); }
+              if (atLeastOne) { out.print(", "); }
               else { atLeastOne = true; }
-              ostr.print("long active" + j);
+              out.print("long active" + j);
             }
           }
 
           if (i <= maxLenForActive[j]) {
-            if (atLeastOne) { ostr.print(", "); }
-            ostr.print("long active" + j);
+            if (atLeastOne) { out.print(", "); }
+            out.print("long active" + j);
           }
         }
         else {
           for (j = 0; j < maxLongsReqd - 1; j++) {
             if (i <= maxLenForActive[j] + 1) {
-              if (atLeastOne) { ostr.print(", "); }
+              if (atLeastOne) { out.print(", "); }
               else { atLeastOne = true; }
-              ostr.print("long old" + j + ", long active" + j);
+              out.print("long old" + j + ", long active" + j);
             }
           }
 
           if (i <= maxLenForActive[j] + 1) {
-            if (atLeastOne) { ostr.print(", "); }
-            ostr.print("long old" + j + ", long active" + j);
+            if (atLeastOne) { out.print(", "); }
+            out.print("long old" + j + ", long active" + j);
           }
         }
       }
-      ostr.println(") throws java.io.IOException");
-      ostr.println("{");
-      ostr.indent();
+      out.println(") throws java.io.IOException");
+      out.println("{");
+      out.indent();
       if (i != 0) {
         if (i > 1) {
           atLeastOne = false;
-          ostr.print("if ((");
+          out.print("if ((");
 
           for (j = 0; j < maxLongsReqd - 1; j++) {
             if (i <= maxLenForActive[j] + 1) {
-              if (atLeastOne) { ostr.print(" | "); }
+              if (atLeastOne) { out.print(" | "); }
               else { atLeastOne = true; }
-              ostr.print("(active" + j + " &= old" + j + ")");
+              out.print("(active" + j + " &= old" + j + ")");
             }
           }
 
           if (i <= maxLenForActive[j] + 1) {
-            if (atLeastOne) { ostr.print(" | "); }
-            ostr.print("(active" + j + " &= old" + j + ")");
+            if (atLeastOne) { out.print(" | "); }
+            out.print("(active" + j + " &= old" + j + ")");
           }
 
-          ostr.println(") == 0L)");
-          ostr.indent();
+          out.println(") == 0L)");
+          out.indent();
           if (!scannerGen.mixed[scannerGen.lexStateIndex] && scannerGen.nfaStates.generatedStates != 0) {
-            ostr.print("return jjStartNfa" + scannerGen.lexStateSuffix +
+            out.print("return jjStartNfa" + scannerGen.lexStateSuffix +
                 "(" + (i - 2) + ", ");
             for (j = 0; j < maxLongsReqd - 1; j++) {
-              if (i <= maxLenForActive[j] + 1) { ostr.print("old" + j + ", "); }
-              else { ostr.print("0L, "); }
+              if (i <= maxLenForActive[j] + 1) { out.print("old" + j + ", "); }
+              else { out.print("0L, "); }
             }
-            if (i <= maxLenForActive[j] + 1) { ostr.println("old" + j + ");"); }
-            else { ostr.println("0L);"); }
+            if (i <= maxLenForActive[j] + 1) { out.println("old" + j + ");"); }
+            else { out.println("0L);"); }
           }
           else if (scannerGen.nfaStates.generatedStates != 0) {
-            ostr.println("return jjMoveNfa" + scannerGen.lexStateSuffix +
+            out.println("return jjMoveNfa" + scannerGen.lexStateSuffix +
                 "(" + scannerGen.nfaStates.initStateName(scannerGen) + ", " + (i - 1) + ");");
           }
-          else { ostr.println("return " + i + ";"); }
-          ostr.unindent();
+          else { out.println("return " + i + ";"); }
+          out.unindent();
         }
 
         if (i != 0 && Options.getDebugScanner()) {
-          ostr.println("if (jjMatchedKind != 0 && jjMatchedKind != 0x" +
+          out.println("if (jjMatchedKind != 0 && jjMatchedKind != 0x" +
               Integer.toHexString(Integer.MAX_VALUE) + ")");
-          ostr.println("debugPrinter.println(\"   Currently matched the first \" + " +
+          out.println("debugPrinter.println(\"   Currently matched the first \" + " +
               "(jjMatchedPos + 1) + \" characters as a \" + tokenImage[jjMatchedKind] + \" token.\");");
 
-          ostr.print("debugPrinter.println(\"   Possible string literal matches : { \"");
+          out.print("debugPrinter.println(\"   Possible string literal matches : { \"");
 
           for (int vecs = 0; vecs < maxStrKind / 64 + 1; vecs++) {
             if (i <= maxLenForActive[vecs]) {
-              ostr.print(" + ");
-              ostr.print("jjKindsForBitVector(" + vecs + ", ");
-              ostr.print("active" + vecs + ") ");
+              out.print(" + ");
+              out.print("jjKindsForBitVector(" + vecs + ", ");
+              out.print("active" + vecs + ") ");
             }
           }
 
-          ostr.print(" + \" } \");");
-          ostr.println();
+          out.print(" + \" } \");");
+          out.println();
         }
 
-        ostr.println("jjChar = charStream.readChar();");
-        ostr.println("if (jjChar == -1)");
-        ostr.println("{");
-        ostr.indent();
+        out.println("jjChar = charStream.readChar();");
+        out.println("if (jjChar == -1)");
+        out.println("{");
+        out.indent();
 
         if (!scannerGen.mixed[scannerGen.lexStateIndex] && scannerGen.nfaStates.generatedStates != 0) {
-          ostr.print("jjStopStringLiteralDfa" + scannerGen.lexStateSuffix + "(" + (i - 1) + ", ");
+          out.print("jjStopStringLiteralDfa" + scannerGen.lexStateSuffix + "(" + (i - 1) + ", ");
           for (k = 0; k < maxLongsReqd - 1; k++) {
-            if (i <= maxLenForActive[k]) { ostr.print("active" + k + ", "); }
-            else { ostr.print("0L, "); }
+            if (i <= maxLenForActive[k]) { out.print("active" + k + ", "); }
+            else { out.print("0L, "); }
           }
 
-          if (i <= maxLenForActive[k]) { ostr.println("active" + k + ");"); }
-          else { ostr.println("0L);"); }
+          if (i <= maxLenForActive[k]) { out.println("active" + k + ");"); }
+          else { out.println("0L);"); }
 
           if (i != 0 && Options.getDebugScanner()) {
-            ostr.println("if (jjMatchedKind != 0 && jjMatchedKind != 0x" +
+            out.println("if (jjMatchedKind != 0 && jjMatchedKind != 0x" +
                 Integer.toHexString(Integer.MAX_VALUE) + ")");
-            ostr.println("debugPrinter.println(\"   Currently matched the first \" + " +
+            out.println("debugPrinter.println(\"   Currently matched the first \" + " +
                 "(jjMatchedPos + 1) + \" characters as a \" + tokenImage[jjMatchedKind] + \" token.\");");
           }
-          ostr.println("return " + i + ";");
+          out.println("return " + i + ";");
         }
         else if (scannerGen.nfaStates.generatedStates != 0) {
-          ostr.println("return jjMoveNfa" + scannerGen.lexStateSuffix + "(" + scannerGen.nfaStates.initStateName(scannerGen) +
+          out.println("return jjMoveNfa" + scannerGen.lexStateSuffix + "(" + scannerGen.nfaStates.initStateName(scannerGen) +
               ", " + (i - 1) + ");");
         }
-        else { ostr.println("return " + i + ";"); }
+        else { out.println("return " + i + ";"); }
 
-        ostr.unindent();
-        ostr.println("}");
+        out.unindent();
+        out.println("}");
       }
 
       if (i != 0 && Options.getDebugScanner()) {
-        ostr.println("debugPrinter.println(" +
+        out.println("debugPrinter.println(" +
             (scannerGen.maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
             "\"Current character : \" + " +
             "ScannerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
             "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
       }
 
-      ostr.println("switch(jjChar)");
-      ostr.println("{");
-      ostr.indent();
+      out.println("switch(jjChar)");
+      out.println("{");
+      out.indent();
 
       CaseLoop:
       for (int q = 0; q < keys.length; q++) {
@@ -494,13 +483,13 @@ final class StringLiterals {
 
         // Since we know key is a single character ...
         if (Options.getIgnoreCase()) {
-          if (c != Character.toUpperCase(c)) { ostr.println("case " + (int) Character.toUpperCase(c) + ":"); }
+          if (c != Character.toUpperCase(c)) { out.println("case " + (int) Character.toUpperCase(c) + ":"); }
 
-          if (c != Character.toLowerCase(c)) { ostr.println("case " + (int) Character.toLowerCase(c) + ":"); }
+          if (c != Character.toLowerCase(c)) { out.println("case " + (int) Character.toLowerCase(c) + ":"); }
         }
 
-        ostr.println("case " + (int) c + ":");
-        ostr.indent();
+        out.println("case " + (int) c + ":");
+        out.indent();
 
         long matchedKind;
 
@@ -512,15 +501,15 @@ final class StringLiterals {
               if ((matchedKind & (1L << k)) == 0L) { continue; }
 
               if (ifGenerated) {
-                ostr.print("else if ");
+                out.print("else if ");
               }
-              else if (i != 0) { ostr.print("if "); }
+              else if (i != 0) { out.print("if "); }
 
               ifGenerated = true;
 
               int kindToPrint;
               if (i != 0) {
-                ostr.println("((active" + j +
+                out.println("((active" + j +
                     " & 0x" + Long.toHexString(1L << k) + "L) != 0L)");
               }
 
@@ -555,32 +544,32 @@ final class StringLiterals {
 
                 if (stateSetName != -1) {
                   createStartNfa = true;
-                  ostr.indent();
-                  ostr.println("return jjStartNfaWithStates" +
+                  out.indent();
+                  out.println("return jjStartNfaWithStates" +
                       scannerGen.lexStateSuffix + "(" + i +
                       ", " + kindToPrint + ", " + stateSetName + ");");
-                  ostr.unindent();
+                  out.unindent();
                 }
                 else {
-                  ostr.indent();
-                  ostr.println("return jjStopAtPos" + "(" + i + ", " + kindToPrint + ");");
-                  ostr.unindent();
+                  out.indent();
+                  out.println("return jjStopAtPos" + "(" + i + ", " + kindToPrint + ");");
+                  out.unindent();
                 }
               }
               else {
                 if ((scannerGen.initMatch[scannerGen.lexStateIndex] != 0 &&
                     scannerGen.initMatch[scannerGen.lexStateIndex] != Integer.MAX_VALUE) ||
                     i != 0) {
-                  ostr.println("{");
-                  ostr.indent();
-                  ostr.println("jjMatchedKind = " +
+                  out.println("{");
+                  out.indent();
+                  out.println("jjMatchedKind = " +
                       kindToPrint + ";");
-                  ostr.println("jjMatchedPos = " + i + ";");
-                  ostr.unindent();
-                  ostr.println("}");
+                  out.println("jjMatchedPos = " + i + ";");
+                  out.unindent();
+                  out.println("}");
                 }
                 else {
-                  ostr.println("jjMatchedKind = " +
+                  out.println("jjMatchedKind = " +
                       kindToPrint + ";");
                 }
               }
@@ -593,52 +582,52 @@ final class StringLiterals {
 
           if (i == 0) {
 
-            ostr.print("return jjMoveStringLiteralDfa" + (i + 1) +
+            out.print("return jjMoveStringLiteralDfa" + (i + 1) +
                 scannerGen.lexStateSuffix + "(");
             for (j = 0; j < maxLongsReqd - 1; j++) {
               if ((i + 1) <= maxLenForActive[j]) {
-                if (atLeastOne) { ostr.print(", "); }
+                if (atLeastOne) { out.print(", "); }
                 else { atLeastOne = true; }
 
-                ostr.print("0x" + Long.toHexString(info.validKinds[j]) + "L");
+                out.print("0x" + Long.toHexString(info.validKinds[j]) + "L");
               }
             }
 
             if ((i + 1) <= maxLenForActive[j]) {
-              if (atLeastOne) { ostr.print(", "); }
+              if (atLeastOne) { out.print(", "); }
 
-              ostr.print("0x" + Long.toHexString(info.validKinds[j]) + "L");
+              out.print("0x" + Long.toHexString(info.validKinds[j]) + "L");
             }
-            ostr.println(");");
+            out.println(");");
             //out.unindent();
           }
           else {
-            ostr.print("return jjMoveStringLiteralDfa" + (i + 1) +
+            out.print("return jjMoveStringLiteralDfa" + (i + 1) +
                 scannerGen.lexStateSuffix + "(");
 
             for (j = 0; j < maxLongsReqd - 1; j++) {
               if ((i + 1) <= maxLenForActive[j] + 1) {
-                if (atLeastOne) { ostr.print(", "); }
+                if (atLeastOne) { out.print(", "); }
                 else { atLeastOne = true; }
 
                 if (info.validKinds[j] != 0L) {
-                  ostr.print("active" + j + ", 0x" +
+                  out.print("active" + j + ", 0x" +
                       Long.toHexString(info.validKinds[j]) + "L");
                 }
-                else { ostr.print("active" + j + ", 0L"); }
+                else { out.print("active" + j + ", 0L"); }
               }
             }
 
             if ((i + 1) <= maxLenForActive[j] + 1) {
-              if (atLeastOne) { ostr.print(", "); }
+              if (atLeastOne) { out.print(", "); }
               if (info.validKinds[j] != 0L) {
-                ostr.print("active" + j + ", 0x" +
+                out.print("active" + j + ", 0x" +
                     Long.toHexString(info.validKinds[j]) + "L");
               }
-              else { ostr.print("active" + j + ", 0L"); }
+              else { out.print("active" + j + ", 0L"); }
             }
 
-            ostr.println(");");
+            out.println(");");
             //out.unindent();
           }
         }
@@ -647,49 +636,49 @@ final class StringLiterals {
           if (i == 0 && scannerGen.mixed[scannerGen.lexStateIndex]) {
 
             if (scannerGen.nfaStates.generatedStates != 0) {
-              ostr.println("return jjMoveNfa" + scannerGen.lexStateSuffix +
+              out.println("return jjMoveNfa" + scannerGen.lexStateSuffix +
                   "(" + scannerGen.nfaStates.initStateName(scannerGen) + ", 0);");
             }
-            else { ostr.println("return 1;"); }
+            else { out.println("return 1;"); }
           }
           else if (i != 0) // No more str literals to look for
           {
-            ostr.println("break;");
+            out.println("break;");
             //out.unindent();
             startNfaNeeded = true;
           }
         }
 
-        ostr.unindent();
+        out.unindent();
       }
 
       /* default means that the current character is not in any of the
   strings at this position. */
-      ostr.println("default:");
+      out.println("default:");
 
       if (Options.getDebugScanner()) {
-        ostr.println("debugPrinter.println(\"   No string literal matches possible.\");");
+        out.println("debugPrinter.println(\"   No string literal matches possible.\");");
       }
 
       if (scannerGen.nfaStates.generatedStates != 0) {
         if (i == 0) {
           /* This means no string literal is possible. Just move nfa with
       this guy and return. */
-          ostr.println("return jjMoveNfa" + scannerGen.lexStateSuffix +
+          out.println("return jjMoveNfa" + scannerGen.lexStateSuffix +
               "(" + scannerGen.nfaStates.initStateName(scannerGen) + ", 0);");
         }
         else {
-          ostr.println("break;");
+          out.println("break;");
           //out.unindent();
           startNfaNeeded = true;
         }
       }
       else {
-        ostr.println("return " + (i + 1) + ";");
+        out.println("return " + (i + 1) + ";");
       }
 
-      ostr.unindent();
-      ostr.println("}");
+      out.unindent();
+      out.println("}");
 
       if (i != 0) {
         if (startNfaNeeded) {
@@ -698,29 +687,29 @@ final class StringLiterals {
    string literals are possible. So set the kind and state set
    upto and including this position for the matched string. */
 
-            ostr.print("return jjStartNfa" + scannerGen.lexStateSuffix + "(" + (i - 1) + ", ");
+            out.print("return jjStartNfa" + scannerGen.lexStateSuffix + "(" + (i - 1) + ", ");
             for (k = 0; k < maxLongsReqd - 1; k++) {
-              if (i <= maxLenForActive[k]) { ostr.print("active" + k + ", "); }
-              else { ostr.print("0L, "); }
+              if (i <= maxLenForActive[k]) { out.print("active" + k + ", "); }
+              else { out.print("0L, "); }
             }
-            if (i <= maxLenForActive[k]) { ostr.println("active" + k + ");"); }
-            else { ostr.println("0L);"); }
+            if (i <= maxLenForActive[k]) { out.println("active" + k + ");"); }
+            else { out.println("0L);"); }
           }
           else if (scannerGen.nfaStates.generatedStates != 0) {
-            ostr.println("return jjMoveNfa" + scannerGen.lexStateSuffix +
+            out.println("return jjMoveNfa" + scannerGen.lexStateSuffix +
                 "(" + scannerGen.nfaStates.initStateName(scannerGen) + ", " + i + ");");
           }
-          else { ostr.println("return " + (i + 1) + ";"); }
+          else { out.println("return " + (i + 1) + ";"); }
         }
       }
 
-      ostr.unindent();
-      ostr.println("}");
-      ostr.println();
+      out.unindent();
+      out.println("}");
+      out.println();
     }
 
     if (!scannerGen.mixed[scannerGen.lexStateIndex] && scannerGen.nfaStates.generatedStates != 0 && createStartNfa) {
-      dumpStartWithStates(scannerGen, ostr);
+      dumpStartWithStates(scannerGen, out);
     }
   }
 
@@ -735,7 +724,7 @@ final class StringLiterals {
     return Integer.MAX_VALUE;
   }
 
-  void generateNfaStartStates(ScannerGen scannerGen, IndentingPrintWriter ostr,
+  void generateNfaStartStates(ScannerGen scannerGen, IndentingPrintWriter out,
                               NfaState initialState) {
     boolean[] seen = new boolean[scannerGen.nfaStates.generatedStates];
     Hashtable stateSets = new Hashtable();
@@ -760,7 +749,7 @@ final class StringLiterals {
       try {
         if ((oldStates = (List) initialState.epsilonMoves.clone()) == null ||
             oldStates.size() == 0) {
-          dumpNfaStartStatesCode(scannerGen, statesForPos, ostr);
+          dumpNfaStartStatesCode(scannerGen, statesForPos, out);
           return;
         }
       }
@@ -839,11 +828,11 @@ final class StringLiterals {
       }
     }
 
-    dumpNfaStartStatesCode(scannerGen, statesForPos, ostr);
+    dumpNfaStartStatesCode(scannerGen, statesForPos, out);
   }
 
   void dumpNfaStartStatesCode(ScannerGen scannerGen, Hashtable[] statesForPos,
-                              IndentingPrintWriter ostr) {
+                              IndentingPrintWriter out) {
     if (maxStrKind == 0) { // No need to generate this function
       return;
     }
@@ -852,21 +841,21 @@ final class StringLiterals {
     boolean condGenerated = false;
     int ind = 0;
 
-    ostr.print("private int jjStopStringLiteralDfa" +
+    out.print("private int jjStopStringLiteralDfa" +
         scannerGen.lexStateSuffix + "(int pos, ");
-    for (i = 0; i < maxKindsReqd - 1; i++) { ostr.print("long active" + i + ", "); }
-    ostr.println("long active" + i + ")\n{");
+    for (i = 0; i < maxKindsReqd - 1; i++) { out.print("long active" + i + ", "); }
+    out.println("long active" + i + ")\n{");
 
     if (Options.getDebugScanner()) {
-      ostr.println("debugPrinter.println(\"   No more string literal token matches are possible.\");");
+      out.println("debugPrinter.println(\"   No more string literal token matches are possible.\");");
     }
 
-    ostr.println("   switch (pos)\n   {");
+    out.println("   switch (pos)\n   {");
 
     for (i = 0; i < maxLen - 1; i++) {
       if (statesForPos[i] == null) { continue; }
 
-      ostr.println("      case " + i + ":");
+      out.println("      case " + i + ":");
 
       Enumeration e = statesForPos[i].keys();
       while (e.hasMoreElements()) {
@@ -876,17 +865,17 @@ final class StringLiterals {
         for (int j = 0; j < maxKindsReqd; j++) {
           if (actives[j] == 0L) { continue; }
 
-          if (condGenerated) { ostr.print(" || "); }
-          else { ostr.print("         if ("); }
+          if (condGenerated) { out.print(" || "); }
+          else { out.print("         if ("); }
 
           condGenerated = true;
 
-          ostr.print("(active" + j + " & 0x" +
+          out.print("(active" + j + " & 0x" +
               Long.toHexString(actives[j]) + "L) != 0L");
         }
 
         if (condGenerated) {
-          ostr.println(")");
+          out.println(")");
 
           String kindStr = stateSetString.substring(0,
               ind = stateSetString.indexOf(", "));
@@ -894,37 +883,37 @@ final class StringLiterals {
           int jjMatchedPos = Integer.parseInt(
               afterKind.substring(0, afterKind.indexOf(", ")));
 
-          if (!kindStr.equals(String.valueOf(Integer.MAX_VALUE))) { ostr.println("         {"); }
+          if (!kindStr.equals(String.valueOf(Integer.MAX_VALUE))) { out.println("         {"); }
 
           if (!kindStr.equals(String.valueOf(Integer.MAX_VALUE))) {
             if (i == 0) {
-              ostr.println("            jjMatchedKind = " + kindStr + ";");
+              out.println("            jjMatchedKind = " + kindStr + ";");
 
               if ((scannerGen.initMatch[scannerGen.lexStateIndex] != 0 &&
                   scannerGen.initMatch[scannerGen.lexStateIndex] != Integer.MAX_VALUE)) {
-                ostr.println("            jjMatchedPos = 0;");
+                out.println("            jjMatchedPos = 0;");
               }
             }
             else if (i == jjMatchedPos) {
               if (subStringAtPos[i]) {
-                ostr.println("            if (jjMatchedPos != " + i + ")");
-                ostr.println("            {");
-                ostr.println("               jjMatchedKind = " + kindStr + ";");
-                ostr.println("               jjMatchedPos = " + i + ";");
-                ostr.println("            }");
+                out.println("            if (jjMatchedPos != " + i + ")");
+                out.println("            {");
+                out.println("               jjMatchedKind = " + kindStr + ";");
+                out.println("               jjMatchedPos = " + i + ";");
+                out.println("            }");
               }
               else {
-                ostr.println("            jjMatchedKind = " + kindStr + ";");
-                ostr.println("            jjMatchedPos = " + i + ";");
+                out.println("            jjMatchedKind = " + kindStr + ";");
+                out.println("            jjMatchedPos = " + i + ";");
               }
             }
             else {
-              if (jjMatchedPos > 0) { ostr.println("            if (jjMatchedPos < " + jjMatchedPos + ")"); }
-              else { ostr.println("            if (jjMatchedPos == 0)"); }
-              ostr.println("            {");
-              ostr.println("               jjMatchedKind = " + kindStr + ";");
-              ostr.println("               jjMatchedPos = " + jjMatchedPos + ";");
-              ostr.println("            }");
+              if (jjMatchedPos > 0) { out.println("            if (jjMatchedPos < " + jjMatchedPos + ")"); }
+              else { out.println("            if (jjMatchedPos == 0)"); }
+              out.println("            {");
+              out.println("               jjMatchedKind = " + kindStr + ";");
+              out.println("               jjMatchedPos = " + jjMatchedPos + ";");
+              out.println("            }");
             }
           }
 
@@ -934,48 +923,48 @@ final class StringLiterals {
           stateSetString = afterKind.substring(
               afterKind.indexOf(", ") + 2);
 
-          if (stateSetString.equals("null;")) { ostr.println("            return -1;"); }
+          if (stateSetString.equals("null;")) { out.println("            return -1;"); }
           else {
-            ostr.println("            return " +
+            out.println("            return " +
                 scannerGen.nfaStates.addStartStateSet(stateSetString) + ";");
           }
 
-          if (!kindStr.equals(String.valueOf(Integer.MAX_VALUE))) { ostr.println("         }"); }
+          if (!kindStr.equals(String.valueOf(Integer.MAX_VALUE))) { out.println("         }"); }
           condGenerated = false;
         }
       }
 
-      ostr.println("         return -1;");
+      out.println("         return -1;");
     }
 
-    ostr.println("      default:");
-    ostr.println("         return -1;");
-    ostr.println("   }");
-    ostr.println("}");
+    out.println("      default:");
+    out.println("         return -1;");
+    out.println("   }");
+    out.println("}");
 
-    ostr.println();
-    ostr.print("private int jjStartNfa" +
+    out.println();
+    out.print("private int jjStartNfa" +
         scannerGen.lexStateSuffix + "(int pos, ");
-    for (i = 0; i < maxKindsReqd - 1; i++) { ostr.print("long active" + i + ", "); }
-    ostr.println("long active" + i + ") throws java.io.IOException \n{");
+    for (i = 0; i < maxKindsReqd - 1; i++) { out.print("long active" + i + ", "); }
+    out.println("long active" + i + ") throws java.io.IOException \n{");
 
     if (scannerGen.mixed[scannerGen.lexStateIndex]) {
       if (scannerGen.nfaStates.generatedStates != 0) {
-        ostr.println("   return jjMoveNfa" + scannerGen.lexStateSuffix +
+        out.println("   return jjMoveNfa" + scannerGen.lexStateSuffix +
             "(" + scannerGen.nfaStates.initStateName(scannerGen) + ", pos + 1);");
       }
-      else { ostr.println("   return pos + 1;"); }
+      else { out.println("   return pos + 1;"); }
 
-      ostr.println("}");
+      out.println("}");
       return;
     }
 
-    ostr.print("   return jjMoveNfa" + scannerGen.lexStateSuffix + "(" +
+    out.print("   return jjMoveNfa" + scannerGen.lexStateSuffix + "(" +
         "jjStopStringLiteralDfa" + scannerGen.lexStateSuffix + "(pos, ");
-    for (i = 0; i < maxKindsReqd - 1; i++) { ostr.print("active" + i + ", "); }
-    ostr.print("active" + i + ")");
-    ostr.println(", pos + 1);");
-    ostr.println("}");
-    ostr.println();
+    for (i = 0; i < maxKindsReqd - 1; i++) { out.print("active" + i + ", "); }
+    out.print("active" + i + ")");
+    out.println(", pos + 1);");
+    out.println("}");
+    out.println();
   }
 }

@@ -33,6 +33,8 @@ import org.javacc.utils.io.IndentingPrintWriter;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /** Generates the Constants file. */
 final class ConstantsFile implements FileGenerator {
@@ -81,9 +83,11 @@ final class ConstantsFile implements FileGenerator {
   private void generateEnum(IndentingPrintWriter out)
       throws IOException {
     TokenPrinter.packageDeclaration(state.cuToInsertionPoint1, out);
+    out.println("import java.util.*;");
     out.println("/** Token literal values and constants. */");
     out.println("public enum TokenKind {");
     out.indent();
+    Set<String> literals = new LinkedHashSet<String>();
     out.print("EOF");
     for (RegularExpression re : state.orderedNamedTokens) {
       if (re.isPrivate) {
@@ -91,6 +95,7 @@ final class ConstantsFile implements FileGenerator {
       }
       out.println(",");
       if (re instanceof RStringLiteral && !((RStringLiteral) re).isRegExp()) {
+        literals.add(re.label);
         out.println("/** The string literal token '" + re.label + "' defined at [" + re.getLine() + ", " + re.getColumn() + "]. */");
         out.print(re.label).print("(\"").print(Parsers.escape(((RStringLiteral) re).image)).print("\")");
       }
@@ -100,6 +105,19 @@ final class ConstantsFile implements FileGenerator {
       }
     }
     out.println(";");
+    if (!literals.isEmpty()) {
+      out.println("/** Literal string tokens. */");
+      out.println("public static final Set<TokenKind> LITERALS =");
+      out.indent().indent();
+      out.print("Collections.unmodifiableSet(EnumSet.of(");
+      out.indent().indent();
+      IndentingPrintWriter.ListPrinter list = out.list(", ");
+      for (String literal : literals) {
+        list.item(literal);
+      }
+      out.println("));");
+      out.unindent().unindent().unindent().unindent();
+    }
     out.println("private final String image;\n");
     out.println("private TokenKind() { this(null); }\n");
     out.println("private TokenKind(String image) { this.image = image; }\n");

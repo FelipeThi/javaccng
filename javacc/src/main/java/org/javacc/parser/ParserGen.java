@@ -145,27 +145,18 @@ final class ParserGen implements FileGenerator {
       out.println("private final int[] jj_la1 = new int[" + parseEngine.maskIndex + "];");
       int tokenMaskSize = (state.tokenCount - 1) / 32 + 1;
       for (int i = 0; i < tokenMaskSize; i++) {
-        out.println("private static int[] jj_la1_" + i + ";");
-      }
-      out.println("static {");
-      out.indent();
-      for (int i = 0; i < tokenMaskSize; i++) {
-        out.println("jj_la1_init_" + i + "();");
-      }
-      out.unindent();
-      out.println("}");
-      for (int i = 0; i < tokenMaskSize; i++) {
-        out.println("private static void jj_la1_init_" + i + "() {");
-        out.print("jj_la1_" + i + " = new int[] {");
+        out.print("private static final int[] jj_la1_" + i + " = new int[] {");
+        out.indent();
+        IndentingPrintWriter.ListPrinter list = out.list(", ");
         for (int[] tokenMask : parseEngine.maskValues) {
-          out.print("0x" + Integer.toHexString(tokenMask[i]) + ",");
+          list.item("0x" + Integer.toHexString(tokenMask[i]));
         }
         out.println("};");
-        out.println("}");
+        out.unindent();
       }
     }
     if (parseEngine.jj2index != 0 && Options.getErrorReporting()) {
-      out.println("final private JJCalls[] jj_2_rtns = new JJCalls[" + parseEngine.jj2index + "];");
+      out.println("private final JJCalls[] jj_2_rtns = new JJCalls[" + parseEngine.jj2index + "];");
       out.println("private boolean jj_rescan = false;");
       out.println("private int jj_gc = 0;");
     }

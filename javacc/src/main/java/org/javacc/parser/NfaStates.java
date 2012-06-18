@@ -37,7 +37,7 @@ final class NfaStates {
       "0xffffffffffffffffL, " +
       "0xffffffffffffffffL\n};";
   public Hashtable tableToDump = new Hashtable();
-  public List orderedStateSet = new ArrayList();
+  public List<int[]> orderedStateSet = new ArrayList<int[]>();
   public int lastIndex = 0;
   public int[][] kinds;
   public int[][][] statesForState;
@@ -263,21 +263,16 @@ final class NfaStates {
   }
 
   public void dumpStateSets(IndentingPrintWriter out) {
-    int cnt = 0;
-
-    out.print("static final int[] jjNextStates = {");
-    for (int i = 0; i < orderedStateSet.size(); i++) {
-      int[] set = (int[]) orderedStateSet.get(i);
-
-      for (int j = 0; j < set.length; j++) {
-        if (cnt++ % 16 == 0) {
-          out.print("\n   ");
-        }
-        out.print(set[j] + ", ");
+    out.print("private static final int[] jjNextStates = {");
+    out.indent();
+    IndentingPrintWriter.ListPrinter list = out.list(", ");
+    for (int[] set : orderedStateSet) {
+      for (int item : set) {
+        list.item(item);
       }
     }
-
-    out.println("\n};");
+    out.println("};");
+    out.unindent();
   }
 
   String getStateSetString(int[] states) {
@@ -377,18 +372,18 @@ final class NfaStates {
       out.println("         long l = 1L << jjChar;");
     }
     else if (byteNum == 1) {
-      out.println("         long l = 1L << (jjChar & 077);");
+      out.println("         long l = 1L << (jjChar & 63);");
     }
 
     else {
       if (Options.getJavaUnicodeEscape() || unicodeWarningGiven) {
         out.println("         int hiByte = (int)(jjChar >> 8);");
         out.println("         int i1 = hiByte >> 6;");
-        out.println("         long l1 = 1L << (hiByte & 077);");
+        out.println("         long l1 = 1L << (hiByte & 63);");
       }
 
       out.println("         int i2 = (jjChar & 0xff) >> 6;");
-      out.println("         long l2 = 1L << (jjChar & 077);");
+      out.println("         long l2 = 1L << (jjChar & 63);");
     }
 
     //out.println("         MatchLoop: do");

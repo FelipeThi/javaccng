@@ -685,7 +685,7 @@ It also generates code to match a char with the common bit vectors.
           scannerGen.nfaStates.allBitVectors.add(tmp);
 
           if (!scannerGen.nfaStates.allBitsSet(tmp)) {
-            out.println("static final long[] jjbitVec" + scannerGen.nfaStates.lohiByteCnt + " = " + tmp);
+            out.println("private static final long[] jjbitVec" + scannerGen.nfaStates.lohiByteCnt + " = " + tmp);
           }
           scannerGen.nfaStates.lohiByteTab.put(tmp, ind = new Integer(scannerGen.nfaStates.lohiByteCnt++));
         }
@@ -700,7 +700,7 @@ It also generates code to match a char with the common bit vectors.
           scannerGen.nfaStates.allBitVectors.add(tmp);
 
           if (!scannerGen.nfaStates.allBitsSet(tmp)) {
-            out.println("static final long[] jjbitVec" + scannerGen.nfaStates.lohiByteCnt + " = " + tmp);
+            out.println("private static final long[] jjbitVec" + scannerGen.nfaStates.lohiByteCnt + " = " + tmp);
           }
           scannerGen.nfaStates.lohiByteTab.put(tmp, ind = new Integer(scannerGen.nfaStates.lohiByteCnt++));
         }
@@ -740,7 +740,7 @@ It also generates code to match a char with the common bit vectors.
           scannerGen.nfaStates.allBitVectors.add(tmp);
 
           if (!scannerGen.nfaStates.allBitsSet(tmp)) {
-            out.println("static final long[] jjbitVec" + scannerGen.nfaStates.lohiByteCnt + " = " + tmp);
+            out.println("private static final long[] jjbitVec" + scannerGen.nfaStates.lohiByteCnt + " = " + tmp);
           }
           scannerGen.nfaStates.lohiByteTab.put(tmp, ind = new Integer(scannerGen.nfaStates.lohiByteCnt++));
         }

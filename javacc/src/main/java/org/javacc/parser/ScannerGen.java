@@ -660,85 +660,84 @@ final class ScannerGen implements FileGenerator {
   }
 
   private void dumpStaticVarDeclarations(IndentingPrintWriter out) {
-    int i;
-
     out.println();
-    out.println("/** Lexer state names. */");
-    out.println("public static final String[] jjLexStateNames = {");
-    out.indent();
-    for (i = 0; i < maxLexStates; i++) {
-      out.println("\"" + lexStateName[i] + "\",");
+
+    if (true) {
+      out.println("/** Lexer state names. */");
+      out.print("public static final String[] jjLexStateNames = {");
+      out.indent();
+      IndentingPrintWriter.ListPrinter l1 = out.list(", ");
+      for (int i = 0; i < maxLexStates; i++) {
+        l1.item("\"" + lexStateName[i] + "\"");
+      }
+      out.println("};");
+      out.unindent();
     }
-    out.unindent();
-    out.println("};");
 
     if (maxLexStates > 1) {
       out.println();
-      out.println("/** Lex State array. */");
-      out.print("public static final int[] jjNewLexState = {");
+      out.println("/** Lex state array. */");
+      out.print("private static final int[] jjNewLexState = {");
       out.indent();
-      for (i = 0; i < maxOrdinal; i++) {
-        if (i % 25 == 0) {
-          out.print("\n");
-        }
-
+      IndentingPrintWriter.ListPrinter l2 = out.list(", ");
+      for (int i = 0; i < maxOrdinal; i++) {
         if (newLexState[i] == null) {
-          out.print("-1, ");
+          l2.item("-1");
         }
         else {
-          out.print(getIndex(newLexState[i]) + ", ");
+          l2.item(getIndex(newLexState[i]));
         }
       }
+      out.println("};");
       out.unindent();
-      out.println("\n};");
     }
 
     if (hasSkip || hasMore || hasSpecial) {
       // Bit vector for TOKEN
-      out.print("static final long[] jjToToken = {");
-      for (i = 0; i < maxOrdinal / 64 + 1; i++) {
-        if (i % 4 == 0) {
-          out.print("\n   ");
-        }
-        out.print("0x" + Long.toHexString(toToken[i]) + "L, ");
+      out.print("private static final long[] jjToToken = {");
+      out.indent();
+      IndentingPrintWriter.ListPrinter l3 = out.list(", ");
+      for (int i = 0; i < maxOrdinal / 64 + 1; i++) {
+        l3.item("0x" + Long.toHexString(toToken[i]) + "L");
       }
-      out.println("\n};");
+      out.println("};");
+      out.unindent();
     }
 
     if (hasSkip || hasSpecial) {
       // Bit vector for SKIP
-      out.print("static final long[] jjToSkip = {");
-      for (i = 0; i < maxOrdinal / 64 + 1; i++) {
-        if (i % 4 == 0) {
-          out.print("\n   ");
-        }
-        out.print("0x" + Long.toHexString(toSkip[i]) + "L, ");
+      out.print("private static final long[] jjToSkip = {");
+      out.indent();
+      IndentingPrintWriter.ListPrinter l4 = out.list(", ");
+      for (int i = 0; i < maxOrdinal / 64 + 1; i++) {
+        l4.item("0x" + Long.toHexString(toSkip[i]) + "L");
       }
-      out.println("\n};");
+      out.println("};");
+      out.unindent();
     }
 
     if (hasSpecial) {
       // Bit vector for SPECIAL
-      out.print("static final long[] jjToSpecial = {");
-      for (i = 0; i < maxOrdinal / 64 + 1; i++) {
-        if (i % 4 == 0) {
-          out.print("\n   ");
-        }
-        out.print("0x" + Long.toHexString(toSpecial[i]) + "L, ");
+      out.print("private static final long[] jjToSpecial = {");
+      out.indent();
+      IndentingPrintWriter.ListPrinter l5 = out.list(", ");
+      for (int i = 0; i < maxOrdinal / 64 + 1; i++) {
+        l5.item("0x" + Long.toHexString(toSpecial[i]) + "L");
       }
-      out.println("\n};");
+      out.println("};");
+      out.unindent();
     }
 
     if (hasMore) {
       // Bit vector for MORE
-      out.print("static final long[] jjToMore = {");
-      for (i = 0; i < maxOrdinal / 64 + 1; i++) {
-        if (i % 4 == 0) {
-          out.print("\n   ");
-        }
-        out.print("0x" + Long.toHexString(toMore[i]) + "L, ");
+      out.print("private static final long[] jjToMore = {");
+      out.indent();
+      IndentingPrintWriter.ListPrinter l6 = out.list(", ");
+      for (int i = 0; i < maxOrdinal / 64 + 1; i++) {
+        l6.item("0x" + Long.toHexString(toMore[i]) + "L");
       }
-      out.println("\n};");
+      out.println("};");
+      out.unindent();
     }
 
     out.println("protected final CharStream charStream;");
@@ -896,11 +895,11 @@ final class ScannerGen implements FileGenerator {
     int i;
 
     out.println();
-    out.println("int jjLexState = " + defaultLexState + ";");
-    out.println("int jjNewStateCount;");
-    out.println("int jjRound;");
-    out.println("int jjMatchedPos;");
-    out.println("int jjMatchedKind;");
+    out.println("private int jjLexState = " + defaultLexState + ";");
+    out.println("private int jjNewStateCount;");
+    out.println("private int jjRound;");
+    out.println("private int jjMatchedPos;");
+    out.println("private int jjMatchedKind;");
 
     out.println();
     out.println("/** Get the next token that is not special. */");
@@ -1006,7 +1005,7 @@ final class ScannerGen implements FileGenerator {
               "          (jjChar >> 6) == 1" +
               " && (0x" +
               Long.toHexString(singlesToSkip[i].asciiMoves[1]) +
-              "L & (1L << (jjChar & 077))) != 0L)");
+              "L & (1L << (jjChar & 63))) != 0L)");
         }
         else if (singlesToSkip[i].asciiMoves[1] == 0L) {
           out.println("while (jjChar <= " +
@@ -1019,7 +1018,7 @@ final class ScannerGen implements FileGenerator {
               ((int) maxChar(singlesToSkip[i].asciiMoves[1]) + 64) +
               " && (0x" +
               Long.toHexString(singlesToSkip[i].asciiMoves[1]) +
-              "L & (1L << (jjChar & 077))) != 0L)");
+              "L & (1L << (jjChar & 63))) != 0L)");
         }
 
         out.println("{");
@@ -1274,7 +1273,7 @@ final class ScannerGen implements FileGenerator {
           .println(" */")
           .println("public static boolean isToken(int kind) {")
           .indent()
-          .println("return (jjToToken[kind >> 6] & (1L << (kind & 077))) != 0L;")
+          .println("return (jjToToken[kind >> 6] & (1L << (kind & 63))) != 0L;")
           .unindent()
           .println("}");
     }
@@ -1289,7 +1288,7 @@ final class ScannerGen implements FileGenerator {
           .println(" */")
           .println("public static boolean isSkip(int kind) {")
           .indent()
-          .println("return (jjToSkip[kind >> 6] & (1L << (kind & 077))) != 0L;")
+          .println("return (jjToSkip[kind >> 6] & (1L << (kind & 63))) != 0L;")
           .unindent()
           .println("}");
     }
@@ -1304,7 +1303,7 @@ final class ScannerGen implements FileGenerator {
           .println(" */")
           .println("public static boolean isSpecial(int kind) {")
           .indent()
-          .println("return (jjToSpecial[kind >> 6] & (1L << (kind & 077))) != 0L;")
+          .println("return (jjToSpecial[kind >> 6] & (1L << (kind & 63))) != 0L;")
           .unindent()
           .println("}");
     }

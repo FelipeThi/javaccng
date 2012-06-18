@@ -14,19 +14,105 @@ import java.util.Locale;
  * on Windows.
  */
 public class IndentingPrintWriter extends FilterWriter {
+  /**
+   * Print list of items separated by a delimiter and wrapped at the
+   * right margin. Suitable for printing array initializers, etc.
+   */
+  public class ListPrinter {
+    private final String delimiter, tailDelimiter;
+    private int count;
+
+    public ListPrinter(String delimiter) {
+      this.delimiter = delimiter;
+      int n = delimiter.length();
+      for (; n > 0; n--) {
+        if (delimiter.charAt(n - 1) != ' ') {
+          break;
+        }
+      }
+      tailDelimiter = delimiter.substring(0, n);
+    }
+
+    public String getDelimiter() {
+      return delimiter;
+    }
+
+    public ListPrinter item(boolean b) {
+      item(b ? "true" : "false");
+      return this;
+    }
+
+    public ListPrinter item(char c) {
+      item(String.valueOf(c));
+      return this;
+    }
+
+    public ListPrinter item(int i) {
+      item(String.valueOf(i));
+      return this;
+    }
+
+    public ListPrinter item(long l) {
+      item(String.valueOf(l));
+      return this;
+    }
+
+    public ListPrinter item(float f) {
+      item(String.valueOf(f));
+      return this;
+    }
+
+    public ListPrinter item(double d) {
+      item(String.valueOf(d));
+      return this;
+    }
+
+    public ListPrinter item(String item) {
+      if (count > 0) {
+        if (column() + delimiter.length() + item.length() >= margin) {
+          println(tailDelimiter);
+        }
+        else {
+          print(delimiter);
+        }
+      }
+      print(item);
+      count++;
+      return this;
+    }
+
+    public ListPrinter item(Object obj) {
+      item(String.valueOf(obj));
+      return this;
+    }
+  }
+
+  private static final int MARGIN = 80;
   private final String lineSeparator;
   private String indentString = "  ";
   private Formatter formatter;
   private int level;
   private boolean indent;
+  private int column;
+  private int margin;
 
   public IndentingPrintWriter(Writer out) {
+    this(out, MARGIN);
+  }
+
+  public IndentingPrintWriter(Writer out, int margin) {
     super(out);
+    this.margin = margin;
     lineSeparator = System.getProperty("line.separator", "\n");
   }
 
   public IndentingPrintWriter(Writer out, String eol) {
+    this(out, MARGIN, eol);
+  }
+
+  public IndentingPrintWriter(Writer out, int margin, String eol) {
     super(out);
+    this.margin = margin;
     lineSeparator = eol;
   }
 
@@ -41,6 +127,9 @@ public class IndentingPrintWriter extends FilterWriter {
   /** Increase indentation level. */
   public IndentingPrintWriter indent() {
     level++;
+    if (indent) {
+      column = indentString.length() * level;
+    }
     return this;
   }
 
@@ -51,6 +140,14 @@ public class IndentingPrintWriter extends FilterWriter {
     }
     level--;
     return this;
+  }
+
+  public int column() {
+    return column;
+  }
+
+  public ListPrinter list(String delimiter) {
+    return new ListPrinter(delimiter);
   }
 
   /**
@@ -64,6 +161,7 @@ public class IndentingPrintWriter extends FilterWriter {
     try {
       if (c == '\n') {
         indent = true;
+        column = indentString.length() * level;
         out.write(lineSeparator);
       }
       else {
@@ -71,8 +169,9 @@ public class IndentingPrintWriter extends FilterWriter {
           for (int n = 0; n < level; n++) {
             out.write(indentString);
           }
+          indent = false;
         }
-        indent = false;
+        column++;
         out.write(c);
       }
     }
