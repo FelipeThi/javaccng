@@ -63,7 +63,7 @@ public abstract class RegularExpression extends Expansion {
    * within a TokenProduction), then this field point to that
    * TokenProduction object.
    */
-  public TokenProduction tpContext = null;
+  public TokenProduction tpContext;
   /**
    * The following variable is used to maintain state information for the
    * loop determination algorithm:  It is initialized to 0, and
@@ -73,6 +73,14 @@ public abstract class RegularExpression extends Expansion {
    * and 1 indicates fully processed.
    */
   int walkStatus = 0;
+  //
+  boolean toToken;
+  //
+  boolean toSkip;
+  //
+  boolean toMore;
+  //
+  boolean toSpecial;
 
   public boolean canMatchAnyChar() {
     return false;

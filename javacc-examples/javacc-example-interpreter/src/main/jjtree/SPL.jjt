@@ -124,9 +124,9 @@ void VarDeclaration() :
 { Token t; }
 {
   (
-    "boolean" { jjtThis.type = BOOL; }
+    "boolean" { jjtThis.type = SPLConstants.BOOL; }
    |
-    "int" { jjtThis.type = INT; }
+    "int" { jjtThis.type = SPLConstants.INT; }
   )
   t = <IDENTIFIER>
   { jjtThis.name = t.getImage(); }

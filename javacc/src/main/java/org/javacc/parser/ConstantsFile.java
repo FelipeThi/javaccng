@@ -35,7 +35,7 @@ import java.io.File;
 import java.io.IOException;
 
 /** Generates the Constants file. */
-final class ConstantsFile implements FileGenerator, JavaCCConstants {
+final class ConstantsFile implements FileGenerator {
   private final JavaCCState state;
   private final ScannerGen scannerGen;
 
@@ -65,33 +65,63 @@ final class ConstantsFile implements FileGenerator, JavaCCConstants {
       throws IOException {
     TokenPrinter.packageDeclaration(state.cuToInsertionPoint1, out);
     out.println();
-    out.println("/** Token literal values and constants. */");
-    out.println("public interface " + state.constantsClass() + " {");
-//    out.indent();
-//    out.println("enum TokenKind {");
-//    out.indent();
-//    out.println("EOF,");
-//    for (RegularExpression re : state.orderedNamedTokens) {
-//      out.println("/** The '" + re.label + "' token. */");
-//      out.println(re.label + ",");
-//    }
-//    out.unindent();
-//    out.println("}");
-//    out.unindent();
-
-    out.indent();
-    out.println("/** End of File. */");
-    out.println("int EOF = 0;");
-    for (RegularExpression re : state.orderedNamedTokens) {
-      out.println("/** The '" + re.label + "' token id. */");
-      out.println("int " + re.label + " = " + re.ordinal + ";");
-    }
+    generateEnum(out);
     if (!Options.getUserScanner() && Options.getBuildScanner()) {
       for (int i = 0; i < scannerGen.lexStateName.length; i++) {
         out.println("/** Lexical state. */");
         out.println("int " + scannerGen.lexStateName[i] + " = " + i + ";");
       }
     }
+    generateImages(out);
+    out.unindent();
+    out.println("};");
+    out.unindent();
+    out.println("}");
+  }
+
+  private void generateEnum(IndentingPrintWriter out) {
+    out.println("/** Token literal values and constants. */");
+    out.println("public interface " + state.constantsClass() + " {");
+    out.indent();
+    out.println("enum TokenKind {");
+    out.indent();
+    out.print("EOF");
+    for (RegularExpression re : state.orderedNamedTokens) {
+      if (re.isPrivate) {
+        continue;
+      }
+      out.println(",");
+      if (re instanceof RStringLiteral && !((RStringLiteral) re).isRegExp()) {
+        out.println("/** The string literal token '" + re.label + "' defined at [" + re.getLine() + ", " + re.getColumn() + "]. */");
+        out.print(re.label).print("(\"").print(Parsers.escape(((RStringLiteral) re).image)).print("\")");
+      }
+      else {
+        out.println("/** The regular expression token '" + re.label + "' defined at [" + re.getLine() + ", " + re.getColumn() + "]. */");
+        out.print(re.label);
+      }
+    }
+    out.println(";");
+    out.println("private final String image;\n");
+    out.println("private TokenKind() { this(null); }\n");
+    out.println("private TokenKind(String image) { this.image = image; }\n");
+    out.println("public String getImage() { return image; }");
+    out.unindent();
+    out.println("}");
+    out.unindent();
+
+    out.indent();
+    out.println("/** End of File. */");
+    out.println("int EOF = 0;");
+    for (RegularExpression re : state.orderedNamedTokens) {
+      if (re.isPrivate) {
+        continue;
+      }
+      out.println("/** The '" + re.label + "' token id. */");
+      out.println("int " + re.label + " = " + re.ordinal + ";");
+    }
+  }
+
+  private void generateImages(IndentingPrintWriter out) {
     out.println("/** Literal token values. */");
     out.println("String[] tokenImage = {");
     out.indent();
@@ -103,7 +133,10 @@ final class ConstantsFile implements FileGenerator, JavaCCConstants {
           out.print("\"\\\"");
           out.print(Parsers.escape(Parsers.escape(((RStringLiteral) re).image)));
           out.print("\\\"\",");
-          if (re.label != null && !re.label.isEmpty()) {
+          if (re.label == null || re.label.isEmpty()) {
+            out.print(" // Anonymous token");
+          }
+          else {
             out.print(" // Literal image of token '" + re.label + "'");
           }
           out.println();
@@ -119,9 +152,5 @@ final class ConstantsFile implements FileGenerator, JavaCCConstants {
         }
       }
     }
-    out.unindent();
-    out.println("};");
-    out.unindent();
-    out.println("}");
   }
 }

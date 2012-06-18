@@ -52,11 +52,11 @@ public class JJTreeParser {
    */
   private boolean notTailOfExpansionUnit() throws java.io.IOException {
     Token t = getToken(1);
-    if (t.getKind() == BIT_OR
-        || t.getKind() == COMMA
-        || t.getKind() == RPAREN
-        || t.getKind() == RBRACE
-        || t.getKind() == RBRACKET) {
+    if (t.getKind() == JJTreeConstants.BIT_OR
+        || t.getKind() == JJTreeConstants.COMMA
+        || t.getKind() == JJTreeConstants.RPAREN
+        || t.getKind() == JJTreeConstants.RBRACE
+        || t.getKind() == JJTreeConstants.RBRACKET) {
         return false;
     }
     return true;
@@ -320,15 +320,15 @@ TOKEN :
 {
   < RUNSIGNEDSHIFT: ">>>" >
   {
-     matchedToken.setKind(GT);
-     ((Token.GTToken) matchedToken).realKind = RUNSIGNEDSHIFT;
+     matchedToken.setKind(JJTreeConstants.GT);
+     ((Token.GTToken) matchedToken).realKind = JJTreeConstants.RUNSIGNEDSHIFT;
      charStream.backup(2);
      matchedToken.setImage(">");
   }
 | < RSIGNEDSHIFT: ">>" >
   {
-     matchedToken.setKind(GT);
-     ((Token.GTToken) matchedToken).realKind = RSIGNEDSHIFT;
+     matchedToken.setKind(JJTreeConstants.GT);
+     ((Token.GTToken) matchedToken).realKind = JJTreeConstants.RSIGNEDSHIFT;
      charStream.backup(1);
      matchedToken.setImage(">");
   }
@@ -633,19 +633,19 @@ void local_lookahead(ASTProduction p) :
 	  emptyLA = false;
 	}
   ]
-  [ LOOKAHEAD(0, { !emptyLA && (getToken(1).getKind() != RPAREN) } )
+  [ LOOKAHEAD(0, { !emptyLA && (getToken(1).getKind() != JJTreeConstants.RPAREN) } )
     ","
 	{
 	  commaAtEnd = true;
 	}
   ]
-  [ LOOKAHEAD(0, { getToken(1).getKind() != RPAREN && getToken(1).getKind() != LBRACE } )
+  [ LOOKAHEAD(0, { getToken(1).getKind() != JJTreeConstants.RPAREN && getToken(1).getKind() != JJTreeConstants.LBRACE } )
     expansion_choices(p)
 	{
 	  emptyLA = false; commaAtEnd = false;
 	}
   ]
-  [ LOOKAHEAD(0, { !emptyLA && !commaAtEnd && (getToken(1).getKind() != RPAREN) } )
+  [ LOOKAHEAD(0, { !emptyLA && !commaAtEnd && (getToken(1).getKind() != JJTreeConstants.RPAREN) } )
     ","
 	{
 	  commaAtEnd = true;
@@ -860,10 +860,10 @@ void node_descriptor_expression() #NodeDescriptorExpression
     if (t.getKind() == 0) {
       throw new ParseException("Premature end of file");
     }
-    if (t.getKind() == LPAREN) {
+    if (t.getKind() == JJTreeConstants.LPAREN) {
       nesting++;
     }
-    if (t.getKind() == RPAREN) {
+    if (t.getKind() == JJTreeConstants.RPAREN) {
       nesting--;
       if (nesting == 0) {
         break;
@@ -1872,8 +1872,8 @@ void TryStatement():
 void RUNSIGNEDSHIFT():
 {}
 {
-  ( LOOKAHEAD({ getToken(1).getKind() == GT &&
-                ((Token.GTToken) getToken(1)).realKind == RUNSIGNEDSHIFT} )
+  ( LOOKAHEAD({ getToken(1).getKind() == JJTreeConstants.GT &&
+                ((Token.GTToken) getToken(1)).realKind == JJTreeConstants.RUNSIGNEDSHIFT} )
    ">" ">" ">"
   )
 }
@@ -1881,8 +1881,8 @@ void RUNSIGNEDSHIFT():
 void RSIGNEDSHIFT():
 {}
 {
-  ( LOOKAHEAD({ getToken(1).getKind() == GT &&
-                ((Token.GTToken) getToken(1)).realKind == RSIGNEDSHIFT} )
+  ( LOOKAHEAD({ getToken(1).getKind() == JJTreeConstants.GT &&
+                ((Token.GTToken) getToken(1)).realKind == JJTreeConstants.RSIGNEDSHIFT} )
   ">" ">"
   )
 }

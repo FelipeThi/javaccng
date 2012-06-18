@@ -44,8 +44,8 @@ public final class RStringLiteral extends RegularExpression {
   @Override
   public Nfa generateNfa(ScannerGen scannerGen, boolean ignoreCase) {
     if (image.length() == 1) {
-      RCharacterList temp = new RCharacterList(image.charAt(0));
-      return temp.generateNfa(scannerGen, ignoreCase);
+      return new RCharacterList(image.charAt(0))
+          .generateNfa(scannerGen, ignoreCase);
     }
 
     NfaState state = new NfaState(scannerGen);
@@ -80,11 +80,10 @@ public final class RStringLiteral extends RegularExpression {
       scannerGen.stringLiterals.maxStrKind = ordinal + 1;
     }
 
-    int len;
-    if ((len = image.length()) > scannerGen.stringLiterals.maxLen) {
+    int len = image.length();
+    if (len > scannerGen.stringLiterals.maxLen) {
       scannerGen.stringLiterals.maxLen = len;
     }
-
     for (int i = 0; i < len; i++) {
       char c;
       String s;
@@ -119,15 +118,15 @@ public final class RStringLiteral extends RegularExpression {
       }
 
       if (i + 1 == len) {
-        info.InsertFinalKind(ordinal);
+        info.insertFinalKind(ordinal);
       }
       else {
-        info.InsertValidKind(ordinal);
+        info.insertValidKind(ordinal);
       }
 
       if (!Options.getIgnoreCase() && scannerGen.ignoreCase[ordinal]
           && c != Character.toLowerCase(c)) {
-        s = ("" + image.charAt(i)).toLowerCase();
+        s = String.valueOf(image.charAt(i)).toLowerCase();
 
         if (i >= scannerGen.stringLiterals.charPosKind.size()) {
           // Kludge, but OK
@@ -142,10 +141,10 @@ public final class RStringLiteral extends RegularExpression {
         }
 
         if (i + 1 == len) {
-          info.InsertFinalKind(ordinal);
+          info.insertFinalKind(ordinal);
         }
         else {
-          info.InsertValidKind(ordinal);
+          info.insertValidKind(ordinal);
         }
       }
 
@@ -167,10 +166,10 @@ public final class RStringLiteral extends RegularExpression {
         }
 
         if (i + 1 == len) {
-          info.InsertFinalKind(ordinal);
+          info.insertFinalKind(ordinal);
         }
         else {
-          info.InsertValidKind(ordinal);
+          info.insertValidKind(ordinal);
         }
       }
     }
@@ -180,14 +179,22 @@ public final class RStringLiteral extends RegularExpression {
     scannerGen.stringLiterals.allImages[ordinal] = image;
   }
 
+  /** Copied from {@link ScannerGen#isRegExp(int)}. */
+  boolean isRegExp() {
+    return (!toSkip && !toMore && !toToken)
+        || toSkip
+        || toMore;
+    //|| canReachOnMore[lexStates[i]]; // TODO what does it mean?
+  }
+
   public String toString() {
     return super.toString() + " - " + image;
   }
 }
 
 final class KindInfo {
-  long[] validKinds;
-  long[] finalKinds;
+  final long[] validKinds;
+  final long[] finalKinds;
   int validKindCnt = 0;
   int finalKindCnt = 0;
 
@@ -196,12 +203,12 @@ final class KindInfo {
     finalKinds = new long[maxKind / 64 + 1];
   }
 
-  public void InsertValidKind(int kind) {
+  public void insertValidKind(int kind) {
     validKinds[kind / 64] |= (1L << (kind % 64));
     validKindCnt++;
   }
 
-  public void InsertFinalKind(int kind) {
+  public void insertFinalKind(int kind) {
     finalKinds[kind / 64] |= (1L << (kind % 64));
     finalKindCnt++;
   }

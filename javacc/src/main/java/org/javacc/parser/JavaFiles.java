@@ -35,7 +35,7 @@ import java.io.File;
 import java.io.IOException;
 
 /** Generate boilerplate java files. */
-public class JavaFiles implements FileGenerator, JavaCCConstants {
+public class JavaFiles implements FileGenerator {
   private final JavaCCState state;
 
   public JavaFiles(JavaCCState state) {

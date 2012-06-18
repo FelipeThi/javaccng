@@ -468,14 +468,14 @@ public final class ParseEngine {
     if (expansion.label.equals("")) {
       String label = state.tokenNames.get(expansion.ordinal);
       if (label != null) {
-        s += "jj_consume_token(" + label + tail;
+        s += "jj_consume_token(" + token(label) + tail;
       }
       else {
         s += "jj_consume_token(" + expansion.ordinal + tail;
       }
     }
     else {
-      s += "jj_consume_token(" + expansion.label + tail;
+      s += "jj_consume_token(" + token(expansion.label) + tail;
     }
     return s;
   }
@@ -767,7 +767,7 @@ public final class ParseEngine {
                   retval += i;
                 }
                 else {
-                  retval += s;
+                  retval += token(s);
                 }
                 retval += ":";
               }
@@ -1076,14 +1076,14 @@ public final class ParseEngine {
     if (expansion.label.equals("")) {
       String label = state.tokenNames.get(expansion.ordinal);
       if (label != null) {
-        out.println("if (jj_scan_token(" + label + ")) " + genReturn(true));
+        out.println("if (jj_scan_token(" + token(label) + ")) " + genReturn(true));
       }
       else {
         out.println("if (jj_scan_token(" + expansion.ordinal + ")) " + genReturn(true));
       }
     }
     else {
-      out.println("if (jj_scan_token(" + expansion.label + ")) " + genReturn(true));
+      out.println("if (jj_scan_token(" + token(expansion.label) + ")) " + genReturn(true));
     }
     //out.println("if (jj_la == 0 && jj_scanPos == jj_lastPos) " + genReturn(false));
   }
@@ -1276,6 +1276,13 @@ public final class ParseEngine {
     }
     expansion.inMinimumSize = false;
     return size;
+  }
+
+  private String token(String name) {
+    if (name != null) {
+      return state.constantsClass() + "." + name;
+    }
+    return null;
   }
 }
 

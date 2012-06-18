@@ -23,7 +23,7 @@ final class StringLiterals {
   boolean boilerPlateDumped;
 
   StringLiterals() {
-    ReInit();
+    reInit();
   }
 
   /**
@@ -32,7 +32,7 @@ final class StringLiterals {
    *
    * Need to call this method after generating code for each lexical state.
    */
-  void ReInit() {
+  void reInit() {
     maxStrKind = 0;
     maxLen = 0;
     charPosKind = new ArrayList();
@@ -45,7 +45,7 @@ final class StringLiterals {
     statesForPos = null;
   }
 
-  void DumpStrLiteralImages(ScannerGen scannerGen, IndentingPrintWriter ostr) {
+  void dumpStrLiteralImages(ScannerGen scannerGen, IndentingPrintWriter ostr) {
     ostr.println("");
     ostr.println("/** Token literal values. */");
     ostr.println("public static final String[] jjLiteralImages = {");
@@ -60,18 +60,12 @@ final class StringLiterals {
     String image;
     int i;
     for (i = 0; i < allImages.length; i++) {
-      if ((image = allImages[i]) == null ||
-          ((scannerGen.toSkip[i / 64] & (1L << (i % 64))) == 0L
-              && (scannerGen.toMore[i / 64] & (1L << (i % 64))) == 0L
-              && (scannerGen.toToken[i / 64] & (1L << (i % 64))) == 0L)
-          || (scannerGen.toSkip[i / 64] & (1L << (i % 64))) != 0L
-          || (scannerGen.toMore[i / 64] & (1L << (i % 64))) != 0L
-          || scannerGen.canReachOnMore[scannerGen.lexStates[i]]
-          || ((Options.getIgnoreCase() || scannerGen.ignoreCase[i])
-          && (!image.equals(image.toLowerCase()) || !image.equals(image.toUpperCase())))) {
+      if ((image = allImages[i]) == null
+          || scannerGen.isRegExp(i)
+          || unnamed(scannerGen, image, i)) {
         allImages[i] = null;
         if ((charCnt += 6) > 80) {
-          ostr.println("");
+          ostr.println();
           charCnt = 0;
         }
 
@@ -101,7 +95,12 @@ final class StringLiterals {
     ostr.println("};");
   }
 
-  void DumpNullStrLiterals(ScannerGen scannerGen, IndentingPrintWriter ostr) {
+  private boolean unnamed(ScannerGen scannerGen, String image, int i) {
+    return (Options.getIgnoreCase() || scannerGen.ignoreCase[i])
+        && (!image.equals(image.toLowerCase()) || !image.equals(image.toUpperCase()));
+  }
+
+  void dumpNullStrLiterals(ScannerGen scannerGen, IndentingPrintWriter ostr) {
     ostr.println("{");
     ostr.indent();
     if (scannerGen.nfaStates.generatedStates != 0) {
@@ -113,7 +112,7 @@ final class StringLiterals {
     ostr.println("}");
   }
 
-  private int GetStateSetForKind(ScannerGen scannerGen, int pos, int kind) {
+  private int getStateSetForKind(ScannerGen scannerGen, int pos, int kind) {
     if (scannerGen.mixed[scannerGen.lexStateIndex] || scannerGen.nfaStates.generatedStates == 0) { return -1; }
 
     Hashtable allStateSets = statesForPos[pos];
@@ -140,7 +139,7 @@ final class StringLiterals {
     return -1;
   }
 
-  String GetLabel(ScannerGen scannerGen, int kind) {
+  String getLabel(ScannerGen scannerGen, int kind) {
     RegularExpression re = scannerGen.rexprs[kind];
 
     if (re instanceof RStringLiteral) {
@@ -154,16 +153,16 @@ final class StringLiterals {
     }
   }
 
-  int GetLine(ScannerGen scannerGen, int kind) {
+  int getLine(ScannerGen scannerGen, int kind) {
     return scannerGen.rexprs[kind].getLine();
   }
 
-  int GetColumn(ScannerGen scannerGen, int kind) {
+  int getColumn(ScannerGen scannerGen, int kind) {
     return scannerGen.rexprs[kind].getColumn();
   }
 
   /** Returns true if s1 starts with s2 (ignoring case for each character). */
-  private boolean StartsWithIgnoreCase(String s1, String s2) {
+  private boolean startsWithIgnoreCase(String s1, String s2) {
     if (s1.length() < s2.length()) { return false; }
 
     for (int i = 0; i < s2.length(); i++) {
@@ -203,7 +202,7 @@ final class StringLiterals {
             break;
           }
           else if (Options.getIgnoreCase() &&
-              StartsWithIgnoreCase(allImages[j], image)) {
+              startsWithIgnoreCase(allImages[j], image)) {
             subString[i] = true;
             subStringAtPos[image.length() - 1] = true;
             break;
@@ -213,7 +212,7 @@ final class StringLiterals {
     }
   }
 
-  void DumpStartWithStates(ScannerGen scannerGen, IndentingPrintWriter ostr) {
+  void dumpStartWithStates(ScannerGen scannerGen, IndentingPrintWriter ostr) {
     ostr.println("private int " +
         "jjStartNfaWithStates" + scannerGen.lexStateSuffix + "(int pos, int kind, int state) throws java.io.IOException");
     ostr.println("{");
@@ -244,7 +243,7 @@ final class StringLiterals {
     ostr.println();
   }
 
-  void DumpBoilerPlate(IndentingPrintWriter ostr) {
+  void dumpBoilerPlate(IndentingPrintWriter ostr) {
     ostr.println("private int " +
         "jjStopAtPos(int pos, int kind)");
     ostr.println("{");
@@ -264,7 +263,7 @@ final class StringLiterals {
     ostr.println();
   }
 
-  String[] ReArrange(Hashtable tab) {
+  String[] reArrange(Hashtable tab) {
     String[] ret = new String[tab.size()];
     Enumeration e = tab.keys();
     int cnt = 0;
@@ -285,7 +284,7 @@ final class StringLiterals {
     return ret;
   }
 
-  void DumpDfaCode(ScannerGen scannerGen, IndentingPrintWriter ostr) {
+  void dumpDfaCode(ScannerGen scannerGen, IndentingPrintWriter ostr) {
     Hashtable tab;
     String key;
     KindInfo info;
@@ -298,23 +297,22 @@ final class StringLiterals {
       ostr.println("private int " +
           "jjMoveStringLiteralDfa0" + scannerGen.lexStateSuffix + "() throws java.io.IOException");
 
-      DumpNullStrLiterals(scannerGen, ostr);
+      dumpNullStrLiterals(scannerGen, ostr);
       ostr.println();
       return;
     }
 
     if (!boilerPlateDumped) {
-      DumpBoilerPlate(ostr);
+      dumpBoilerPlate(ostr);
       boilerPlateDumped = true;
     }
 
     boolean createStartNfa = false;
-    ;
     for (i = 0; i < maxLen; i++) {
       boolean atLeastOne = false;
       boolean startNfaNeeded = false;
       tab = (Hashtable) charPosKind.get(i);
-      String[] keys = ReArrange(tab);
+      String[] keys = reArrange(tab);
 
       ostr.print("private int " +
           "jjMoveStringLiteralDfa" + i + scannerGen.lexStateSuffix + "(");
@@ -534,9 +532,9 @@ final class StringLiterals {
                 JavaCCErrors.warning(" \"" +
                     Parsers.escape(allImages[j * 64 + k]) +
                     "\" cannot be matched as a string literal token " +
-                    "at line " + GetLine(scannerGen, j * 64 + k) + ", column " + GetColumn(scannerGen, j * 64 + k) +
+                    "at line " + getLine(scannerGen, j * 64 + k) + ", column " + getColumn(scannerGen, j * 64 + k) +
                     ". It will be matched as " +
-                    GetLabel(scannerGen, intermediateKinds[(j * 64 + k)][i]) + ".");
+                    getLabel(scannerGen, intermediateKinds[(j * 64 + k)][i]) + ".");
                 kindToPrint = intermediateKinds[(j * 64 + k)][i];
               }
               else if (i == 0 &&
@@ -545,15 +543,15 @@ final class StringLiterals {
                 JavaCCErrors.warning(" \"" +
                     Parsers.escape(allImages[j * 64 + k]) +
                     "\" cannot be matched as a string literal token " +
-                    "at line " + GetLine(scannerGen, j * 64 + k) + ", column " + GetColumn(scannerGen, j * 64 + k) +
+                    "at line " + getLine(scannerGen, j * 64 + k) + ", column " + getColumn(scannerGen, j * 64 + k) +
                     ". It will be matched as " +
-                    GetLabel(scannerGen, scannerGen.canMatchAnyChar[scannerGen.lexStateIndex]) + ".");
+                    getLabel(scannerGen, scannerGen.canMatchAnyChar[scannerGen.lexStateIndex]) + ".");
                 kindToPrint = scannerGen.canMatchAnyChar[scannerGen.lexStateIndex];
               }
               else { kindToPrint = j * 64 + k; }
 
               if (!subString[(j * 64 + k)]) {
-                int stateSetName = GetStateSetForKind(scannerGen, i, j * 64 + k);
+                int stateSetName = getStateSetForKind(scannerGen, i, j * 64 + k);
 
                 if (stateSetName != -1) {
                   createStartNfa = true;
@@ -722,11 +720,11 @@ final class StringLiterals {
     }
 
     if (!scannerGen.mixed[scannerGen.lexStateIndex] && scannerGen.nfaStates.generatedStates != 0 && createStartNfa) {
-      DumpStartWithStates(scannerGen, ostr);
+      dumpStartWithStates(scannerGen, ostr);
     }
   }
 
-  final int GetStrKind(ScannerGen scannerGen, String str) {
+  final int getStrKind(ScannerGen scannerGen, String str) {
     for (int i = 0; i < maxStrKind; i++) {
       if (scannerGen.lexStates[i] != scannerGen.lexStateIndex) { continue; }
 
@@ -737,7 +735,7 @@ final class StringLiterals {
     return Integer.MAX_VALUE;
   }
 
-  void GenerateNfaStartStates(ScannerGen scannerGen, IndentingPrintWriter ostr,
+  void generateNfaStartStates(ScannerGen scannerGen, IndentingPrintWriter ostr,
                               NfaState initialState) {
     boolean[] seen = new boolean[scannerGen.nfaStates.generatedStates];
     Hashtable stateSets = new Hashtable();
@@ -762,7 +760,7 @@ final class StringLiterals {
       try {
         if ((oldStates = (List) initialState.epsilonMoves.clone()) == null ||
             oldStates.size() == 0) {
-          DumpNfaStartStatesCode(scannerGen, statesForPos, ostr);
+          dumpNfaStartStatesCode(scannerGen, statesForPos, ostr);
           return;
         }
       }
@@ -791,7 +789,7 @@ final class StringLiterals {
             kind = scannerGen.canMatchAnyChar[scannerGen.lexStateIndex];
           }
 
-          if (GetStrKind(scannerGen, image.substring(0, j + 1)) < kind) {
+          if (getStrKind(scannerGen, image.substring(0, j + 1)) < kind) {
             intermediateKinds[i][j] = kind = Integer.MAX_VALUE;
             jjMatchedPos = 0;
           }
@@ -841,10 +839,10 @@ final class StringLiterals {
       }
     }
 
-    DumpNfaStartStatesCode(scannerGen, statesForPos, ostr);
+    dumpNfaStartStatesCode(scannerGen, statesForPos, ostr);
   }
 
-  void DumpNfaStartStatesCode(ScannerGen scannerGen, Hashtable[] statesForPos,
+  void dumpNfaStartStatesCode(ScannerGen scannerGen, Hashtable[] statesForPos,
                               IndentingPrintWriter ostr) {
     if (maxStrKind == 0) { // No need to generate this function
       return;

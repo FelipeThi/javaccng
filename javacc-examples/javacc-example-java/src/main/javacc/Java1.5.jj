@@ -1011,16 +1011,16 @@ TOKEN :
 {
   < RUNSIGNEDSHIFT: ">>>" >
   {
-     matchedToken.setKind(GT);
-     ((MyToken) matchedToken).realKind = RUNSIGNEDSHIFT;
+     matchedToken.setKind(JavaConstants.GT);
+     ((MyToken) matchedToken).realKind = JavaConstants.RUNSIGNEDSHIFT;
      charStream.backup(2);
      matchedToken.setImage(">");
      //matchedToken.setOffset(matchedToken.getBeginOffset(), matchedToken.getEndOffset() - 2);
   }
 | < RSIGNEDSHIFT: ">>" >
   {
-     matchedToken.setKind(GT);
-     ((MyToken) matchedToken).realKind = RSIGNEDSHIFT;
+     matchedToken.setKind(JavaConstants.GT);
+     ((MyToken) matchedToken).realKind = JavaConstants.RSIGNEDSHIFT;
      charStream.backup(1);
      matchedToken.setImage(">");
      //matchedToken.setOffset(matchedToken.getBeginOffset(), matchedToken.getEndOffset() - 1);
@@ -1959,8 +1959,8 @@ void TryStatement():
 void RUNSIGNEDSHIFT():
 {}
 {
-  ( LOOKAHEAD({ getToken(1).getKind() == GT &&
-                ((MyToken)getToken(1)).realKind == RUNSIGNEDSHIFT} )
+  ( LOOKAHEAD({ getToken(1).getKind() == JavaConstants.GT &&
+                ((MyToken)getToken(1)).realKind == JavaConstants.RUNSIGNEDSHIFT} )
    ">" ">" ">"
   )
 }
@@ -1968,8 +1968,8 @@ void RUNSIGNEDSHIFT():
 void RSIGNEDSHIFT():
 {}
 {
-  ( LOOKAHEAD({ getToken(1).getKind() == GT &&
-                ((MyToken)getToken(1)).realKind == RSIGNEDSHIFT} )
+  ( LOOKAHEAD({ getToken(1).getKind() == JavaConstants.GT &&
+                ((MyToken)getToken(1)).realKind == JavaConstants.RSIGNEDSHIFT} )
   ">" ">"
   )
 }

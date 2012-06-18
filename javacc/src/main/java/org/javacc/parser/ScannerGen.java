@@ -35,14 +35,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 
 /** Generate lexer. */
-final class ScannerGen implements FileGenerator, JavaCCConstants {
+final class ScannerGen implements FileGenerator {
   private final JavaCCState state;
   // Hashtable of vectors
-  Hashtable allTpsForState = new Hashtable();
+  Hashtable<String, List<TokenProduction>> allTpsForState
+      = new Hashtable<String, List<TokenProduction>>();
   int lexStateIndex;
   int[] kinds;
   int maxOrdinal = 1;
@@ -129,13 +129,13 @@ final class ScannerGen implements FileGenerator, JavaCCConstants {
 
     while (e.hasMoreElements()) {
       nfaStates.reInit();
-      stringLiterals.ReInit();
+      stringLiterals.reInit();
 
       String key = (String) e.nextElement();
 
       lexStateIndex = getIndex(key);
       lexStateSuffix = "_" + lexStateIndex;
-      List allTps = (List) allTpsForState.get(key);
+      List<TokenProduction> allTps = allTpsForState.get(key);
       initStates.put(key, initialState = new NfaState(this));
       ignoring = false;
 
@@ -147,7 +147,7 @@ final class ScannerGen implements FileGenerator, JavaCCConstants {
       }
 
       for (i = 0; i < allTps.size(); i++) {
-        tp = (TokenProduction) allTps.get(i);
+        tp = allTps.get(i);
         int kind = tp.kind;
         boolean ignore = tp.ignoreCase;
         List<RegExpSpec> reSpecs = tp.reSpecs;
@@ -220,17 +220,21 @@ final class ScannerGen implements FileGenerator, JavaCCConstants {
                   (newLexState[curRE.ordinal] != null);
               hasSpecial = true;
               toSpecial[curRE.ordinal / 64] |= 1L << (curRE.ordinal % 64);
+              curRE.toSpecial = true;
               toSkip[curRE.ordinal / 64] |= 1L << (curRE.ordinal % 64);
+              curRE.toSkip = true;
               break;
             case TokenProduction.SKIP:
               hasSkipActions |= (actions[curRE.ordinal] != null);
               hasSkip = true;
               toSkip[curRE.ordinal / 64] |= 1L << (curRE.ordinal % 64);
+              curRE.toSkip = true;
               break;
             case TokenProduction.MORE:
               hasMoreActions |= (actions[curRE.ordinal] != null);
               hasMore = true;
               toMore[curRE.ordinal / 64] |= 1L << (curRE.ordinal % 64);
+              curRE.toMore = true;
 
               if (newLexState[curRE.ordinal] != null) {
                 canReachOnMore[getIndex(newLexState[curRE.ordinal])] = true;
@@ -243,6 +247,7 @@ final class ScannerGen implements FileGenerator, JavaCCConstants {
             case TokenProduction.TOKEN:
               hasTokenActions |= (actions[curRE.ordinal] != null);
               toToken[curRE.ordinal / 64] |= 1L << (curRE.ordinal % 64);
+              curRE.toToken = true;
               break;
           }
         }
@@ -261,8 +266,8 @@ final class ScannerGen implements FileGenerator, JavaCCConstants {
       }
 
       if (initialState.kind != Integer.MAX_VALUE && initialState.kind != 0) {
-        if ((toSkip[initialState.kind / 64] & (1L << initialState.kind)) != 0L ||
-            (toSpecial[initialState.kind / 64] & (1L << initialState.kind)) != 0L) {
+        if ((toSkip[initialState.kind / 64] & (1L << initialState.kind)) != 0L
+            || (toSpecial[initialState.kind / 64] & (1L << initialState.kind)) != 0L) {
           hasSkipActions = true;
         }
         else if ((toMore[initialState.kind / 64] & (1L << initialState.kind)) != 0L) {
@@ -285,10 +290,10 @@ final class ScannerGen implements FileGenerator, JavaCCConstants {
       stringLiterals.FillSubString(this);
 
       if (hasNfa[lexStateIndex] && !mixed[lexStateIndex]) {
-        stringLiterals.GenerateNfaStartStates(this, out, initialState);
+        stringLiterals.generateNfaStartStates(this, out, initialState);
       }
 
-      stringLiterals.DumpDfaCode(this, out);
+      stringLiterals.dumpDfaCode(this, out);
 
       if (hasNfa[lexStateIndex]) {
         nfaStates.dumpMoveNfa(this, out);
@@ -306,7 +311,7 @@ final class ScannerGen implements FileGenerator, JavaCCConstants {
     nfaStates.dumpStateSets(out);
     checkEmptyStringMatch();
     nfaStates.dumpNonAsciiMoveMethods(out);
-    stringLiterals.DumpStrLiteralImages(this, out);
+    stringLiterals.dumpStrLiteralImages(this, out);
     dumpStaticVarDeclarations(out);
     dumpMakeToken(out);
     dumpGetNextToken(out);
@@ -350,21 +355,21 @@ final class ScannerGen implements FileGenerator, JavaCCConstants {
       }
 
       kind = tokens.get(l).getKind();
-      if (kind == PACKAGE || kind == IMPORT) {
+      if (kind == JavaCCConstants.PACKAGE || kind == JavaCCConstants.IMPORT) {
         for (; i < tokens.size(); i++) {
           kind = tokens.get(i).getKind();
-          if (kind == SEMICOLON
-              || kind == ABSTRACT
-              || kind == FINAL
-              || kind == PUBLIC
-              || kind == CLASS
-              || kind == INTERFACE) {
+          if (kind == JavaCCConstants.SEMICOLON
+              || kind == JavaCCConstants.ABSTRACT
+              || kind == JavaCCConstants.FINAL
+              || kind == JavaCCConstants.PUBLIC
+              || kind == JavaCCConstants.CLASS
+              || kind == JavaCCConstants.INTERFACE) {
             TokenPrinter.cLine = tokens.get(l).getBeginLine();
             TokenPrinter.cCol = tokens.get(l).getBeginColumn();
             for (j = l; j < i; j++) {
               TokenPrinter.printToken(tokens.get(j), out);
             }
-            if (kind == SEMICOLON) {
+            if (kind == JavaCCConstants.SEMICOLON) {
               TokenPrinter.printToken(tokens.get(j), out);
             }
             out.println();
@@ -416,7 +421,7 @@ final class ScannerGen implements FileGenerator, JavaCCConstants {
       TokenPrinter.cCol = 1;
 
       for (Token t : tokens) {
-        if (t.getKind() == IDENTIFIER
+        if (t.getKind() == JavaCCConstants.IDENTIFIER
             && Options.getCommonTokenAction()
             && !commonTokenActionSeen) {
           commonTokenActionSeen = t.getImage().equals("commonTokenAction");
@@ -491,33 +496,27 @@ final class ScannerGen implements FileGenerator, JavaCCConstants {
   }
 
   private void buildLexStatesTable() {
-    Iterator<TokenProduction> it = state.tokenProductions.iterator();
-    TokenProduction tp;
-    int i;
-
     String[] tmpLexStateName = new String[state.lexStateI2S.size()];
-    while (it.hasNext()) {
-      tp = it.next();
-      List respecs = tp.reSpecs;
-      List tps;
+    for (TokenProduction tp : state.tokenProductions) {
+      List<RegExpSpec> reSpecs = tp.reSpecs;
+      List<TokenProduction> tps;
 
-      for (i = 0; i < tp.lexStates.length; i++) {
-        if ((tps = (List) allTpsForState.get(tp.lexStates[i])) == null) {
+      for (int i = 0; i < tp.lexStates.length; i++) {
+        if ((tps = allTpsForState.get(tp.lexStates[i])) == null) {
           tmpLexStateName[maxLexStates++] = tp.lexStates[i];
-          allTpsForState.put(tp.lexStates[i], tps = new ArrayList());
+          allTpsForState.put(tp.lexStates[i], tps = new ArrayList<TokenProduction>());
         }
 
         tps.add(tp);
       }
 
-      if (respecs == null || respecs.size() == 0) {
+      if (reSpecs == null || reSpecs.isEmpty()) {
         continue;
       }
 
-      RegularExpression re;
-      for (i = 0; i < respecs.size(); i++) {
-        if (maxOrdinal <= (re = ((RegExpSpec) respecs.get(i)).regExp).ordinal) {
-          maxOrdinal = re.ordinal + 1;
+      for (RegExpSpec reSpec : reSpecs) {
+        if (maxOrdinal <= reSpec.regExp.ordinal) {
+          maxOrdinal = reSpec.regExp.ordinal + 1;
         }
       }
     }
@@ -539,7 +538,7 @@ final class ScannerGen implements FileGenerator, JavaCCConstants {
     singlesToSkip = new NfaState[maxLexStates];
     System.arraycopy(tmpLexStateName, 0, lexStateName, 0, maxLexStates);
 
-    for (i = 0; i < maxLexStates; i++) {
+    for (int i = 0; i < maxLexStates; i++) {
       canMatchAnyChar[i] = -1;
     }
 
@@ -1563,5 +1562,14 @@ final class ScannerGen implements FileGenerator, JavaCCConstants {
     out.println("         break;");
     out.println("   }");
     out.println("}");
+  }
+
+  boolean isRegExp(int i) {
+    int n = i / 64;
+    long mask = 1L << (i % 64);
+    return ((toSkip[n] & mask) == 0 && (toMore[n] & mask) == 0 && (toToken[n] & mask) == 0)
+        || (toSkip[n] & mask) != 0
+        || (toMore[n] & mask) != 0
+        || canReachOnMore[lexStates[i]];
   }
 }

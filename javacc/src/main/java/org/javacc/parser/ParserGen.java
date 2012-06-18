@@ -35,7 +35,7 @@ import java.io.IOException;
 import java.util.List;
 
 /** Generate the parser. */
-final class ParserGen implements FileGenerator, JavaCCConstants {
+final class ParserGen implements FileGenerator {
   private final JavaCCState state;
   private final Semanticize semanticize;
 
@@ -83,30 +83,14 @@ final class ParserGen implements FileGenerator, JavaCCConstants {
 
   private void printHeader(IndentingPrintWriter out)
       throws IOException {
-    boolean implementsExists = false;
-
     List<Token> tokens1 = state.cuToInsertionPoint1;
     if (tokens1.size() != 0) {
       TokenPrinter.printTokenSetup(tokens1.get(0));
       TokenPrinter.cCol = 1;
       for (Token t : tokens1) {
-        if (t.getKind() == IMPLEMENTS) {
-          implementsExists = true;
-        }
-        else if (t.getKind() == CLASS) {
-          implementsExists = false;
-        }
         TokenPrinter.printToken(t, out);
       }
     }
-    if (implementsExists) {
-      out.print(", ");
-    }
-    else {
-      out.print(" implements ");
-    }
-
-    out.print(state.constantsClass() + " ");
 
     List<Token> tokens2 = state.cuToInsertionPoint2;
     if (tokens2.size() != 0) {
@@ -427,7 +411,7 @@ final class ParserGen implements FileGenerator, JavaCCConstants {
         out.println("exptokseq[i] = jj_expentries.get(i);");
       }
       out.println("}");
-      out.println("return new ParseException(token, exptokseq, tokenImage);");
+      out.println("return new ParseException(token, exptokseq, " + state.constantsClass() + ".tokenImage);");
       out.println("}");
     }
     else {
@@ -437,7 +421,7 @@ final class ParserGen implements FileGenerator, JavaCCConstants {
       if (Options.getKeepLineColumn()) {
         out.println("int line = errortok.beginLine, column = errortok.beginColumn;");
       }
-      out.println("String mess = (errortok.getKind() == 0) ? tokenImage[0] : errortok.image;");
+      out.println("String mess = (errortok.getKind() == 0) ? " + state.constantsClass() + ".tokenImage[0] : errortok.image;");
       if (Options.getKeepLineColumn()) {
         out.println("return new ParseException(" +
             "\"Parse error at line \" + line + \", column \" + column + \".  " +
@@ -484,8 +468,8 @@ final class ParserGen implements FileGenerator, JavaCCConstants {
       out.println("private void trace_token(Token t, String where) {");
       out.println("if (trace_enabled) {");
       out.println("for (int i = 0; i < trace_indent; i++) { System.out.print(\" \"); }");
-      out.println("System.out.print(\"Consumed token: <\" + tokenImage[t.getKind()]);");
-      out.println("if (t.getKind() != 0 && !tokenImage[t.getKind()].equals(\"\\\"\" + t.image + \"\\\"\")) {");
+      out.println("System.out.print(\"Consumed token: <\" + " + state.constantsClass() + ".tokenImage[t.getKind()]);");
+      out.println("if (t.getKind() != 0 && !" + state.constantsClass() + ".tokenImage[t.getKind()].equals(\"\\\"\" + t.image + \"\\\"\")) {");
       out.println("System.out.print(\": \\\"\" + t.image + \"\\\"\");");
       out.println("}");
       out.println("System.out.println(\" at line \" + t.beginLine + " +
@@ -496,12 +480,12 @@ final class ParserGen implements FileGenerator, JavaCCConstants {
       out.println("private void trace_scan(Token t1, int t2) {");
       out.println("if (trace_enabled) {");
       out.println("for (int i = 0; i < trace_indent; i++) { System.out.print(\" \"); }");
-      out.println("System.out.print(\"Visited token: <\" + tokenImage[t1.getKind()]);");
-      out.println("if (t1.getKind() != 0 && !tokenImage[t1.getKind()].equals(\"\\\"\" + t1.image + \"\\\"\")) {");
+      out.println("System.out.print(\"Visited token: <\" + " + state.constantsClass() + ".tokenImage[t1.getKind()]);");
+      out.println("if (t1.getKind() != 0 && !" + state.constantsClass() + ".tokenImage[t1.getKind()].equals(\"\\\"\" + t1.image + \"\\\"\")) {");
       out.println("System.out.print(\": \\\"\" + t1.image + \"\\\"\");");
       out.println("}");
       out.println("System.out.println(\" at line \" + t1.beginLine + \"" +
-          " column \" + t1.beginColumn + \">; Expected token: <\" + tokenImage[t2] + \">\");");
+          " column \" + t1.beginColumn + \">; Expected token: <\" + " + state.constantsClass() + ".tokenImage[t2] + \">\");");
       out.println("}");
       out.println("}");
       out.println();

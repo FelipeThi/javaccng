@@ -90,11 +90,11 @@ public final class JavaCCParser extends JavaCCParserBase {
    */
   private boolean notTailOfExpansionUnit() throws java.io.IOException {
     Token t = getToken(1);
-    if (t.getKind() == BIT_OR
-        || t.getKind() == COMMA
-        || t.getKind() == RPAREN
-        || t.getKind() == RBRACE
-        || t.getKind() == RBRACKET) {
+    if (t.getKind() == JavaCCConstants.BIT_OR
+        || t.getKind() == JavaCCConstants.COMMA
+        || t.getKind() == JavaCCConstants.RPAREN
+        || t.getKind() == JavaCCConstants.RBRACE
+        || t.getKind() == JavaCCConstants.RBRACKET) {
         return false;
     }
     return true;
@@ -390,15 +390,15 @@ TOKEN :
 {
   < RUNSIGNEDSHIFT: ">>>" >
   {
-     matchedToken.setKind(GT);
-     ((Token.GTToken)matchedToken).realKind = RUNSIGNEDSHIFT;
+     matchedToken.setKind(JavaCCConstants.GT);
+     ((Token.GTToken)matchedToken).realKind = JavaCCConstants.RUNSIGNEDSHIFT;
      charStream.backup(2);
      matchedToken.setImage(">");
   }
 | < RSIGNEDSHIFT: ">>" >
   {
-     matchedToken.setKind(GT);
-     ((Token.GTToken)matchedToken).realKind = RSIGNEDSHIFT;
+     matchedToken.setKind(JavaCCConstants.GT);
+     ((Token.GTToken)matchedToken).realKind = JavaCCConstants.RSIGNEDSHIFT;
      charStream.backup(1);
      matchedToken.setImage(">");
   }
@@ -840,20 +840,20 @@ Lookahead local_lookahead() :
 	  la.setAmount(laAmount);
 	}
   ]
-  [ LOOKAHEAD(0, { !emptyLA && (getToken(1).getKind() != RPAREN) } )
+  [ LOOKAHEAD(0, { !emptyLA && (getToken(1).getKind() != JavaCCConstants.RPAREN) } )
     ","
 	{
 	  commaAtEnd = true;
 	}
   ]
-  [ LOOKAHEAD(0, { getToken(1).getKind() != RPAREN && getToken(1).getKind() != LBRACE } )
+  [ LOOKAHEAD(0, { getToken(1).getKind() != JavaCCConstants.RPAREN && getToken(1).getKind() != JavaCCConstants.LBRACE } )
     expansion_choices(c)
 	{
 	  emptyLA = false; commaAtEnd = false;
 	  la.setLaExpansion((Expansion)c.member);
 	}
   ]
-  [ LOOKAHEAD(0, { !emptyLA && !commaAtEnd && (getToken(1).getKind() != RPAREN) } )
+  [ LOOKAHEAD(0, { !emptyLA && !commaAtEnd && (getToken(1).getKind() != JavaCCConstants.RPAREN) } )
     ","
 	{
 	  commaAtEnd = true;
@@ -1318,7 +1318,7 @@ Token JavaIdentifier() :
 )
 	{
 	  final Token t = getToken(0);
-	  t.setKind(IDENTIFIER);
+	  t.setKind(JavaCCConstants.IDENTIFIER);
 	  return t;
 	}
 }
@@ -2443,8 +2443,8 @@ void TryStatement():
 void RUNSIGNEDSHIFT():
 {}
 {
-  ( LOOKAHEAD({ getToken(1).getKind() == GT &&
-                ((Token.GTToken)getToken(1)).realKind == RUNSIGNEDSHIFT} )
+  ( LOOKAHEAD({ getToken(1).getKind() == JavaCCConstants.GT &&
+                ((Token.GTToken)getToken(1)).realKind == JavaCCConstants.RUNSIGNEDSHIFT} )
    ">" ">" ">"
   )
 }
@@ -2452,8 +2452,8 @@ void RUNSIGNEDSHIFT():
 void RSIGNEDSHIFT():
 {}
 {
-  ( LOOKAHEAD({ getToken(1).getKind() == GT &&
-                ((Token.GTToken)getToken(1)).realKind == RSIGNEDSHIFT} )
+  ( LOOKAHEAD({ getToken(1).getKind() == JavaCCConstants.GT &&
+                ((Token.GTToken)getToken(1)).realKind == JavaCCConstants.RSIGNEDSHIFT} )
   ">" ">"
   )
 }
