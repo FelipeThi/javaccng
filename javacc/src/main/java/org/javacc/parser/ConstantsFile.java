@@ -50,40 +50,39 @@ final class ConstantsFile implements FileGenerator {
       throw new MetaParseException();
     }
 
-    File path = new File(Options.getOutputDirectory(), state.constantsClass() + ".java");
+    enumFile();
+    constantsFile();
+  }
+
+  private void enumFile() throws IOException {
+    File path = new File(Options.getOutputDirectory(), "TokenKind" + ".java");
     OutputFile outputFile = new OutputFile(path);
     IndentingPrintWriter out = outputFile.getPrintWriter();
     try {
-      generate(scannerGen, out);
+      generateEnum(out);
     }
     finally {
       out.close();
     }
   }
 
-  private void generate(ScannerGen scannerGen, IndentingPrintWriter out)
-      throws IOException {
-    TokenPrinter.packageDeclaration(state.cuToInsertionPoint1, out);
-    out.println();
-    generateEnum(out);
-    if (!Options.getUserScanner() && Options.getBuildScanner()) {
-      for (int i = 0; i < scannerGen.lexStateName.length; i++) {
-        out.println("/** Lexical state. */");
-        out.println("int " + scannerGen.lexStateName[i] + " = " + i + ";");
-      }
+  private void constantsFile() throws IOException {
+    File path = new File(Options.getOutputDirectory(), state.constantsClass() + ".java");
+    OutputFile outputFile = new OutputFile(path);
+    IndentingPrintWriter out = outputFile.getPrintWriter();
+    try {
+      generateConstants(out);
     }
-    generateImages(out);
-    out.unindent();
-    out.println("};");
-    out.unindent();
-    out.println("}");
+    finally {
+      out.close();
+    }
   }
 
-  private void generateEnum(IndentingPrintWriter out) {
+  private void generateEnum(IndentingPrintWriter out)
+      throws IOException {
+    TokenPrinter.packageDeclaration(state.cuToInsertionPoint1, out);
     out.println("/** Token literal values and constants. */");
-    out.println("public interface " + state.constantsClass() + " {");
-    out.indent();
-    out.println("enum TokenKind {");
+    out.println("public enum TokenKind {");
     out.indent();
     out.print("EOF");
     for (RegularExpression re : state.orderedNamedTokens) {
@@ -107,8 +106,13 @@ final class ConstantsFile implements FileGenerator {
     out.println("public String getImage() { return image; }");
     out.unindent();
     out.println("}");
-    out.unindent();
+  }
 
+  private void generateConstants(IndentingPrintWriter out)
+      throws IOException {
+    TokenPrinter.packageDeclaration(state.cuToInsertionPoint1, out);
+    out.println("/** Token literal values and constants. */");
+    out.println("public interface " + state.constantsClass() + " {");
     out.indent();
     out.println("/** End of File. */");
     out.println("int EOF = 0;");
@@ -119,6 +123,15 @@ final class ConstantsFile implements FileGenerator {
       out.println("/** The '" + re.label + "' token id. */");
       out.println("int " + re.label + " = " + re.ordinal + ";");
     }
+    if (!Options.getUserScanner() && Options.getBuildScanner()) {
+      for (int i = 0; i < scannerGen.lexStateName.length; i++) {
+        out.println("/** Lexical state. */");
+        out.println("int " + scannerGen.lexStateName[i] + " = " + i + ";");
+      }
+    }
+    generateImages(out);
+    out.unindent();
+    out.println("}");
   }
 
   private void generateImages(IndentingPrintWriter out) {
@@ -152,5 +165,7 @@ final class ConstantsFile implements FileGenerator {
         }
       }
     }
+    out.unindent();
+    out.println("};");
   }
 }
