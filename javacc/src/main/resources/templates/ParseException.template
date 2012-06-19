@@ -87,8 +87,8 @@ public class ParseException extends Exception {
     }
 #if KEEP_LINE_COLUMN
     s.append(" at line ")
-        .append(currentToken.next.getLine())
-        .append(", column ").append(currentToken.next.getColumn());
+        .append(currentToken.next.getLine() + 1)
+        .append(", column ").append(currentToken.next.getColumn() + 1);
 #fi
     s.append(".\n");
     if (expectedTokenSequences.length == 1) {

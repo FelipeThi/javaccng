@@ -11,9 +11,10 @@ public class TransformerTest {
   public void test() throws Exception {
     ToyParser parser = new ToyParser(
         new ToyScanner(
-            new JavaCharStream(
-                new InputStreamReader(
-                    getClass().getResourceAsStream("/divide.toy")))));
+            new CharStream.Escaping(
+                new CharStream.ForReader(
+                    new InputStreamReader(
+                        getClass().getResourceAsStream("/divide.toy"))))));
 
     ASTCompilationUnit cu = parser.CompilationUnit();
 

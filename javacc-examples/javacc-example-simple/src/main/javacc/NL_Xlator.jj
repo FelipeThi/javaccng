@@ -33,7 +33,7 @@ public class NL_Xlator {
   public static void main(String[] args) throws ParseException, java.io.IOException {
     NL_Xlator parser = new NL_Xlator(
         new NL_XlatorScanner(
-            new SimpleCharStream(
+            new CharStream.ForReader(
                 new java.io.InputStreamReader(System.in))));
     parser.ExpressionList();
   }

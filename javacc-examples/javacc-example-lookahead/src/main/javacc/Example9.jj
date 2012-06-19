@@ -32,16 +32,14 @@ PARSER_BEGIN(Example9)
 package org.javacc.examples.lookahead;
 
 public class Example9 {
-
   public static void main(String[] args) throws ParseException, java.io.IOException {
     Example9 parser = new Example9(System.in);
     parser.funny_list();
   }
 
   public Example9(java.io.InputStream in) throws ParseException, java.io.IOException {
-    this(new Example9Scanner(new SimpleCharStream(new java.io.InputStreamReader(in))));
+    this(new Example9Scanner(new CharStream.ForReader(new java.io.InputStreamReader(in))));
   }
-
 }
 
 PARSER_END

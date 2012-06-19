@@ -6,7 +6,7 @@ public class ScannerException extends RuntimeException {
   public static final int LOOP_DETECTED = 1;
 
   private final int errorCode;
-  private final int lexState;
+  private final int state;
 #if KEEP_LINE_COLUMN
   private final int line;
   private final int column;
@@ -22,7 +22,7 @@ public class ScannerException extends RuntimeException {
   public ScannerException(String message, int errorCode) {
     super(message);
     this.errorCode = errorCode;
-    this.lexState = -1;
+    this.state = -1;
 #if KEEP_LINE_COLUMN
     this.line = -1;
     this.column = -1;
@@ -34,7 +34,7 @@ public class ScannerException extends RuntimeException {
    * Create new lexical error instance.
    *
    * @param errorCode Reason for lexical error.
-   * @param lexState  Lexical state in which this error occurred.
+   * @param state     Lexical state in which this error occurred.
 #if KEEP_LINE_COLUMN
    * @param line      Line number when the error occurred.
    * @param column    Column number when the error occurred.
@@ -44,26 +44,34 @@ public class ScannerException extends RuntimeException {
 #fi
    * @param character The offending character, or -1 if EOF causes the error.
    */
-  public ScannerException(int errorCode,
-                          int lexState,
 #if KEEP_LINE_COLUMN
-                          int line,
-                          int column,
-#fi
 #if KEEP_IMAGE
-                          String prefix,
+  public ScannerException(int errorCode, int state, int line, int column, String prefix, int character) {
+#else
+  public ScannerException(int errorCode, int state, int line, int column, int character) {
 #fi
-                          int character) {
-    super(genMessage(lexState,
+#else
+#if KEEP_IMAGE
+  public ScannerException(int errorCode, int state, String prefix, int character) {
+#else
+  public ScannerException(int errorCode, int state, int character) {
+#fi
+#fi
 #if KEEP_LINE_COLUMN
-            line, column,
-#fi
 #if KEEP_IMAGE
-            prefix,
+    super(describe(state, line, column, prefix, character));
+#else
+    super(describe(state, line, column, character));
 #fi
-            character));
+#else
+#if KEEP_IMAGE
+    super(describe(state, prefix, character));
+#else
+    super(describe(state, character));
+#fi
+#fi
     this.errorCode = errorCode;
-    this.lexState = lexState;
+    this.state = state;
 #if KEEP_LINE_COLUMN
     this.line = line;
     this.column = column;
@@ -71,23 +79,23 @@ public class ScannerException extends RuntimeException {
     this.character = character;
   }
 
-  /** @return the reason why the exception is thrown. */
+  /** @return The reason why the exception is thrown. */
   public int getErrorCode() {
     return errorCode;
   }
 
   /** @return Lexical state in which this error occurred. */
-  public int getLexState() {
-    return lexState;
+  public int getState() {
+    return state;
   }
 #if KEEP_LINE_COLUMN
 
-  /** @return Line number when the error occurred. */
+  /** @return Line number when the error occurred, 0-based. */
   public int getLine() {
     return line;
   }
 
-  /** @return Column number when the error occurred. */
+  /** @return Column number when the error occurred, 0-based. */
   public int getColumn() {
     return column;
   }
@@ -102,40 +110,50 @@ public class ScannerException extends RuntimeException {
    * Returns a detailed message for the exception when it is thrown by the
    * scanner to indicate a lexical error.
    *
-   * @param lexState Lexical state in which this error occurred.
+   * @param state     Lexical state in which this error occurred.
 #if KEEP_LINE_COLUMN
-   * @param line     Line number when the error occurred.
-   * @param column   Column number when the error occurred.
+   * @param line      Line number when the error occurred.
+   * @param column    Column number when the error occurred.
 #fi
 #if KEEP_IMAGE
-   * @param prefix   Prefix that was seen before this error occurred.
+   * @param prefix    Prefix that was seen before this error occurred.
 #fi
-   * @param curChar  The offending character, or -1 if EOF causes the error.
+   * @param character The offending character, or -1 if EOF causes the error.
    * @return Descriptive error message.
    */
-  static String genMessage(int lexState,
 #if KEEP_LINE_COLUMN
-                           int line,
-                           int column,
-#fi
 #if KEEP_IMAGE
-                           String prefix,
+  static String describe(int state, int line, int column, String prefix, int character) {
+#else
+  static String describe(int state, int line, int column, int character) {
 #fi
-                           int curChar) {
+#else
+#if KEEP_IMAGE
+  static String describe(int state, String prefix, int character) {
+#else
+  static String describe(int state, int character) {
+#fi
+#fi
     StringBuilder s = new StringBuilder();
 #if KEEP_LINE_COLUMN
-    s.append("Lexical error at line ").append(line).append(", column ").append(column).append(". Encountered: ");
+    s.append("Lexical error at line ").append(line + 1).append(", column ").append(column + 1)
+        .append(". Encountered: ");
 #else
-    s.append("Lexical error").append(". Encountered: ");
+    s.append("Lexical error")
+        .append(". Encountered: ");
 #fi
-    if (curChar == -1) {
+    if (character == -1) {
       s.append("<EOF>");
     }
     else {
-      s.append("'").append(escape(String.valueOf((char) curChar))).append("' (").append(curChar).append(")");
+      s.append("'");
+      escape(s, String.valueOf((char) character));
+      s.append("' (").append(character).append(")");
     }
 #if KEEP_IMAGE
-    s.append(" after: \"").append(escape(prefix)).append("\"");
+    s.append(" after: \"");
+    escape(s, prefix);
+    s.append("\"");
 #fi
     return s.toString();
   }
@@ -143,15 +161,11 @@ public class ScannerException extends RuntimeException {
   /**
    * Replaces unprintable characters by their escaped (or unicode escaped)
    * equivalents in the given string
-   *
-   * @param string String to escape.
-   * @return Escaped string.
    */
-  static String escape(String string) {
-    StringBuilder b = new StringBuilder(string.length());
-    for (int i = 0; i < string.length(); i++) {
-      char ch = string.charAt(i);
-      switch (ch) {
+  static void escape(StringBuilder b, CharSequence cs) {
+    for (int i = 0; i < cs.length(); i++) {
+      char c = cs.charAt(i);
+      switch (c) {
         case '\b':
           b.append("\\b");
           continue;
@@ -177,20 +191,19 @@ public class ScannerException extends RuntimeException {
           b.append("\\\\");
           continue;
         default:
-          if (ch < 0x20 || ch > 0x7e) {
+          if (c < 0x20 || c > 0x7e) {
             b.append("\\u");
-            String s = Integer.toString(ch, 16);
+            String s = Integer.toString(c, 16);
             for (int n = 0; n < 4 - s.length(); n++) {
               b.append("0");
             }
             b.append(s);
           }
           else {
-            b.append(ch);
+            b.append(c);
           }
           continue;
       }
     }
-    return b.toString();
   }
 }

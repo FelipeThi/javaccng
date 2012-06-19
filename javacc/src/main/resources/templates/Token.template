@@ -91,7 +91,6 @@ public class Token implements java.io.Serializable {
   public int getEnd() {
     return end;
   }
-
 #if KEEP_LINE_COLUMN
 
   /** @return The line number of the first character of this token. */

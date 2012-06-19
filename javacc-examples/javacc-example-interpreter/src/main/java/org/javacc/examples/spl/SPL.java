@@ -39,7 +39,7 @@ public class SPL {
       try {
         parser = new SPLParser(
             new SPLScanner(
-                new SimpleCharStream(
+                new CharStream.ForReader(
                     new InputStreamReader(
                         new FileInputStream(args[0])))));
       }

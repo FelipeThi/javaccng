@@ -174,7 +174,7 @@ SKIP :
 
 <AFTER_EGEN> SKIP :
 {
-  <~[]> { restoreBeginLineCol(); charStream.backup(1); } : DEFAULT
+  <~[]> { restoreBeginLineCol(); backup(1); } : DEFAULT
 }
 
 /* COMMENTS */
@@ -182,11 +182,11 @@ SKIP :
 MORE :
 {
   "//" : IN_SINGLE_LINE_COMMENT
-| <"/**" ~["/"]> { charStream.backup(1); } : IN_FORMAL_COMMENT
+| <"/**" ~["/"]> { backup(1); } : IN_FORMAL_COMMENT
 | "/*" : IN_MULTI_LINE_COMMENT
 | "/*@bgen(jjtree"
      {
-        saveBeginLineCol(charStream.getLine(), charStream.getColumn());
+        saveBeginLineCol(getLine(), getColumn());
      } : IN_MULTI_LINE_COMMENT
 }
 
@@ -392,14 +392,14 @@ TOKEN :
   {
      matchedToken.setKind(JavaCCConstants.GT);
      ((Token.GTToken)matchedToken).realKind = JavaCCConstants.RUNSIGNEDSHIFT;
-     charStream.backup(2);
+     backup(2);
      matchedToken.setImage(">");
   }
 | < RSIGNEDSHIFT: ">>" >
   {
      matchedToken.setKind(JavaCCConstants.GT);
      ((Token.GTToken)matchedToken).realKind = JavaCCConstants.RSIGNEDSHIFT;
-     charStream.backup(1);
+     backup(1);
      matchedToken.setImage(">");
   }
 | < GT: ">" >
@@ -2378,7 +2378,7 @@ void ReturnStatement() :
 	  // Add if statement to prevent subsequent code generated
 	  // from being dead code.
 	  if (inAction) {
-	    t.setImage("{if (true) return");
+	    t.setImage("{if (true) return ");
 	    jumpPatched = true;
 	  }
 	}
@@ -2404,7 +2404,7 @@ void ThrowStatement() :
 	  // Add if statement to prevent subsequent code generated
 	  // from being dead code.
 	  if (inAction) {
-	    t.setImage("{if (true) throw");
+	    t.setImage("{if (true) throw ");
 	    jumpPatched = true;
 	  }
 	}

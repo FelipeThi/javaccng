@@ -42,7 +42,7 @@ public class Eg4 {
     System.out.println("Reading from standard input...");
     Eg4 parser = new Eg4(
         new Eg4Scanner(
-            new SimpleCharStream(
+            new CharStream.ForReader(
                 new java.io.InputStreamReader(System.in))));
     ASTStart n = parser.Start();
     Eg4Visitor v = new Eg4DumpVisitor();

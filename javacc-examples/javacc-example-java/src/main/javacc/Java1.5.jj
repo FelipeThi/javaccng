@@ -148,7 +148,7 @@ SKIP :
 
 MORE :
 {
-  <"/**" ~["/"]> { charStream.backup(1); } : IN_FORMAL_COMMENT
+  <"/**" ~["/"]> { backup(1); } : IN_FORMAL_COMMENT
 |
   "/*" : IN_MULTI_LINE_COMMENT
 }
@@ -1013,7 +1013,7 @@ TOKEN :
   {
      matchedToken.setKind(JavaConstants.GT);
      ((MyToken) matchedToken).realKind = JavaConstants.RUNSIGNEDSHIFT;
-     charStream.backup(2);
+     backup(2);
      matchedToken.setImage(">");
      //matchedToken.setOffset(matchedToken.getBeginOffset(), matchedToken.getEndOffset() - 2);
   }
@@ -1021,7 +1021,7 @@ TOKEN :
   {
      matchedToken.setKind(JavaConstants.GT);
      ((MyToken) matchedToken).realKind = JavaConstants.RSIGNEDSHIFT;
-     charStream.backup(1);
+     backup(1);
      matchedToken.setImage(">");
      //matchedToken.setOffset(matchedToken.getBeginOffset(), matchedToken.getEndOffset() - 1);
   }

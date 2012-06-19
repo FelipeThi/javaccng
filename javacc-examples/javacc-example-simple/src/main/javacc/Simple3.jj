@@ -34,7 +34,7 @@ public class Simple3 {
   public static void main(String[] args) throws ParseException, java.io.IOException {
     Simple3 parser = new Simple3(
         new Simple3Scanner(
-            new SimpleCharStream(
+            new CharStream.ForReader(
                 new java.io.InputStreamReader(System.in))));
     parser.Input();
   }

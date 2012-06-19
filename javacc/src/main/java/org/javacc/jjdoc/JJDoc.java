@@ -98,10 +98,9 @@ public class JJDoc implements FileGenerator {
     token = getPrecedingSpecialToken(token);
     String s = "";
     if (token != null) {
-      TokenPrinter.cLine = token.getLine();
-      TokenPrinter.cCol = token.getColumn();
+      TokenPrinter tp = new TokenPrinter(token);
       while (token != null) {
-        s += TokenPrinter.printTokenOnly(token);
+        s += tp.printTokenOnly(token);
         token = token.next;
       }
     }

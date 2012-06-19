@@ -92,7 +92,8 @@ public final class Main {
 
       parser = new JavaCCParser(
           new JavaCCScanner(
-              new JavaCharStream(reader)));
+              new CharStream.Escaping(
+                  new CharStream.ForReader(reader))));
     }
     catch (SecurityException ex) {
       System.out.println("Security violation while trying to open " + path);

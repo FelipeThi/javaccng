@@ -36,7 +36,7 @@ public class IDLParser {
       System.out.println("IDL Parser Version 0.1:  Reading from standard input . . .");
       parser = new IDLParser(
           new IDLScanner(
-              new SimpleCharStream(
+              new CharStream.ForReader(
                   new java.io.InputStreamReader(System.in))));
     }
     else if (args.length == 1) {
@@ -44,11 +44,11 @@ public class IDLParser {
       try {
         parser = new IDLParser(
             new IDLScanner(
-                new SimpleCharStream(
+                new CharStream.ForReader(
                     new java.io.InputStreamReader(
                         new java.io.FileInputStream(args[0])))));
       }
-      catch (java.io.FileNotFoundException e) {
+      catch (java.io.FileNotFoundException ex) {
         System.out.println("IDL Parser Version 0.1:  File " + args[0] + " not found.");
         return;
       }

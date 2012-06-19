@@ -41,7 +41,7 @@ public class Eg2 {
     System.out.println("Reading from standard input...");
     Eg2 parser = new Eg2(
         new Eg2Scanner(
-            new SimpleCharStream(
+            new CharStream.ForReader(
                 new java.io.InputStreamReader(System.in))));
     ASTStart n = parser.Start();
     n.dump("");

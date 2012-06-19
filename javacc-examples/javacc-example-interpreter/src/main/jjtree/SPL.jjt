@@ -73,7 +73,7 @@ TOKEN : /* LITERALS */
 
 MORE : /* COMMENTS */
 {
-  <"/**" ~["/"]> { charStream.backup(1); } : IN_FORMAL_COMMENT
+  <"/**" ~["/"]> { backup(1); } : IN_FORMAL_COMMENT
 |
   "/*" : IN_MULTI_LINE_COMMENT
 }

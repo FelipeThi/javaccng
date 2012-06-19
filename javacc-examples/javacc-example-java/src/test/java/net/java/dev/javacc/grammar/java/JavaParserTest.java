@@ -47,8 +47,9 @@ public class JavaParserTest {
 
     for (Source source : sources) {
       Reader reader = new StringReader(source.content);
-      JavaCharStream charStream = new JavaCharStream(reader);
-      JavaScanner scanner = new JavaScanner(charStream);
+      CharStream stream = new CharStream.Escaping(
+          new CharStream.ForReader(reader));
+      JavaScanner scanner = new JavaScanner(stream);
       JavaParser parser = new JavaParser(scanner);
       try {
         parser.CompilationUnit();
@@ -73,8 +74,9 @@ public class JavaParserTest {
   @Test
   public void lexicalErrorReporting() throws IOException {
     Reader reader = new StringReader("/* comment");
-    CharStream charStream = new JavaCharStream(reader);
-    Scanner scanner = new JavaScanner(charStream);
+    CharStream stream = new CharStream.Escaping(
+        new CharStream.ForReader(reader));
+    Scanner scanner = new JavaScanner(stream);
     ScannerException exception = null;
     try {
       scanner.getNextToken();
@@ -89,8 +91,9 @@ public class JavaParserTest {
   @Test
   public void parsingErrorReporting() throws IOException {
     Reader reader = new StringReader("final class MyClass {\nvoid ();\n}");
-    JavaCharStream charStream = new JavaCharStream(reader);
-    JavaScanner scanner = new JavaScanner(charStream);
+    CharStream stream = new CharStream.Escaping(
+        new CharStream.ForReader(reader));
+    JavaScanner scanner = new JavaScanner(stream);
     ParseException exception = null;
     try {
       JavaParser parser = new JavaParser(scanner);

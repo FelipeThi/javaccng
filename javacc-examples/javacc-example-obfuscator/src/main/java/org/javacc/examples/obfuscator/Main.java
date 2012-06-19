@@ -80,9 +80,10 @@ public class Main extends Globals {
       try {
         MapFile parser = new MapFile(
             new MapFileScanner(
-                new JavaCharStream(
-                    new InputStreamReader(
-                        new FileInputStream(arg2)))));
+                new CharStream.Escaping(
+                    new CharStream.ForReader(
+                        new InputStreamReader(
+                            new FileInputStream(arg2))))));
         parser.input();
       }
       catch (ParseException ex) {
@@ -97,9 +98,10 @@ public class Main extends Globals {
       try {
         idParser = new IdsFile(
             new IdsFileScanner(
-                new JavaCharStream(
-                    new InputStreamReader(
-                        new FileInputStream(arg3)))));
+                new CharStream.Escaping(
+                    new CharStream.ForReader(
+                        new InputStreamReader(
+                            new FileInputStream(arg3))))));
         idParser.input(true, arg3);
       }
       catch (ParseException ex) {

@@ -52,7 +52,7 @@ public class Simple1 {
   public static void main(String[] args) throws ParseException, java.io.IOException {
     Simple1 parser = new Simple1(
         new Simple1Scanner(
-            new SimpleCharStream(
+            new CharStream.ForReader(
                 new java.io.InputStreamReader(System.in))));
     parser.Input();
   }

@@ -41,7 +41,7 @@ public class Eg3 {
     System.out.println("Reading from standard input...");
     Eg3 parser = new Eg3(
         new Eg3Scanner(
-            new SimpleCharStream(
+            new CharStream.ForReader(
                 new java.io.InputStreamReader(System.in))));
     ASTStart n = parser.Start();
     n.dump("");

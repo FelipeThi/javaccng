@@ -82,7 +82,8 @@ final class ConstantsFile implements FileGenerator {
 
   private void generateEnum(IndentingPrintWriter out)
       throws IOException {
-    TokenPrinter.packageDeclaration(state.cuToInsertionPoint1, out);
+    TokenPrinter tp = new TokenPrinter();
+    tp.packageDeclaration(state.cuToInsertionPoint1, out);
     out.println("import java.util.*;");
     out.println("/** Token literal values and constants. */");
     out.println("public enum TokenKind {");
@@ -128,7 +129,8 @@ final class ConstantsFile implements FileGenerator {
 
   private void generateConstants(IndentingPrintWriter out)
       throws IOException {
-    TokenPrinter.packageDeclaration(state.cuToInsertionPoint1, out);
+    TokenPrinter tp = new TokenPrinter();
+    tp.packageDeclaration(state.cuToInsertionPoint1, out);
     out.println("/** Token literal values and constants. */");
     out.println("public interface " + state.constantsClass() + " {");
     out.indent();

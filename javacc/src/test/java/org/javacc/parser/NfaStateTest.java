@@ -36,7 +36,8 @@ public class NfaStateTest extends JavaCCTestCase {
             new FileInputStream(path), Options.getGrammarEncoding()));
     JavaCCParser parser = new JavaCCParser(
         new JavaCCScanner(
-            new JavaCharStream(reader)));
+            new CharStream.Escaping(
+                new CharStream.ForReader(reader))));
     parser.setState(state);
     parser.start();
     state.fileName = path;

@@ -20,7 +20,7 @@ public interface CharStream extends java.io.Closeable {
   int position();
 
   /**
-   * A {@link org.javacc.runtime.CharStream} implementation that reads characters from the
+   * A {@link CharStream} implementation that reads characters from the
    * provided {@link CharSequence}.
    *
    * <p>This implementation does not process java-like unicode escapes.</p>
@@ -105,7 +105,7 @@ public interface CharStream extends java.io.Closeable {
   }
 
   /**
-   * A {@link org.javacc.runtime.CharStream} implementation that can read from
+   * A {@link CharStream} implementation that can read from
    * arbitrary {@link Readable}.
    */
   final class ForReadable
@@ -186,7 +186,7 @@ public interface CharStream extends java.io.Closeable {
   }
 
   /**
-   * A {@link org.javacc.runtime.CharStream} implementation that can read from
+   * A {@link CharStream} implementation that can read from
    * arbitrary {@link java.io.Reader}.
    */
   final class ForReader

@@ -254,26 +254,27 @@ public final class ParseEngine {
       throws IOException {
     JavaCodeProduction jp = (JavaCodeProduction) production;
     Token t = jp.getReturnTypeTokens().get(0);
-    TokenPrinter.printTokenSetup(t);
-    TokenPrinter.cCol = 1;
-    TokenPrinter.printLeadingComments(t, out);
+    TokenPrinter tp = new TokenPrinter();
+    tp.setup(t);
+    tp.column = 0;
+    tp.printLeadingComments(t, out);
     out.print(production.getAccessModifier() != null ? production.getAccessModifier() + " " : "");
-    TokenPrinter.cLine = t.getLine();
-    TokenPrinter.cCol = t.getColumn();
-    TokenPrinter.printTokenOnly(t, out);
+    tp.line = t.getLine();
+    tp.column = t.getColumn();
+    tp.printTokenOnly(t, out);
     for (int i = 1; i < jp.getReturnTypeTokens().size(); i++) {
       t = jp.getReturnTypeTokens().get(i);
-      TokenPrinter.printToken(t, out);
+      tp.printToken(t, out);
     }
-    TokenPrinter.printTrailingComments(t);
+    tp.printTrailingComments(t);
     out.print(" " + jp.getLhs() + "(");
     if (jp.getParameterListTokens().size() != 0) {
-      TokenPrinter.printTokenSetup(jp.getParameterListTokens().get(0));
+      tp.setup(jp.getParameterListTokens().get(0));
       for (Token token : jp.getParameterListTokens()) {
         t = token;
-        TokenPrinter.printToken(t, out);
+        tp.printToken(t, out);
       }
-      TokenPrinter.printTrailingComments(t);
+      tp.printTrailingComments(t);
     }
     out.print(") throws java.io.IOException, ParseException");
     for (List<Token> tokens : jp.getThrowsList()) {
@@ -290,9 +291,9 @@ public final class ParseEngine {
       out.print("try {");
     }
     if (jp.getCodeTokens().size() != 0) {
-      TokenPrinter.printTokenSetup(jp.getCodeTokens().get(0));
-      TokenPrinter.cLine--;
-      TokenPrinter.printTokenList(jp.getCodeTokens(), out);
+      tp.setup(jp.getCodeTokens().get(0));
+      tp.line--;
+      tp.printTokenList(jp.getCodeTokens(), out);
     }
     out.println();
     if (Options.getDebugParser()) {
@@ -308,26 +309,27 @@ public final class ParseEngine {
       throws IOException {
     Token t = p.getReturnTypeTokens().get(0);
     boolean voidReturn = t.getKind() == JavaCCConstants.VOID;
-    TokenPrinter.printTokenSetup(t);
-    TokenPrinter.cCol = 1;
-    TokenPrinter.printLeadingComments(t, out);
+    TokenPrinter tp = new TokenPrinter();
+    tp.setup(t);
+    tp.column = 0;
+    tp.printLeadingComments(t, out);
     out.print((p.getAccessModifier() != null ? p.getAccessModifier() : "private") + " final ");
-    TokenPrinter.cLine = t.getLine();
-    TokenPrinter.cCol = t.getColumn();
-    TokenPrinter.printTokenOnly(t, out);
+    tp.line = t.getLine();
+    tp.column = t.getColumn();
+    tp.printTokenOnly(t, out);
     for (int i = 1; i < p.getReturnTypeTokens().size(); i++) {
       t = p.getReturnTypeTokens().get(i);
-      TokenPrinter.printToken(t, out);
+      tp.printToken(t, out);
     }
-    TokenPrinter.printTrailingComments(t);
+    tp.printTrailingComments(t);
     out.print(" " + p.getLhs() + "(");
     if (p.getParameterListTokens().size() != 0) {
-      TokenPrinter.printTokenSetup(p.getParameterListTokens().get(0));
+      tp.setup(p.getParameterListTokens().get(0));
       for (Token token : p.getParameterListTokens()) {
         t = token;
-        TokenPrinter.printToken(t, out);
+        tp.printToken(t, out);
       }
-      TokenPrinter.printTrailingComments(t);
+      tp.printTrailingComments(t);
     }
     out.print(") throws java.io.IOException, ParseException");
     for (List<Token> tokens : p.getThrowsList()) {
@@ -348,18 +350,16 @@ public final class ParseEngine {
     }
 
     if (p.getTokens().size() != 0) {
-      TokenPrinter.printTokenSetup(p.getTokens().get(0));
-      TokenPrinter.cLine--;
+      tp.setup(p.getTokens().get(0));
+      tp.line--;
       for (Token token : p.getTokens()) {
         t = token;
-        TokenPrinter.printToken(t, out);
+        tp.printToken(t, out);
       }
-      TokenPrinter.printTrailingComments(t);
+      tp.printTrailingComments(t);
     }
 
-    String code = phase1ExpansionGen(p.getExpansion(), out);
-
-    out.println(code);
+    out.println(phase1ExpansionGen(p.getExpansion(), out));
 
     out.println();
 
@@ -414,24 +414,26 @@ public final class ParseEngine {
   private String phase1_NonTerminal(NonTerminal expansion, IndentingPrintWriter out) {
     String s = "\n";
     if (expansion.getLhsTokens().size() != 0) {
-      TokenPrinter.printTokenSetup(expansion.getLhsTokens().get(0));
+      TokenPrinter tp = new TokenPrinter();
+      tp.setup(expansion.getLhsTokens().get(0));
       Token t = null;
       for (Token token : expansion.getLhsTokens()) {
         t = token;
-        s += TokenPrinter.printToken(t);
+        s += tp.printToken(t);
       }
-      s += TokenPrinter.printTrailingComments(t);
+      s += tp.printTrailingComments(t);
       s += " = ";
     }
     s += expansion.getName() + "(";
     if (expansion.getArgumentTokens().size() != 0) {
-      TokenPrinter.printTokenSetup(expansion.getArgumentTokens().get(0));
+      TokenPrinter tp = new TokenPrinter();
+      tp.setup(expansion.getArgumentTokens().get(0));
       Token t = null;
       for (Token token : expansion.getArgumentTokens()) {
         t = token;
-        s += TokenPrinter.printToken(t);
+        s += tp.printToken(t);
       }
-      s += TokenPrinter.printTrailingComments(t);
+      s += tp.printTrailingComments(t);
     }
     s += ");";
     return s;
@@ -440,14 +442,15 @@ public final class ParseEngine {
   private String phase1_Action(Action expansion, IndentingPrintWriter out) {
     String s = "\n";
     if (expansion.getActionTokens().size() != 0) {
-      TokenPrinter.printTokenSetup(expansion.getActionTokens().get(0));
-      TokenPrinter.cCol = 1;
+      TokenPrinter tp = new TokenPrinter();
+      tp.setup(expansion.getActionTokens().get(0));
+      tp.column = 0;
       Token t = null;
       for (Token token : expansion.getActionTokens()) {
         t = token;
-        s += TokenPrinter.printToken(t);
+        s += tp.printToken(t);
       }
-      s += TokenPrinter.printTrailingComments(t);
+      s += tp.printTrailingComments(t);
     }
     return s;
   }
@@ -456,12 +459,13 @@ public final class ParseEngine {
     String s = "\n";
     if (expansion.lhsTokens.size() != 0) {
       Token t = null;
-      TokenPrinter.printTokenSetup(expansion.lhsTokens.get(0));
+      TokenPrinter tp = new TokenPrinter();
+      tp.setup(expansion.lhsTokens.get(0));
       for (Token lhsToken : expansion.lhsTokens) {
         t = lhsToken;
-        s += TokenPrinter.printToken(t);
+        s += tp.printToken(t);
       }
-      s += TokenPrinter.printTrailingComments(t);
+      s += tp.printTrailingComments(t);
       s += " = ";
     }
     String tail = expansion.rhsToken == null ? ");" : ")." + expansion.rhsToken.getImage() + ";";
@@ -586,43 +590,47 @@ public final class ParseEngine {
       List<Token> list = expansion.types.get(i);
       Token t = null;
       if (list.size() != 0) {
-        TokenPrinter.printTokenSetup(list.get(0));
+        TokenPrinter tp = new TokenPrinter();
+
+        tp.setup(list.get(0));
 
         for (Token token : list) {
           t = token;
-          s += TokenPrinter.printToken(t);
+          s += tp.printToken(t);
         }
-        s += TokenPrinter.printTrailingComments(t);
+        s += tp.printTrailingComments(t);
       }
       s += " ";
       t = expansion.ids.get(i);
-      TokenPrinter.printTokenSetup(t);
-      s += TokenPrinter.printToken(t);
-      s += TokenPrinter.printTrailingComments(t);
+      TokenPrinter tp = new TokenPrinter();
+      tp.setup(t);
+      s += tp.printToken(t);
+      s += tp.printTrailingComments(t);
       s += ") {\n";
       list = expansion.catchBlocks.get(i);
       if (list.size() != 0) {
-        TokenPrinter.printTokenSetup(list.get(0));
-        TokenPrinter.cCol = 1;
+        tp.setup(list.get(0));
+        tp.column = 0;
         for (Token token : list) {
           t = token;
-          s += TokenPrinter.printToken(t);
+          s += tp.printToken(t);
         }
-        s += TokenPrinter.printTrailingComments(t);
+        s += tp.printTrailingComments(t);
       }
       s += "\n}";
     }
     if (expansion.finallyBlocks != null) {
       s += " finally {\n";
       if (expansion.finallyBlocks.size() != 0) {
-        TokenPrinter.printTokenSetup(expansion.finallyBlocks.get(0));
-        TokenPrinter.cCol = 1;
+        TokenPrinter tp = new TokenPrinter();
+        tp.setup(expansion.finallyBlocks.get(0));
+        tp.column = 0;
         Token t = null;
         for (Token token : expansion.finallyBlocks) {
           t = token;
-          s += TokenPrinter.printToken(t);
+          s += tp.printToken(t);
         }
-        s += TokenPrinter.printTrailingComments(t);
+        s += tp.printTrailingComments(t);
       }
       s += "\n}";
     }
@@ -700,13 +708,14 @@ public final class ParseEngine {
               retval += "\nif (";
               indentAmt++;
           }
-          TokenPrinter.printTokenSetup(la.getActionTokens().get(0));
+          TokenPrinter tp = new TokenPrinter();
+          tp.setup(la.getActionTokens().get(0));
           Token t = null;
           for (Token token : la.getActionTokens()) {
             t = token;
-            retval += TokenPrinter.printToken(t);
+            retval += tp.printToken(t);
           }
-          retval += TokenPrinter.printTrailingComments(t);
+          retval += tp.printTrailingComments(t);
           retval += ") {" + actions[index];
           state = OPEN_IF;
         }
@@ -814,13 +823,14 @@ public final class ParseEngine {
           // In addition, there is also a semantic lookahead.  So concatenate
           // the semantic check with the syntactic one.
           retval += " && (";
-          TokenPrinter.printTokenSetup(la.getActionTokens().get(0));
+          TokenPrinter tp = new TokenPrinter();
+          tp.setup(la.getActionTokens().get(0));
           Token t = null;
           for (Token token : la.getActionTokens()) {
             t = token;
-            retval += TokenPrinter.printToken(t);
+            retval += tp.printToken(t);
           }
-          retval += TokenPrinter.printTrailingComments(t);
+          retval += tp.printTrailingComments(t);
           retval += ")";
         }
         retval += ") {" + actions[index];
@@ -1120,13 +1130,14 @@ public final class ParseEngine {
         lookaheadNeeded = true;
         out.println("jj_lookingAhead = true;");
         out.print("jj_semLA = ");
-        TokenPrinter.printTokenSetup(la.getActionTokens().get(0));
+        TokenPrinter tp = new TokenPrinter();
+        tp.setup(la.getActionTokens().get(0));
         Token t = null;
         for (Token token : la.getActionTokens()) {
           t = token;
-          TokenPrinter.printToken(t, out);
+          tp.printToken(t, out);
         }
-        TokenPrinter.printTrailingComments(t);
+        tp.printTrailingComments(t);
         out.println(";");
         out.println("jj_lookingAhead = false;");
       }

@@ -46,7 +46,9 @@ public class Token {
   public Token specialToken;
 
   public Token(int kind, int begin, int end, String image) {
-    if (begin > end) { throw new IllegalArgumentException(); }
+    if (begin > end) {
+      throw new IllegalArgumentException();
+    }
     this.kind = kind;
     this.begin = begin;
     this.end = end;
@@ -93,30 +95,36 @@ public class Token {
     return column;
   }
 
-  /**
-   * @return The line number of the last character of this token.
-   * @deprecated
-   */
-  @Deprecated public int getEndLine() {
-    return 0;
-  }
-
-  /**
-   * @return The column number of the last character of this token.
-   * @deprecated
-   */
-  @Deprecated public int getEndColumn() {
-    return 0;
-  }
-
   public void setLineColumn(int line, int column) {
     this.line = line;
     this.column = column;
   }
 
-  /** @return The image. */
-  public String toString() {
-    return image;
+  @Override public boolean equals(Object o) {
+    if (this == o) { return true; }
+    if (!(o instanceof Token)) { return false; }
+    Token token = (Token) o;
+    if (begin != token.begin) { return false; }
+    if (end != token.end) { return false; }
+    if (kind != token.kind) { return false; }
+    return true;
+  }
+
+  @Override public int hashCode() {
+    int result = kind;
+    result = 31 * result + begin;
+    result = 31 * result + end;
+    return result;
+  }
+
+  @Override public String toString() {
+    return "Token{" +
+        "kind=" + kind +
+        ", begin=" + begin +
+        ", end=" + end +
+        ", line=" + line +
+        ", column=" + column +
+        ", image='" + image + "'}";
   }
 
   public static Token newToken(int kind, int begin, int end, String image) {

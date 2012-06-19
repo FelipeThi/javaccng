@@ -28,11 +28,11 @@
 
 package org.javacc.jjdoc;
 
+import org.javacc.parser.CharStream;
 import org.javacc.parser.JavaCCErrors;
 import org.javacc.parser.JavaCCParser;
 import org.javacc.parser.JavaCCScanner;
 import org.javacc.parser.JavaCCState;
-import org.javacc.parser.JavaCharStream;
 import org.javacc.parser.MetaParseException;
 import org.javacc.parser.ParseException;
 import org.javacc.utils.Tools;
@@ -80,8 +80,9 @@ public final class Main {
       JJDocGlobals.info("Reading from standard input . . .");
       parser = new JavaCCParser(
           new JavaCCScanner(
-              new JavaCharStream(
-                  new InputStreamReader(System.in))));
+              new CharStream.Escaping(
+                  new CharStream.ForReader(
+                      new InputStreamReader(System.in)))));
       JJDocGlobals.inputFile = "standard input";
       JJDocGlobals.outputFile = "standard output";
     }
@@ -104,7 +105,8 @@ public final class Main {
                 JJDocOptions.getGrammarEncoding()));
         parser = new JavaCCParser(
             new JavaCCScanner(
-                new JavaCharStream(reader)));
+                new CharStream.Escaping(
+                    new CharStream.ForReader(reader))));
       }
       catch (SecurityException se) {
         JJDocGlobals.error("Security violation while trying to open " + args[args.length - 1]);

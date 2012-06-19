@@ -977,12 +977,12 @@ final class NfaStates {
 
     if (Options.getDebugScanner()) {
       out.println("debugPrinter.println(\"   Starting NFA to match one of : \" + " +
-          "jjKindsForStateVector(jjLexState, jjStateSet, 0, 1));");
+          "jjKindsForStateVector(jjState, jjStateSet, 0, 1));");
     }
 
     if (Options.getDebugScanner()) {
       out.println("debugPrinter.println(" + (scannerGen.maxLexStates > 1 ?
-          "\"<\" + jjLexStateNames[jjLexState] + \">\" + " :
+          "\"<\" + jjStateNames[jjState] + \">\" + " :
           "") + "\"Current character : \" + " +
           "ScannerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
           "at line \" + charStream.getLine() + \" column \" + charStream.getColumn());");
@@ -1041,7 +1041,7 @@ final class NfaStates {
 
     if (Options.getDebugScanner()) {
       out.println("debugPrinter.println(\"   Possible kinds of longer matches : \" + " +
-          "jjKindsForStateVector(jjLexState, jjStateSet, startsAt, i));");
+          "jjKindsForStateVector(jjState, jjStateSet, startsAt, i));");
     }
 
     out.println("jjChar = read();");
@@ -1055,7 +1055,7 @@ final class NfaStates {
 
     if (Options.getDebugScanner()) {
       out.println("debugPrinter.println(" + (scannerGen.maxLexStates > 1 ?
-          "\"<\" + jjLexStateNames[jjLexState] + \">\" + " :
+          "\"<\" + jjStateNames[jjState] + \">\" + " :
           "") + "\"Current character : \" + " +
           "ScannerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
           "at line \" + charStream.getLine() + \" column \" + charStream.getColumn());");

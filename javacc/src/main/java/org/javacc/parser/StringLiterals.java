@@ -216,7 +216,7 @@ final class StringLiterals {
 
     if (Options.getDebugScanner()) {
       out.println("debugPrinter.println(" +
-          (scannerGen.maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
+          (scannerGen.maxLexStates > 1 ? "\"<\" + jjStateNames[jjState] + \">\" + " : "") +
           "\"Current character : \" + " +
           "ScannerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
           "at line \" + charStream.getLine() + \" column \" + charStream.getColumn());");
@@ -427,7 +427,7 @@ final class StringLiterals {
 
       if (i != 0 && Options.getDebugScanner()) {
         out.println("debugPrinter.println(" +
-            (scannerGen.maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
+            (scannerGen.maxLexStates > 1 ? "\"<\" + jjStateNames[jjState] + \">\" + " : "") +
             "\"Current character : \" + " +
             "ScannerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
             "at line \" + charStream.getLine() + \" column \" + charStream.getColumn());");

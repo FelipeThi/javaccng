@@ -37,7 +37,7 @@ import java.io.OutputStreamWriter;
 
 /**
  * This class handles the creation and maintenance of the boiler-plate classes,
- * such as Token.java, JavaCharStream.java etc.
+ * such as Token.java, CharStream.java etc.
  *
  * It is responsible for:
  * <ul>

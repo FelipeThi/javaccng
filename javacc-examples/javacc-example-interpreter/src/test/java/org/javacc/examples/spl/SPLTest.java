@@ -27,7 +27,7 @@ public class SPLTest {
   private void parse(String name) throws IOException, ParseException {
     SPLParser parser = new SPLParser(
         new SPLScanner(
-            new SimpleCharStream(
+            new CharStream.ForReader(
                 new InputStreamReader(
                     open(name)))));
     parser.CompilationUnit();

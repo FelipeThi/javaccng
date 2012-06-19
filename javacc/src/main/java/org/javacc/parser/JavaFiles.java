@@ -49,12 +49,6 @@ public class JavaFiles implements FileGenerator {
     generateScannerException();
     generateParseException();
     generateCharStream();
-    if (Options.getJavaUnicodeEscape()) {
-      generateJavaCharStream();
-    }
-    else {
-      generateSimpleCharStream();
-    }
   }
 
   public void generateScanner() throws IOException {
@@ -77,20 +71,13 @@ public class JavaFiles implements FileGenerator {
     generate("/templates/CharStream.template", "CharStream.java");
   }
 
-  public void generateSimpleCharStream() throws IOException {
-    generate("/templates/SimpleCharStream.template", "SimpleCharStream.java");
-  }
-
-  public void generateJavaCharStream() throws IOException {
-    generate("/templates/JavaCharStream.template", "JavaCharStream.java");
-  }
-
   private void generate(String templateName, String fileName) throws IOException {
     File path = new File(Options.getOutputDirectory(), fileName);
     OutputFile outputFile = new OutputFile(path);
     IndentingPrintWriter out = outputFile.getPrintWriter();
     try {
-      TokenPrinter.packageDeclaration(state.cuToInsertionPoint1, out);
+      TokenPrinter tp = new TokenPrinter();
+      tp.packageDeclaration(state.cuToInsertionPoint1, out);
       JavaFileGenerator generator = new JavaFileGenerator(
           templateName, Options.getOptions());
       generator.generate(out);

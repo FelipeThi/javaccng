@@ -104,24 +104,26 @@ public class Obfuscator extends Globals {
         break;
       }
       createOutputFile();
-      System.out.println("Obfuscating " + dirFile[dirStackSize].getPath());
+      File file = dirFile[dirStackSize];
+      System.out.println("Obfuscating " + file.getPath());
       System.out.println("       into " + outFile.getPath());
       JavaParser parser;
       Token first;
       try {
         parser = new JavaParser(
             new JavaScanner(
-                new JavaCharStream(
-                    new InputStreamReader(
-                        new FileInputStream(dirFile[dirStackSize])))));
+                new CharStream.Escaping(
+                    new CharStream.ForReader(
+                        new InputStreamReader(
+                            new FileInputStream(file))))));
         first = parser.CompilationUnit(dirStack[dirStackSize][dirStackIndex[dirStackSize] - 1]);
       }
-      catch (ParseException e1) {
-        System.out.println("Parse error in file " + dirFile[dirStackSize].getPath());
+      catch (ParseException ex) {
+        System.out.println("Parse error in file " + file.getPath());
         throw new Error();
       }
-      catch (IOException e2) {
-        System.out.println("Could not open file " + dirFile[dirStackSize].getPath());
+      catch (IOException ex) {
+        System.out.println("Could not open file " + file.getPath());
         throw new Error();
       }
       printOutputFile(first);
@@ -165,7 +167,7 @@ public class Obfuscator extends Globals {
 
   static void printOutputFile(Token first) {
     Token t = first;
-    for (int i = 1; i < t.getBeginColumn(); i++) {
+    for (int i = 1; i < t.getColumn(); i++) {
       out.print(" ");
     }
     while (true) {
@@ -177,16 +179,16 @@ public class Obfuscator extends Globals {
         out.println("");
         break;
       }
-      if (t.getEndLine() != t.next.getBeginLine()) {
-        for (int i = t.getEndLine(); i < t.next.getBeginLine(); i++) {
+      if (t.getEndLine() != t.next.getLine()) {
+        for (int i = t.getEndLine(); i < t.next.getLine(); i++) {
           out.println("");
         }
-        for (int i = 1; i < t.next.getBeginColumn(); i++) {
+        for (int i = 1; i < t.next.getColumn(); i++) {
           out.print(" ");
         }
       }
       else {
-        for (int i = t.getEndColumn() + 1; i < t.next.getBeginColumn(); i++) {
+        for (int i = t.getEndColumn() + 1; i < t.next.getColumn(); i++) {
           out.print(" ");
         }
       }

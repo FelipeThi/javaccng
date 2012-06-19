@@ -18,8 +18,8 @@ class Parse {
     else {
       reader = new InputStreamReader(new FileInputStream(new File(args[0])));
     }
-    JavaCharStream charStream = new JavaCharStream(reader);
-    JavaScanner scanner = new JavaScanner(charStream);
+    CharStream stream = new CharStream.ForReader(reader);
+    JavaScanner scanner = new JavaScanner(stream);
     JavaParser parser = new JavaParser(scanner);
     parser.CompilationUnit();
   }

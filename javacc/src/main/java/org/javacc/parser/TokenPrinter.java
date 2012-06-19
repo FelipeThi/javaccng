@@ -1,107 +1,123 @@
 package org.javacc.parser;
 
 import org.javacc.utils.Parsers;
+import org.javacc.utils.io.IndentingPrintWriter;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.util.List;
 
 public class TokenPrinter {
-  public static int cLine;
-  public static int cCol;
+  public int line;
+  public int column;
 
-  public static void printTokenSetup(Token t) {
-    Token st = t;
-    while (st.specialToken != null) {
-      st = st.specialToken;
-    }
-    cLine = st.getLine();
-    cCol = st.getColumn();
+  public TokenPrinter() {}
+
+  public TokenPrinter(Token token) {
+    setup(token);
   }
 
-  public static void printToken(Token t, Writer out)
+  public void setup(Token token) {
+    Token special = token;
+    while (special.specialToken != null) {
+      special = special.specialToken;
+    }
+    line = special.getLine();
+    column = special.getColumn();
+  }
+
+  public void printToken(Token token, IndentingPrintWriter out)
       throws IOException {
-    Token st = t.specialToken;
-    if (st != null) {
-      while (st.specialToken != null) {
-        st = st.specialToken;
+    Token special = token.specialToken;
+    if (special != null) {
+      while (special.specialToken != null) {
+        special = special.specialToken;
       }
-      while (st != null) {
-        printTokenOnly(st, out);
-        st = st.next;
-      }
-    }
-    printTokenOnly(t, out);
-  }
-
-  public static String printToken(Token t) {
-    String result = "";
-    Token st = t.specialToken;
-    if (st != null) {
-      while (st.specialToken != null) {
-        st = st.specialToken;
-      }
-      while (st != null) {
-        result += printTokenOnly(st);
-        st = st.next;
+      while (special != null) {
+        printTokenOnly(special, out);
+        special = special.next;
       }
     }
-    result += printTokenOnly(t);
-    return result;
+    printTokenOnly(token, out);
   }
 
-  public static void printTokenOnly(Token t, Writer out)
+  public String printToken(Token token) {
+    StringBuilder result = new StringBuilder();
+    Token special = token.specialToken;
+    if (special != null) {
+      while (special.specialToken != null) {
+        special = special.specialToken;
+      }
+      while (special != null) {
+        result.append(printTokenOnly(special));
+        special = special.next;
+      }
+    }
+    result.append(printTokenOnly(token));
+    return result.toString();
+  }
+
+  public void printTokenOnly(Token token, IndentingPrintWriter out)
       throws IOException {
-    for (; cLine < t.getLine(); cLine++) {
-      out.write("\n");
-      cCol = 1;
+    for (; line < token.getLine(); line++) {
+      out.println();
+      column = 0;
     }
-    for (; cCol < t.getColumn(); cCol++) {
-      out.write(" ");
+    for (; column < token.getColumn(); column++) {
+      out.print(" ");
     }
-    if (t.getKind() == JavaCCConstants.STRING_LITERAL
-        || t.getKind() == JavaCCConstants.CHARACTER_LITERAL) {
-      out.write(Parsers.unicodeEscape(t.getImage()));
+    if (token.getKind() == JavaCCConstants.STRING_LITERAL
+        || token.getKind() == JavaCCConstants.CHARACTER_LITERAL) {
+      String image = Parsers.unicodeEscape(token.getImage());
+      adjust(token, image);
+      out.write(image);
     }
     else {
-      out.write(t.getImage());
-    }
-    cLine = t.getEndLine();
-    cCol = t.getEndColumn() + 1;
-    char last = t.getImage().charAt(t.getImage().length() - 1);
-    if (last == '\n' || last == '\r') {
-      cLine++;
-      cCol = 1;
+      String image = token.getImage();
+      adjust(token, image);
+      out.write(image);
     }
   }
 
-  public static String printTokenOnly(Token t) {
+  public String printTokenOnly(Token token) {
     String result = "";
-    for (; cLine < t.getLine(); cLine++) {
+    for (; line < token.getLine(); line++) {
       result += "\n";
-      cCol = 1;
+      column = 0;
     }
-    for (; cCol < t.getColumn(); cCol++) {
+    for (; column < token.getColumn(); column++) {
       result += " ";
     }
-    if (t.getKind() == JavaCCConstants.STRING_LITERAL
-        || t.getKind() == JavaCCConstants.CHARACTER_LITERAL) {
-      result += Parsers.unicodeEscape(t.getImage());
+    if (token.getKind() == JavaCCConstants.STRING_LITERAL
+        || token.getKind() == JavaCCConstants.CHARACTER_LITERAL) {
+      String image = Parsers.unicodeEscape(token.getImage());
+      adjust(token, image);
+      result += image;
     }
     else {
-      result += t.getImage();
+      String image = token.getImage();
+      adjust(token, image);
+      result += image;
     }
-    cLine = t.getEndLine();
-    cCol = t.getEndColumn() + 1;
-    char last = t.getImage().charAt(t.getImage().length() - 1);
-    if (last == '\n' || last == '\r') {
-      cLine++;
-      cCol = 1;
-    }
+
     return result;
   }
 
-  public static void printTokenList(List<Token> list, Writer out)
+  private void adjust(Token token, String image) {
+    line = token.getLine();
+    column = token.getColumn();
+    for (int n = 0; n < image.length(); n++) {
+      char c = image.charAt(n);
+      if (c == '\n') {
+        line++;
+        column = 0;
+      }
+      else {
+        column++;
+      }
+    }
+  }
+
+  public void printTokenList(List<Token> list, IndentingPrintWriter out)
       throws IOException {
     Token t = null;
     for (Token token : list) {
@@ -112,62 +128,62 @@ public class TokenPrinter {
     }
   }
 
-  public static void printLeadingComments(Token t, Writer out)
+  public void printLeadingComments(Token token, IndentingPrintWriter out)
       throws IOException {
-    if (t.specialToken == null) {
+    if (token.specialToken == null) {
       return;
     }
-    Token st = t.specialToken;
-    while (st.specialToken != null) {
-      st = st.specialToken;
+    Token special = token.specialToken;
+    while (special.specialToken != null) {
+      special = special.specialToken;
     }
-    while (st != null) {
-      printTokenOnly(st, out);
-      st = st.next;
+    while (special != null) {
+      printTokenOnly(special, out);
+      special = special.next;
     }
-    if (cCol != 1 && cLine != t.getLine()) {
-      out.write("\n");
-      cLine++;
-      cCol = 1;
+    if (column != 0 && line != token.getLine()) {
+      out.println();
+      line++;
+      column = 0;
     }
   }
 
-  public static String printLeadingComments(Token t) {
+  public String printLeadingComments(Token token) {
     String result = "";
-    if (t.specialToken == null) {
+    if (token.specialToken == null) {
       return result;
     }
-    Token st = t.specialToken;
-    while (st.specialToken != null) {
-      st = st.specialToken;
+    Token special = token.specialToken;
+    while (special.specialToken != null) {
+      special = special.specialToken;
     }
-    while (st != null) {
-      result += printTokenOnly(st);
-      st = st.next;
+    while (special != null) {
+      result += printTokenOnly(special);
+      special = special.next;
     }
-    if (cCol != 1 && cLine != t.getLine()) {
+    if (column != 0 && line != token.getLine()) {
       result += "\n";
-      cLine++;
-      cCol = 1;
+      line++;
+      column = 0;
     }
     return result;
   }
 
-  public static String printTrailingComments(Token t) {
-    if (t.next == null) {
+  public String printTrailingComments(Token token) {
+    if (token.next == null) {
       return "";
     }
-    return printLeadingComments(t.next);
+    return printLeadingComments(token.next);
   }
 
-  static void packageDeclaration(List<Token> tokens, Writer out)
+  void packageDeclaration(List<Token> tokens, IndentingPrintWriter out)
       throws IOException {
     if (tokens.size() != 0
         && tokens.get(0).getKind() == JavaCCConstants.PACKAGE) {
       for (int i = 1; i < tokens.size(); i++) {
         if (tokens.get(i).getKind() == JavaCCConstants.SEMICOLON) {
-          cLine = tokens.get(0).getLine();
-          cCol = tokens.get(0).getColumn();
+          line = tokens.get(0).getLine();
+          column = tokens.get(0).getColumn();
           for (int j = 0; j <= i; j++) {
             printToken(tokens.get(j), out);
           }

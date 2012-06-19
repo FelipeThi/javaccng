@@ -41,7 +41,7 @@ public class AddAcceptVisitor extends UnparseVisitor {
     if (node == node.jjtGetParent().jjtGetChild(0)) {
       // Attempt to make the new code match the indentation of the node.
       StringBuilder s = new StringBuilder();
-      for (int i = 1; i < node.getFirstToken().getBeginColumn(); ++i) {
+      for (int i = 1; i < node.getFirstToken().getColumn(); ++i) {
         s.append(' ');
       }
 

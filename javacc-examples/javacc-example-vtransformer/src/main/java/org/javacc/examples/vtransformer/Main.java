@@ -36,8 +36,9 @@ public class Main {
     System.err.println("Reading from standard input...");
     JavaParser parser = new JavaParser(
         new JavaScanner(
-            new JavaCharStream(
-                new InputStreamReader(System.in))));
+            new CharStream.Escaping(
+                new CharStream.ForReader(
+                    new InputStreamReader(System.in)))));
     ASTCompilationUnit cu = parser.CompilationUnit();
     JavaVisitor visitor = new AddAcceptVisitor(System.out);
     cu.jjtAccept(visitor, null);

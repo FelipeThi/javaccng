@@ -83,20 +83,21 @@ final class ParserGen implements FileGenerator {
 
   private void printHeader(IndentingPrintWriter out)
       throws IOException {
+    TokenPrinter tp = new TokenPrinter();
     List<Token> tokens1 = state.cuToInsertionPoint1;
-    if (tokens1.size() != 0) {
-      TokenPrinter.printTokenSetup(tokens1.get(0));
-      TokenPrinter.cCol = 1;
+    if (tokens1.size() > 0) {
+      tp.setup(tokens1.get(0));
+      tp.column = 0;
       for (Token t : tokens1) {
-        TokenPrinter.printToken(t, out);
+        tp.printToken(t, out);
       }
     }
 
     List<Token> tokens2 = state.cuToInsertionPoint2;
-    if (tokens2.size() != 0) {
-      TokenPrinter.printTokenSetup(tokens2.get(0));
+    if (tokens2.size() > 0) {
+      tp.setup(tokens2.get(0));
       for (Token t : tokens2) {
-        TokenPrinter.printToken(t, out);
+        tp.printToken(t, out);
       }
     }
 
@@ -106,22 +107,23 @@ final class ParserGen implements FileGenerator {
 
   private void printFooter(IndentingPrintWriter out)
       throws IOException {
+    TokenPrinter tp = new TokenPrinter();
     List<Token> tokens = state.cuFromInsertionPoint2;
-    if (tokens.size() != 0) {
-      TokenPrinter.printTokenSetup(tokens.get(0));
-      TokenPrinter.cCol = 1;
+    if (tokens.size() > 0) {
+      tp.setup(tokens.get(0));
+      tp.column = 0;
       Token t = null;
       for (Token token : tokens) {
         t = token;
-        TokenPrinter.printToken(t, out);
+        tp.printToken(t, out);
       }
-      TokenPrinter.printTrailingComments(t);
+      tp.printTrailingComments(t);
     }
   }
 
   private void printBoilerplate(ParseEngine parseEngine, IndentingPrintWriter out) {
     out.println("/** Either generated or user defined scanner. */");
-    out.println("public final Scanner scanner;");
+    out.println("protected final Scanner scanner;");
     out.println("/** Current token. */");
     out.println("private Token token;");
     out.println("/** Next token. */");
