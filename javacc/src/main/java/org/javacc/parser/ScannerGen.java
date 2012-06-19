@@ -734,10 +734,8 @@ final class ScannerGen implements FileGenerator {
     if (hasMoreActions || hasSkipActions || hasTokenActions) {
       if (keepImage) {
         out.println("private final StringBuilder jjImage = new StringBuilder();");
-        out.println("private StringBuilder image = jjImage;");
         out.println("private int jjImageLength;");
       }
-      out.println("private int lengthOfMatch;");
     }
 
     out.println("protected int jjChar;");
@@ -877,8 +875,7 @@ final class ScannerGen implements FileGenerator {
       if (keepImage) {
         out.println("if (jjMatchedPos < 0) {");
         out.indent();
-        out.println("if (image == null) { currentImage = \"\"; }");
-        out.println("else { currentImage = image.toString(); }");
+        out.println("currentImage = jjImage.toString();");
         out.unindent();
         out.println("}");
         out.println("else {");
@@ -1013,8 +1010,7 @@ final class ScannerGen implements FileGenerator {
 
     if (hasMoreActions || hasSkipActions || hasTokenActions) {
       if (keepImage) {
-        out.println("image = jjImage;");
-        out.println("image.setLength(0);");
+        out.println("jjImage.setLength(0);");
         out.println("jjImageLength = 0;");
       }
     }
@@ -1041,29 +1037,28 @@ final class ScannerGen implements FileGenerator {
       if (singlesToSkip[i].hasTransitions()) {
         if (singlesToSkip[i].asciiMoves[0] != 0L &&
             singlesToSkip[i].asciiMoves[1] != 0L) {
-          out.println("while ((jjChar < 64" + " && (0x" +
+          out.print("while ((jjChar < 64" + " && (0x" +
               Long.toHexString(singlesToSkip[i].asciiMoves[0]) +
-              "L & (1L << jjChar)) != 0L) || \n" +
-              "          (jjChar >> 6) == 1" +
+              "L & (1L << jjChar)) != 0L) || (jjChar >> 6) == 1" +
               " && (0x" +
               Long.toHexString(singlesToSkip[i].asciiMoves[1]) +
               "L & (1L << (jjChar & 63))) != 0L)");
         }
         else if (singlesToSkip[i].asciiMoves[1] == 0L) {
-          out.println("while (jjChar <= " +
+          out.print("while (jjChar <= " +
               (int) maxChar(singlesToSkip[i].asciiMoves[0]) + " && (0x" +
               Long.toHexString(singlesToSkip[i].asciiMoves[0]) +
               "L & (1L << jjChar)) != 0L)");
         }
         else if (singlesToSkip[i].asciiMoves[0] == 0L) {
-          out.println("while (jjChar > 63 && jjChar <= " +
+          out.print("while (jjChar > 63 && jjChar <= " +
               ((int) maxChar(singlesToSkip[i].asciiMoves[1]) + 64) +
               " && (0x" +
               Long.toHexString(singlesToSkip[i].asciiMoves[1]) +
               "L & (1L << (jjChar & 63))) != 0L)");
         }
 
-        out.println("{");
+        out.println(" {");
         out.indent();
         if (Options.getDebugScanner()) {
           out.println("debugPrinter.println(" +
@@ -1106,14 +1101,14 @@ final class ScannerGen implements FileGenerator {
 
       if (canMatchAnyChar[i] != -1) {
         if (initMatch[i] != Integer.MAX_VALUE && initMatch[i] != 0) {
-          out.println("if (jjMatchedPos < 0 || (jjMatchedPos == 0 && jjMatchedKind > " +
+          out.print("if (jjMatchedPos < 0 || (jjMatchedPos == 0 && jjMatchedKind > " +
               canMatchAnyChar[i] + "))");
         }
         else {
-          out.println("if (jjMatchedPos == 0 && jjMatchedKind > " +
+          out.print("if (jjMatchedPos == 0 && jjMatchedKind > " +
               canMatchAnyChar[i] + ")");
         }
-        out.println("{");
+        out.println(" {");
         out.indent();
 
         if (Options.getDebugScanner()) {
@@ -1153,10 +1148,10 @@ final class ScannerGen implements FileGenerator {
     if (maxLexStates > 0) {
       out.println("if (jjMatchedKind != 0x" + Integer.toHexString(Integer.MAX_VALUE) + ") {");
       out.indent();
-      out.println("if (jjMatchedPos + 1 < pos)");
+      out.print("if (jjMatchedPos + 1 < pos)");
 
       if (Options.getDebugScanner()) {
-        out.println("{");
+        out.println(" {");
         out.println("debugPrinter.println(" +
             "\"   Putting back \" + (pos - jjMatchedPos - 1) + \" characters into the input stream.\");");
       }
@@ -1204,13 +1199,13 @@ final class ScannerGen implements FileGenerator {
 
         if (hasSkip || hasSpecial) {
           if (hasMore) {
-            out.println("else if (isSkip(jjMatchedKind))");
+            out.print("else if (isSkip(jjMatchedKind))");
           }
           else {
-            out.println("else");
+            out.print("else");
           }
 
-          out.println("{");
+          out.println(" {");
           out.indent();
 
           if (hasSpecial) {
@@ -1419,11 +1414,10 @@ final class ScannerGen implements FileGenerator {
 
         if (keepImage) {
           if (stringLiterals.allImages[i] != null) {
-            out.println("image.append(jjLiteralImages[" + i + "]);");
-            out.println("lengthOfMatch = jjLiteralImages[" + i + "].length();");
+            out.println("jjImage.append(jjLiteralImages[" + i + "]);");
           }
           else {
-            out.println("append(image, jjImageLength + (lengthOfMatch = jjMatchedPos + 1));");
+            out.println("append(jjImage, jjImageLength + jjMatchedPos + 1);");
           }
         }
 
@@ -1457,7 +1451,7 @@ final class ScannerGen implements FileGenerator {
     out.println("void moreLexicalActions() {");
     out.indent();
     if (keepImage) {
-      out.println("jjImageLength += (lengthOfMatch = jjMatchedPos + 1);");
+      out.println("jjImageLength += jjMatchedPos + 1;");
     }
     out.println("switch(jjMatchedKind) {");
     out.indent();
@@ -1506,10 +1500,10 @@ final class ScannerGen implements FileGenerator {
 
         if (keepImage) {
           if (stringLiterals.allImages[i] != null) {
-            out.println("image.append(jjLiteralImages[" + i + "]);");
+            out.println("jjImage.append(jjLiteralImages[" + i + "]);");
           }
           else {
-            out.println("append(image, jjImageLength);");
+            out.println("append(jjImage, jjImageLength);");
           }
           out.println("jjImageLength = 0;");
         }
@@ -1590,21 +1584,19 @@ final class ScannerGen implements FileGenerator {
 
         if (keepImage) {
           if (i == 0) {
-            out.println("image.setLength(0);"); // For EOF no image is there
+            out.println("jjImage.setLength(0);"); // For EOF no image is there
           }
           else {
-            out.print("image.append");
+            out.print("jjImage.append");
             if (stringLiterals.allImages[i] != null) {
               out.println("(jjLiteralImages[" + i + "]);");
-              out.println("lengthOfMatch = jjLiteralImages[" + i + "].length();");
             }
             else {
               if (stringLiterals.allImages[i] != null) {
-                out.println("image.append(jjLiteralImages[" + i + "]);");
-                out.println("lengthOfMatch = jjLiteralImages[" + i + "].length();");
+                out.println("jjImage.append(jjLiteralImages[" + i + "]);");
               }
               else {
-                out.println("append(image, jjImageLength + (lengthOfMatch = jjMatchedPos + 1));");
+                out.println("append(jjImage, jjImageLength + jjMatchedPos + 1);");
               }
             }
           }

@@ -124,16 +124,14 @@ public class NfaStateTest extends JavaCCTestCase {
     StringWriter output = new StringWriter();
     IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     scannerGen.nfaStates.dumpCharAndRangeMoves(scannerGen, contentWriter);
-    assertEquals("         int i2 = (jjChar & 0xff) >> 6;\n" +
-        "         long l2 = 1L << (jjChar & 63);\n" +
-        "         do\n" +
-        "         {\n" +
-        "            switch(jjStateSet[--i])\n" +
-        "            {\n" +
-        "               default: break;\n" +
-        "            }\n" +
-        "         } while(i != startsAt);\n"
-        , output.toString().replaceAll("\r", ""));
+    assertEquals("int i2 = (jjChar & 0xff) >> 6;\n" +
+        "long l2 = 1L << (jjChar & 63);\n" +
+        "do {\n" +
+        "  switch(jjStateSet[--i]) {\n" +
+        "    default: break;\n" +
+        "  }\n" +
+        "} while(i != startsAt);\n",
+        output.toString().replaceAll("\r", ""));
   }
 
   /**
@@ -146,20 +144,17 @@ public class NfaStateTest extends JavaCCTestCase {
     IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     setupState();
     scannerGen.nfaStates.dumpCharAndRangeMoves(scannerGen, contentWriter);
-    assertEquals(
-        "         int hiByte = (int)(jjChar >> 8);\n" +
-            "         int i1 = hiByte >> 6;\n" +
-            "         long l1 = 1L << (hiByte & 63);\n" +
-            "         int i2 = (jjChar & 0xff) >> 6;\n" +
-            "         long l2 = 1L << (jjChar & 63);\n" +
-            "         do\n" +
-            "         {\n" +
-            "            switch(jjStateSet[--i])\n" +
-            "            {\n" +
-            "               default: break;\n" +
-            "            }\n" +
-            "         } while(i != startsAt);\n"
-        , output.toString().replaceAll("\r", ""));
+    assertEquals("int hiByte = (int)(jjChar >> 8);\n" +
+        "int i1 = hiByte >> 6;\n" +
+        "long l1 = 1L << (hiByte & 63);\n" +
+        "int i2 = (jjChar & 0xff) >> 6;\n" +
+        "long l2 = 1L << (jjChar & 63);\n" +
+        "do {\n" +
+        "  switch(jjStateSet[--i]) {\n" +
+        "    default: break;\n" +
+        "  }\n" +
+        "} while(i != startsAt);\n",
+        output.toString().replaceAll("\r", ""));
   }
 
   /**
@@ -184,185 +179,176 @@ public class NfaStateTest extends JavaCCTestCase {
     IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     setupState();
     scannerGen.nfaStates.dumpNonAsciiMoveMethods(contentWriter);
-    assertEquals("private static boolean jjCanMove_0(int hiByte, int i1, int i2, long l1, long l2)\n" +
-        "{\n" +
-        "   switch(hiByte)\n" +
-        "   {\n" +
-        "      case 0:\n" +
-        "         return ((jjbitVec2[i2] & l2) != 0L);\n" +
-        "      default:\n" +
-        "         if ((jjbitVec0[i1] & l1) != 0L)\n" +
-        "            return true;\n" +
-        "         return false;\n" +
-        "   }\n" +
+    assertEquals("private static boolean jjCanMove_0(int hiByte, int i1, int i2, long l1, long l2) {\n" +
+        "  switch(hiByte) {\n" +
+        "    case 0:\n" +
+        "      return ((jjbitVec2[i2] & l2) != 0L);\n" +
+        "    default:\n" +
+        "      if ((jjbitVec0[i1] & l1) != 0L) { return true; }\n" +
+        "      return false;\n" +
+        "  }\n" +
         "}\n" +
-        "private static boolean jjCanMove_1(int hiByte, int i1, int i2, long l1, long l2)\n" +
-        "{\n" +
-        "   switch(hiByte)\n" +
-        "   {\n" +
-        "      case 0:\n" +
-        "         return ((jjbitVec4[i2] & l2) != 0L);\n" +
-        "      case 2:\n" +
-        "         return ((jjbitVec5[i2] & l2) != 0L);\n" +
-        "      case 3:\n" +
-        "         return ((jjbitVec6[i2] & l2) != 0L);\n" +
-        "      case 4:\n" +
-        "         return ((jjbitVec7[i2] & l2) != 0L);\n" +
-        "      case 5:\n" +
-        "         return ((jjbitVec8[i2] & l2) != 0L);\n" +
-        "      case 6:\n" +
-        "         return ((jjbitVec9[i2] & l2) != 0L);\n" +
-        "      case 7:\n" +
-        "         return ((jjbitVec10[i2] & l2) != 0L);\n" +
-        "      case 9:\n" +
-        "         return ((jjbitVec11[i2] & l2) != 0L);\n" +
-        "      case 10:\n" +
-        "         return ((jjbitVec12[i2] & l2) != 0L);\n" +
-        "      case 11:\n" +
-        "         return ((jjbitVec13[i2] & l2) != 0L);\n" +
-        "      case 12:\n" +
-        "         return ((jjbitVec14[i2] & l2) != 0L);\n" +
-        "      case 13:\n" +
-        "         return ((jjbitVec15[i2] & l2) != 0L);\n" +
-        "      case 14:\n" +
-        "         return ((jjbitVec16[i2] & l2) != 0L);\n" +
-        "      case 15:\n" +
-        "         return ((jjbitVec17[i2] & l2) != 0L);\n" +
-        "      case 16:\n" +
-        "         return ((jjbitVec18[i2] & l2) != 0L);\n" +
-        "      case 17:\n" +
-        "         return ((jjbitVec19[i2] & l2) != 0L);\n" +
-        "      case 18:\n" +
-        "         return ((jjbitVec20[i2] & l2) != 0L);\n" +
-        "      case 19:\n" +
-        "         return ((jjbitVec21[i2] & l2) != 0L);\n" +
-        "      case 20:\n" +
-        "         return ((jjbitVec0[i2] & l2) != 0L);\n" +
-        "      case 22:\n" +
-        "         return ((jjbitVec22[i2] & l2) != 0L);\n" +
-        "      case 23:\n" +
-        "         return ((jjbitVec23[i2] & l2) != 0L);\n" +
-        "      case 24:\n" +
-        "         return ((jjbitVec24[i2] & l2) != 0L);\n" +
-        "      case 30:\n" +
-        "         return ((jjbitVec25[i2] & l2) != 0L);\n" +
-        "      case 31:\n" +
-        "         return ((jjbitVec26[i2] & l2) != 0L);\n" +
-        "      case 32:\n" +
-        "         return ((jjbitVec27[i2] & l2) != 0L);\n" +
-        "      case 33:\n" +
-        "         return ((jjbitVec28[i2] & l2) != 0L);\n" +
-        "      case 48:\n" +
-        "         return ((jjbitVec29[i2] & l2) != 0L);\n" +
-        "      case 49:\n" +
-        "         return ((jjbitVec30[i2] & l2) != 0L);\n" +
-        "      case 77:\n" +
-        "         return ((jjbitVec31[i2] & l2) != 0L);\n" +
-        "      case 159:\n" +
-        "         return ((jjbitVec32[i2] & l2) != 0L);\n" +
-        "      case 164:\n" +
-        "         return ((jjbitVec33[i2] & l2) != 0L);\n" +
-        "      case 215:\n" +
-        "         return ((jjbitVec34[i2] & l2) != 0L);\n" +
-        "      case 250:\n" +
-        "         return ((jjbitVec35[i2] & l2) != 0L);\n" +
-        "      case 251:\n" +
-        "         return ((jjbitVec36[i2] & l2) != 0L);\n" +
-        "      case 253:\n" +
-        "         return ((jjbitVec37[i2] & l2) != 0L);\n" +
-        "      case 254:\n" +
-        "         return ((jjbitVec38[i2] & l2) != 0L);\n" +
-        "      case 255:\n" +
-        "         return ((jjbitVec39[i2] & l2) != 0L);\n" +
-        "      default:\n" +
-        "         if ((jjbitVec3[i1] & l1) != 0L)\n" +
-        "            return true;\n" +
-        "         return false;\n" +
-        "   }\n" +
+        "private static boolean jjCanMove_1(int hiByte, int i1, int i2, long l1, long l2) {\n" +
+        "  switch(hiByte) {\n" +
+        "    case 0:\n" +
+        "      return ((jjbitVec4[i2] & l2) != 0L);\n" +
+        "    case 2:\n" +
+        "      return ((jjbitVec5[i2] & l2) != 0L);\n" +
+        "    case 3:\n" +
+        "      return ((jjbitVec6[i2] & l2) != 0L);\n" +
+        "    case 4:\n" +
+        "      return ((jjbitVec7[i2] & l2) != 0L);\n" +
+        "    case 5:\n" +
+        "      return ((jjbitVec8[i2] & l2) != 0L);\n" +
+        "    case 6:\n" +
+        "      return ((jjbitVec9[i2] & l2) != 0L);\n" +
+        "    case 7:\n" +
+        "      return ((jjbitVec10[i2] & l2) != 0L);\n" +
+        "    case 9:\n" +
+        "      return ((jjbitVec11[i2] & l2) != 0L);\n" +
+        "    case 10:\n" +
+        "      return ((jjbitVec12[i2] & l2) != 0L);\n" +
+        "    case 11:\n" +
+        "      return ((jjbitVec13[i2] & l2) != 0L);\n" +
+        "    case 12:\n" +
+        "      return ((jjbitVec14[i2] & l2) != 0L);\n" +
+        "    case 13:\n" +
+        "      return ((jjbitVec15[i2] & l2) != 0L);\n" +
+        "    case 14:\n" +
+        "      return ((jjbitVec16[i2] & l2) != 0L);\n" +
+        "    case 15:\n" +
+        "      return ((jjbitVec17[i2] & l2) != 0L);\n" +
+        "    case 16:\n" +
+        "      return ((jjbitVec18[i2] & l2) != 0L);\n" +
+        "    case 17:\n" +
+        "      return ((jjbitVec19[i2] & l2) != 0L);\n" +
+        "    case 18:\n" +
+        "      return ((jjbitVec20[i2] & l2) != 0L);\n" +
+        "    case 19:\n" +
+        "      return ((jjbitVec21[i2] & l2) != 0L);\n" +
+        "    case 20:\n" +
+        "      return ((jjbitVec0[i2] & l2) != 0L);\n" +
+        "    case 22:\n" +
+        "      return ((jjbitVec22[i2] & l2) != 0L);\n" +
+        "    case 23:\n" +
+        "      return ((jjbitVec23[i2] & l2) != 0L);\n" +
+        "    case 24:\n" +
+        "      return ((jjbitVec24[i2] & l2) != 0L);\n" +
+        "    case 30:\n" +
+        "      return ((jjbitVec25[i2] & l2) != 0L);\n" +
+        "    case 31:\n" +
+        "      return ((jjbitVec26[i2] & l2) != 0L);\n" +
+        "    case 32:\n" +
+        "      return ((jjbitVec27[i2] & l2) != 0L);\n" +
+        "    case 33:\n" +
+        "      return ((jjbitVec28[i2] & l2) != 0L);\n" +
+        "    case 48:\n" +
+        "      return ((jjbitVec29[i2] & l2) != 0L);\n" +
+        "    case 49:\n" +
+        "      return ((jjbitVec30[i2] & l2) != 0L);\n" +
+        "    case 77:\n" +
+        "      return ((jjbitVec31[i2] & l2) != 0L);\n" +
+        "    case 159:\n" +
+        "      return ((jjbitVec32[i2] & l2) != 0L);\n" +
+        "    case 164:\n" +
+        "      return ((jjbitVec33[i2] & l2) != 0L);\n" +
+        "    case 215:\n" +
+        "      return ((jjbitVec34[i2] & l2) != 0L);\n" +
+        "    case 250:\n" +
+        "      return ((jjbitVec35[i2] & l2) != 0L);\n" +
+        "    case 251:\n" +
+        "      return ((jjbitVec36[i2] & l2) != 0L);\n" +
+        "    case 253:\n" +
+        "      return ((jjbitVec37[i2] & l2) != 0L);\n" +
+        "    case 254:\n" +
+        "      return ((jjbitVec38[i2] & l2) != 0L);\n" +
+        "    case 255:\n" +
+        "      return ((jjbitVec39[i2] & l2) != 0L);\n" +
+        "    default:\n" +
+        "      if ((jjbitVec3[i1] & l1) != 0L) { return true; }\n" +
+        "      return false;\n" +
+        "  }\n" +
         "}\n" +
-        "private static boolean jjCanMove_2(int hiByte, int i1, int i2, long l1, long l2)\n" +
-        "{\n" +
-        "   switch(hiByte)\n" +
-        "   {\n" +
-        "      case 0:\n" +
-        "         return ((jjbitVec40[i2] & l2) != 0L);\n" +
-        "      case 2:\n" +
-        "         return ((jjbitVec5[i2] & l2) != 0L);\n" +
-        "      case 3:\n" +
-        "         return ((jjbitVec41[i2] & l2) != 0L);\n" +
-        "      case 4:\n" +
-        "         return ((jjbitVec42[i2] & l2) != 0L);\n" +
-        "      case 5:\n" +
-        "         return ((jjbitVec43[i2] & l2) != 0L);\n" +
-        "      case 6:\n" +
-        "         return ((jjbitVec44[i2] & l2) != 0L);\n" +
-        "      case 7:\n" +
-        "         return ((jjbitVec45[i2] & l2) != 0L);\n" +
-        "      case 9:\n" +
-        "         return ((jjbitVec46[i2] & l2) != 0L);\n" +
-        "      case 10:\n" +
-        "         return ((jjbitVec47[i2] & l2) != 0L);\n" +
-        "      case 11:\n" +
-        "         return ((jjbitVec48[i2] & l2) != 0L);\n" +
-        "      case 12:\n" +
-        "         return ((jjbitVec49[i2] & l2) != 0L);\n" +
-        "      case 13:\n" +
-        "         return ((jjbitVec50[i2] & l2) != 0L);\n" +
-        "      case 14:\n" +
-        "         return ((jjbitVec51[i2] & l2) != 0L);\n" +
-        "      case 15:\n" +
-        "         return ((jjbitVec52[i2] & l2) != 0L);\n" +
-        "      case 16:\n" +
-        "         return ((jjbitVec53[i2] & l2) != 0L);\n" +
-        "      case 17:\n" +
-        "         return ((jjbitVec19[i2] & l2) != 0L);\n" +
-        "      case 18:\n" +
-        "         return ((jjbitVec20[i2] & l2) != 0L);\n" +
-        "      case 19:\n" +
-        "         return ((jjbitVec54[i2] & l2) != 0L);\n" +
-        "      case 20:\n" +
-        "         return ((jjbitVec0[i2] & l2) != 0L);\n" +
-        "      case 22:\n" +
-        "         return ((jjbitVec22[i2] & l2) != 0L);\n" +
-        "      case 23:\n" +
-        "         return ((jjbitVec55[i2] & l2) != 0L);\n" +
-        "      case 24:\n" +
-        "         return ((jjbitVec56[i2] & l2) != 0L);\n" +
-        "      case 30:\n" +
-        "         return ((jjbitVec25[i2] & l2) != 0L);\n" +
-        "      case 31:\n" +
-        "         return ((jjbitVec26[i2] & l2) != 0L);\n" +
-        "      case 32:\n" +
-        "         return ((jjbitVec57[i2] & l2) != 0L);\n" +
-        "      case 33:\n" +
-        "         return ((jjbitVec28[i2] & l2) != 0L);\n" +
-        "      case 48:\n" +
-        "         return ((jjbitVec58[i2] & l2) != 0L);\n" +
-        "      case 49:\n" +
-        "         return ((jjbitVec30[i2] & l2) != 0L);\n" +
-        "      case 77:\n" +
-        "         return ((jjbitVec31[i2] & l2) != 0L);\n" +
-        "      case 159:\n" +
-        "         return ((jjbitVec32[i2] & l2) != 0L);\n" +
-        "      case 164:\n" +
-        "         return ((jjbitVec33[i2] & l2) != 0L);\n" +
-        "      case 215:\n" +
-        "         return ((jjbitVec34[i2] & l2) != 0L);\n" +
-        "      case 250:\n" +
-        "         return ((jjbitVec35[i2] & l2) != 0L);\n" +
-        "      case 251:\n" +
-        "         return ((jjbitVec59[i2] & l2) != 0L);\n" +
-        "      case 253:\n" +
-        "         return ((jjbitVec37[i2] & l2) != 0L);\n" +
-        "      case 254:\n" +
-        "         return ((jjbitVec60[i2] & l2) != 0L);\n" +
-        "      case 255:\n" +
-        "         return ((jjbitVec61[i2] & l2) != 0L);\n" +
-        "      default:\n" +
-        "         if ((jjbitVec3[i1] & l1) != 0L)\n" +
-        "            return true;\n" +
-        "         return false;\n" +
-        "   }\n" +
+        "private static boolean jjCanMove_2(int hiByte, int i1, int i2, long l1, long l2) {\n" +
+        "  switch(hiByte) {\n" +
+        "    case 0:\n" +
+        "      return ((jjbitVec40[i2] & l2) != 0L);\n" +
+        "    case 2:\n" +
+        "      return ((jjbitVec5[i2] & l2) != 0L);\n" +
+        "    case 3:\n" +
+        "      return ((jjbitVec41[i2] & l2) != 0L);\n" +
+        "    case 4:\n" +
+        "      return ((jjbitVec42[i2] & l2) != 0L);\n" +
+        "    case 5:\n" +
+        "      return ((jjbitVec43[i2] & l2) != 0L);\n" +
+        "    case 6:\n" +
+        "      return ((jjbitVec44[i2] & l2) != 0L);\n" +
+        "    case 7:\n" +
+        "      return ((jjbitVec45[i2] & l2) != 0L);\n" +
+        "    case 9:\n" +
+        "      return ((jjbitVec46[i2] & l2) != 0L);\n" +
+        "    case 10:\n" +
+        "      return ((jjbitVec47[i2] & l2) != 0L);\n" +
+        "    case 11:\n" +
+        "      return ((jjbitVec48[i2] & l2) != 0L);\n" +
+        "    case 12:\n" +
+        "      return ((jjbitVec49[i2] & l2) != 0L);\n" +
+        "    case 13:\n" +
+        "      return ((jjbitVec50[i2] & l2) != 0L);\n" +
+        "    case 14:\n" +
+        "      return ((jjbitVec51[i2] & l2) != 0L);\n" +
+        "    case 15:\n" +
+        "      return ((jjbitVec52[i2] & l2) != 0L);\n" +
+        "    case 16:\n" +
+        "      return ((jjbitVec53[i2] & l2) != 0L);\n" +
+        "    case 17:\n" +
+        "      return ((jjbitVec19[i2] & l2) != 0L);\n" +
+        "    case 18:\n" +
+        "      return ((jjbitVec20[i2] & l2) != 0L);\n" +
+        "    case 19:\n" +
+        "      return ((jjbitVec54[i2] & l2) != 0L);\n" +
+        "    case 20:\n" +
+        "      return ((jjbitVec0[i2] & l2) != 0L);\n" +
+        "    case 22:\n" +
+        "      return ((jjbitVec22[i2] & l2) != 0L);\n" +
+        "    case 23:\n" +
+        "      return ((jjbitVec55[i2] & l2) != 0L);\n" +
+        "    case 24:\n" +
+        "      return ((jjbitVec56[i2] & l2) != 0L);\n" +
+        "    case 30:\n" +
+        "      return ((jjbitVec25[i2] & l2) != 0L);\n" +
+        "    case 31:\n" +
+        "      return ((jjbitVec26[i2] & l2) != 0L);\n" +
+        "    case 32:\n" +
+        "      return ((jjbitVec57[i2] & l2) != 0L);\n" +
+        "    case 33:\n" +
+        "      return ((jjbitVec28[i2] & l2) != 0L);\n" +
+        "    case 48:\n" +
+        "      return ((jjbitVec58[i2] & l2) != 0L);\n" +
+        "    case 49:\n" +
+        "      return ((jjbitVec30[i2] & l2) != 0L);\n" +
+        "    case 77:\n" +
+        "      return ((jjbitVec31[i2] & l2) != 0L);\n" +
+        "    case 159:\n" +
+        "      return ((jjbitVec32[i2] & l2) != 0L);\n" +
+        "    case 164:\n" +
+        "      return ((jjbitVec33[i2] & l2) != 0L);\n" +
+        "    case 215:\n" +
+        "      return ((jjbitVec34[i2] & l2) != 0L);\n" +
+        "    case 250:\n" +
+        "      return ((jjbitVec35[i2] & l2) != 0L);\n" +
+        "    case 251:\n" +
+        "      return ((jjbitVec59[i2] & l2) != 0L);\n" +
+        "    case 253:\n" +
+        "      return ((jjbitVec37[i2] & l2) != 0L);\n" +
+        "    case 254:\n" +
+        "      return ((jjbitVec60[i2] & l2) != 0L);\n" +
+        "    case 255:\n" +
+        "      return ((jjbitVec61[i2] & l2) != 0L);\n" +
+        "    default:\n" +
+        "      if ((jjbitVec3[i1] & l1) != 0L) { return true; }\n" +
+        "      return false;\n" +
+        "  }\n" +
         "}\n", output.toString().replaceAll("\r", ""));
   }
 
@@ -421,9 +407,8 @@ public class NfaStateTest extends JavaCCTestCase {
     IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     setupState();
     scannerGen.nfaStates.dumpMoveNfa(scannerGen, contentWriter);
-    assertEquals("private int jjMoveNfa_3(int startState, int curPos) throws java.io.IOException\n" +
-        "{\n" +
-        "   return curPos;\n" +
+    assertEquals("private int jjMoveNfa_3(int startState, int pos) throws java.io.IOException {\n" +
+        "  return pos;\n" +
         "}\n", output.toString().replaceAll("\r", ""));
   }
 

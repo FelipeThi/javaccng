@@ -90,15 +90,12 @@ final class StringLiterals {
   }
 
   void dumpNullStrLiterals(ScannerGen scannerGen, IndentingPrintWriter out) {
-    out.println("{");
-    out.indent();
     if (scannerGen.nfaStates.generatedStates != 0) {
       out.println("return jjMoveNfa" + scannerGen.lexStateSuffix + "(" + scannerGen.nfaStates.initStateName(scannerGen) + ", 0);");
     }
-    else { out.println("return 1;"); }
-
-    out.unindent();
-    out.println("}");
+    else {
+      out.println("return 1;");
+    }
   }
 
   private int getStateSetForKind(ScannerGen scannerGen, int pos, int kind) {
@@ -203,8 +200,7 @@ final class StringLiterals {
 
   void dumpStartWithStates(ScannerGen scannerGen, IndentingPrintWriter out) {
     out.println("private int " +
-        "jjStartNfaWithStates" + scannerGen.lexStateSuffix + "(int pos, int kind, int state) throws java.io.IOException");
-    out.println("{");
+        "jjStartNfaWithStates" + scannerGen.lexStateSuffix + "(int pos, int kind, int state) throws java.io.IOException {");
     out.indent();
     out.println("jjMatchedKind = kind;");
     out.println("jjMatchedPos = pos;");
@@ -234,8 +230,7 @@ final class StringLiterals {
 
   void dumpBoilerPlate(IndentingPrintWriter out) {
     out.println("private int " +
-        "jjStopAtPos(int pos, int kind)");
-    out.println("{");
+        "jjStopAtPos(int pos, int kind) {");
     out.indent();
     out.println("jjMatchedKind = kind;");
     out.println("jjMatchedPos = pos;");
@@ -284,9 +279,11 @@ final class StringLiterals {
 
     if (maxLen == 0) {
       out.println("private int " +
-          "jjMoveStringLiteralDfa0" + scannerGen.lexStateSuffix + "() throws java.io.IOException");
-
+          "jjMoveStringLiteralDfa0" + scannerGen.lexStateSuffix + "() throws java.io.IOException {");
+      out.indent();
       dumpNullStrLiterals(scannerGen, out);
+      out.unindent();
+      out.println("}");
       out.println();
       return;
     }
@@ -336,8 +333,7 @@ final class StringLiterals {
           }
         }
       }
-      out.println(") throws java.io.IOException");
-      out.println("{");
+      out.println(") throws java.io.IOException {");
       out.indent();
       if (i != 0) {
         if (i > 1) {
@@ -398,8 +394,7 @@ final class StringLiterals {
         }
 
         out.println("jjChar = read();");
-        out.println("if (jjChar == -1)");
-        out.println("{");
+        out.println("if (jjChar == -1) {");
         out.indent();
 
         if (!scannerGen.mixed[scannerGen.lexStateIndex] && scannerGen.nfaStates.generatedStates != 0) {
@@ -438,8 +433,7 @@ final class StringLiterals {
             "at line \" + charStream.getLine() + \" column \" + charStream.getColumn());");
       }
 
-      out.println("switch(jjChar)");
-      out.println("{");
+      out.println("switch(jjChar) {");
       out.indent();
 
       CaseLoop:
@@ -562,15 +556,13 @@ final class StringLiterals {
                     i != 0) {
                   out.println("{");
                   out.indent();
-                  out.println("jjMatchedKind = " +
-                      kindToPrint + ";");
+                  out.println("jjMatchedKind = " + kindToPrint + ";");
                   out.println("jjMatchedPos = " + i + ";");
                   out.unindent();
                   out.println("}");
                 }
                 else {
-                  out.println("jjMatchedKind = " +
-                      kindToPrint + ";");
+                  out.println("jjMatchedKind = " + kindToPrint + ";");
                 }
               }
             }
@@ -844,18 +836,21 @@ final class StringLiterals {
     out.print("private int jjStopStringLiteralDfa" +
         scannerGen.lexStateSuffix + "(int pos, ");
     for (i = 0; i < maxKindsReqd - 1; i++) { out.print("long active" + i + ", "); }
-    out.println("long active" + i + ")\n{");
+    out.println("long active" + i + ") {");
+    out.indent();
 
     if (Options.getDebugScanner()) {
       out.println("debugPrinter.println(\"   No more string literal token matches are possible.\");");
     }
 
-    out.println("   switch (pos)\n   {");
+    out.println("switch (pos) {");
+    out.indent();
 
     for (i = 0; i < maxLen - 1; i++) {
       if (statesForPos[i] == null) { continue; }
 
-      out.println("      case " + i + ":");
+      out.println("case " + i + ":");
+      out.indent();
 
       Enumeration e = statesForPos[i].keys();
       while (e.hasMoreElements()) {
@@ -866,7 +861,7 @@ final class StringLiterals {
           if (actives[j] == 0L) { continue; }
 
           if (condGenerated) { out.print(" || "); }
-          else { out.print("         if ("); }
+          else { out.print("if ("); }
 
           condGenerated = true;
 
@@ -883,37 +878,43 @@ final class StringLiterals {
           int jjMatchedPos = Integer.parseInt(
               afterKind.substring(0, afterKind.indexOf(", ")));
 
-          if (!kindStr.equals(String.valueOf(Integer.MAX_VALUE))) { out.println("         {"); }
+          if (!kindStr.equals(String.valueOf(Integer.MAX_VALUE))) { out.println("{"); }
 
           if (!kindStr.equals(String.valueOf(Integer.MAX_VALUE))) {
             if (i == 0) {
-              out.println("            jjMatchedKind = " + kindStr + ";");
+              out.println("jjMatchedKind = " + kindStr + ";");
 
               if ((scannerGen.initMatch[scannerGen.lexStateIndex] != 0 &&
                   scannerGen.initMatch[scannerGen.lexStateIndex] != Integer.MAX_VALUE)) {
-                out.println("            jjMatchedPos = 0;");
+                out.println("jjMatchedPos = 0;");
               }
             }
             else if (i == jjMatchedPos) {
               if (subStringAtPos[i]) {
-                out.println("            if (jjMatchedPos != " + i + ")");
-                out.println("            {");
-                out.println("               jjMatchedKind = " + kindStr + ";");
-                out.println("               jjMatchedPos = " + i + ";");
-                out.println("            }");
+                out.println("if (jjMatchedPos != " + i + ") {");
+                out.indent();
+                out.println("jjMatchedKind = " + kindStr + ";");
+                out.println("jjMatchedPos = " + i + ";");
+                out.unindent();
+                out.println("}");
               }
               else {
-                out.println("            jjMatchedKind = " + kindStr + ";");
-                out.println("            jjMatchedPos = " + i + ";");
+                out.println("jjMatchedKind = " + kindStr + ";");
+                out.println("jjMatchedPos = " + i + ";");
               }
             }
             else {
-              if (jjMatchedPos > 0) { out.println("            if (jjMatchedPos < " + jjMatchedPos + ")"); }
-              else { out.println("            if (jjMatchedPos == 0)"); }
-              out.println("            {");
-              out.println("               jjMatchedKind = " + kindStr + ";");
-              out.println("               jjMatchedPos = " + jjMatchedPos + ";");
-              out.println("            }");
+              if (jjMatchedPos > 0) {
+                out.println("if (jjMatchedPos < " + jjMatchedPos + ") {");
+              }
+              else {
+                out.println("if (jjMatchedPos == 0) {");
+              }
+              out.indent();
+              out.println("jjMatchedKind = " + kindStr + ";");
+              out.println("jjMatchedPos = " + jjMatchedPos + ";");
+              out.unindent();
+              out.println("}");
             }
           }
 
@@ -923,47 +924,54 @@ final class StringLiterals {
           stateSetString = afterKind.substring(
               afterKind.indexOf(", ") + 2);
 
-          if (stateSetString.equals("null;")) { out.println("            return -1;"); }
+          if (stateSetString.equals("null;")) {
+            out.println("return -1;");
+          }
           else {
-            out.println("            return " +
-                scannerGen.nfaStates.addStartStateSet(stateSetString) + ";");
+            out.println("return " + scannerGen.nfaStates.addStartStateSet(stateSetString) + ";");
           }
 
-          if (!kindStr.equals(String.valueOf(Integer.MAX_VALUE))) { out.println("         }"); }
+          if (!kindStr.equals(String.valueOf(Integer.MAX_VALUE))) {
+            out.println("}");
+          }
           condGenerated = false;
         }
       }
 
-      out.println("         return -1;");
+      out.println("return -1;");
+      out.unindent();
     }
 
-    out.println("      default:");
-    out.println("         return -1;");
-    out.println("   }");
+    out.println("default:");
+    out.println("return -1;");
+    out.unindent();
+    out.println("}");
     out.println("}");
 
     out.println();
-    out.print("private int jjStartNfa" +
-        scannerGen.lexStateSuffix + "(int pos, ");
-    for (i = 0; i < maxKindsReqd - 1; i++) { out.print("long active" + i + ", "); }
-    out.println("long active" + i + ") throws java.io.IOException \n{");
+    out.print("private int jjStartNfa" + scannerGen.lexStateSuffix + "(int pos, ");
+    for (i = 0; i < maxKindsReqd - 1; i++) {
+      out.print("long active" + i + ", ");
+    }
+    out.println("long active" + i + ") throws java.io.IOException {");
 
     if (scannerGen.mixed[scannerGen.lexStateIndex]) {
       if (scannerGen.nfaStates.generatedStates != 0) {
-        out.println("   return jjMoveNfa" + scannerGen.lexStateSuffix +
-            "(" + scannerGen.nfaStates.initStateName(scannerGen) + ", pos + 1);");
+        out.println("return jjMoveNfa" + scannerGen.lexStateSuffix + "(" + scannerGen.nfaStates.initStateName(scannerGen) + ", pos + 1);");
       }
-      else { out.println("   return pos + 1;"); }
+      else {
+        out.println("return pos + 1;");
+      }
 
       out.println("}");
       return;
     }
 
-    out.print("   return jjMoveNfa" + scannerGen.lexStateSuffix + "(" +
-        "jjStopStringLiteralDfa" + scannerGen.lexStateSuffix + "(pos, ");
+    out.print("return jjMoveNfa" + scannerGen.lexStateSuffix + "(jjStopStringLiteralDfa" + scannerGen.lexStateSuffix + "(pos, ");
     for (i = 0; i < maxKindsReqd - 1; i++) { out.print("active" + i + ", "); }
     out.print("active" + i + ")");
     out.println(", pos + 1);");
+    out.unindent();
     out.println("}");
     out.println();
   }

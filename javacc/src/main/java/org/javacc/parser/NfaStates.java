@@ -369,29 +369,27 @@ final class NfaStates {
 
   void dumpHeadForCase(IndentingPrintWriter out, int byteNum) {
     if (byteNum == 0) {
-      out.println("         long l = 1L << jjChar;");
+      out.println("long l = 1L << jjChar;");
     }
     else if (byteNum == 1) {
-      out.println("         long l = 1L << (jjChar & 63);");
+      out.println("long l = 1L << (jjChar & 63);");
     }
 
     else {
       if (Options.getJavaUnicodeEscape() || unicodeWarningGiven) {
-        out.println("         int hiByte = (int)(jjChar >> 8);");
-        out.println("         int i1 = hiByte >> 6;");
-        out.println("         long l1 = 1L << (hiByte & 63);");
+        out.println("int hiByte = (int)(jjChar >> 8);");
+        out.println("int i1 = hiByte >> 6;");
+        out.println("long l1 = 1L << (hiByte & 63);");
       }
 
-      out.println("         int i2 = (jjChar & 0xff) >> 6;");
-      out.println("         long l2 = 1L << (jjChar & 63);");
+      out.println("int i2 = (jjChar & 0xff) >> 6;");
+      out.println("long l2 = 1L << (jjChar & 63);");
     }
 
-    //out.println("         MatchLoop: do");
-    out.println("         do");
-    out.println("         {");
-
-    out.println("            switch(jjStateSet[--i])");
-    out.println("            {");
+    out.println("do {");
+    out.indent();
+    out.println("switch(jjStateSet[--i]) {");
+    out.indent();
   }
 
   Vector partitionStatesSetForAscii(int[] states, int byteNum) {
@@ -476,7 +474,7 @@ final class NfaStates {
 
       if (tmp.stateForCase != null) {
         if (stateForCase != null) {
-          throw new Error("JavaCC Bug: Please send mail to sankar@cs.stanford.edu : ");
+          throw new Error("JavaCC Bug");
         }
 
         stateForCase = tmp.stateForCase;
@@ -489,7 +487,7 @@ final class NfaStates {
 
     if (neededStates == 0) {
       if (stateForCase != null && toPrint.equals("")) {
-        out.println("                  break;");
+        out.println("break;");
       }
       return;
     }
@@ -503,10 +501,10 @@ final class NfaStates {
         out.print(toPrint);
       }
 
-      out.println("               case " + stateNameForComposite(key) + ":");
+      out.println("case " + stateNameForComposite(key) + ":");
 
       if (!dumped[toBePrinted.stateName] && !stateBlock && toBePrinted.inNextOf > 1) {
-        out.println("               case " + toBePrinted.stateName + ":");
+        out.println("case " + toBePrinted.stateName + ":");
       }
 
       dumped[toBePrinted.stateName] = true;
@@ -521,7 +519,7 @@ final class NfaStates {
     }
 
     int keyState = stateNameForComposite(key);
-    out.println("               case " + keyState + ":");
+    out.println("case " + keyState + ":");
     if (keyState < generatedStates) {
       dumped[keyState] = true;
     }
@@ -540,10 +538,10 @@ final class NfaStates {
     }
 
     if (stateBlock) {
-      out.println("                  break;");
+      out.println("break;");
     }
     else {
-      out.println("                  break;");
+      out.println("break;");
     }
   }
 
@@ -562,36 +560,50 @@ final class NfaStates {
 
       if (dumped[temp.stateName] || temp.lexState != scannerGen.lexStateIndex ||
           !temp.hasTransitions() || temp.dummy ||
-          temp.stateName == -1) { continue; }
+          temp.stateName == -1) {
+        continue;
+      }
 
       String toPrint = "";
 
       if (temp.stateForCase != null) {
-        if (temp.inNextOf == 1) { continue; }
+        if (temp.inNextOf == 1) {
+          continue;
+        }
 
-        if (dumped[temp.stateForCase.stateName]) { continue; }
+        if (dumped[temp.stateForCase.stateName]) {
+          continue;
+        }
 
         toPrint = (temp.stateForCase.printNoBreak(out, byteNum, dumped));
 
         if (temp.asciiMoves[byteNum] == 0L) {
-          if (toPrint.equals("")) { out.println("                  break;"); }
+          if (toPrint.equals("")) {
+            out.println("break;");
+          }
 
           continue;
         }
       }
 
-      if (temp.asciiMoves[byteNum] == 0L) { continue; }
+      if (temp.asciiMoves[byteNum] == 0L) {
+        continue;
+      }
 
-      if (!toPrint.equals("")) { out.print(toPrint); }
+      if (!toPrint.equals("")) {
+        out.print(toPrint);
+      }
 
       dumped[temp.stateName] = true;
-      out.println("               case " + temp.stateName + ":");
+      out.println("case " + temp.stateName + ":");
       temp.dumpAsciiMove(out, byteNum, dumped);
     }
 
-    out.println("               default: break;");
-    out.println("            }");
-    out.println("         } while(i != startsAt);");
+    out.println("default: break;");
+    out.unindent();
+    out.println("}");
+    out.unindent();
+    out.println("} while(i != startsAt);");
   }
 
   void dumpCompositeStatesNonAsciiMoves(IndentingPrintWriter out,
@@ -599,7 +611,9 @@ final class NfaStates {
     int i;
     int[] nameSet = (int[]) allNextStates.get(key);
 
-    if (nameSet.length == 1 || dumped[stateNameForComposite(key)]) { return; }
+    if (nameSet.length == 1 || dumped[stateNameForComposite(key)]) {
+      return;
+    }
 
     NfaState toBePrinted = null;
     int neededStates = 0;
@@ -619,7 +633,7 @@ final class NfaStates {
 
       if (tmp.stateForCase != null) {
         if (stateForCase != null) {
-          throw new Error("JavaCC Bug: Please send mail to sankar@cs.stanford.edu : ");
+          throw new Error("JavaCC Bug");
         }
 
         stateForCase = tmp.stateForCase;
@@ -632,19 +646,21 @@ final class NfaStates {
 
     if (neededStates == 0) {
       if (stateForCase != null && toPrint.equals("")) {
-        out.println("                  break;");
+        out.println("break;");
       }
 
       return;
     }
 
     if (neededStates == 1) {
-      if (!toPrint.equals("")) { out.print(toPrint); }
+      if (!toPrint.equals("")) {
+        out.print(toPrint);
+      }
 
-      out.println("               case " + stateNameForComposite(key) + ":");
+      out.println("case " + stateNameForComposite(key) + ":");
 
       if (!dumped[toBePrinted.stateName] && !stateBlock && toBePrinted.inNextOf > 1) {
-        out.println("               case " + toBePrinted.stateName + ":");
+        out.println("case " + toBePrinted.stateName + ":");
       }
 
       dumped[toBePrinted.stateName] = true;
@@ -652,23 +668,33 @@ final class NfaStates {
       return;
     }
 
-    if (!toPrint.equals("")) { out.print(toPrint); }
+    if (!toPrint.equals("")) {
+      out.print(toPrint);
+    }
 
     int keyState = stateNameForComposite(key);
-    out.println("               case " + keyState + ":");
-    if (keyState < generatedStates) { dumped[keyState] = true; }
+    out.println("case " + keyState + ":");
+    if (keyState < generatedStates) {
+      dumped[keyState] = true;
+    }
 
     for (i = 0; i < nameSet.length; i++) {
       tmp = (NfaState) allStates.get(nameSet[i]);
 
       if (tmp.nonAsciiMethod != -1) {
-        if (stateBlock) { dumped[tmp.stateName] = true; }
+        if (stateBlock) {
+          dumped[tmp.stateName] = true;
+        }
         tmp.dumpNonAsciiMoveForCompositeState(out);
       }
     }
 
-    if (stateBlock) { out.println("                  break;"); }
-    else { out.println("                  break;"); }
+    if (stateBlock) {
+      out.println("break;");
+    }
+    else {
+      out.println("break;");
+    }
   }
 
   public void dumpCharAndRangeMoves(ScannerGen scannerGen, IndentingPrintWriter out) {
@@ -685,8 +711,9 @@ final class NfaStates {
     for (i = 0; i < allStates.size(); i++) {
       NfaState temp = (NfaState) allStates.get(i);
 
-      if (temp.stateName == -1 || dumped[temp.stateName] || temp.lexState != scannerGen.lexStateIndex ||
-          !temp.hasTransitions() || temp.dummy) { continue; }
+      if (temp.stateName == -1 || dumped[temp.stateName] || temp.lexState != scannerGen.lexStateIndex || !temp.hasTransitions() || temp.dummy) {
+        continue;
+      }
 
       String toPrint = "";
 
@@ -698,25 +725,34 @@ final class NfaStates {
         toPrint = (temp.stateForCase.printNoBreak(out, -1, dumped));
 
         if (temp.nonAsciiMethod == -1) {
-          if (toPrint.equals("")) { out.println("                  break;"); }
+          if (toPrint.equals("")) {
+            out.println("break;");
+          }
 
           continue;
         }
       }
 
-      if (temp.nonAsciiMethod == -1) { continue; }
+      if (temp.nonAsciiMethod == -1) {
+        continue;
+      }
 
-      if (!toPrint.equals("")) { out.print(toPrint); }
+      if (!toPrint.equals("")) {
+        out.print(toPrint);
+      }
 
       dumped[temp.stateName] = true;
-      //System.out.println("case : " + temp.stateName);
-      out.println("               case " + temp.stateName + ":");
+      out.println("case " + temp.stateName + ":");
+      out.indent();
       temp.dumpNonAsciiMove(out, dumped);
+      out.unindent();
     }
 
-    out.println("               default: break;");
-    out.println("            }");
-    out.println("         } while(i != startsAt);");
+    out.println("default: break;");
+    out.unindent();
+    out.println("}");
+    out.unindent();
+    out.println("} while(i != startsAt);");
   }
 
   public void dumpNonAsciiMoveMethods(IndentingPrintWriter out) {
@@ -914,134 +950,145 @@ final class NfaStates {
     kinds[scannerGen.lexStateIndex] = kindsForStates;
 
     out.println("private int " +
-        "jjMoveNfa" + scannerGen.lexStateSuffix + "(int startState, int curPos) throws java.io.IOException");
-    out.println("{");
+        "jjMoveNfa" + scannerGen.lexStateSuffix + "(int startState, int pos) throws java.io.IOException {");
+    out.indent();
 
     if (generatedStates == 0) {
-      out.println("   return curPos;");
+      out.println("return pos;");
+      out.unindent();
       out.println("}");
       return;
     }
 
     if (scannerGen.mixed[scannerGen.lexStateIndex]) {
-      out.println("   int strKind = jjMatchedKind;");
-      out.println("   int strPos = jjMatchedPos;");
-      out.println("   int seenUpto;");
-      out.println("   backup(seenUpto = curPos + 1);");
-      out.println("   jjChar = read();");
-      out.println("   if (jjChar == -1) { throw new Error(\"Internal Error\"); }");
-      out.println("   curPos = 0;");
+      out.println("int strKind = jjMatchedKind;");
+      out.println("int strPos = jjMatchedPos;");
+      out.println("int seenUpto;");
+      out.println("backup(seenUpto = pos + 1);");
+      out.println("jjChar = read();");
+      out.println("if (jjChar == -1) { throw new Error(\"Internal Error\"); }");
+      out.println("pos = 0;");
     }
 
-    out.println("   int startsAt = 0;");
-    out.println("   jjNewStateCount = " + generatedStates + ";");
-    out.println("   int i = 1;");
-    out.println("   jjStateSet[0] = startState;");
+    out.println("int startsAt = 0;");
+    out.println("jjNewStateCount = " + generatedStates + ";");
+    out.println("int i = 1;");
+    out.println("jjStateSet[0] = startState;");
 
     if (Options.getDebugScanner()) {
-      out.println("      debugPrinter.println(\"   Starting NFA to match one of : \" + " +
+      out.println("debugPrinter.println(\"   Starting NFA to match one of : \" + " +
           "jjKindsForStateVector(jjLexState, jjStateSet, 0, 1));");
     }
 
     if (Options.getDebugScanner()) {
-      out.println("      debugPrinter.println(" + (scannerGen.maxLexStates > 1 ?
+      out.println("debugPrinter.println(" + (scannerGen.maxLexStates > 1 ?
           "\"<\" + jjLexStateNames[jjLexState] + \">\" + " :
           "") + "\"Current character : \" + " +
           "ScannerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
           "at line \" + charStream.getLine() + \" column \" + charStream.getColumn());");
     }
 
-    out.println("   int kind = 0x" + Integer.toHexString(Integer.MAX_VALUE) + ";");
-    out.println("   for (;;)");
-    out.println("   {");
-    out.println("      if (++jjRound == 0x" + Integer.toHexString(Integer.MAX_VALUE) + ")");
-    out.println("         reInitRounds();");
-    out.println("      if (jjChar < 64)");
-    out.println("      {");
-
+    out.println("int kind = 0x" + Integer.toHexString(Integer.MAX_VALUE) + ";");
+    out.println("while (true) {");
+    out.indent();
+    out.println("if (++jjRound == 0x" + Integer.toHexString(Integer.MAX_VALUE) + ")");
+    out.indent();
+    out.println("reInitRounds();");
+    out.unindent();
+    out.println("if (jjChar < 64) {");
+    out.indent();
     dumpAsciiMoves(scannerGen, out, 0);
-
-    out.println("      }");
-
-    out.println("      else if (jjChar < 128)");
-
-    out.println("      {");
-
+    out.unindent();
+    out.println("}");
+    out.println("else if (jjChar < 128) {");
+    out.indent();
     dumpAsciiMoves(scannerGen, out, 1);
-
-    out.println("      }");
-
-    out.println("      else");
-    out.println("      {");
-
+    out.unindent();
+    out.println("}");
+    out.println("else {");
+    out.indent();
     dumpCharAndRangeMoves(scannerGen, out);
+    out.unindent();
+    out.println("}");
 
-    out.println("      }");
-
-    out.println("      if (kind != 0x" + Integer.toHexString(Integer.MAX_VALUE) + ")");
-    out.println("      {");
-    out.println("         jjMatchedKind = kind;");
-    out.println("         jjMatchedPos = curPos;");
-    out.println("         kind = 0x" + Integer.toHexString(Integer.MAX_VALUE) + ";");
-    out.println("      }");
-    out.println("      ++curPos;");
-
+    out.println("if (kind != 0x" + Integer.toHexString(Integer.MAX_VALUE) + ") {");
+    out.indent();
+    out.println("jjMatchedKind = kind;");
+    out.println("jjMatchedPos = pos;");
+    out.println("kind = 0x" + Integer.toHexString(Integer.MAX_VALUE) + ";");
+    out.unindent();
+    out.println("}");
+    out.println("pos++;");
     if (Options.getDebugScanner()) {
-      out.println("      if (jjMatchedKind != 0 && jjMatchedKind != 0x" +
+      out.println("if (jjMatchedKind != 0 && jjMatchedKind != 0x" +
           Integer.toHexString(Integer.MAX_VALUE) + ")");
-      out.println("         debugPrinter.println(" +
+      out.indent();
+      out.println("debugPrinter.println(" +
           "\"   Currently matched the first \" + (jjMatchedPos + 1) + \" characters as" +
           " a \" + tokenImage[jjMatchedKind] + \" token.\");");
+      out.unindent();
     }
 
-    out.println("      if ((i = jjNewStateCount) == (startsAt = " +
-        generatedStates + " - (jjNewStateCount = startsAt)))");
-    if (scannerGen.mixed[scannerGen.lexStateIndex]) { out.println("         break;"); }
-    else { out.println("         return curPos;"); }
+    out.println("if ((i = jjNewStateCount) == (startsAt = " + generatedStates + " - (jjNewStateCount = startsAt)))");
+    out.indent();
+    if (scannerGen.mixed[scannerGen.lexStateIndex]) {
+      out.println("break;");
+    }
+    else {
+      out.println("return pos;");
+    }
+    out.unindent();
 
     if (Options.getDebugScanner()) {
-      out.println("      debugPrinter.println(\"   Possible kinds of longer matches : \" + " +
+      out.println("debugPrinter.println(\"   Possible kinds of longer matches : \" + " +
           "jjKindsForStateVector(jjLexState, jjStateSet, startsAt, i));");
     }
 
-    out.println("      jjChar = read();");
+    out.println("jjChar = read();");
 
-    if (scannerGen.mixed[scannerGen.lexStateIndex]) { out.println("      if (jjChar == -1) { break; }"); }
-    else { out.println("      if (jjChar == -1) { return curPos; }"); }
+    if (scannerGen.mixed[scannerGen.lexStateIndex]) {
+      out.println("if (jjChar == -1) { break; }");
+    }
+    else {
+      out.println("if (jjChar == -1) { return pos; }");
+    }
 
     if (Options.getDebugScanner()) {
-      out.println("      debugPrinter.println(" + (scannerGen.maxLexStates > 1 ?
+      out.println("debugPrinter.println(" + (scannerGen.maxLexStates > 1 ?
           "\"<\" + jjLexStateNames[jjLexState] + \">\" + " :
           "") + "\"Current character : \" + " +
           "ScannerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
           "at line \" + charStream.getLine() + \" column \" + charStream.getColumn());");
     }
 
-    out.println("   }");
+    out.unindent();
+    out.println("}");
 
     if (scannerGen.mixed[scannerGen.lexStateIndex]) {
-      out.println("   if (jjMatchedPos > strPos)");
-      out.println("      return curPos;");
-      out.println("");
-      out.println("   int toRet = Math.max(curPos, seenUpto);");
-      out.println("");
-      out.println("   if (curPos < toRet)");
-      out.println("      for (i = toRet - Math.min(curPos, seenUpto); i-- > 0; )");
-      out.println("         jjChar = read();");
-      out.println("         if (jjChar == -1) { " +
-          "throw new Error(\"Internal Error : Please send a bug report.\"); }");
-      out.println("");
-      out.println("   if (jjMatchedPos < strPos)");
-      out.println("   {");
-      out.println("      jjMatchedKind = strKind;");
-      out.println("      jjMatchedPos = strPos;");
-      out.println("   }");
-      out.println("   else if (jjMatchedPos == strPos && jjMatchedKind > strKind)");
-      out.println("      jjMatchedKind = strKind;");
-      out.println("");
-      out.println("   return toRet;");
+      out.println("if (jjMatchedPos > strPos) { return pos; }");
+      out.println("int toRet = Math.max(pos, seenUpto);");
+      out.println();
+      out.println("if (pos < toRet)");
+      out.indent();
+      out.println("for (i = toRet - Math.min(pos, seenUpto); i-- > 0;)");
+      out.println("jjChar = read();");
+      out.println("if (jjChar == -1) { throw new Error(\"Internal Error : Please send a bug report.\"); }");
+      out.println();
+      out.println("if (jjMatchedPos < strPos) {");
+      out.indent();
+      out.println("jjMatchedKind = strKind;");
+      out.println("jjMatchedPos = strPos;");
+      out.unindent();
+      out.println("}");
+      out.println("else if (jjMatchedPos == strPos && jjMatchedKind > strKind)");
+      out.indent();
+      out.println("jjMatchedKind = strKind;");
+      out.unindent();
+      out.println();
+      out.println("return toRet;");
     }
 
+    out.unindent();
     out.println("}");
     allStates.clear();
   }
@@ -1055,17 +1102,16 @@ final class NfaStates {
     }
     else { out.println("{"); }
 
-    for (int i = 0; i < statesForState.length; i++) {
-
-      if (statesForState[i] == null) {
+    for (int[][] states : statesForState) {
+      if (states == null) {
         out.println(" null,");
         continue;
       }
 
       out.println(" {");
 
-      for (int j = 0; j < statesForState[i].length; j++) {
-        int[] stateSet = statesForState[i][j];
+      for (int j = 0; j < states.length; j++) {
+        int[] stateSet = states[j];
 
         if (stateSet == null) {
           out.println("   { " + j + " },");
@@ -1074,7 +1120,7 @@ final class NfaStates {
 
         out.print("   { ");
 
-        for (int k = 0; k < stateSet.length; k++) { out.print(stateSet[k] + ", "); }
+        for (int set : stateSet) { out.print(set + ", "); }
 
         out.println("},");
       }
