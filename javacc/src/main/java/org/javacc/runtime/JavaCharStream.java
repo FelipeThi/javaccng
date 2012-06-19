@@ -305,26 +305,12 @@ public final class JavaCharStream implements CharStream {
     return end;
   }
 
-  public int getBeginLine() {
+  public int getLine() {
     return bufLine[0];
   }
 
-  public int getBeginColumn() {
+  public int getColumn() {
     return bufColumn[0];
-  }
-
-  public int getEndLine() {
-    if (offset > 0) {
-      return bufLine[offset - 1];
-    }
-    return 0;
-  }
-
-  public int getEndColumn() {
-    if (offset > 0) {
-      return bufColumn[offset - 1];
-    }
-    return 0;
   }
 
   public void close() {
@@ -375,6 +361,6 @@ public final class JavaCharStream implements CharStream {
         return 15;
     }
     throw new java.io.IOException("Illegal hex digit in escape sequence '" + (char) c + "'" +
-        " at " + getEndLine() + "," + getEndColumn());
+        " at " + getLine() + "," + getColumn());
   }
 }

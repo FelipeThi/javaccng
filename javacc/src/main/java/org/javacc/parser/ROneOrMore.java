@@ -34,8 +34,8 @@ public final class ROneOrMore extends RegularExpression {
   public RegularExpression regExp;
 
   public ROneOrMore(Token t, RegularExpression re) {
-    setLine(t.getBeginLine());
-    setColumn(t.getBeginColumn());
+    setLine(t.getLine());
+    setColumn(t.getColumn());
     regExp = re;
   }
 

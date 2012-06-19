@@ -36,8 +36,8 @@ public final class RZeroOrMore extends RegularExpression {
   public RZeroOrMore() {}
 
   public RZeroOrMore(Token t, RegularExpression re) {
-    setLine(t.getBeginLine());
-    setColumn(t.getBeginColumn());
+    setLine(t.getLine());
+    setColumn(t.getColumn());
     regExp = re;
   }
 

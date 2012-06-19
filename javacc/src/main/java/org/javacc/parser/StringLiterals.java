@@ -215,7 +215,7 @@ final class StringLiterals {
           "+ (jjMatchedPos + 1) + \" characters as a \" + tokenImage[jjMatchedKind] + \" token.\");");
     }
 
-    out.println("jjChar = charStream.readChar();");
+    out.println("jjChar = read();");
     out.println("if (jjChar == -1) { return pos + 1; }");
 
     if (Options.getDebugScanner()) {
@@ -223,7 +223,7 @@ final class StringLiterals {
           (scannerGen.maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
           "\"Current character : \" + " +
           "ScannerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
-          "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
+          "at line \" + charStream.getLine() + \" column \" + charStream.getColumn());");
     }
 
     out.println("return jjMoveNfa" + scannerGen.lexStateSuffix + "(state, pos + 1);");
@@ -397,7 +397,7 @@ final class StringLiterals {
           out.println();
         }
 
-        out.println("jjChar = charStream.readChar();");
+        out.println("jjChar = read();");
         out.println("if (jjChar == -1)");
         out.println("{");
         out.indent();
@@ -435,7 +435,7 @@ final class StringLiterals {
             (scannerGen.maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
             "\"Current character : \" + " +
             "ScannerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
-            "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
+            "at line \" + charStream.getLine() + \" column \" + charStream.getColumn());");
       }
 
       out.println("switch(jjChar)");

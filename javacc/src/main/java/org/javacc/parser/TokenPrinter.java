@@ -15,8 +15,8 @@ public class TokenPrinter {
     while (st.specialToken != null) {
       st = st.specialToken;
     }
-    cLine = st.getBeginLine();
-    cCol = st.getBeginColumn();
+    cLine = st.getLine();
+    cCol = st.getColumn();
   }
 
   public static void printToken(Token t, Writer out)
@@ -52,11 +52,11 @@ public class TokenPrinter {
 
   public static void printTokenOnly(Token t, Writer out)
       throws IOException {
-    for (; cLine < t.getBeginLine(); cLine++) {
+    for (; cLine < t.getLine(); cLine++) {
       out.write("\n");
       cCol = 1;
     }
-    for (; cCol < t.getBeginColumn(); cCol++) {
+    for (; cCol < t.getColumn(); cCol++) {
       out.write(" ");
     }
     if (t.getKind() == JavaCCConstants.STRING_LITERAL
@@ -77,11 +77,11 @@ public class TokenPrinter {
 
   public static String printTokenOnly(Token t) {
     String result = "";
-    for (; cLine < t.getBeginLine(); cLine++) {
+    for (; cLine < t.getLine(); cLine++) {
       result += "\n";
       cCol = 1;
     }
-    for (; cCol < t.getBeginColumn(); cCol++) {
+    for (; cCol < t.getColumn(); cCol++) {
       result += " ";
     }
     if (t.getKind() == JavaCCConstants.STRING_LITERAL
@@ -125,7 +125,7 @@ public class TokenPrinter {
       printTokenOnly(st, out);
       st = st.next;
     }
-    if (cCol != 1 && cLine != t.getBeginLine()) {
+    if (cCol != 1 && cLine != t.getLine()) {
       out.write("\n");
       cLine++;
       cCol = 1;
@@ -145,7 +145,7 @@ public class TokenPrinter {
       result += printTokenOnly(st);
       st = st.next;
     }
-    if (cCol != 1 && cLine != t.getBeginLine()) {
+    if (cCol != 1 && cLine != t.getLine()) {
       result += "\n";
       cLine++;
       cCol = 1;
@@ -166,8 +166,8 @@ public class TokenPrinter {
         && tokens.get(0).getKind() == JavaCCConstants.PACKAGE) {
       for (int i = 1; i < tokens.size(); i++) {
         if (tokens.get(i).getKind() == JavaCCConstants.SEMICOLON) {
-          cLine = tokens.get(0).getBeginLine();
-          cCol = tokens.get(0).getBeginColumn();
+          cLine = tokens.get(0).getLine();
+          cCol = tokens.get(0).getColumn();
           for (int j = 0; j <= i; j++) {
             printToken(tokens.get(j), out);
           }

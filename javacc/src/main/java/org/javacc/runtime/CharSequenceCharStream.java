@@ -60,19 +60,11 @@ public final class CharSequenceCharStream implements CharStream {
     return end;
   }
 
-  public int getBeginLine() {
+  public int getLine() {
     throw new UnsupportedOperationException();
   }
 
-  public int getBeginColumn() {
-    throw new UnsupportedOperationException();
-  }
-
-  public int getEndLine() {
-    throw new UnsupportedOperationException();
-  }
-
-  public int getEndColumn() {
+  public int getColumn() {
     throw new UnsupportedOperationException();
   }
 

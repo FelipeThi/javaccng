@@ -26,10 +26,9 @@ public interface CharStream extends java.io.Closeable {
   void beginToken() throws java.io.IOException;
 
   /**
-   * Returns the next character from the selected input.  The method
-   * of selecting the input is the responsibility of the class
-   * implementing this interface.
-   *
+   * @return The next character from the selected input.  The method
+   *         of selecting the input is the responsibility of the class
+   *         implementing this interface.
    * @throws java.io.IOException If any I/O error occurs.
    */
   int readChar() throws java.io.IOException;
@@ -38,13 +37,13 @@ public interface CharStream extends java.io.Closeable {
    * Backs up the input stream by amount steps. Lexer calls this method if it
    * had already read some characters, but could not use them to match a
    * (longer) token. So, they will be used again as the prefix of the next
-   * token and it is the implemetation's responsibility to do this right.
+   * token and it is the implementation's responsibility to do this right.
    */
   void backup(int amount);
 
   /**
-   * Returns a string made up of characters from the marked token beginning
-   * to the current buffer position.
+   * @return A string made up of characters from the marked token beginning
+   *         to the current buffer position.
    */
   String getImage();
 
@@ -61,40 +60,28 @@ public interface CharStream extends java.io.Closeable {
   char[] getSuffix(int length);
 
   /**
-   * Returns index of the first character for current token (being
-   * matched after the last call to {@link #beginToken beginToken()}).
+   * @return Index of the first character for current token (being
+   *         matched after the last call to {@link #beginToken beginToken()}).
    */
   int getBegin();
 
   /**
-   * Returns index of the last character for current token (being
-   * matched after the last call to {@link #beginToken beginToken()}).
+   * @return Index of the last character for current token (being
+   *         matched after the last call to {@link #beginToken beginToken()}).
    */
   int getEnd();
 
   /**
-   * Returns the line number of the first character for current token (being
-   * matched after the last call to {@link #beginToken beginToken()}).
+   * @return The line number of the first character for current token (being
+   *         matched after the last call to {@link #beginToken beginToken()}).
    */
-  int getBeginLine();
+  int getLine();
 
   /**
-   * Returns the column number of the first character for current token (being
-   * matched after the last call to {@link #beginToken beginToken()}).
+   * @return The column number of the first character for current token (being
+   *         matched after the last call to {@link #beginToken beginToken()}).
    */
-  int getBeginColumn();
-
-  /**
-   * Returns the column number of the last character for current token (being
-   * matched after the last call to {@link #beginToken beginToken()}).
-   */
-  int getEndColumn();
-
-  /**
-   * Returns the line number of the last character for current token (being
-   * matched after the last call to {@link #beginToken beginToken()}).
-   */
-  int getEndLine();
+  int getColumn();
 
   /**
    * The lexer calls this function to indicate that it is done with the stream

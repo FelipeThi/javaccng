@@ -19,10 +19,8 @@ public class Token {
   private int kind;
   private final int begin;
   private final int end;
-  private int beginLine;
-  private int beginColumn;
-  private int endLine;
-  private int endColumn;
+  private int line;
+  private int column;
   private String image;
   /**
    * A reference to the next regular (non-special) token from the input
@@ -86,38 +84,18 @@ public class Token {
   }
 
   /** @return The line number of the first character of this token. */
-  public int getBeginLine() {
-    return beginLine;
+  public int getLine() {
+    return line;
   }
 
   /** @return The column number of the first character of this token. */
-  public int getBeginColumn() {
-    return beginColumn;
+  public int getColumn() {
+    return column;
   }
 
-  /** @return The line number of the last character of this token. */
-  public int getEndLine() {
-    return endLine;
-  }
-
-  /** @return The column number of the last character of this token. */
-  public int getEndColumn() {
-    return endColumn;
-  }
-
-  /**
-   * Set token line and column numbers.
-   *
-   * @param beginLine   The line number of the first character of this token
-   * @param beginColumn The column number of the first character of this token.
-   * @param endLine     The line number of the last character of this token.
-   * @param endColumn   The column number of the last character of this token.
-   */
-  public void setLineColumn(int beginLine, int beginColumn, int endLine, int endColumn) {
-    this.beginLine = beginLine;
-    this.beginColumn = beginColumn;
-    this.endLine = endLine;
-    this.endColumn = endColumn;
+  public void setLineColumn(int line, int column) {
+    this.line = line;
+    this.column = column;
   }
 
   /** @return The image. */

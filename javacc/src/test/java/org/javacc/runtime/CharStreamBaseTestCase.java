@@ -60,47 +60,43 @@ public abstract class CharStreamBaseTestCase {
   @Test
   public void reportsEofEx() throws IOException {
     final CharStream s = new JavaCharStream(new StringReader("x"));
-    assertCharLineColumn(s, 'x', 1, 1, 1, 1);
-    assertCharLineColumn(s, -1, 1, 1, 1, 1);
+    assertCharLineColumn(s, 'x', 1, 1);
+    assertCharLineColumn(s, -1, 1, 1);
   }
 
   @Test
   public void providesLineAndColumnNumbers() throws IOException {
     final CharStream cs = makeCharStream("a1\r\nb2\nc3\rd");
     cs.beginToken();
-    assertCharLineColumn(cs, 'a', 1, 1, 1, 1);
-    assertCharLineColumn(cs, '1', 1, 1, 1, 2);
-    assertCharLineColumn(cs, '\r', 1, 1, 1, 3);
-    assertCharLineColumn(cs, '\n', 1, 1, 1, 4);
-    assertCharLineColumn(cs, 'b', 1, 1, 2, 1);
-    assertCharLineColumn(cs, '2', 1, 1, 2, 2);
-    assertCharLineColumn(cs, '\n', 1, 1, 2, 3);
-    assertCharLineColumn(cs, 'c', 1, 1, 3, 1);
-    assertCharLineColumn(cs, '3', 1, 1, 3, 2);
-    assertCharLineColumn(cs, '\r', 1, 1, 3, 3);
-    assertCharLineColumn(cs, 'd', 1, 1, 4, 1);
-    assertCharLineColumn(cs, -1, 1, 1, 4, 1);
+    assertCharLineColumn(cs, 'a', 1, 1);
+    assertCharLineColumn(cs, '1', 1, 1);
+    assertCharLineColumn(cs, '\r', 1, 1);
+    assertCharLineColumn(cs, '\n', 1, 1);
+    assertCharLineColumn(cs, 'b', 1, 1);
+    assertCharLineColumn(cs, '2', 1, 1);
+    assertCharLineColumn(cs, '\n', 1, 1);
+    assertCharLineColumn(cs, 'c', 1, 1);
+    assertCharLineColumn(cs, '3', 1, 1);
+    assertCharLineColumn(cs, '\r', 1, 1);
+    assertCharLineColumn(cs, 'd', 1, 1);
+    assertCharLineColumn(cs, -1, 1, 1);
     cs.backup(3);
-    assertCharLineColumn(cs, '3', 1, 1, 3, 2);
-    assertCharLineColumn(cs, '\r', 1, 1, 3, 3);
-    assertCharLineColumn(cs, 'd', 1, 1, 4, 1);
-    assertCharLineColumn(cs, -1, 1, 1, 4, 1);
+    assertCharLineColumn(cs, '3', 1, 1);
+    assertCharLineColumn(cs, '\r', 1, 1);
+    assertCharLineColumn(cs, 'd', 1, 1);
+    assertCharLineColumn(cs, -1, 1, 1);
     cs.backup(3);
     cs.beginToken();
-    assertCharLineColumn(cs, '3', 3, 2, 3, 2);
-    assertCharLineColumn(cs, '\r', 3, 2, 3, 3);
-    assertCharLineColumn(cs, 'd', 3, 2, 4, 1);
-    assertCharLineColumn(cs, -1, 3, 2, 4, 1);
+    assertCharLineColumn(cs, '3', 3, 2);
+    assertCharLineColumn(cs, '\r', 3, 2);
+    assertCharLineColumn(cs, 'd', 3, 2);
+    assertCharLineColumn(cs, -1, 3, 2);
   }
 
-  static void assertCharLineColumn(final CharStream cs,
-                                   final int c,
-                                   final int beginLne, final int beginColumn,
-                                   final int endLine, final int endColumn) throws IOException {
+  static void assertCharLineColumn(
+      CharStream cs, int c, int line, int column) throws IOException {
     assertEquals(c, cs.readChar());
-    assertEquals(beginLne, cs.getBeginLine());
-    assertEquals(beginColumn, cs.getBeginColumn());
-    assertEquals(endLine, cs.getEndLine());
-    assertEquals(endColumn, cs.getEndColumn());
+    assertEquals(line, cs.getLine());
+    assertEquals(column, cs.getColumn());
   }
 }

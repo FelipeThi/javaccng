@@ -186,7 +186,7 @@ MORE :
 | "/*" : IN_MULTI_LINE_COMMENT
 | "/*@bgen(jjtree"
      {
-        saveBeginLineCol(charStream.getBeginLine(), charStream.getBeginColumn());
+        saveBeginLineCol(charStream.getLine(), charStream.getColumn());
      } : IN_MULTI_LINE_COMMENT
 }
 
@@ -512,8 +512,8 @@ void javacode_production() :
 	  JavaCodeProduction p = new JavaCodeProduction();
 	  Token t = getToken(1);
 	  p.setFirstToken(t);
-	  p.setLine(t.getBeginLine());
-	  p.setColumn(t.getBeginColumn());
+	  p.setLine(t.getLine());
+	  p.setColumn(t.getColumn());
 	  p.setThrowsList(new ArrayList());
 	  String lhs;
 	  List excName;
@@ -554,8 +554,8 @@ void bnf_production() :
 	  BNFProduction p = new BNFProduction();
 	  Token t = getToken(1);
 	  p.setFirstToken(t);
-	  p.setLine(t.getBeginLine());
-	  p.setColumn(t.getBeginColumn());
+	  p.setLine(t.getLine());
+	  p.setColumn(t.getColumn());
 	  p.setThrowsList(new ArrayList());
 	  Container<Expansion> c = new Container<Expansion>();
 	  String lhs;
@@ -614,8 +614,8 @@ void regular_expr_production() :
 	{
 	  TokenProduction p = new TokenProduction();
 	  Token t = p.firstToken = getToken(1);
-	  p.setLine(t.getBeginLine());
-	  p.setColumn(t.getBeginColumn());
+	  p.setLine(t.getLine());
+	  p.setColumn(t.getColumn());
 	  List states;
 	}
 {
@@ -774,10 +774,10 @@ void expansion(Container<Expansion> c1) :
 	  Container<Expansion> c2 = new Container<Expansion>();
 	  Lookahead la = new Lookahead();
 	  Token t = getToken(1);
-	  seq.setLine(t.getBeginLine());
-	  seq.setColumn(t.getBeginColumn());
-	  la.setLine(t.getBeginLine());
-	  la.setColumn(t.getBeginColumn());
+	  seq.setLine(t.getLine());
+	  seq.setColumn(t.getColumn());
+	  la.setLine(t.getLine());
+	  la.setColumn(t.getColumn());
 	}
 {
 	{
@@ -817,8 +817,8 @@ Lookahead local_lookahead() :
 	  Lookahead la = new Lookahead();
 	  la.setExplicit(true);
 	  Token t = getToken(1);
-	  la.setLine(t.getBeginLine());
-	  la.setColumn(t.getBeginColumn());
+	  la.setLine(t.getLine());
+	  la.setColumn(t.getColumn());
 	  la.setLaExpansion(null);
 	  Container<Expansion> c = new Container<Expansion>();
 	  boolean commaAtEnd = false, emptyLA = true;
@@ -898,8 +898,8 @@ void expansion_unit(Container<Expansion> c) :
 	  Sequence seq = new Sequence(t, la);
 	  la.parent = seq; la.ordinal = 0;
 	  act = new Action();
-	  act.setLine(t.getBeginLine());
-	  act.setColumn(t.getBeginColumn());
+	  act.setLine(t.getLine());
+	  act.setColumn(t.getColumn());
 	  seq.units.add(act);
 	  act.parent = seq; act.ordinal = 1;
 	  ch.getChoices().add(seq);
@@ -918,8 +918,8 @@ void expansion_unit(Container<Expansion> c) :
 	{
 	  act = new Action();
 	  t = getToken(1);
-	  act.setLine(t.getBeginLine());
-	  act.setColumn(t.getBeginColumn());
+	  act.setLine(t.getLine());
+	  act.setColumn(t.getColumn());
 	  inAction = true;
 	}
   Block(act.getActionTokens())
@@ -1007,8 +1007,8 @@ void expansion_unit(Container<Expansion> c) :
 	{
 	  nt = new NonTerminal();
 	  t = getToken(1);
-	  nt.setLine(t.getBeginLine());
-	  nt.setColumn(t.getBeginColumn());
+	  nt.setLine(t.getLine());
+	  nt.setColumn(t.getColumn());
 	  nt.setLhsTokens(lhsTokens);
 	}
    name=identifier() Arguments(nt.getArgumentTokens())
@@ -1071,8 +1071,8 @@ void regular_expression(Container<Expansion> c) :
 	  }
 	  re.label = image;
 	  re.isPrivate = isPrivate;
-	  re.setLine(t.getBeginLine());
-	  re.setColumn(t.getBeginColumn());
+	  re.setLine(t.getLine());
+	  re.setColumn(t.getColumn());
 	  c.member = re;
 	}
 |
@@ -1085,8 +1085,8 @@ void regular_expression(Container<Expansion> c) :
   "<" "EOF" ">"
 	{
 	  ef = new REndOfFile();
-	  ef.setLine(t.getBeginLine());
-	  ef.setColumn(t.getBeginColumn());
+	  ef.setLine(t.getLine());
+	  ef.setColumn(t.getColumn());
 	  ef.ordinal = 0;
 	  c.member = ef;
 	}
@@ -1186,8 +1186,8 @@ void complex_regular_expression_unit(Container<Expansion> c) :
    | "?"
 	{
 	  RZeroOrOne zorexp = new RZeroOrOne();
-	  zorexp.setLine(t.getBeginLine());
-	  zorexp.setColumn(t.getBeginColumn());
+	  zorexp.setLine(t.getLine());
+	  zorexp.setColumn(t.getColumn());
 	  zorexp.regExp = (RegularExpression)c.member;
 	  c.member = zorexp;
 	}
@@ -1196,8 +1196,8 @@ void complex_regular_expression_unit(Container<Expansion> c) :
      "}"
 	{
 	  RRepetitionRange rrrexp = new RRepetitionRange();
-	  rrrexp.setLine(t.getBeginLine());
-	  rrrexp.setColumn(t.getBeginColumn());
+	  rrrexp.setLine(t.getLine());
+	  rrrexp.setColumn(t.getColumn());
 	  rrrexp.min = r1;
 	  rrrexp.max = r2;
       rrrexp.hasMax = hasMax;
@@ -1211,8 +1211,8 @@ void character_list(Container<Expansion> c1) :
 	{
 	  RCharacterList chlist = new RCharacterList();
 	  Token t = getToken(1);
-	  chlist.setLine(t.getBeginLine());
-	  chlist.setColumn(t.getBeginColumn());
+	  chlist.setLine(t.getLine());
+	  chlist.setColumn(t.getColumn());
 	  Container<CharacterDescriptor> c2 = new Container<CharacterDescriptor>();
 	}
 {
@@ -1258,16 +1258,16 @@ void character_descriptor(Container<CharacterDescriptor> c) :
 	{
 	  if (isrange) {
 	    CharacterRange cr = new CharacterRange();
-	    cr.setLine(t.getBeginLine());
-	    cr.setColumn(t.getBeginColumn());
+	    cr.setLine(t.getLine());
+	    cr.setColumn(t.getColumn());
         cr.setLeft(c1);
         cr.setRight(c2);
 	    c.member = cr;
 	  }
 	  else {
 	    SingleCharacter sc = new SingleCharacter();
-	    sc.setLine(t.getBeginLine());
-	    sc.setColumn(t.getBeginColumn());
+	    sc.setLine(t.getLine());
+	    sc.setColumn(t.getColumn());
 	    sc.ch = c1;
 	    c.member = sc;
 	  }

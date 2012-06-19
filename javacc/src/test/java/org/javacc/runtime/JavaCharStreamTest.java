@@ -11,15 +11,14 @@ import java.io.StringReader;
 import static org.junit.Assert.*;
 
 public class JavaCharStreamTest extends CharStreamBaseTestCase {
-  @Override
-  CharStream makeCharStream(final CharSequence content) {
+  @Override CharStream makeCharStream(final CharSequence content) {
     return new JavaCharStream(new StringReader(content.toString()));
   }
 
   @Test
   public void canReadEmptyStreamEx() throws IOException {
     final CharStream s = makeCharStream("");
-    assertCharLineColumn(s, -1, 0, 0, 0, 0);
+    assertCharLineColumn(s, -1, 0, 0);
   }
 
   @Test
@@ -125,7 +124,7 @@ public class JavaCharStreamTest extends CharStreamBaseTestCase {
     catch (IOException ex) {
       s = ex.getMessage();
     }
-    assertEquals("Illegal hex digit in escape sequence 'X' at 1,8", s);
+    assertEquals("Illegal hex digit in escape sequence 'X' at 1,1", s);
   }
 
   @Test

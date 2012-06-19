@@ -23,13 +23,12 @@ public interface CharStream extends java.io.Closeable {
   void beginToken() throws java.io.IOException;
 
   /**
-   * Returns the next character from the selected input.  The method
-   * of selecting the input is the responsibility of the class
-   * implementing this interface.
-   *
-   * @throws java.io.IOException If any I/O error occurs.
-   */
-  int readChar() throws java.io.IOException;
+     * @return The next character from the selected input.  The method
+     *         of selecting the input is the responsibility of the class
+     *         implementing this interface.
+     * @throws java.io.IOException If any I/O error occurs.
+     */
+  int read() throws java.io.IOException;
 
   /**
    * Backs up the input stream by amount steps. Lexer calls this method if it
@@ -41,8 +40,8 @@ public interface CharStream extends java.io.Closeable {
 #if KEEP_IMAGE
 
   /**
-   * Returns a string made up of characters from the marked token beginning
-   * to the current buffer position.
+   * @return A string made up of characters from the marked token beginning
+   *         to the current buffer position.
    */
   String getImage();
 
@@ -61,40 +60,28 @@ public interface CharStream extends java.io.Closeable {
 
   /**
    * @return Index of the first character for current token (being
-   * matched after the last call to {@link #beginToken beginToken()}).
+   *         matched after the last call to {@link #beginToken beginToken()}).
    */
   int getBegin();
 
   /**
    * @return Index of the last character for current token (being
-   * matched after the last call to {@link #beginToken beginToken()}).
+   *         matched after the last call to {@link #beginToken beginToken()}).
    */
   int getEnd();
 #if KEEP_LINE_COLUMN
 
   /**
-   * Returns the line number of the first character for current token (being
-   * matched after the last call to {@link #beginToken beginToken()}).
+   * @return The line number of the first character for current token (being
+   *         matched after the last call to {@link #beginToken beginToken()}).
    */
-  int getBeginLine();
+  int getLine();
 
   /**
-   * Returns the column number of the first character for current token (being
-   * matched after the last call to {@link #beginToken beginToken()}).
+   * @return The column number of the first character for current token (being
+   *         matched after the last call to {@link #beginToken beginToken()}).
    */
-  int getBeginColumn();
-
-  /**
-   * Returns the column number of the last character for current token (being
-   * matched after the last call to {@link #beginToken beginToken()}).
-   */
-  int getEndColumn();
-
-  /**
-   * Returns the line number of the last character for current token (being
-   * matched after the last call to {@link #beginToken beginToken()}).
-   */
-  int getEndLine();
+  int getColumn();
 #fi
 
   /**

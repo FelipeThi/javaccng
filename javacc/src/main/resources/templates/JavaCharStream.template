@@ -115,14 +115,14 @@ public final class JavaCharStream implements CharStream {
     }
   }
 
-  public int readChar() throws java.io.IOException {
+  public int read() throws java.io.IOException {
     if (offset < length) {
       // Read backed up characters.
       end++;
       return buffer[offset++];
     }
     // Read new character by reader and put it into buffer.
-    int c = read();
+    int c = readImpl();
     if (c == '\\') {
       c = readEscape();
     }
@@ -162,20 +162,20 @@ public final class JavaCharStream implements CharStream {
   private int readEscape() throws java.io.IOException {
     int lastOffset = offset - 1;
 
-    int c = read();
+    int c = readImpl();
     if (c == 'u') {
       // Slash followed by u gets escaped.
 
       while (c == 'u') {
-        c = read();
+        c = readImpl();
       }
 
       if (c != -1) {
-        int c1 = read();
+        int c1 = readImpl();
         if (c1 != -1) {
-          int c2 = read();
+          int c2 = readImpl();
           if (c2 != -1) {
-            int c3 = read();
+            int c3 = readImpl();
             if (c3 != -1) {
               c = hexValue(c) << 12 | hexValue(c1) << 8 | hexValue(c2) << 4 | hexValue(c3);
               insertChar(c, lastOffset);
@@ -203,7 +203,7 @@ public final class JavaCharStream implements CharStream {
    * @return Character read from the reader.
    * @throws java.io.IOException If reader throws exception.
    */
-  private int read() throws java.io.IOException {
+  private int readImpl() throws java.io.IOException {
     int c = reader.read();
     if (c != -1) {
       appendChar(c);
@@ -320,26 +320,12 @@ public final class JavaCharStream implements CharStream {
   }
 #if KEEP_LINE_COLUMN
 
-  public int getBeginLine() {
+  public int getLine() {
     return bufLine[0];
   }
 
-  public int getBeginColumn() {
+  public int getColumn() {
     return bufColumn[0];
-  }
-
-  public int getEndLine() {
-    if (offset > 0) {
-      return bufLine[offset - 1];
-    }
-    return 0;
-  }
-
-  public int getEndColumn() {
-    if (offset > 0) {
-      return bufColumn[offset - 1];
-    }
-    return 0;
   }
 #fi
 
@@ -408,7 +394,7 @@ public final class JavaCharStream implements CharStream {
     }
 #if KEEP_LINE_COLUMN
     throw new java.io.IOException("Illegal hex digit in escape sequence '" + (char) c + "'" +
-        " at " + getEndLine() + "," + getEndColumn());
+        " at " + getLine() + "," + getColumn());
 #else
     throw new java.io.IOException("Illegal hex digit in escape sequence '" + (char) c + "'" +
         " at index " + getEnd());

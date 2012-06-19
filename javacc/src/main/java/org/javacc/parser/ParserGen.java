@@ -410,7 +410,7 @@ final class ParserGen implements FileGenerator {
       out.println("public ParseException generateParseException() throws java.io.IOException {");
       out.println("Token errortok = token.next;");
       if (Options.getKeepLineColumn()) {
-        out.println("int line = errortok.beginLine, column = errortok.beginColumn;");
+        out.println("int line = errortok.getLine(), column = errortok.getColumn();");
       }
       out.println("String mess = (errortok.getKind() == 0) ? " + state.constantsClass() + ".tokenImage[0] : errortok.image;");
       if (Options.getKeepLineColumn()) {
@@ -463,8 +463,8 @@ final class ParserGen implements FileGenerator {
       out.println("if (t.getKind() != 0 && !" + state.constantsClass() + ".tokenImage[t.getKind()].equals(\"\\\"\" + t.image + \"\\\"\")) {");
       out.println("System.out.print(\": \\\"\" + t.image + \"\\\"\");");
       out.println("}");
-      out.println("System.out.println(\" at line \" + t.beginLine + " +
-          "\" column \" + t.beginColumn + \">\" + where);");
+      out.println("System.out.println(\" at line \" + t.getLine() + " +
+          "\" column \" + t.getColumn() + \">\" + where);");
       out.println("}");
       out.println("}");
       out.println();

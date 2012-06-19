@@ -255,8 +255,8 @@ abstract class JavaCCParserBase {
       return;
     }
     TryBlock block = new TryBlock();
-    block.setLine(tryLoc.getBeginLine());
-    block.setColumn(tryLoc.getBeginColumn());
+    block.setLine(tryLoc.getLine());
+    block.setColumn(tryLoc.getColumn());
     block.expansion = nestedExp.member;
     block.expansion.parent = block;
     block.expansion.ordinal = 0;

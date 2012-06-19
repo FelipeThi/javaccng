@@ -51,7 +51,8 @@ final class ScannerGen implements FileGenerator {
   int[] lexStates;
   boolean[] ignoreCase;
   Action[] actions;
-  Hashtable initStates = new Hashtable();
+  Hashtable<String, NfaState> initStates
+      = new Hashtable<String, NfaState>();
   int stateSetSize;
   int maxLexStates;
   String[] lexStateName;
@@ -115,23 +116,19 @@ final class ScannerGen implements FileGenerator {
   private void generate(IndentingPrintWriter out) throws IOException {
     keepLineCol = Options.getKeepLineColumn();
     keepImage = Options.getKeepImage();
-    List choices = new ArrayList();
-    Enumeration e;
-    TokenProduction tp;
-    int i, j;
+    ArrayList choices = new ArrayList();
 
     printClassHead(out);
     buildLexStatesTable();
 
-    e = allTpsForState.keys();
-
     boolean ignoring;
 
+    Enumeration<String> e = allTpsForState.keys();
     while (e.hasMoreElements()) {
       nfaStates.reInit();
       stringLiterals.reInit();
 
-      String key = (String) e.nextElement();
+      String key = e.nextElement();
 
       lexStateIndex = getIndex(key);
       lexStateSuffix = "_" + lexStateIndex;
@@ -146,8 +143,8 @@ final class ScannerGen implements FileGenerator {
         defaultLexState = lexStateIndex;
       }
 
-      for (i = 0; i < allTps.size(); i++) {
-        tp = allTps.get(i);
+      for (int i = 0; i < allTps.size(); i++) {
+        TokenProduction tp = allTps.get(i);
         int kind = tp.kind;
         boolean ignore = tp.ignoreCase;
         List<RegExpSpec> reSpecs = tp.reSpecs;
@@ -156,8 +153,7 @@ final class ScannerGen implements FileGenerator {
           ignoring = ignore;
         }
 
-        for (j = 0; j < reSpecs.size(); j++) {
-          RegExpSpec reSpec = reSpecs.get(j);
+        for (RegExpSpec reSpec : reSpecs) {
           curRE = reSpec.regExp;
 
           rexprs[curKind = curRE.ordinal] = curRE;
@@ -256,7 +252,7 @@ final class ScannerGen implements FileGenerator {
       // Generate a static block for initializing the nfa transitions
       nfaStates.computeClosures();
 
-      for (i = 0; i < initialState.epsilonMoves.size(); i++) {
+      for (int i = 0; i < initialState.epsilonMoves.size(); i++) {
         ((NfaState) initialState.epsilonMoves.elementAt(i)).generateCode();
       }
 
@@ -304,8 +300,8 @@ final class ScannerGen implements FileGenerator {
       }
     }
 
-    for (i = 0; i < choices.size(); i++) {
-      ((RChoice) choices.get(i)).checkUnmatchability(this);
+    for (Object choice : choices) {
+      ((RChoice) choice).checkUnmatchability(this);
     }
 
     nfaStates.dumpStateSets(out);
@@ -364,8 +360,8 @@ final class ScannerGen implements FileGenerator {
               || kind == JavaCCConstants.PUBLIC
               || kind == JavaCCConstants.CLASS
               || kind == JavaCCConstants.INTERFACE) {
-            TokenPrinter.cLine = tokens.get(l).getBeginLine();
-            TokenPrinter.cCol = tokens.get(l).getBeginColumn();
+            TokenPrinter.cLine = tokens.get(l).getLine();
+            TokenPrinter.cCol = tokens.get(l).getColumn();
             for (j = l; j < i; j++) {
               TokenPrinter.printToken(tokens.get(j), out);
             }
@@ -530,7 +526,7 @@ final class ScannerGen implements FileGenerator {
     actions = new Action[maxOrdinal];
     actions[0] = state.eofAction;
     hasTokenActions = state.eofAction != null;
-    initStates = new Hashtable();
+    initStates = new Hashtable<String, NfaState>();
     canMatchAnyChar = new int[maxLexStates];
     canLoop = new boolean[maxLexStates];
     stateHasActions = new boolean[maxLexStates];
@@ -562,7 +558,6 @@ final class ScannerGen implements FileGenerator {
         return i;
       }
     }
-
     throw new Error(); // Should never come here
   }
 
@@ -646,17 +641,6 @@ final class ScannerGen implements FileGenerator {
                 " This can result in an endless loop of empty string matches.");
       }
     }
-  }
-
-  private void printArrayInitializer(int noElems, IndentingPrintWriter out) {
-    out.print("{");
-    for (int i = 0; i < noElems; i++) {
-      if (i % 25 == 0) {
-        out.print("\n   ");
-      }
-      out.print("0, ");
-    }
-    out.println("\n};");
   }
 
   private void dumpStaticVarDeclarations(IndentingPrintWriter out) {
@@ -757,20 +741,84 @@ final class ScannerGen implements FileGenerator {
     }
 
     out.println("protected int jjChar;");
+    out.println("private char[] buffer = new char[256];");
+    out.println("private int length;");
+    out.println("private int position;");
+    out.println();
+    out.println("protected void beginToken() {");
+    out.indent();
+    out.println("if (position == length) {");
+    out.indent();
+    out.println("length = 0;");
+    out.println("position = 0;");
+    out.unindent();
+    out.println("}");
+    out.println("else {");
+    out.indent();
+    out.println("System.arraycopy(buffer, position, buffer, 0, length - position);");
+    out.println("length = length - position;");
+    out.println("position = 0;");
+    out.unindent();
+    out.println("}");
+    out.unindent();
+    out.println("}");
+    out.println();
+    out.println("protected int read() throws java.io.IOException {");
+    out.indent();
+    out.println("if (position < length) {");
+    out.indent();
+    out.println("return buffer[position++];");
+    out.unindent();
+    out.println("}");
+    out.println("int c = charStream.read();");
+    out.println("if (position == buffer.length) {");
+    out.indent();
+    out.println("buffer = java.util.Arrays.copyOf(buffer, buffer.length * 2);");
+    out.unindent();
+    out.println("}");
+    out.println("buffer[position++] = (char) c;");
+    out.println("length++;");
+    out.println("return c;");
+    out.unindent();
+    out.println("}");
+    out.println();
+    out.println("protected void backup(int amount) {");
+    out.indent();
+    out.println("if (amount > position) {");
+    out.indent();
+    out.println("throw new IllegalArgumentException();");
+    out.unindent();
+    out.println("}");
+    out.println("position -= amount;");
+    out.unindent();
+    out.println("}");
+    out.println("");
+    out.println("protected String getImage() {");
+    out.indent();
+    out.println("return new String(buffer, 0, position);");
+    out.unindent();
+    out.println("}");
+    out.println();
+    out.println("private void append(StringBuilder b, int length) {");
+    out.indent();
+    out.println("b.append(buffer, 0, length);");
+    out.unindent();
+    out.println("}");
 
     if (Options.getScannerUsesParser()) {
       out.println();
       out.println("/** Constructor with parser. */");
-      out.println("public " + state.scannerClass() + "(" + state.parserClass() + " parserArg, CharStream stream) {");
-      out.println("   parser = parserArg;");
+      out.println("public " + state.scannerClass() + "(" + state.parserClass() + " parser, CharStream charStream) {");
+      out.indent();
+      out.println("this.parser = parser;");
     }
     else {
       out.println("/** Constructor. */");
-      out.println("public " + state.scannerClass() + "(CharStream stream) {");
+      out.println("public " + state.scannerClass() + "(CharStream charStream) {");
+      out.indent();
     }
-
-    out.println("   charStream = stream;");
-
+    out.println("this.charStream = charStream;");
+    out.unindent();
     out.println("}");
 
     if (Options.getScannerUsesParser()) {
@@ -790,9 +838,8 @@ final class ScannerGen implements FileGenerator {
 
     // Method to reinitialize the jjRounds array.
     out.println("private void reInitRounds() {");
-    out.println("   int i;");
     out.println("   jjRound = 0x" + Integer.toHexString(Integer.MIN_VALUE + 1) + ";");
-    out.println("   for (i = " + stateSetSize + "; i-- > 0;)");
+    out.println("   for (int i = 0; i < " + stateSetSize + "; i++)");
     out.println("      jjRounds[i] = 0x" + Integer.toHexString(Integer.MIN_VALUE) + ";");
     out.println("}");
 
@@ -837,7 +884,7 @@ final class ScannerGen implements FileGenerator {
         out.println("else {");
         out.indent();
         out.println("String literal = jjLiteralImages[jjMatchedKind];");
-        out.println("if (literal == null) { currentImage = charStream.getImage(); }");
+        out.println("if (literal == null) { currentImage = getImage(); }");
         out.println("else { currentImage = literal; }");
         out.unindent();
         out.println("}");
@@ -846,17 +893,17 @@ final class ScannerGen implements FileGenerator {
     else {
       if (keepImage) {
         out.println("String literal = jjLiteralImages[jjMatchedKind];");
-        out.println("if (literal == null) { currentImage = charStream.getImage(); }");
+        out.println("if (literal == null) { currentImage = getImage(); }");
         out.println("else { currentImage = literal; }");
       }
     }
 
     if (keepImage) {
       if (Options.getTokenFactory().length() > 0) {
-        out.println("Token t = " + Options.getTokenFactory() + ".newToken(jjMatchedKind, charStream.getBegin(), charStream.getEnd(), currentImage);");
+        out.println("Token t = " + Options.getTokenFactory() + ".newToken(jjMatchedKind, /*charStream.getBegin()*/0, /*charStream.getEnd()*/0, currentImage);");
       }
       else {
-        out.println("Token t = Token.newToken(jjMatchedKind, charStream.getBegin(), charStream.getEnd(), currentImage);");
+        out.println("Token t = Token.newToken(jjMatchedKind, /*charStream.getBegin()*/0, /*charStream.getEnd()*/0, currentImage);");
       }
     }
     else {
@@ -872,17 +919,17 @@ final class ScannerGen implements FileGenerator {
       if (hasEmptyMatch) {
         out.println("if (jjMatchedPos < 0) {");
         out.indent();
-        out.println("t.setLineColumn(charStream.getBeginLine(), charStream.getBeginColumn(), charStream.getBeginLine(), charStream.getBeginColumn());");
+        out.println("t.setLineColumn(charStream.getLine(), charStream.getColumn());");
         out.unindent();
         out.println("}");
         out.println("else {");
         out.indent();
-        out.println("t.setLineColumn(charStream.getBeginLine(), charStream.getBeginColumn(), charStream.getEndLine(), charStream.getEndColumn());");
+        out.println("t.setLineColumn(charStream.getLine(), charStream.getColumn());");
         out.unindent();
         out.println("}");
       }
       else {
-        out.println("t.setLineColumn(charStream.getBeginLine(), charStream.getBeginColumn(), charStream.getEndLine(), charStream.getEndColumn());");
+        out.println("t.setLineColumn(charStream.getLine(), charStream.getColumn());");
       }
     }
 
@@ -892,8 +939,6 @@ final class ScannerGen implements FileGenerator {
   }
 
   private void dumpGetNextToken(IndentingPrintWriter out) {
-    int i;
-
     out.println();
     out.println("private int jjLexState = " + defaultLexState + ";");
     out.println("private int jjNewStateCount;");
@@ -938,12 +983,12 @@ final class ScannerGen implements FileGenerator {
     out.println("public Token getAnyNextToken() throws java.io.IOException {");
     out.indent();
     out.println("Token token;");
-    out.println("int curPos = 0;");
+    out.println("int pos = 0;");
     out.println();
     out.println("loop:\nwhile (true) {");
     out.indent();
-    out.println("charStream.beginToken();");
-    out.println("jjChar = charStream.readChar();");
+    out.println("beginToken();");
+    out.println("jjChar = read();");
     out.println("if (jjChar == -1) {");
     out.indent();
 
@@ -987,16 +1032,13 @@ final class ScannerGen implements FileGenerator {
       out.indent();
     }
 
-    for (i = 0; i < maxLexStates; i++) {
+    for (int i = 0; i < maxLexStates; i++) {
       if (maxLexStates > 1) {
         out.println("case " + i + ":");
         out.indent();
       }
 
       if (singlesToSkip[i].hasTransitions()) {
-        // added the backup(0) to make JIT happy
-        out.println("// added the backup(0) to make JIT happy");
-        out.println("charStream.backup(0);");
         if (singlesToSkip[i].asciiMoves[0] != 0L &&
             singlesToSkip[i].asciiMoves[1] != 0L) {
           out.println("while ((jjChar < 64" + " && (0x" +
@@ -1030,8 +1072,8 @@ final class ScannerGen implements FileGenerator {
               "\"Skipping character : \" + " +
               "ScannerException.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \")\");");
         }
-        out.println("charStream.beginToken();");
-        out.println("jjChar = charStream.readChar();");
+        out.println("beginToken();");
+        out.println("jjChar = read();");
         out.println("if (jjChar == -1) { continue loop; }");
         out.unindent();
         out.println("}");
@@ -1045,7 +1087,7 @@ final class ScannerGen implements FileGenerator {
 
         out.println("jjMatchedKind = " + initMatch[i] + ";");
         out.println("jjMatchedPos = -1;");
-        out.println("curPos = 0;");
+        out.println("pos = 0;");
       }
       else {
         out.println("jjMatchedKind = 0x" + Integer.toHexString(Integer.MAX_VALUE) + ";");
@@ -1057,10 +1099,10 @@ final class ScannerGen implements FileGenerator {
             (maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
             "\"Current character : \" + " +
             "ScannerException.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
-            "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
+            "at line \" + charStream.getLine() + \" column \" + charStream.getColumn());");
       }
 
-      out.println("curPos = jjMoveStringLiteralDfa0_" + i + "();");
+      out.println("pos = jjMoveStringLiteralDfa0_" + i + "();");
 
       if (canMatchAnyChar[i] != -1) {
         if (initMatch[i] != Integer.MAX_VALUE && initMatch[i] != 0) {
@@ -1111,15 +1153,15 @@ final class ScannerGen implements FileGenerator {
     if (maxLexStates > 0) {
       out.println("if (jjMatchedKind != 0x" + Integer.toHexString(Integer.MAX_VALUE) + ") {");
       out.indent();
-      out.println("if (jjMatchedPos + 1 < curPos)");
+      out.println("if (jjMatchedPos + 1 < pos)");
 
       if (Options.getDebugScanner()) {
         out.println("{");
         out.println("debugPrinter.println(" +
-            "\"   Putting back \" + (curPos - jjMatchedPos - 1) + \" characters into the input stream.\");");
+            "\"   Putting back \" + (pos - jjMatchedPos - 1) + \" characters into the input stream.\");");
       }
 
-      out.println("charStream.backup(curPos - jjMatchedPos - 1);");
+      out.println("backup(pos - jjMatchedPos - 1);");
 
       if (Options.getDebugScanner()) {
         out.println("}");
@@ -1128,7 +1170,7 @@ final class ScannerGen implements FileGenerator {
       if (Options.getDebugScanner()) {
         out.println("debugPrinter.println(" +
             "\"****** FOUND A \" + tokenImage[jjMatchedKind] + \" MATCH " +
-            "(\" + ScannerException.escape(new String(charStream.getSuffix(jjMatchedPos + 1))) + " +
+            "(\" + ScannerException.escape(new String(buffer, 0, jjMatchedPos + 1))) + " +
             "\") ******\\n\");");
       }
 
@@ -1228,10 +1270,10 @@ final class ScannerGen implements FileGenerator {
                 .println("jjLexState = jjNewLexState[jjMatchedKind];")
                 .unindent();
           }
-          out.println("curPos = 0;");
+          out.println("pos = 0;");
           out.println("jjMatchedKind = 0x" + Integer.toHexString(Integer.MAX_VALUE) + ";");
 
-          out.println("jjChar = charStream.readChar();");
+          out.println("jjChar = read();");
           out.println("if (jjChar != -1) {");
           out.indent();
           if (Options.getDebugScanner()) {
@@ -1239,7 +1281,7 @@ final class ScannerGen implements FileGenerator {
                 (maxLexStates > 1 ? "\"<\" + jjLexStateNames[jjLexState] + \">\" + " : "") +
                 "\"Current character : \" + " +
                 "ScannerException.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
-                "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
+                "at line \" + charStream.getLine() + \" column \" + charStream.getColumn());");
           }
           out.println("continue;");
           out.unindent();
@@ -1249,7 +1291,7 @@ final class ScannerGen implements FileGenerator {
       out.unindent();
       out.println("}");
 
-      out.println("reportLexicalError(curPos);");
+      out.println("reportLexicalError(pos);");
     }
 
     if (hasMore) {
@@ -1309,72 +1351,79 @@ final class ScannerGen implements FileGenerator {
     }
 
     out.println();
-    out.println("void reportLexicalError(int curPos) throws java.io.IOException {");
-    out.println("   throw new ScannerException(jjLexState,");
-    out.println("        ScannerException.LEXICAL_ERROR,");
+    out.println("void reportLexicalError(int pos) throws java.io.IOException {");
+    out.indent();
+    out.println("throw new ScannerException(jjLexState,");
+    out.println("  ScannerException.LEXICAL_ERROR,");
     if (keepLineCol) {
-      out.println("        charStream.getEndLine(),");
-      out.println("        charStream.getEndColumn(),");
+      out.println("  charStream.getLine(),");
+      out.println("  charStream.getColumn(),");
     }
     if (keepImage) {
-      out.println("        charStream.getImage(),");
+      out.println("  getImage(),");
     }
-    out.println("        jjChar);");
-
+    out.println("  jjChar);");
+    out.unindent();
     out.println("}");
     out.println();
   }
 
   public void dumpSkipActions(IndentingPrintWriter out)
       throws IOException {
-    Action act;
-
     out.println("void skipLexicalActions(Token matchedToken) {");
-    out.println("   switch(jjMatchedKind) {");
+    out.indent();
+    out.println("switch(jjMatchedKind) {");
+    out.indent();
 
-    Outer:
+    outer:
     for (int i = 0; i < maxOrdinal; i++) {
       if ((toSkip[i / 64] & (1L << (i % 64))) == 0L) {
         continue;
       }
 
-      for (; ; ) {
-        if (((act = actions[i]) == null ||
-            act.getActionTokens() == null ||
-            act.getActionTokens().size() == 0) && !canLoop[lexStates[i]]) {
-          continue Outer;
+      while (true) {
+        Action act = actions[i];
+        if ((act == null
+            || act.getActionTokens() == null
+            || act.getActionTokens().size() == 0)
+            && !canLoop[lexStates[i]]) {
+          continue outer;
         }
 
-        out.println("      case " + i + " :");
+        out.println("case " + i + " :");
+        out.indent();
 
         if (initMatch[lexStates[i]] == i && canLoop[lexStates[i]]) {
-          out.println("         if (jjMatchedPos == -1) {");
-          out.println("            if (jjBeenHere[" + lexStates[i] + "] &&");
-          out.println("                jjEmptyLineNo[" + lexStates[i] + "] == charStream.getBeginLine() &&");
-          out.println("                jjEmptyColumnNo[" + lexStates[i] + "] == charStream.getBeginColumn())");
-          out.println("               throw new ScannerException(" +
-              "(\"Bailing out of infinite loop caused by repeated empty string matches " +
-              "at line \" + charStream.getBeginLine() + \", " +
-              "column \" + charStream.getBeginColumn() + \".\"), ScannerException.LOOP_DETECTED);");
-          out.println("            jjEmptyLineNo[" + lexStates[i] + "] = charStream.getBeginLine();");
-          out.println("            jjEmptyColumnNo[" + lexStates[i] + "] = charStream.getBeginColumn();");
-          out.println("            jjBeenHere[" + lexStates[i] + "] = true;");
-          out.println("         }");
+          out.println("if (jjMatchedPos == -1) {");
+          out.indent();
+          out.println("if (jjBeenHere[" + lexStates[i] + "]");
+          out.println("  && jjEmptyLineNo[" + lexStates[i] + "] == charStream.getLine()");
+          out.println("  && jjEmptyColumnNo[" + lexStates[i] + "] == charStream.getColumn())");
+          out.indent();
+          out.println("throw new ScannerException("
+              + "(\"Bailing out of infinite loop caused by repeated empty string matches "
+              + "at line \" + charStream.getLine() + \", "
+              + "column \" + charStream.getColumn() + \".\"), ScannerException.LOOP_DETECTED);");
+          out.unindent();
+          out.println("jjEmptyLineNo[" + lexStates[i] + "] = charStream.getLine();");
+          out.println("jjEmptyColumnNo[" + lexStates[i] + "] = charStream.getColumn();");
+          out.println("jjBeenHere[" + lexStates[i] + "] = true;");
+          out.unindent();
+          out.println("}");
         }
 
-        if ((act = actions[i]) == null ||
-            act.getActionTokens().size() == 0) {
+        if ((act = actions[i]) == null
+            || act.getActionTokens().size() == 0) {
           break;
         }
 
         if (keepImage) {
-          out.print("         image.append");
           if (stringLiterals.allImages[i] != null) {
-            out.println("(jjLiteralImages[" + i + "]);");
-            out.println("        lengthOfMatch = jjLiteralImages[" + i + "].length();");
+            out.println("image.append(jjLiteralImages[" + i + "]);");
+            out.println("lengthOfMatch = jjLiteralImages[" + i + "].length();");
           }
           else {
-            out.println("(charStream.getSuffix(jjImageLength + (lengthOfMatch = jjMatchedPos + 1)));");
+            out.println("append(image, jjImageLength + (lengthOfMatch = jjMatchedPos + 1));");
           }
         }
 
@@ -1389,69 +1438,80 @@ final class ScannerGen implements FileGenerator {
         break;
       }
 
-      out.println("         break;");
+      out.println("break;");
+      out.unindent();
     }
 
-    out.println("      default:");
-    out.println("         break;");
-    out.println("   }");
+    out.println("default:")
+        .indent()
+        .print("break;")
+        .unindent();
+    out.unindent();
+    out.println("}");
+    out.unindent();
     out.println("}");
   }
 
   public void dumpMoreActions(IndentingPrintWriter out)
       throws IOException {
-    Action act;
-
     out.println("void moreLexicalActions() {");
+    out.indent();
     if (keepImage) {
-      out.println("   jjImageLength += (lengthOfMatch = jjMatchedPos + 1);");
+      out.println("jjImageLength += (lengthOfMatch = jjMatchedPos + 1);");
     }
-    out.println("   switch(jjMatchedKind) {");
+    out.println("switch(jjMatchedKind) {");
+    out.indent();
 
-    Outer:
+    outer:
     for (int i = 0; i < maxOrdinal; i++) {
       if ((toMore[i / 64] & (1L << (i % 64))) == 0L) {
         continue;
       }
 
-      for (; ; ) {
-        if (((act = actions[i]) == null ||
-            act.getActionTokens() == null ||
-            act.getActionTokens().size() == 0) && !canLoop[lexStates[i]]) {
-          continue Outer;
+      while (true) {
+        Action act = actions[i];
+        if ((act == null
+            || act.getActionTokens() == null
+            || act.getActionTokens().size() == 0)
+            && !canLoop[lexStates[i]]) {
+          continue outer;
         }
 
-        out.println("      case " + i + " :");
+        out.println("case " + i + " :");
+        out.indent();
 
         if (initMatch[lexStates[i]] == i && canLoop[lexStates[i]]) {
-          out.println("         if (jjMatchedPos == -1) {");
-          out.println("            if (jjBeenHere[" + lexStates[i] + "] &&");
-          out.println("                jjEmptyLineNo[" + lexStates[i] + "] == charStream.getBeginLine() &&");
-          out.println("                jjEmptyColumnNo[" + lexStates[i] + "] == charStream.getBeginColumn())");
-          out.println("               throw new ScannerException(" +
-              "(\"Bailing out of infinite loop caused by repeated empty string matches " +
-              "at line \" + charStream.getBeginLine() + \", " +
-              "column \" + charStream.getBeginColumn() + \".\"), ScannerException.LOOP_DETECTED);");
-          out.println("            jjEmptyLineNo[" + lexStates[i] + "] = charStream.getBeginLine();");
-          out.println("            jjEmptyColumnNo[" + lexStates[i] + "] = charStream.getBeginColumn();");
-          out.println("            jjBeenHere[" + lexStates[i] + "] = true;");
-          out.println("         }");
+          out.println("if (jjMatchedPos == -1) {");
+          out.indent();
+          out.println("if (jjBeenHere[" + lexStates[i] + "]");
+          out.println("  && jjEmptyLineNo[" + lexStates[i] + "] == charStream.getLine()");
+          out.println("  && jjEmptyColumnNo[" + lexStates[i] + "] == charStream.getColumn())");
+          out.indent();
+          out.println("throw new ScannerException("
+              + "(\"Bailing out of infinite loop caused by repeated empty string matches "
+              + "at line \" + charStream.getLine() + \", "
+              + "column \" + charStream.getColumn() + \".\"), ScannerException.LOOP_DETECTED);");
+          out.unindent();
+          out.println("jjEmptyLineNo[" + lexStates[i] + "] = charStream.getLine();");
+          out.println("jjEmptyColumnNo[" + lexStates[i] + "] = charStream.getColumn();");
+          out.println("jjBeenHere[" + lexStates[i] + "] = true;");
+          out.unindent();
+          out.println("}");
         }
 
-        if ((act = actions[i]) == null ||
-            act.getActionTokens().size() == 0) {
+        if ((act = actions[i]) == null
+            || act.getActionTokens().size() == 0) {
           break;
         }
 
         if (keepImage) {
-          out.print("         image.append");
           if (stringLiterals.allImages[i] != null) {
-            out.println("(jjLiteralImages[" + i + "]);");
+            out.println("image.append(jjLiteralImages[" + i + "]);");
           }
           else {
-            out.println("(charStream.getSuffix(jjImageLength));");
+            out.println("append(image, jjImageLength);");
           }
-          out.println("         jjImageLength = 0;");
+          out.println("jjImageLength = 0;");
         }
 
         TokenPrinter.printTokenSetup(act.getActionTokens().get(0));
@@ -1465,52 +1525,62 @@ final class ScannerGen implements FileGenerator {
         break;
       }
 
-      out.println("         break;");
+      out.println("break;");
+      out.unindent();
     }
 
-    out.println("      default:");
-    out.println("         break;");
-
-    out.println("   }");
+    out.println("default:")
+        .indent()
+        .print("break;")
+        .unindent();
+    out.unindent();
+    out.println("}");
+    out.unindent();
     out.println("}");
   }
 
   public void dumpTokenActions(IndentingPrintWriter out)
       throws IOException {
-    Action act;
-    int i;
-
     out.println("void tokenLexicalActions(Token matchedToken) {");
-    out.println("   switch(jjMatchedKind) {");
+    out.indent();
+    out.println("switch(jjMatchedKind) {");
+    out.indent();
 
-    Outer:
-    for (i = 0; i < maxOrdinal; i++) {
+    outer:
+    for (int i = 0; i < maxOrdinal; i++) {
       if ((toToken[i / 64] & (1L << (i % 64))) == 0L) {
         continue;
       }
 
-      for (; ; ) {
-        if (((act = actions[i]) == null ||
-            act.getActionTokens() == null ||
-            act.getActionTokens().size() == 0) && !canLoop[lexStates[i]]) {
-          continue Outer;
+      while (true) {
+        Action act = actions[i];
+        if ((act == null
+            || act.getActionTokens() == null
+            || act.getActionTokens().size() == 0)
+            && !canLoop[lexStates[i]]) {
+          continue outer;
         }
 
-        out.println("      case " + i + " :");
+        out.println("case " + i + " :");
+        out.indent();
 
         if (initMatch[lexStates[i]] == i && canLoop[lexStates[i]]) {
-          out.println("         if (jjMatchedPos == -1) {");
-          out.println("            if (jjBeenHere[" + lexStates[i] + "] &&");
-          out.println("                jjEmptyLineNo[" + lexStates[i] + "] == charStream.getBeginLine() &&");
-          out.println("                jjEmptyColumnNo[" + lexStates[i] + "] == charStream.getBeginColumn())");
-          out.println("               throw new ScannerException(" +
-              "(\"Bailing out of infinite loop caused by repeated empty string matches " +
-              "at line \" + charStream.getBeginLine() + \", " +
-              "column \" + charStream.getBeginColumn() + \".\"), ScannerException.LOOP_DETECTED);");
-          out.println("            jjEmptyLineNo[" + lexStates[i] + "] = charStream.getBeginLine();");
-          out.println("            jjEmptyColumnNo[" + lexStates[i] + "] = charStream.getBeginColumn();");
-          out.println("            jjBeenHere[" + lexStates[i] + "] = true;");
-          out.println("         }");
+          out.println("if (jjMatchedPos == -1) {");
+          out.indent();
+          out.println("if (jjBeenHere[" + lexStates[i] + "]");
+          out.println("  && jjEmptyLineNo[" + lexStates[i] + "] == charStream.getLine()");
+          out.println("  && jjEmptyColumnNo[" + lexStates[i] + "] == charStream.getColumn())");
+          out.indent();
+          out.println("throw new ScannerException("
+              + "(\"Bailing out of infinite loop caused by repeated empty string matches "
+              + "at line \" + charStream.getLine() + \", "
+              + "column \" + charStream.getColumn() + \".\"), ScannerException.LOOP_DETECTED);");
+          out.unindent();
+          out.println("jjEmptyLineNo[" + lexStates[i] + "] = charStream.getLine();");
+          out.println("jjEmptyColumnNo[" + lexStates[i] + "] = charStream.getColumn();");
+          out.println("jjBeenHere[" + lexStates[i] + "] = true;");
+          out.unindent();
+          out.println("}");
         }
 
         if ((act = actions[i]) == null
@@ -1520,24 +1590,21 @@ final class ScannerGen implements FileGenerator {
 
         if (keepImage) {
           if (i == 0) {
-            out.println("      image.setLength(0);"); // For EOF no image is there
+            out.println("image.setLength(0);"); // For EOF no image is there
           }
           else {
-            out.print("        image.append");
-
+            out.print("image.append");
             if (stringLiterals.allImages[i] != null) {
               out.println("(jjLiteralImages[" + i + "]);");
-              out.println("        lengthOfMatch = jjLiteralImages[" + i + "].length();");
+              out.println("lengthOfMatch = jjLiteralImages[" + i + "].length();");
             }
             else {
-              out.print("        image.append");
-
               if (stringLiterals.allImages[i] != null) {
-                out.println("(jjLiteralImages[" + i + "]);");
-                out.println("        lengthOfMatch = jjLiteralImages[" + i + "].length();");
+                out.println("image.append(jjLiteralImages[" + i + "]);");
+                out.println("lengthOfMatch = jjLiteralImages[" + i + "].length();");
               }
               else {
-                out.println("(charStream.getSuffix(jjImageLength + (lengthOfMatch = jjMatchedPos + 1)));");
+                out.println("append(image, jjImageLength + (lengthOfMatch = jjMatchedPos + 1));");
               }
             }
           }
@@ -1554,12 +1621,17 @@ final class ScannerGen implements FileGenerator {
         break;
       }
 
-      out.println("         break;");
+      out.println("break;");
+      out.unindent();
     }
 
-    out.println("      default:");
-    out.println("         break;");
-    out.println("   }");
+    out.println("default:")
+        .indent()
+        .print("break;")
+        .unindent();
+    out.unindent();
+    out.println("}");
+    out.unindent();
     out.println("}");
   }
 
@@ -1567,8 +1639,6 @@ final class ScannerGen implements FileGenerator {
     int n = i / 64;
     long mask = 1L << (i % 64);
     return ((toSkip[n] & mask) == 0 && (toMore[n] & mask) == 0 && (toToken[n] & mask) == 0)
-        || (toSkip[n] & mask) != 0
-        || (toMore[n] & mask) != 0
-        || canReachOnMore[lexStates[i]];
+        || (toSkip[n] & mask) != 0 || (toMore[n] & mask) != 0 || canReachOnMore[lexStates[i]];
   }
 }

@@ -36,8 +36,8 @@ public final class RStringLiteral extends RegularExpression {
   public String image;
 
   public RStringLiteral(Token t, String image) {
-    setLine(t.getBeginLine());
-    setColumn(t.getBeginColumn());
+    setLine(t.getLine());
+    setColumn(t.getColumn());
     this.image = image;
   }
 

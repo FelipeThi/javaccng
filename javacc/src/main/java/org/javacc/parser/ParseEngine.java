@@ -258,8 +258,8 @@ public final class ParseEngine {
     TokenPrinter.cCol = 1;
     TokenPrinter.printLeadingComments(t, out);
     out.print(production.getAccessModifier() != null ? production.getAccessModifier() + " " : "");
-    TokenPrinter.cLine = t.getBeginLine();
-    TokenPrinter.cCol = t.getBeginColumn();
+    TokenPrinter.cLine = t.getLine();
+    TokenPrinter.cCol = t.getColumn();
     TokenPrinter.printTokenOnly(t, out);
     for (int i = 1; i < jp.getReturnTypeTokens().size(); i++) {
       t = jp.getReturnTypeTokens().get(i);
@@ -312,8 +312,8 @@ public final class ParseEngine {
     TokenPrinter.cCol = 1;
     TokenPrinter.printLeadingComments(t, out);
     out.print((p.getAccessModifier() != null ? p.getAccessModifier() : "private") + " final ");
-    TokenPrinter.cLine = t.getBeginLine();
-    TokenPrinter.cCol = t.getBeginColumn();
+    TokenPrinter.cLine = t.getLine();
+    TokenPrinter.cCol = t.getColumn();
     TokenPrinter.printTokenOnly(t, out);
     for (int i = 1; i < p.getReturnTypeTokens().size(); i++) {
       t = p.getReturnTypeTokens().get(i);

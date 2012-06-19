@@ -42,7 +42,7 @@ public class ASTBNFDeclaration extends JJTreeNode {
     if (!nodeScope.isVoid()) {
       String indent = "";
       if (TokenUtils.hasTokens(this)) {
-        for (int i = 1; i < getFirstToken().getBeginColumn(); ++i) {
+        for (int i = 1; i < getFirstToken().getColumn(); ++i) {
           indent += " ";
         }
       }

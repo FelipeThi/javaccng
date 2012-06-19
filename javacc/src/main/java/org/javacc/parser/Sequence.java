@@ -45,8 +45,8 @@ public final class Sequence extends Expansion {
   public Sequence() {}
 
   public Sequence(Token t, Lookahead la) {
-    setLine(t.getBeginLine());
-    setColumn(t.getBeginColumn());
+    setLine(t.getLine());
+    setColumn(t.getColumn());
     units.add(la);
   }
 }

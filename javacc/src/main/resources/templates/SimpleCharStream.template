@@ -115,14 +115,14 @@ public final class SimpleCharStream implements CharStream {
     }
   }
 
-  public int readChar() throws java.io.IOException {
+  public int read() throws java.io.IOException {
     if (offset < length) {
       // Read backed up characters.
       end++;
       return buffer[offset++];
     }
     // Read new character by reader and put it into buffer.
-    return read();
+    return readImpl();
   }
 
   /**
@@ -131,7 +131,7 @@ public final class SimpleCharStream implements CharStream {
    * @return Character read from the reader.
    * @throws java.io.IOException If reader throws exception.
    */
-  private int read() throws java.io.IOException {
+  private int readImpl() throws java.io.IOException {
     int c = reader.read();
     if (c != -1) {
       appendChar(c);
@@ -248,26 +248,12 @@ public final class SimpleCharStream implements CharStream {
   }
 #if KEEP_LINE_COLUMN
 
-  public int getBeginLine() {
+  public int getLine() {
     return bufLine[0];
   }
 
-  public int getBeginColumn() {
+  public int getColumn() {
     return bufColumn[0];
-  }
-
-  public int getEndLine() {
-    if (offset > 0) {
-      return bufLine[offset - 1];
-    }
-    return 0;
-  }
-
-  public int getEndColumn() {
-    if (offset > 0) {
-      return bufColumn[offset - 1];
-    }
-    return 0;
   }
 #fi
 

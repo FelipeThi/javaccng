@@ -211,7 +211,7 @@ public class JJTreeNode extends SimpleNode {
 
   String getIndentation(JJTreeNode n, int offset) {
     String s = "";
-    for (int i = offset + 1; i < n.getFirstToken().getBeginColumn(); ++i) {
+    for (int i = offset + 1; i < n.getFirstToken().getColumn(); ++i) {
       s += " ";
     }
     return s;

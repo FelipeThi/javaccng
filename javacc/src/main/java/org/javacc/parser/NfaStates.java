@@ -927,8 +927,8 @@ final class NfaStates {
       out.println("   int strKind = jjMatchedKind;");
       out.println("   int strPos = jjMatchedPos;");
       out.println("   int seenUpto;");
-      out.println("   charStream.backup(seenUpto = curPos + 1);");
-      out.println("   jjChar = charStream.readChar();");
+      out.println("   backup(seenUpto = curPos + 1);");
+      out.println("   jjChar = read();");
       out.println("   if (jjChar == -1) { throw new Error(\"Internal Error\"); }");
       out.println("   curPos = 0;");
     }
@@ -948,7 +948,7 @@ final class NfaStates {
           "\"<\" + jjLexStateNames[jjLexState] + \">\" + " :
           "") + "\"Current character : \" + " +
           "ScannerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
-          "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
+          "at line \" + charStream.getLine() + \" column \" + charStream.getColumn());");
     }
 
     out.println("   int kind = 0x" + Integer.toHexString(Integer.MAX_VALUE) + ";");
@@ -1004,7 +1004,7 @@ final class NfaStates {
           "jjKindsForStateVector(jjLexState, jjStateSet, startsAt, i));");
     }
 
-    out.println("      jjChar = charStream.readChar();");
+    out.println("      jjChar = read();");
 
     if (scannerGen.mixed[scannerGen.lexStateIndex]) { out.println("      if (jjChar == -1) { break; }"); }
     else { out.println("      if (jjChar == -1) { return curPos; }"); }
@@ -1014,7 +1014,7 @@ final class NfaStates {
           "\"<\" + jjLexStateNames[jjLexState] + \">\" + " :
           "") + "\"Current character : \" + " +
           "ScannerError.escape(String.valueOf(jjChar)) + \" (\" + jjChar + \") " +
-          "at line \" + charStream.getEndLine() + \" column \" + charStream.getEndColumn());");
+          "at line \" + charStream.getLine() + \" column \" + charStream.getColumn());");
     }
 
     out.println("   }");
@@ -1027,7 +1027,7 @@ final class NfaStates {
       out.println("");
       out.println("   if (curPos < toRet)");
       out.println("      for (i = toRet - Math.min(curPos, seenUpto); i-- > 0; )");
-      out.println("         jjChar = charStream.readChar();");
+      out.println("         jjChar = read();");
       out.println("         if (jjChar == -1) { " +
           "throw new Error(\"Internal Error : Please send a bug report.\"); }");
       out.println("");

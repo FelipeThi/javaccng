@@ -38,8 +38,8 @@ public final class RJustName extends RegularExpression {
   public RegularExpression regExp;
 
   public RJustName(Token token, String image) {
-    setLine(token.getBeginLine());
-    setColumn(token.getBeginColumn());
+    setLine(token.getLine());
+    setColumn(token.getColumn());
     label = image;
   }
 
