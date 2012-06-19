@@ -83,7 +83,7 @@ public class JavaParserTest {
       exception = ex;
     }
     assertNotNull(exception);
-    assertEquals("Lexical error at line 1, column 10. Encountered: <EOF> after: \"/* comment\"", exception.getMessage());
+    assertEquals("Lexical error at line 1, column 1. Encountered: <EOF> after: \"/* comment\"", exception.getMessage());
   }
 
   @Test

@@ -3,100 +3,60 @@ package org.javacc.runtime;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.io.StringReader;
-import java.text.ParseException;
 
 import static org.junit.Assert.*;
 
 public abstract class CharStreamBaseTestCase {
-  abstract CharStream makeCharStream(CharSequence content);
+  abstract CharStream newCharStream(CharSequence content);
 
   @Test
-  public void canReadEmptyStream() throws IOException {
-    final CharStream s = makeCharStream("");
-    assertEquals(-1, s.readChar());
+  public void readEmpty() throws IOException {
+    CharStream s = newCharStream("");
+    assertRead(s, 0, 0, 0, -1);
+    assertRead(s, 0, 0, 0, -1);
   }
 
   @Test
-  public void providesValidOffset() throws ParseException, IOException {
-    final CharStream cs = makeCharStream("12345");
-    cs.beginToken();
-    assertEquals(0, cs.getBegin());
-    assertEquals(0, cs.getEnd());
-    assertEquals('1', cs.readChar());
-    assertEquals(0, cs.getBegin());
-    assertEquals(1, cs.getEnd());
-    assertEquals('2', cs.readChar());
-    assertEquals(0, cs.getBegin());
-    assertEquals(2, cs.getEnd());
-    cs.backup(1);
-    assertEquals(0, cs.getBegin());
-    assertEquals(1, cs.getEnd());
-    cs.beginToken();
-    assertEquals('2', cs.readChar());
-    assertEquals(1, cs.getBegin());
-    assertEquals(2, cs.getEnd());
-    assertEquals('3', cs.readChar());
-    assertEquals(1, cs.getBegin());
-    assertEquals(3, cs.getEnd());
+  public void readNonEmpty() throws IOException {
+    CharStream s = newCharStream("123");
+    assertRead(s, 0, 0, 0, '1');
+    assertRead(s, 1, 0, 1, '2');
+    assertRead(s, 2, 0, 2, '3');
+    assertRead(s, 3, 0, 3, -1);
+    assertRead(s, 3, 0, 3, -1);
   }
 
   @Test
-  public void reportsEof() throws IOException {
-    final CharStream cs = makeCharStream("123");
-    cs.beginToken();
-    assertEquals('1', cs.readChar());
-    assertEquals('2', cs.readChar());
-    assertEquals('3', cs.readChar());
-    assertEquals(-1, cs.readChar());
-    cs.backup(1);
-    assertEquals('3', cs.readChar());
-    assertEquals(-1, cs.readChar());
-    cs.backup(1);
-    assertEquals('3', cs.readChar());
-    assertEquals(-1, cs.readChar());
+  public void lineColumn() throws IOException {
+    CharStream s = newCharStream("1\r\n2\r\n3\n\n4\n");
+    assertRead(s, 0, 0, 0, '1');
+    assertRead(s, 1, 0, 1, '\r');
+    assertRead(s, 2, 0, 1, '\n');
+    assertRead(s, 3, 1, 0, '2');
+    assertRead(s, 4, 1, 1, '\r');
+    assertRead(s, 5, 1, 1, '\n');
+    assertRead(s, 6, 2, 0, '3');
+    assertRead(s, 7, 2, 1, '\n');
+    assertRead(s, 8, 3, 0, '\n');
+    assertRead(s, 9, 4, 0, '4');
+    assertRead(s, 10, 4, 1, '\n');
+    assertRead(s, 11, 5, 0, -1);
+    assertRead(s, 11, 5, 0, -1);
   }
 
-  @Test
-  public void reportsEofEx() throws IOException {
-    final CharStream s = new JavaCharStream(new StringReader("x"));
-    assertCharLineColumn(s, 'x', 1, 1);
-    assertCharLineColumn(s, -1, 1, 1);
+  private static void assertRead(CharStream s, int position, int line, int column, int c)
+      throws IOException {
+    assertEquals(position, s.position());
+    assertEquals(line, line(s));
+    assertEquals(column, column(s));
+    assertEquals(c, s.read());
   }
 
-  @Test
-  public void providesLineAndColumnNumbers() throws IOException {
-    final CharStream cs = makeCharStream("a1\r\nb2\nc3\rd");
-    cs.beginToken();
-    assertCharLineColumn(cs, 'a', 1, 1);
-    assertCharLineColumn(cs, '1', 1, 1);
-    assertCharLineColumn(cs, '\r', 1, 1);
-    assertCharLineColumn(cs, '\n', 1, 1);
-    assertCharLineColumn(cs, 'b', 1, 1);
-    assertCharLineColumn(cs, '2', 1, 1);
-    assertCharLineColumn(cs, '\n', 1, 1);
-    assertCharLineColumn(cs, 'c', 1, 1);
-    assertCharLineColumn(cs, '3', 1, 1);
-    assertCharLineColumn(cs, '\r', 1, 1);
-    assertCharLineColumn(cs, 'd', 1, 1);
-    assertCharLineColumn(cs, -1, 1, 1);
-    cs.backup(3);
-    assertCharLineColumn(cs, '3', 1, 1);
-    assertCharLineColumn(cs, '\r', 1, 1);
-    assertCharLineColumn(cs, 'd', 1, 1);
-    assertCharLineColumn(cs, -1, 1, 1);
-    cs.backup(3);
-    cs.beginToken();
-    assertCharLineColumn(cs, '3', 3, 2);
-    assertCharLineColumn(cs, '\r', 3, 2);
-    assertCharLineColumn(cs, 'd', 3, 2);
-    assertCharLineColumn(cs, -1, 3, 2);
+  private static int line(CharStream s) {
+    return ((CharStream.LineColumnInfo) s).line();
   }
 
-  static void assertCharLineColumn(
-      CharStream cs, int c, int line, int column) throws IOException {
-    assertEquals(c, cs.readChar());
-    assertEquals(line, cs.getLine());
-    assertEquals(column, cs.getColumn());
+  private static int column(CharStream s) {
+    return ((CharStream.LineColumnInfo) s).column();
   }
 }
