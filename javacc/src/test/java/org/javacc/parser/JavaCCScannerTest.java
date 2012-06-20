@@ -1,16 +1,13 @@
 package org.javacc.parser;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
 import org.javacc.utils.io.IndentingPrintWriter;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.io.StringWriter;
-import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.*;
@@ -47,7 +44,8 @@ public class JavaCCScannerTest {
   public void file() throws IOException {
     Pattern pattern = Pattern.compile("\\\"\\\\u+[0-9a-zA-Z]{4}\\\"");
 
-    String source = read(new File("src/main/javacc/JavaCC.jj"));
+    String source = Files.toString(new File("src/main/javacc/JavaCC.jj"),
+        Charsets.UTF_8);
 
     JavaCCScanner scanner = new JavaCCScanner(
         new CharStream.Escaping(
@@ -94,22 +92,5 @@ public class JavaCCScannerTest {
     assertEquals("line number does not match,", line, t.getLine());
     assertEquals("column number does not match,", column, t.getColumn());
     assertEquals("image does not match,", image, t.getImage());
-  }
-
-  private static String read(File file) throws IOException {
-    InputStream in = new FileInputStream(file);
-    Reader reader = new InputStreamReader(in, Charset.forName("UTF-8"));
-    try {
-      StringWriter writer = new StringWriter();
-      char[] buffer = new char[1024];
-      int read;
-      while ((read = reader.read(buffer)) != -1) {
-        writer.write(buffer, 0, read);
-      }
-      return writer.toString();
-    }
-    finally {
-      reader.close();
-    }
   }
 }

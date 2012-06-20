@@ -9,6 +9,18 @@
   </parent>
   <artifactId>javacc-examples</artifactId>
   <packaging>pom</packaging>
+  <dependencies>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava-testlib</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
   <modules>
     <module>javacc-example-simple</module>
     <module>javacc-example-lookahead</module>
