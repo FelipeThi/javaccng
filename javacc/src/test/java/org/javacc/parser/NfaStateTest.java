@@ -145,7 +145,7 @@ public class NfaStateTest extends JavaCCTestCase {
     IndentingPrintWriter contentWriter = new IndentingPrintWriter(output);
     setupState();
     scannerGen.nfaStates.dumpCharAndRangeMoves(scannerGen, contentWriter);
-    assertEquals("int hiByte = (int)(jjChar >> 8);\n" +
+    assertEquals("int hiByte = jjChar >> 8;\n" +
         "int i1 = hiByte >> 6;\n" +
         "long l1 = 1L << (hiByte & 63);\n" +
         "int i2 = (jjChar & 0xff) >> 6;\n" +

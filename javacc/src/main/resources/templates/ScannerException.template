@@ -7,6 +7,7 @@ public class ScannerException extends RuntimeException {
 
   private final int errorCode;
   private final int state;
+  private final int position;
 #if KEEP_LINE_COLUMN
   private final int line;
   private final int column;
@@ -14,15 +15,17 @@ public class ScannerException extends RuntimeException {
   private final int character;
 
   /**
-   * Constructor with message and reason.
-   *
-   * @param message   Descriptive error message.
-   * @param errorCode Reason for lexical error.
-   */
-  public ScannerException(String message, int errorCode) {
+     * Create new scanner exception.
+     *
+     * @param message   Descriptive error message.
+     * @param errorCode Reason for lexical error.
+     * @param position  Error position within input stream.
+     */
+  public ScannerException(String message, int errorCode, int position) {
     super(message);
     this.errorCode = errorCode;
     this.state = -1;
+    this.position = position;
 #if KEEP_LINE_COLUMN
     this.line = -1;
     this.column = -1;
@@ -31,47 +34,31 @@ public class ScannerException extends RuntimeException {
   }
 
   /**
-   * Create new lexical error instance.
+   * Create new scanner exception.
    *
    * @param errorCode Reason for lexical error.
    * @param state     Lexical state in which this error occurred.
+   * @param position  Error position within input stream.
 #if KEEP_LINE_COLUMN
    * @param line      Line number when the error occurred.
    * @param column    Column number when the error occurred.
 #fi
-#if KEEP_IMAGE
-   * @param prefix    Prefix that was seen before this error occurred.
-#fi
    * @param character The offending character, or -1 if EOF causes the error.
    */
 #if KEEP_LINE_COLUMN
-#if KEEP_IMAGE
-  public ScannerException(int errorCode, int state, int line, int column, String prefix, int character) {
+  public ScannerException(int errorCode, int state, int position,
+                          int line, int column, int character) {
 #else
-  public ScannerException(int errorCode, int state, int line, int column, int character) {
-#fi
-#else
-#if KEEP_IMAGE
-  public ScannerException(int errorCode, int state, String prefix, int character) {
-#else
-  public ScannerException(int errorCode, int state, int character) {
-#fi
+  public ScannerException(int errorCode, int state, int position, int character) {
 #fi
 #if KEEP_LINE_COLUMN
-#if KEEP_IMAGE
-    super(describe(state, line, column, prefix, character));
+    super(describe(state, position, line, column, character));
 #else
-    super(describe(state, line, column, character));
-#fi
-#else
-#if KEEP_IMAGE
-    super(describe(state, prefix, character));
-#else
-    super(describe(state, character));
-#fi
+    super(describe(state, position, character));
 #fi
     this.errorCode = errorCode;
     this.state = state;
+    this.position = position;
 #if KEEP_LINE_COLUMN
     this.line = line;
     this.column = column;
@@ -87,6 +74,11 @@ public class ScannerException extends RuntimeException {
   /** @return Lexical state in which this error occurred. */
   public int getState() {
     return state;
+  }
+
+  /** @return Error position within input stream. */
+  public int getPosition() {
+    return position;
   }
 #if KEEP_LINE_COLUMN
 
@@ -111,37 +103,26 @@ public class ScannerException extends RuntimeException {
    * scanner to indicate a lexical error.
    *
    * @param state     Lexical state in which this error occurred.
+   * @param position  Error position within input stream.
 #if KEEP_LINE_COLUMN
    * @param line      Line number when the error occurred.
    * @param column    Column number when the error occurred.
-#fi
-#if KEEP_IMAGE
-   * @param prefix    Prefix that was seen before this error occurred.
 #fi
    * @param character The offending character, or -1 if EOF causes the error.
    * @return Descriptive error message.
    */
 #if KEEP_LINE_COLUMN
-#if KEEP_IMAGE
-  static String describe(int state, int line, int column, String prefix, int character) {
+  static String describe(int state, int position, int line, int column,
+                         int character) {
 #else
-  static String describe(int state, int line, int column, int character) {
-#fi
-#else
-#if KEEP_IMAGE
-  static String describe(int state, String prefix, int character) {
-#else
-  static String describe(int state, int character) {
-#fi
+  static String describe(int state, int position, int character) {
 #fi
     StringBuilder s = new StringBuilder();
+    s.append("Lexical error at ").append(position)
 #if KEEP_LINE_COLUMN
-    s.append("Lexical error at line ").append(line + 1).append(", column ").append(column + 1)
-        .append(". Encountered: ");
-#else
-    s.append("Lexical error")
-        .append(". Encountered: ");
+            .append(", line ").append(line + 1).append(", column ").append(column + 1)
 #fi
+            .append(", character ");
     if (character == -1) {
       s.append("<EOF>");
     }
@@ -150,11 +131,6 @@ public class ScannerException extends RuntimeException {
       escape(s, String.valueOf((char) character));
       s.append("' (").append(character).append(")");
     }
-#if KEEP_IMAGE
-    s.append(" after: \"");
-    escape(s, prefix);
-    s.append("\"");
-#fi
     return s.toString();
   }
 

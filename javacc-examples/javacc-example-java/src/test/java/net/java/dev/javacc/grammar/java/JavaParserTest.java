@@ -37,9 +37,7 @@ public class JavaParserTest {
     long chars = 0;
 
     for (Source source : sources) {
-      CharStream stream = new CharStream.Escaping(
-          new CharStream.ForCharSequence(source.content));
-      JavaScanner scanner = new JavaScanner(stream);
+      JavaScanner scanner = scanner(source.content);
       JavaParser parser = new JavaParser(scanner);
       try {
         parser.CompilationUnit();
@@ -58,10 +56,7 @@ public class JavaParserTest {
 
   @Test
   public void lexicalErrorReporting() throws IOException {
-    String source = "/* comment";
-    CharStream stream = new CharStream.Escaping(
-        new CharStream.ForCharSequence(source));
-    Scanner scanner = new JavaScanner(stream);
+    JavaScanner scanner = scanner("/* comment");
     ScannerException exception = null;
     try {
       scanner.getNextToken();
@@ -70,17 +65,14 @@ public class JavaParserTest {
       exception = ex;
     }
     assertNotNull(exception);
-    assertEquals("Lexical error at line 1, column 1. Encountered: <EOF> after: \"/* comment\"",
+    assertEquals("Lexical error at 10, line 1, column 11, character <EOF>",
         exception.getMessage());
   }
 
   @Test
   public void parsingErrorReporting()
       throws IOException, ParseException {
-    String source = "final class MyClass {\nvoid ();\n}";
-    CharStream stream = new CharStream.Escaping(
-        new CharStream.ForCharSequence(source));
-    JavaScanner scanner = new JavaScanner(stream);
+    JavaScanner scanner = scanner("final class MyClass {\nvoid ();\n}");
     ParseException exception = null;
     JavaParser parser = new JavaParser(scanner);
     try {
@@ -92,6 +84,12 @@ public class JavaParserTest {
     assertNotNull(exception);
     assertEquals("Encountered: \"(\" at line 2, column 6.\nWas expecting:\n   <IDENTIFIER>...",
         exception.getMessage());
+  }
+
+  private JavaScanner scanner(String source) {
+    return new JavaScanner(
+        new CharStream.Escaping(
+            new CharStream.ForCharSequence(source)));
   }
 
   void list(ArrayList<Source> sources, FileFilter filter, File parentFile)

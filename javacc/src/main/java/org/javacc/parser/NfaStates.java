@@ -377,7 +377,7 @@ final class NfaStates {
 
     else {
       if (Options.getJavaUnicodeEscape() || unicodeWarningGiven) {
-        out.println("int hiByte = (int)(jjChar >> 8);");
+        out.println("int hiByte = jjChar >> 8;");
         out.println("int i1 = hiByte >> 6;");
         out.println("long l1 = 1L << (hiByte & 63);");
       }

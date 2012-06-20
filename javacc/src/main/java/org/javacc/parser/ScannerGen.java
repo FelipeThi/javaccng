@@ -737,6 +737,7 @@ final class ScannerGen implements FileGenerator {
 
     if (hasMoreActions || hasSkipActions || hasTokenActions) {
       if (keepImage) {
+        // TODO get rid of thi field?
         out.println("private final StringBuilder jjImage = new StringBuilder();");
         out.println("private int jjImageLength;");
       }
@@ -824,11 +825,11 @@ final class ScannerGen implements FileGenerator {
     out.println("if (c != -1) {");
     out.indent();
     out.println("ensureCapacity(offset);");
-    out.println("buffer[offset++] = (char) c;");
-    out.println("length = offset;");
-    out.println("buffer();");
+    out.println("buffer[offset] = (char) c;");
     out.unindent();
     out.println("}");
+    out.println("length = ++offset;");
+    out.println("buffer();");
     out.println("return c;");
     out.unindent();
     out.println("}");
@@ -844,6 +845,7 @@ final class ScannerGen implements FileGenerator {
     }
     out.unindent();
     out.println("}");
+    out.println();
 
     out.println("private void ensureCapacity(int capacity) {");
     out.indent();
@@ -969,12 +971,25 @@ final class ScannerGen implements FileGenerator {
   }
 
   private void dumpMakeToken(IndentingPrintWriter out) {
-    if (keepImage) {
-      out.println("protected Token newToken(int kind, int begin, int end, String image) {");
+    if (keepLineCol) {
+      if (keepImage) {
+        out.println("protected Token newToken(int kind, int begin, int end,");
+        out.println("                         int line, int column, String image) {");
+      }
+      else {
+        out.println("protected Token newToken(int kind, int begin, int end,");
+        out.println("                         int line, int column) {");
+      }
     }
     else {
-      out.println("protected Token newToken(int kind, int begin, int end) {");
+      if (keepImage) {
+        out.println("protected Token newToken(int kind, int begin, int end, String image) {");
+      }
+      else {
+        out.println("protected Token newToken(int kind, int begin, int end) {");
+      }
     }
+
     out.indent();
 
     if (keepImage) {
@@ -998,17 +1013,17 @@ final class ScannerGen implements FileGenerator {
       if (hasEmptyMatch) {
         out.println("if (jjMatchedPos < 0) {");
         out.indent();
-        out.println("token.setLineColumn(getLine(), getColumn());");
+        out.println("token.setLineColumn(line, column);");
         out.unindent();
         out.println("}");
         out.println("else {");
         out.indent();
-        out.println("token.setLineColumn(getLine(), getColumn());");
+        out.println("token.setLineColumn(line, column);");
         out.unindent();
         out.println("}");
       }
       else {
-        out.println("token.setLineColumn(getLine(), getColumn());");
+        out.println("token.setLineColumn(line, column);");
       }
     }
 
@@ -1076,12 +1091,7 @@ final class ScannerGen implements FileGenerator {
     }
 
     out.println("jjMatchedKind = 0;");
-    if (keepImage) {
-      out.println("token = newToken(jjMatchedKind, getBegin(), getEnd(), getImage());");
-    }
-    else {
-      out.println("token = newToken(jjMatchedKind, getBegin(), getEnd());");
-    }
+    newTokenFragment(out);
 
     if (state.eofNextState != null || state.eofAction != null) {
       out.println("tokenLexicalActions(token);");
@@ -1261,12 +1271,7 @@ final class ScannerGen implements FileGenerator {
         out.indent();
       }
 
-      if (keepImage) {
-        out.println("token = newToken(jjMatchedKind, getBegin(), getEnd(), getImage());");
-      }
-      else {
-        out.println("token = newToken(jjMatchedKind, getBegin(), getEnd());");
-      }
+      newTokenFragment(out);
 
       if (hasTokenActions) {
         out.println("tokenLexicalActions(token);");
@@ -1303,12 +1308,7 @@ final class ScannerGen implements FileGenerator {
           if (hasSpecial) {
             out.println("if (isSpecial(jjMatchedKind)) {");
             out.indent();
-            if (keepImage) {
-              out.println("token = newToken(jjMatchedKind, getBegin(), getEnd(), getImage());");
-            }
-            else {
-              out.println("token = newToken(jjMatchedKind, getBegin(), getEnd());");
-            }
+            newTokenFragment(out);
 
             if (hasSkipActions) {
               out.println("skipLexicalActions(token);");
@@ -1383,7 +1383,12 @@ final class ScannerGen implements FileGenerator {
       out.unindent();
       out.println("}");
 
-      out.println("reportLexicalError(pos);");
+      if (keepLineCol) {
+        out.println("reportError(jjState, position[offset - 1], line[offset - 1], column[offset - 1], jjChar);");
+      }
+      else {
+        out.println("reportError(jjState, position[offset - 1], jjChar);");
+      }
     }
 
     if (hasMore) {
@@ -1443,21 +1448,45 @@ final class ScannerGen implements FileGenerator {
           .println();
     }
 
-    out.println("void reportLexicalError(int pos) throws java.io.IOException {");
-    out.indent();
-    out.println("throw new ScannerException(jjState,");
-    out.println("  ScannerException.LEXICAL_ERROR,");
     if (keepLineCol) {
-      out.println("  getLine(),");
-      out.println("  getColumn(),");
+      out.println("protected void reportError(int state, int pos, int line, int column, int character) {");
     }
-    if (keepImage) {
-      out.println("  getImage(),");
+    else {
+      out.println("protected void reportError(int state, int pos, int character) {");
     }
-    out.println("  jjChar);");
+    out.indent();
+    if (keepLineCol) {
+      out.println("throw new ScannerException(state, ScannerException.LEXICAL_ERROR,");
+      out.println("  pos, line, column, character);");
+    }
+    else {
+      out.println("throw new ScannerException(state, ScannerException.LEXICAL_ERROR,");
+      out.println("  pos, character);");
+    }
     out.unindent();
     out.println("}");
     out.println();
+  }
+
+  private void newTokenFragment(IndentingPrintWriter out) {
+    if (keepLineCol) {
+      if (keepImage) {
+        out.println("token = newToken(jjMatchedKind, getBegin(), getEnd(),");
+        out.println("    getLine(), getColumn(), getImage());");
+      }
+      else {
+        out.println("token = newToken(jjMatchedKind, getBegin(), getEnd(),");
+        out.println("    getLine(), getColumn());");
+      }
+    }
+    else {
+      if (keepImage) {
+        out.println("token = newToken(jjMatchedKind, getBegin(), getEnd(), getImage());");
+      }
+      else {
+        out.println("token = newToken(jjMatchedKind, getBegin(), getEnd());");
+      }
+    }
   }
 
   public void dumpSkipActions(IndentingPrintWriter out)
