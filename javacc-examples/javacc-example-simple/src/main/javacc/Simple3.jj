@@ -30,16 +30,7 @@
 PARSER_BEGIN(Simple3)
 package org.javacc.examples.simple3;
 
-public class Simple3 {
-  public static void main(String[] args) throws ParseException, java.io.IOException {
-    Simple3 parser = new Simple3(
-        new Simple3Scanner(
-            new CharStream.ForReader(
-                new java.io.InputStreamReader(System.in))));
-    parser.Input();
-  }
-}
-
+public class Simple3 {}
 PARSER_END
 
 SKIP :
@@ -57,7 +48,7 @@ TOKEN :
 }
 
 /** Root production. */
-void Input() :
+public void Input() :
 { int count; }
 {
   count = MatchedBraces() <EOF>

@@ -31,18 +31,7 @@ PARSER_BEGIN(Eg1)
 package org.javacc.examples.jjtree.eg1;
 
 /** An Arithmetic Grammar. */
-public class Eg1 {
-  public static void main(String[] args) throws java.io.IOException, ParseException {
-    System.out.println("Reading from standard input...");
-    Eg1 parser = new Eg1(
-        new Eg1Scanner(
-            new CharStream.ForReader(
-                new java.io.InputStreamReader(System.in))));
-    SimpleNode n = parser.Start();
-    n.dump("");
-    System.out.println("Thank you.");
-  }
-}
+public class Eg1 {}
 PARSER_END
 
 

@@ -28,20 +28,9 @@
 
 
 PARSER_BEGIN(Example8)
-
 package org.javacc.examples.lookahead;
 
-public class Example8 {
-  public static void main(String[] args) throws ParseException, java.io.IOException {
-    Example8 parser = new Example8(System.in);
-    parser.basic_expr();
-  }
-
-  public Example8(java.io.InputStream in) throws ParseException, java.io.IOException {
-    this(new Example8Scanner(new CharStream.ForReader(new java.io.InputStreamReader(in))));
-  }
-}
-
+public class Example8 {}
 PARSER_END
 
 SKIP :
@@ -52,17 +41,14 @@ SKIP :
 | "\r"
 }
 
-void basic_expr() :
+public void basic_expr() :
 {}
 {
   LOOKAHEAD(2)
   <ID> "(" expr() ")"
-|
-  "(" expr() ")"
-|
-  "new" <ID>
-|
-  <ID> "." <ID>
+| "(" expr() ")"
+| "new" <ID>
+| <ID> "." <ID>
 }
 
 void expr() :

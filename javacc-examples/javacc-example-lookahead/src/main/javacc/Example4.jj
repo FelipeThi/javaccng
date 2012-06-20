@@ -28,20 +28,9 @@
 
 
 PARSER_BEGIN(Example4)
-
 package org.javacc.examples.lookahead;
 
-public class Example4 {
-  public static void main(String[] args) throws ParseException, java.io.IOException {
-    Example4 parser = new Example4(System.in);
-    parser.identifier_list();
-  }
-
-  public Example4(java.io.InputStream in) throws ParseException, java.io.IOException {
-    this(new Example4Scanner(new CharStream.ForReader(new java.io.InputStreamReader(in))));
-  }
-}
-
+public class Example4 {}
 PARSER_END
 
 SKIP :

@@ -28,20 +28,9 @@
 
 
 PARSER_BEGIN(Example7)
-
 package org.javacc.examples.lookahead;
 
-public class Example7 {
-  public static void main(String[] args) throws ParseException, java.io.IOException {
-    Example7 parser = new Example7(System.in);
-    parser.funny_list();
-  }
-
-  public Example7(java.io.InputStream in) throws ParseException, java.io.IOException {
-    this(new Example7Scanner(new CharStream.ForReader(new java.io.InputStreamReader(in))));
-  }
-}
-
+public class Example7 {}
 PARSER_END
 
 SKIP :
@@ -52,7 +41,7 @@ SKIP :
 | "\r"
 }
 
-void funny_list() :
+public void funny_list() :
 {}
 {
   <ID> "," ( <ID> "," )* <INT>
@@ -60,7 +49,6 @@ void funny_list() :
 
 TOKEN [IGNORE_CASE] :
 {
-  <ID: (["a"-"z"])+>
-|
-  <INT: (["0"-"9"])+>
+  <ID:  (["a"-"z"])+>
+| <INT: (["0"-"9"])+>
 }

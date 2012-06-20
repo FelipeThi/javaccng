@@ -34,6 +34,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.Writer;
 
 public class Obfuscator extends Globals {
   // These data structures implement a stack that is used to recursively
@@ -55,8 +56,8 @@ public class Obfuscator extends Globals {
     return name.length() >= 6 && name.substring(name.length() - 5).equals(".java");
   }
 
-  // The iterator.  This uses the above datastructures to walk the input
-  // directory tree.  Everytime it finds a Java file or when it cannot find
+  // The iterator.  This uses the above data structures to walk the input
+  // directory tree.  Every time it finds a Java file or when it cannot find
   // any more Java file, it returns to the caller.
   static void nextJavaFile() {
     while (true) {
@@ -97,7 +98,7 @@ public class Obfuscator extends Globals {
   // tokens that make up this file.  It then calls printOutputFile that takes
   // first token and walks the next field chain printing tokens as it goes along.
   // Finally a main program is created if necessary.
-  static public void start() {
+  static public void start() throws IOException {
     while (true) {
       nextJavaFile();
       if (dirStackSize == 0) {
@@ -165,30 +166,48 @@ public class Obfuscator extends Globals {
     }
   }
 
-  static void printOutputFile(Token first) {
+  static void printOutputFile(Token first) throws IOException {
     Token t = first;
-    for (int i = 1; i < t.getColumn(); i++) {
+    for (int i = 0; i < t.getColumn(); i++) {
       out.print(" ");
     }
     while (true) {
+      String image = t.getImage();
+
       if (t.getKind() == JavaConstants.IDENTIFIER) {
-        t.setImage(map(t.getImage()));
+        t.setImage(map(image));
       }
-      out.print(addUnicodeEscapes(t.getImage()));
+
+      escape(image, out);
+
       if (t.next == null) {
-        out.println("");
+        out.println();
         break;
       }
-      if (t.getEndLine() != t.next.getLine()) {
-        for (int i = t.getEndLine(); i < t.next.getLine(); i++) {
-          out.println("");
+
+      int line = t.getLine();
+      int column = t.getColumn();
+      for (int n = 0; n < image.length(); n++) {
+        if (image.charAt(n) == '\n') {
+          line++;
+          column = 0;
         }
-        for (int i = 1; i < t.next.getColumn(); i++) {
+        else {
+          column++;
+        }
+      }
+      int nextLine = t.next.getLine();
+      int nextColumn = t.next.getColumn();
+      if (line != nextLine) {
+        for (int i = line; i < nextLine; i++) {
+          out.println();
+        }
+        for (int i = 0; i < nextColumn; i++) {
           out.print(" ");
         }
       }
       else {
-        for (int i = t.getEndColumn() + 1; i < t.next.getColumn(); i++) {
+        for (int i = column; i < nextColumn; i++) {
           out.print(" ");
         }
       }
@@ -197,20 +216,21 @@ public class Obfuscator extends Globals {
     out.close();
   }
 
-  static String addUnicodeEscapes(String str) {
-    String retval = "";
-    char ch;
+  static void escape(String str, Writer out) throws IOException {
     for (int i = 0; i < str.length(); i++) {
-      ch = str.charAt(i);
-      if (ch < 0x20 || ch > 0x7e) {
-        String s = "0000" + Integer.toString(ch, 16);
-        retval += "\\u" + s.substring(s.length() - 4, s.length());
+      char c = str.charAt(i);
+      if (c < 0x20 || c > 0x7e) {
+        String s = Integer.toString(c, 16);
+        out.write("\\u");
+        for (int n = 0; n < 4 - s.length(); n++) {
+          out.write('0');
+        }
+        out.write(s);
       }
       else {
-        retval += ch;
+        out.write(c);
       }
     }
-    return retval;
   }
 
   // This creates a main program if there was one in the original file.  This
@@ -243,7 +263,7 @@ public class Obfuscator extends Globals {
     try {
       out = new PrintWriter(new FileWriter(mFile));
     }
-    catch (IOException e) {
+    catch (IOException ex) {
       System.out.println("Could not create " + mFile.getPath());
       throw new Error();
     }
@@ -255,11 +275,11 @@ public class Obfuscator extends Globals {
       }
       out.println("package " + pname.substring(1) + ";");
       System.out.print(pname.substring(1) + ".");
-      out.println("");
+      out.println();
     }
     System.out.println(origFileName.substring(0, origFileName.length() - 5));
     out.println("public class " + origFileName.substring(0, origFileName.length() - 5) + " {");
-    out.println("");
+    out.println();
     out.println("  public static void main(String[] args) {");
     pname = "";
     for (int i = 1; i < dirStackSize; i++) {
@@ -267,7 +287,7 @@ public class Obfuscator extends Globals {
     }
     out.println("    " + pname + map(origFileName.substring(0, origFileName.length() - 5)) + ".main(args);");
     out.println("  }");
-    out.println("");
+    out.println();
     out.println("}");
     out.close();
   }

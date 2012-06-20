@@ -48,20 +48,11 @@ options {
 PARSER_BEGIN(Simple1)
 package org.javacc.examples.simple1;
 
-public class Simple1 {
-  public static void main(String[] args) throws ParseException, java.io.IOException {
-    Simple1 parser = new Simple1(
-        new Simple1Scanner(
-            new CharStream.ForReader(
-                new java.io.InputStreamReader(System.in))));
-    parser.Input();
-  }
-}
-
+public class Simple1 {}
 PARSER_END
 
 /** Root production. */
-void Input() :
+public void Input() :
 {}
 {
   MatchedBraces() ("\n"|"\r")* <EOF>

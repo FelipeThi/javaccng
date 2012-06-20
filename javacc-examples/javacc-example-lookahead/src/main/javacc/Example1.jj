@@ -28,20 +28,9 @@
 
 
 PARSER_BEGIN(Example1)
-
 package org.javacc.examples.lookahead;
 
-public class Example1 {
-  public static void main(String[] args) throws ParseException, java.io.IOException {
-    Example1 parser = new Example1(System.in);
-    parser.Input();
-  }
-
-  public Example1(java.io.InputStream in) throws ParseException, java.io.IOException {
-    this(new Example1Scanner(new CharStream.ForReader(new java.io.InputStreamReader(in))));
-  }
-}
-
+public class Example1 {}
 PARSER_END
 
 SKIP :
@@ -52,7 +41,7 @@ SKIP :
 | "\r"
 }
 
-void Input() :
+public void input() :
 {}
 {
   "a" BC() "c"

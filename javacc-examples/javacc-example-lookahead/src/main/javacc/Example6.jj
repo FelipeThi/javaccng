@@ -28,20 +28,9 @@
 
 
 PARSER_BEGIN(Example6)
-
 package org.javacc.examples.lookahead;
 
-public class Example6 {
-  public static void main(String[] args) throws ParseException, java.io.IOException {
-    Example6 parser = new Example6(System.in);
-    parser.basic_expr();
-  }
-
-  public Example6(java.io.InputStream in) throws ParseException, java.io.IOException {
-    this(new Example6Scanner(new CharStream.ForReader(new java.io.InputStreamReader(in))));
-  }
-}
-
+public class Example6 {}
 PARSER_END
 
 SKIP :
@@ -52,7 +41,7 @@ SKIP :
 | "\r"
 }
 
-void basic_expr() :
+public void basic_expr() :
 {}
 {
   <ID> ( "(" expr() ")" | "." <ID> )

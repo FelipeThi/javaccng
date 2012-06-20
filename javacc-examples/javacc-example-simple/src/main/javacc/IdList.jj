@@ -29,16 +29,7 @@
 PARSER_BEGIN(IdList)
 package org.javacc.examples.idlist;
 
-public class IdList {
-  public static void main(String[] args) throws ParseException, java.io.IOException {
-    IdList parser = new IdList(
-            new IdListScanner(
-                new CharStream.ForReader(
-                    new java.io.InputStreamReader(System.in))));
-    parser.Input();
-  }
-}
-
+public class IdList {}
 PARSER_END
 
 SKIP :
@@ -51,12 +42,12 @@ SKIP :
 
 TOKEN :
 {
-  < Id: ["a"-"z","A"-"Z"] ( ["a"-"z","A"-"Z","0"-"9"] )* >
+  < ID: ["a"-"z","A"-"Z"] ( ["a"-"z","A"-"Z","0"-"9"] )* >
 }
 
 /** Top level production. */
-void Input() :
+public void Input() :
 {}
 {
-  ( <Id> )+ <EOF>
+  ( <ID> )+ <EOF>
 }

@@ -30,16 +30,7 @@
 PARSER_BEGIN(Simple2)
 package org.javacc.examples.simple2;
 
-public class Simple2 {
-  public static void main(String[] args) throws ParseException, java.io.IOException {
-    Simple2 parser = new Simple2(
-        new Simple2Scanner(
-            new CharStream.ForReader(
-                new java.io.InputStreamReader(System.in))));
-    parser.Input();
-  }
-}
-
+public class Simple2 {}
 PARSER_END
 
 SKIP :
@@ -51,7 +42,7 @@ SKIP :
 }
 
 /** Root production. */
-void Input() :
+public void Input() :
 {}
 {
   MatchedBraces() <EOF>

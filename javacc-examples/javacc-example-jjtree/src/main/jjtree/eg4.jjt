@@ -37,19 +37,7 @@ PARSER_BEGIN(Eg4)
 package org.javacc.examples.jjtree.eg4;
 
 /** An Arithmetic Grammar. */
-public class Eg4 {
-  public static void main(String[] args) throws java.io.IOException, ParseException {
-    System.out.println("Reading from standard input...");
-    Eg4 parser = new Eg4(
-        new Eg4Scanner(
-            new CharStream.ForReader(
-                new java.io.InputStreamReader(System.in))));
-    ASTStart n = parser.Start();
-    Eg4Visitor v = new Eg4DumpVisitor();
-    n.jjtAccept(v, null);
-    System.out.println("Thank you.");
-  }
-}
+public class Eg4 {}
 PARSER_END
 
 

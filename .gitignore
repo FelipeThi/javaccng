@@ -1,5 +1,6 @@
 target
 out-dir
+tmp
 *~
 *.iml
 *.ipr
